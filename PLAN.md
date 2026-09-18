@@ -1,6 +1,6 @@
 # Pelias Maine (+NH) Geocoder -- Project Plan
 
-Status: Active -- Phases 1-6 done (2026-09-18); see docs/PROJECT_LOG.md
+Status: Active -- Phases 1-7 done (2026-09-18); see docs/PROJECT_LOG.md
 
 ## 1. Goal
 
@@ -116,6 +116,12 @@ Single static page served by Caddy from the same origin as the API (no CORS need
 
 Packaged as a small reusable JS module (`pelias-search.js`) so it can be dropped into
 other pages later (your requirement #5).
+
+**Built 2026-09-18** ("Chart Room" design): see `web/` and README. Implementation notes:
+MapLibre GL 6.10 (ES modules, same-origin module worker, so no CSP exception beyond
+`worker-src 'self' blob:`), PMTiles 4.5, @protomaps/basemaps 5.7 with a chart-paper flavor,
+self-hosted Fraunces / IBM Plex fonts and Noto glyph ranges; all vendored with pinned
+integrity by `scripts/vendor_web.sh`. Batch is client-side (Pelias has no batch endpoint).
 
 ## 7. Decisions needed
 

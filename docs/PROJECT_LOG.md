@@ -13,7 +13,7 @@ entries are appended to each section; dates are absolute. For the plan itself se
 |---|------|---------------------|
 | G1 | Host our own feature-rich forward and reverse geocoder for Maine (New Hampshire later) | Live at https://geocoder.example.org (VM 120, LAN + tailnet) |
 | G2 | Load every applicable Pelias data source for Maine | Done: OSM, OpenAddresses, Who's On First, polylines, TIGER interpolation, GNIS, Census ZCTA, Overture Places. GeoNames and transit deliberately skipped (D6) |
-| G3 | Demo web page with a MapLibre map showing the capabilities | Planned (Phase 7); Protomaps basemap already extracted |
+| G3 | Demo web page with a MapLibre map showing the capabilities | Live at https://geocoder.example.org/ |
 | G4 | Longer term: reproduce the Pelias capabilities and API entirely in PostgreSQL/PostGIS + extensions, with Pelias as the reference and test oracle | Planned (Phase 10) |
 | G5 | Be able to move the service to our remote VPS | Designed in (build once, ship the snapshot; inventory-driven exposure) |
 
@@ -65,6 +65,11 @@ confidence scores; easy loading and updates.
     password). Let's Encrypt DNS-01 certificate issued in ~2 minutes. Fixed an nginx bug
     that returned 403 to every real client (F15). Verified end to end: peer check, real
     client IP logging, spoofed `X-Forwarded-For` ignored, rate limit returns 429.
+14. **Demo page (Phase 7)**: "Chart Room" design (nautical-chart styling). Reusable
+    `PeliasClient` and `<pelias-search>` element; structured, reverse and batch tabs.
+    All third-party assets vendored with pinned integrity (strict same-origin CSP). Local
+    preview server with the production CSP; Playwright browser test (light/dark, desktop/
+    mobile) passes locally and against the live site. The batch tool surfaced F16 and F17.
 
 ---
 
@@ -121,6 +126,9 @@ confidence scores; easy loading and updates.
 | D17 | Keep all raw and intermediate data on the workstation | Archive for rebuilds and Phase 10; upstream "latest" URLs do not keep history | Prune after import |
 | D18 | Do not load Overture addresses for Maine | Identical to OA (F7) | Load all; load NAD-only rows |
 | D20 | Single canonical endpoint `https://geocoder.example.org` for all clients (API, demo page, batch jobs, harness) | One name, one TLS terminator, one rate-limit policy; `geocoder.lan.example:8080` stays wharf-only | Direct LAN HTTP access for trusted hosts |
+| D21 | Demo design "Chart Room": chart-paper palette, magenta aids, graduated neatline, DMS readout; Fraunces + IBM Plex | Distinctive and on-theme for a Maine coast geocoder | Generic dashboard styling |
+| D22 | Vendor all web assets (npm tarballs with pinned sha512, basemap assets at a pinned commit) and serve same-origin | Strict CSP, no third-party requests from clients, reproducible | CDN script tags with SRI |
+| D23 | Demo batch runs client-side: 250 rows, 4 req/s, backoff on 429, CSV export with formula-injection guard | Pelias has no batch endpoint; stays under the edge rate limit | Server-side batch service (Phase 10) |
 | D19 | Phase 10 targets PostgreSQL 18 + PostGIS 3.6 | User choice | PostgreSQL 17 |
 
 ---
@@ -143,6 +151,8 @@ confidence scores; easy loading and updates.
 | F13 | My first document-count total (1.73 M) was an arithmetic slip; the real total is 1,649,644, confirmed on both hosts | Docs corrected |
 | F14 | wharf: user `jcz` can edit `/etc/caddy/Caddyfile` (group-writable) but `sudo` needs a password. My append ran even though the `sudo cp` backup failed (a failing command inside an `&&` list does not trip `set -e`). Caddy was not reloaded, so nothing went live. Backup reconstructed and verified byte-exact (1,828 bytes) at `~/Caddyfile.pre-pelias-orig` on wharf | Lesson: in remote scripts, make the backup a hard gate (`cp ... || exit 1`) before any edit. The user reloads Caddy (password) |
 | F15 | nginx `allow`/`deny` is evaluated after the realip module rewrites `$remote_addr` to the end client, so "allow wharf only" denied every real user (403 through Caddy) | Peer check moved to a `geo` on `$realip_remote_addr`; rate limits still key on the real client IP |
+| F16 | Wrong-town exact match: "12 Park St, Bar Harbor, ME" returns 12 Park Street, **Fairfield** with confidence 1.0 (parse is correct: city = bar harbor). Bar Harbor has no #12, so Pelias drops the town (a boost, not a filter) and its confidence score does not penalize the mismatch. Found by the demo's batch tool | Added as an expected-failure test; a key Phase 10 target (locality as a hard constraint when present, confidence that accounts for admin mismatch) |
+| F17 | Demo batch bug: unquoted addresses in a one-column CSV were split at commas, sending only "210 State St" (-> Bangor) | Fixed: a lone address column rejoins the whole line; browser test asserts the right towns |
 | F11 | The whole Maine build is small: ~15 min, 1,649,644 documents, 435 MB snapshot | A VPS deploy is cheap to ship |
 
 ---
@@ -155,4 +165,4 @@ confidence scores; easy loading and updates.
 | Rename local folder `~/Forge/pelia_maine` -> `~/Forge/pelias_maine` | User, after the session | Then update `DATA_DIR` in `projects/pelias_maine/.env` |
 | Get an OpenAddresses account and token | User | Avoids throttling on rebuilds |
 | Back up `data/raw` + latest snapshot to `bigblock` or `ObeliskNFS` | Not started | |
-| Phase 7 demo page, Phase 8 ops, Phase 9 NH, Phase 10 PostGIS | Planned | See PLAN.md |
+| Phase 8 ops, Phase 9 NH, Phase 10 PostGIS | Planned | See PLAN.md |

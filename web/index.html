@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>Pelias Maine</title>
+  <link rel="stylesheet" href="vendor/maplibre-gl/maplibre-gl.css">
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="css/app.css">
+  <!-- Classic scripts define window.pmtiles and window.basemaps before the module runs. -->
+  <script src="vendor/pmtiles/pmtiles.js" defer></script>
+  <script src="vendor/basemaps/basemaps.js" defer></script>
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <div id="map" role="region" aria-label="Map of Maine"></div>
+  <div class="neatline" aria-hidden="true"></div>
+
+  <aside class="cartouche" aria-label="Geocoder">
+    <header class="title">
+      <p class="kicker">United States &middot; State of Maine</p>
+      <h1><span class="t-main">Pelias</span> <span class="t-sub">Geocoder</span></h1>
+      <p class="edition">Self-hosted &middot; 1,649,644 features &middot; OSM &middot; OA &middot; WOF &middot; GNIS &middot; Overture</p>
+    </header>
+
+    <nav class="tabs" role="tablist" aria-label="Mode">
+      <button type="button" role="tab" id="tab-search" aria-controls="panel-search" aria-selected="true">Search</button>
+      <button type="button" role="tab" id="tab-structured" aria-controls="panel-structured" aria-selected="false" tabindex="-1">Structured</button>
+      <button type="button" role="tab" id="tab-reverse" aria-controls="panel-reverse" aria-selected="false" tabindex="-1">Reverse</button>
+      <button type="button" role="tab" id="tab-batch" aria-controls="panel-batch" aria-selected="false" tabindex="-1">Batch</button>
+    </nav>
+
+    <section class="panel" id="panel-search" role="tabpanel" aria-labelledby="tab-search">
+      <pelias-search id="search" placeholder="Address, town, lake, summit, ZIP..." min-chars="2" debounce="150"></pelias-search>
+      <div class="opts">
+        <label class="switch"><input type="checkbox" id="opt-focus" checked><span>Bias to map center</span></label>
+        <label class="switch"><input type="checkbox" id="opt-bounds"><span>Only within view</span></label>
+      </div>
+      <fieldset class="chips" id="layer-chips"><legend>Layers</legend></fieldset>
+      <fieldset class="chips" id="source-chips"><legend>Sources</legend></fieldset>
+      <ol class="results" id="search-results" aria-label="Search results"></ol>
+    </section>
+
+    <section class="panel" id="panel-structured" role="tabpanel" aria-labelledby="tab-structured" hidden>
+      <form id="structured-form" class="grid-form" autocomplete="off">
+        <label class="wide">Street address<input name="address" maxlength="120" placeholder="389 Congress St"></label>
+        <label>Town / city<input name="locality" maxlength="80" placeholder="Portland"></label>
+        <label>ZIP<input name="postalcode" maxlength="5" inputmode="numeric" pattern="\d{5}" placeholder="04101"></label>
+        <label>County<input name="county" maxlength="60" placeholder="Cumberland"></label>
+        <label>State<input name="region" maxlength="20" value="ME"></label>
+        <button type="submit" class="btn btn-ink wide">Find address</button>
+      </form>
+      <ol class="results" id="structured-results" aria-label="Structured search results"></ol>
+    </section>
+
+    <section class="panel" id="panel-reverse" role="tabpanel" aria-labelledby="tab-reverse" hidden>
+      <p class="hint">Click anywhere on the chart to find what is there. Right-click works from any tab.</p>
+      <div class="opts">
+        <label class="select">Nearest
+          <select id="rev-layer">
+            <option value="">anything</option>
+            <option value="address">address</option>
+            <option value="street">street</option>
+            <option value="venue">venue</option>
+            <option value="neighbourhood">neighbourhood</option>
+            <option value="locality">town</option>
+            <option value="county">county</option>
+            <option value="postalcode">ZIP</option>
+          </select>
+        </label>
+        <label class="select">Within
+          <select id="rev-radius">
+            <option value="0.25">0.25 km</option>
+            <option value="1" selected>1 km</option>
+            <option value="5">5 km</option>
+            <option value="">no limit</option>
+          </select>
+        </label>
+      </div>
+      <ol class="results" id="reverse-results" aria-label="Reverse geocoding results"></ol>
+    </section>
+
+    <section class="panel" id="panel-batch" role="tabpanel" aria-labelledby="tab-batch" hidden>
+      <p class="hint">Paste a CSV with an <code>address</code> column (forward) or <code>lat,lon</code> columns
+        (reverse), or one query per line. Up to 250 rows, 4 per second.</p>
+      <textarea id="batch-input" rows="6" spellcheck="false" aria-label="Batch input"></textarea>
+      <div class="row">
+        <input type="file" id="batch-file" accept=".csv,text/csv" aria-label="Load a CSV file">
+        <button type="button" class="btn" id="batch-sample">Sample</button>
+      </div>
+      <div class="row">
+        <button type="button" class="btn btn-ink" id="batch-run">Geocode</button>
+        <button type="button" class="btn" id="batch-cancel" disabled>Cancel</button>
+        <button type="button" class="btn" id="batch-download" disabled>Download CSV</button>
+      </div>
+      <progress id="batch-progress" value="0" max="1"></progress>
+      <p class="status" id="batch-status" role="status"></p>
+      <div class="table-wrap">
+        <table class="batch-table">
+          <thead><tr><th>Input</th><th>Match</th><th>Conf.</th><th>Note</th></tr></thead>
+          <tbody id="batch-table"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <article class="result" id="result" aria-live="polite" hidden></article>
+  </aside>
+
+  <div class="readout" aria-hidden="true">
+    <span id="ro-lat">--</span><span id="ro-lon">--</span><span id="ro-zoom">--</span>
+  </div>
+
+  <svg class="compass" viewBox="-60 -60 120 120" aria-hidden="true" focusable="false">
+    <circle r="54" class="c-ring"/>
+    <circle r="46" class="c-ring c-thin"/>
+    <g class="c-ticks"></g>
+    <path d="M0,-50 L6,0 L0,50 L-6,0 Z" class="c-ns"/>
+    <path d="M-50,0 L0,-6 L50,0 L0,6 Z" class="c-ew"/>
+    <path d="M0,-50 L6,0 L0,0 Z" class="c-dark"/>
+    <path d="M0,50 L-6,0 L0,0 Z" class="c-dark"/>
+    <path d="M50,0 L0,6 L0,0 Z" class="c-dark"/>
+    <path d="M-50,0 L0,-6 L0,0 Z" class="c-dark"/>
+    <text y="-38" class="c-n">N</text>
+  </svg>
+</body>
+</html>

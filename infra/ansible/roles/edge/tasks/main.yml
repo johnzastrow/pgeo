@@ -14,6 +14,27 @@
     group: www-data
     mode: "0755"
 
+- name: Demo page files (web/ from the repo)
+  ansible.posix.synchronize:
+    src: "{{ local_web_dir }}/"
+    dest: "{{ edge_demo_root }}/"
+    delete: true
+    rsync_opts: ["--exclude=tiles/", "--chown=root:www-data", "--chmod=D0755,F0644"]
+
+- name: Basemap tiles directory
+  ansible.builtin.file:
+    path: "{{ edge_demo_root }}/tiles"
+    state: directory
+    owner: root
+    group: www-data
+    mode: "0755"
+
+- name: Basemap PMTiles extract
+  ansible.posix.synchronize:
+    src: "{{ local_basemap_file }}"
+    dest: "{{ edge_demo_root }}/tiles/maine.pmtiles"
+    rsync_opts: ["--chown=root:www-data", "--chmod=F0644"]
+
 - name: Remove default site
   ansible.builtin.file:
     path: /etc/nginx/sites-enabled/default

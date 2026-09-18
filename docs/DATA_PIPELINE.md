@@ -550,7 +550,7 @@ q 'search?text=T4%20R9%20WELS'                             # T4 R9 WELS | venue/
 
 # Test suite (projects/pelias_maine/test_cases)
 (cd projects/pelias_maine && ../../vendor/pelias-docker/pelias test run)
-# Reference: Pass 14, Expected Failures 3, Regressions 0 (the 3 are known ranking issues)
+# Reference: Pass 15, Expected Failures 4, Regressions 0 (known ranking/confidence issues)
 ```
 
 ---

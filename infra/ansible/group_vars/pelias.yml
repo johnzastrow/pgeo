@@ -27,6 +27,9 @@ edge_allowed_sources: ["192.0.2.254"]
 edge_trusted_proxies: ["192.0.2.254"]
 edge_server_name: geocoder.example.org
 edge_demo_root: /srv/pelias-demo
+# Controller-side sources for the demo page and its basemap.
+local_web_dir: "{{ local_repo_root }}/web"
+local_basemap_file: "{{ local_repo_root }}/data/raw/basemap/maine.pmtiles"
 # Requests per second per client IP (real IP from X-Forwarded-For set by wharf Caddy).
 edge_rate_search: 10
 edge_rate_autocomplete: 25

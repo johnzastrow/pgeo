@@ -8,6 +8,6 @@ data/
 __pycache__/
 .venv/
 # Vendored pelias/docker CLI (fetched by scripts/bootstrap.sh)
-vendor/
+/vendor/
 # Rendered Pelias config (may contain the OA token)
 projects/*/pelias.json

@@ -62,6 +62,39 @@
           }
         ]
       }
+    },
+    {
+      "id": 4,
+      "status": "fail",
+      "user": "pelias_maine",
+      "description": "Baseline 2026-09-18: house number absent in the named town; Pelias returns 12 Park Street, Fairfield with confidence 1.0 instead of a Bar Harbor street/interpolated result (town is a boost, not a filter; confidence ignores the town mismatch).",
+      "in": {
+        "text": "12 Park St, Bar Harbor, ME"
+      },
+      "expected": {
+        "properties": [
+          {
+            "locality": "Bar Harbor"
+          }
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "status": "pass",
+      "user": "pelias_maine",
+      "in": {
+        "text": "32 Park St, Bar Harbor, ME"
+      },
+      "expected": {
+        "properties": [
+          {
+            "layer": "address",
+            "housenumber": "32",
+            "locality": "Bar Harbor"
+          }
+        ]
+      }
     }
   ]
 }
