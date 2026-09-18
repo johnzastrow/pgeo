@@ -1,0 +1,13 @@
+# Reference copy of the site block appended to /etc/caddy/Caddyfile on wharf (VM 102).
+# `acme_dns_opts` is the existing snippet in that file (Linode DNS-01, token from
+# /etc/caddy/environment). Apply manually; wharf's sudo requires a password:
+#   ssh -t jcz@192.0.2.254 'sudo caddy validate --config /etc/caddy/Caddyfile \
+#     --adapter caddyfile --envfile /etc/caddy/environment && sudo systemctl reload caddy'
+# Pre-change backup on wharf: ~/Caddyfile.pre-pelias-orig
+
+# Pelias Maine geocoder - VM 120 pelias-maine (192.0.2.20), nginx edge on 8080
+geocoder.example.org {
+	import acme_dns_opts
+	encode zstd gzip
+	reverse_proxy 192.0.2.20:8080
+}

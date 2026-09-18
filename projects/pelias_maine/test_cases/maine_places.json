@@ -1,0 +1,197 @@
+{
+  "name": "/v1/search places (Maine)",
+  "description": "Towns, landmarks and natural features in Maine",
+  "priorityThresh": 3,
+  "normalizers": {
+    "name": [
+      "toUpperCase",
+      "stripPunctuation"
+    ]
+  },
+  "tests": [
+    {
+      "id": 1,
+      "status": "pass",
+      "user": "pelias_maine",
+      "in": {
+        "text": "Portland, Maine"
+      },
+      "expected": {
+        "properties": [
+          {
+            "layer": "locality",
+            "name": "Portland",
+            "region": "Maine"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "status": "pass",
+      "user": "pelias_maine",
+      "in": {
+        "text": "Bangor ME"
+      },
+      "expected": {
+        "properties": [
+          {
+            "layer": "locality",
+            "name": "Bangor",
+            "region": "Maine"
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "status": "pass",
+      "user": "pelias_maine",
+      "in": {
+        "text": "Augusta, Maine"
+      },
+      "expected": {
+        "properties": [
+          {
+            "layer": "locality",
+            "name": "Augusta",
+            "region": "Maine"
+          }
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "status": "pass",
+      "user": "pelias_maine",
+      "in": {
+        "text": "Bar Harbor"
+      },
+      "expected": {
+        "properties": [
+          {
+            "layer": "locality",
+            "name": "Bar Harbor",
+            "region": "Maine"
+          }
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "status": "pass",
+      "user": "pelias_maine",
+      "in": {
+        "text": "Kittery"
+      },
+      "expected": {
+        "properties": [
+          {
+            "layer": "locality",
+            "name": "Kittery",
+            "region": "Maine"
+          }
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "status": "fail",
+      "user": "pelias_maine",
+      "in": {
+        "text": "Moosehead Lake"
+      },
+      "expected": {
+        "properties": [
+          {
+            "name": "Moosehead Lake",
+            "region": "Maine"
+          }
+        ]
+      },
+      "description": "Baseline 2026-09-18: WOF neighbourhood 'Moosehead' outranks the lake (venue)."
+    },
+    {
+      "id": 7,
+      "status": "pass",
+      "user": "pelias_maine",
+      "in": {
+        "text": "Katahdin"
+      },
+      "expected": {
+        "properties": [
+          {
+            "name": "Mount Katahdin",
+            "region": "Maine"
+          }
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "status": "fail",
+      "user": "pelias_maine",
+      "in": {
+        "text": "Mount Desert Island"
+      },
+      "expected": {
+        "properties": [
+          {
+            "name": "Mount Desert Island",
+            "region": "Maine"
+          }
+        ]
+      },
+      "description": "Baseline 2026-09-18: locality 'Mount Desert' outranks the island (venue)."
+    },
+    {
+      "id": 9,
+      "status": "fail",
+      "user": "pelias_maine",
+      "in": {
+        "text": "Portland International Jetport"
+      },
+      "expected": {
+        "properties": [
+          {
+            "layer": "venue",
+            "region": "Maine"
+          }
+        ]
+      },
+      "description": "Baseline 2026-09-18: jetport found at position 5; venue ranking below admin."
+    },
+    {
+      "id": 10,
+      "status": "pass",
+      "user": "pelias_maine",
+      "in": {
+        "text": "04101"
+      },
+      "expected": {
+        "properties": [
+          {
+            "layer": "postalcode",
+            "name": "04101"
+          }
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "status": "pass",
+      "user": "pelias_maine",
+      "in": {
+        "text": "Aroostook County"
+      },
+      "expected": {
+        "properties": [
+          {
+            "layer": "county",
+            "name": "Aroostook County"
+          }
+        ]
+      }
+    }
+  ]
+}

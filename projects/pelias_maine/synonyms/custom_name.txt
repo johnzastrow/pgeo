@@ -1,0 +1,8 @@
+# Maine place/venue name synonyms (Solr synonym format). Applied at index creation;
+# re-create the index after edits. Keep entries conservative: each one widens matching.
+mount,mt
+fort,ft
+university of maine,umaine,umo
+university of southern maine,usm
+portland international jetport,jetport,pwm
+bangor international airport,bgr

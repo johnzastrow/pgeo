@@ -1,0 +1,53 @@
+# nginx on the VM: path allowlist, rate limits, real client IP, demo static files.
+# TLS is terminated upstream (wharf Caddy on the LAN, or added here for exposure: public).
+
+- name: Install nginx
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+
+- name: Demo site root
+  ansible.builtin.file:
+    path: "{{ edge_demo_root }}"
+    state: directory
+    owner: root
+    group: www-data
+    mode: "0755"
+
+- name: Remove default site
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: Reload nginx
+
+- name: Pelias site config
+  ansible.builtin.template:
+    src: pelias.conf.j2
+    dest: /etc/nginx/sites-available/pelias.conf
+    mode: "0644"
+  notify: Reload nginx
+
+- name: Enable Pelias site
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/pelias.conf
+    dest: /etc/nginx/sites-enabled/pelias.conf
+    state: link
+  notify: Reload nginx
+
+- name: Validate nginx config
+  ansible.builtin.command: nginx -t
+  changed_when: false
+
+- name: Allow the edge port from the TLS terminator only
+  community.general.ufw:
+    rule: allow
+    port: "{{ edge_listen_port | string }}"
+    proto: tcp
+    from_ip: "{{ item }}"
+  loop: "{{ edge_allowed_sources }}"
+
+- name: Nginx running
+  ansible.builtin.service:
+    name: nginx
+    enabled: true
+    state: started

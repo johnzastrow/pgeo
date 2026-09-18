@@ -1,0 +1,85 @@
+# Managed by Ansible (role: edge)
+# Client -> HTTPS -> wharf Caddy -> HTTP -> this server -> Pelias API on 127.0.0.1:4000
+
+# Rate limits keyed on the real client IP (restored from X-Forwarded-For below).
+limit_req_zone $binary_remote_addr zone=pelias_search:10m rate={{ edge_rate_search }}r/s;
+limit_req_zone $binary_remote_addr zone=pelias_autocomplete:10m rate={{ edge_rate_autocomplete }}r/s;
+limit_req_status 429;
+
+# Only the TLS terminator may connect. Checked against the TCP peer
+# ($realip_remote_addr), not $remote_addr: the realip module below rewrites
+# $remote_addr to the end client, which would make allow/deny reject every real user.
+geo $realip_remote_addr $edge_peer_allowed {
+    default 0;
+{% for src in edge_allowed_sources %}
+    {{ src }} 1;
+{% endfor %}
+}
+
+upstream pelias_api {
+    server 127.0.0.1:4000;
+    keepalive 16;
+}
+
+server {
+    listen {{ ansible_facts['default_ipv4']['address'] }}:{{ edge_listen_port }};
+    server_name {{ edge_server_name }};
+    server_tokens off;
+
+    # Defense in depth alongside UFW (see geo block above).
+    if ($edge_peer_allowed = 0) {
+        return 403;
+    }
+
+{% for proxy in edge_trusted_proxies %}
+    set_real_ip_from {{ proxy }};
+{% endfor %}
+    real_ip_header X-Forwarded-For;
+    real_ip_recursive on;
+
+    client_max_body_size 4k;
+    client_body_timeout 10s;
+    client_header_timeout 10s;
+
+    add_header X-Content-Type-Options nosniff always;
+    add_header Referrer-Policy strict-origin-when-cross-origin always;
+    add_header X-Frame-Options DENY always;
+    add_header Permissions-Policy "geolocation=(self), camera=(), microphone=()" always;
+
+    # Shared proxy settings for the allowlisted API paths.
+    set $pelias_upstream http://pelias_api;
+    proxy_http_version 1.1;
+    proxy_set_header Connection "";
+    proxy_set_header Host $host;
+    proxy_connect_timeout 2s;
+    proxy_read_timeout 15s;
+    proxy_hide_header X-Powered-By;
+
+    location = /v1/autocomplete {
+        limit_except GET { deny all; }
+        limit_req zone=pelias_autocomplete burst=50 nodelay;
+        proxy_pass $pelias_upstream;
+    }
+
+    location ~ ^/v1/(search|search/structured|reverse|place)$ {
+        limit_except GET { deny all; }
+        limit_req zone=pelias_search burst=20 nodelay;
+        proxy_pass $pelias_upstream;
+    }
+
+    # Anything else under /v1 (e.g. /v1/nearby, attribution) is not exposed.
+    location /v1/ {
+        return 404;
+    }
+
+    # Demo page (Phase 7). Same origin as the API, so no CORS is needed.
+    location / {
+        root {{ edge_demo_root }};
+        index index.html;
+        try_files $uri $uri/ =404;
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; worker-src 'self' blob:; connect-src 'self'; frame-ancestors 'none'" always;
+        add_header X-Content-Type-Options nosniff always;
+        add_header Referrer-Policy strict-origin-when-cross-origin always;
+        add_header X-Frame-Options DENY always;
+    }
+}

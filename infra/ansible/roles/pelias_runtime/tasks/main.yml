@@ -1,0 +1,142 @@
+# Query-only Pelias: the index is built elsewhere and restored from an ES snapshot.
+
+- name: Service account (no login shell)
+  ansible.builtin.user:
+    name: "{{ pelias_user }}"
+    system: true
+    home: "{{ pelias_home }}"
+    shell: /usr/sbin/nologin
+    groups: [docker]
+    append: true
+  register: pelias_runtime_account
+
+- name: Project and data directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ pelias_user }}"
+    group: "{{ pelias_user }}"
+    mode: "0750"
+  loop:
+    - "{{ pelias_home }}"
+    - "{{ pelias_home }}/synonyms"
+    - "{{ pelias_home }}/blacklist"
+    - "{{ pelias_data_dir }}"
+    - "{{ pelias_data_dir }}/elasticsearch"
+    - "{{ pelias_data_dir }}/es_snapshots"
+
+- name: Compose file, synonyms, blacklist
+  ansible.builtin.copy:
+    src: "{{ local_project_dir }}/{{ item }}"
+    dest: "{{ pelias_home }}/{{ item }}"
+    owner: "{{ pelias_user }}"
+    group: "{{ pelias_user }}"
+    mode: "0640"
+  loop:
+    - docker-compose.yml
+    - synonyms/custom_name.txt
+    - synonyms/custom_street.txt
+    - blacklist/osm.txt
+  notify: Restart pelias
+
+- name: Rendered pelias.json (may contain the OA token; never world-readable)
+  ansible.builtin.copy:
+    src: "{{ local_project_dir }}/pelias.json"
+    dest: "{{ pelias_home }}/pelias.json"
+    owner: "{{ pelias_user }}"
+    group: "{{ pelias_user }}"
+    mode: "0640"
+  notify: Restart pelias
+
+- name: Compose environment
+  ansible.builtin.template:
+    src: env.j2
+    dest: "{{ pelias_home }}/.env"
+    owner: "{{ pelias_user }}"
+    group: "{{ pelias_user }}"
+    mode: "0600"
+  notify: Restart pelias
+
+- name: Ship prepared data from the workstation build
+  ansible.posix.synchronize:
+    src: "{{ local_data_dir }}/{{ item }}/"
+    dest: "{{ pelias_data_dir }}/{{ item }}/"
+    delete: true
+    # Set ownership and modes explicitly so they match the directory task above and
+    # repeated runs report no change.
+    rsync_opts: ["--chown={{ pelias_user }}:{{ pelias_user }}", "--chmod=D0750,F0640"]
+  loop: "{{ pelias_sync_dirs }}"
+  notify: Restart pelias
+
+- name: Systemd unit for the query stack
+  ansible.builtin.template:
+    src: pelias-maine.service.j2
+    dest: /etc/systemd/system/pelias-maine.service
+    mode: "0644"
+  notify: Restart pelias
+
+- name: Start Elasticsearch alone for restore
+  ansible.builtin.command:
+    cmd: docker compose up -d elasticsearch
+    chdir: "{{ pelias_home }}"
+  changed_when: false
+
+- name: Wait for Elasticsearch
+  ansible.builtin.uri:
+    url: http://127.0.0.1:9200/_cluster/health?wait_for_status=yellow&timeout=5s
+    status_code: 200
+  register: pelias_runtime_es_health
+  retries: 30
+  delay: 5
+  until: pelias_runtime_es_health.status == 200
+
+- name: Does the pelias index exist?
+  ansible.builtin.uri:
+    url: http://127.0.0.1:9200/pelias
+    status_code: [200, 404]
+  register: pelias_runtime_es_index
+
+- name: Restore index from snapshot
+  when: pelias_runtime_es_index.status == 404 or pelias_force_restore | bool
+  block:
+    - name: Require a snapshot name
+      ansible.builtin.assert:
+        that: pelias_snapshot_name | length > 0
+        fail_msg: set pelias_snapshot_name (see scripts/snapshot_local.sh output)
+
+    - name: Register snapshot repository
+      ansible.builtin.uri:
+        url: http://127.0.0.1:9200/_snapshot/pelias_repo
+        method: PUT
+        body_format: json
+        body: { type: fs, settings: { location: /usr/share/elasticsearch/snapshots, readonly: true } }
+
+    - name: Drop existing index before forced restore
+      when: pelias_runtime_es_index.status == 200
+      ansible.builtin.uri:
+        url: http://127.0.0.1:9200/pelias
+        method: DELETE
+
+    - name: Restore snapshot (blocks until done)
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:9200/_snapshot/pelias_repo/{{ pelias_snapshot_name }}/_restore?wait_for_completion=true"
+        method: POST
+        body_format: json
+        body: { indices: pelias, include_global_state: false }
+        timeout: 1800
+
+- name: Query stack enabled and running
+  ansible.builtin.systemd_service:
+    name: pelias-maine
+    enabled: true
+    state: started
+    daemon_reload: true
+
+- name: Smoke test the API locally
+  ansible.builtin.uri:
+    url: http://127.0.0.1:4000/v1/search?text=portland%20maine&size=1
+    return_content: true
+  register: pelias_runtime_smoke
+  retries: 20
+  delay: 6
+  until: pelias_runtime_smoke.status == 200 and (pelias_runtime_smoke.json.features | length) > 0

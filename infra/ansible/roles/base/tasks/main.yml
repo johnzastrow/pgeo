@@ -1,0 +1,63 @@
+- name: Upgrade packages
+  ansible.builtin.apt:
+    update_cache: true
+    upgrade: dist
+    cache_valid_time: 3600
+
+- name: Install base packages
+  ansible.builtin.apt:
+    name: [unattended-upgrades, ufw, fail2ban, qemu-guest-agent, chrony, curl, jq, rsync, ca-certificates]
+    state: present
+
+- name: Enable unattended security upgrades
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+    mode: "0644"
+
+- name: Kernel settings for Elasticsearch
+  ansible.posix.sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    sysctl_file: /etc/sysctl.d/60-pelias.conf
+    reload: true
+  loop:
+    - { name: vm.max_map_count, value: "262144" }
+    - { name: vm.swappiness, value: "1" }
+
+- name: Harden sshd (key-only, no root, admin user only)
+  ansible.builtin.template:
+    src: sshd_hardening.conf.j2
+    dest: /etc/ssh/sshd_config.d/60-hardening.conf
+    mode: "0644"
+    validate: /usr/sbin/sshd -t -f %s
+  notify: Restart sshd
+
+- name: Firewall defaults
+  community.general.ufw:
+    direction: "{{ item.direction }}"
+    default: "{{ item.policy }}"
+  loop:
+    - { direction: incoming, policy: deny }
+    - { direction: outgoing, policy: allow }
+
+- name: Allow SSH from trusted sources only
+  community.general.ufw:
+    rule: allow
+    port: "22"
+    proto: tcp
+    from_ip: "{{ item }}"
+  loop: "{{ ssh_allowed_sources }}"
+
+- name: Enable firewall
+  community.general.ufw:
+    state: enabled
+
+- name: Enable services
+  ansible.builtin.service:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop: [qemu-guest-agent, fail2ban, chrony]

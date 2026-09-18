@@ -1,0 +1,37 @@
+[project]
+name = "pelias-prep"
+version = "0.1.0"
+description = "Convert Maine open datasets (GNIS, Census ZCTA, Overture Places) into Pelias CSV-importer files"
+requires-python = ">=3.12"
+dependencies = [
+    "duckdb==1.5.5",
+]
+
+[project.scripts]
+pelias-prep = "pelias_prep.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+    "ruff==0.16.8",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pelias_prep"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

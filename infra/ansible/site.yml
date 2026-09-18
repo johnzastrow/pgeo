@@ -1,0 +1,8 @@
+- name: Pelias Maine query host
+  hosts: pelias
+  become: true
+  roles:
+    - base
+    - docker
+    - pelias_runtime
+    - edge

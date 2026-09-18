@@ -1,0 +1,32 @@
+# --- access -------------------------------------------------------------------
+admin_user: jcz
+# Sources allowed to reach SSH: home LAN and the tailnet (CGNAT range).
+ssh_allowed_sources: ["192.0.2.0/24", "100.64.0.0/10"]
+
+# --- pelias runtime -----------------------------------------------------------
+pelias_user: pelias
+pelias_home: /opt/pelias_maine
+pelias_data_dir: /srv/pelias/data
+pelias_es_heap: 2g
+# Query-time services only; importers never run on the VM.
+pelias_query_services: [elasticsearch, libpostal, placeholder, pip, interpolation, api]
+# Data dirs shipped from the workstation build (relative to its DATA_DIR).
+pelias_sync_dirs: [whosonfirst, placeholder, interpolation, es_snapshots]
+# Workstation paths (controller side).
+local_repo_root: "{{ playbook_dir }}/../.."
+local_project_dir: "{{ local_repo_root }}/projects/pelias_maine"
+local_data_dir: "{{ local_repo_root }}/data/pelias"
+# Snapshot to restore (created by scripts/snapshot_local.sh). Required on first deploy.
+pelias_snapshot_name: ""
+pelias_force_restore: false
+
+# --- edge (nginx on the VM, behind wharf Caddy for TLS) ------------------------
+edge_listen_port: 8080
+# Only the TLS terminator may reach the edge port (wharf VM on the LAN).
+edge_allowed_sources: ["192.0.2.254"]
+edge_trusted_proxies: ["192.0.2.254"]
+edge_server_name: geocoder.example.org
+edge_demo_root: /srv/pelias-demo
+# Requests per second per client IP (real IP from X-Forwarded-For set by wharf Caddy).
+edge_rate_search: 10
+edge_rate_autocomplete: 25

@@ -1,0 +1,141 @@
+# Pelias for Maine. Adapted from pelias/docker projects/texas (commit 3dfa07d).
+# Changes vs. upstream:
+#   - every image pinned to a dated master tag (upstream uses :master)
+#   - every published port bound to 127.0.0.1 (upstream publishes api on 0.0.0.0);
+#     Docker-published ports bypass UFW, so nothing here may listen on a LAN address
+#   - Elasticsearch heap set from ES_HEAP
+#   - geonames service removed (not used)
+#   - interpolation reads OA from OAPATH=/data/interpolation_oa (CSV converted by prep/)
+#   - pelias.json is rendered from pelias.template.json by scripts/render_config.sh
+networks:
+  default:
+    driver: bridge
+services:
+  libpostal:
+    image: pelias/libpostal-service:master-2026-07-08-61c5d6e058f021c42b33781f0b5fd566fdec954d
+    container_name: pelias_maine_libpostal
+    user: "${DOCKER_USER}"
+    restart: always
+    ports: [ "127.0.0.1:4400:4400" ]
+  schema:
+    image: pelias/schema:master-2026-08-26-0ecff1bdb48ffd4731dfc2dced63d9d0f6d2aa4b
+    container_name: pelias_maine_schema
+    user: "${DOCKER_USER}"
+    volumes:
+      - "./synonyms/custom_name.txt:/code/pelias/schema/synonyms/custom_name.txt:ro"
+      - "./synonyms/custom_street.txt:/code/pelias/schema/synonyms/custom_street.txt:ro"
+      - "./pelias.json:/code/pelias.json:ro"
+  api:
+    image: pelias/api:master-2026-08-21-4116a88fb1105e1f223ba00d2d36295f42edde0e
+    container_name: pelias_maine_api
+    user: "${DOCKER_USER}"
+    restart: always
+    environment: [ "PORT=4000" ]
+    ports: [ "127.0.0.1:4000:4000" ]
+    volumes:
+      - "./pelias.json:/code/pelias.json:ro"
+  placeholder:
+    image: pelias/placeholder:master-2026-08-04-bf5e1a1379677abd25e03410eede51a4b7d2b062
+    container_name: pelias_maine_placeholder
+    user: "${DOCKER_USER}"
+    restart: always
+    environment: [ "PORT=4100" ]
+    ports: [ "127.0.0.1:4100:4100" ]
+    volumes:
+      - "./pelias.json:/code/pelias.json:ro"
+      - "${DATA_DIR}:/data"
+      - "./blacklist/:/data/blacklist:ro"
+  whosonfirst:
+    image: pelias/whosonfirst:master-2026-08-11-6748d5a3d0ecbf57922dae63dfcd91843cce8fd3
+    container_name: pelias_maine_whosonfirst
+    user: "${DOCKER_USER}"
+    volumes:
+      - "./pelias.json:/code/pelias.json:ro"
+      - "${DATA_DIR}:/data"
+      - "./blacklist/:/data/blacklist:ro"
+  openstreetmap:
+    image: pelias/openstreetmap:master-2026-08-04-a0a5556a03b006fcae1bedc4c762a11ce7e7971f
+    container_name: pelias_maine_openstreetmap
+    user: "${DOCKER_USER}"
+    volumes:
+      - "./pelias.json:/code/pelias.json:ro"
+      - "${DATA_DIR}:/data"
+      - "./blacklist/:/data/blacklist:ro"
+  openaddresses:
+    image: pelias/openaddresses:master-2026-08-04-e80aefd788a4ff858ec79895c4b7ec1879b9c688
+    container_name: pelias_maine_openaddresses
+    user: "${DOCKER_USER}"
+    volumes:
+      - "./pelias.json:/code/pelias.json:ro"
+      - "${DATA_DIR}:/data"
+      - "./blacklist/:/data/blacklist:ro"
+  transit:
+    image: pelias/transit:master-2026-08-04-f04c7aad4568f6a3cffa829a6ea2b9a418381c8d
+    container_name: pelias_maine_transit
+    user: "${DOCKER_USER}"
+    volumes:
+      - "./pelias.json:/code/pelias.json:ro"
+      - "${DATA_DIR}:/data"
+  csv-importer:
+    image: pelias/csv-importer:master-2026-08-18-b341ee23b89896f6fa69f3dc9b2a6cdecfa060ae
+    container_name: pelias_maine_csv_importer
+    user: "${DOCKER_USER}"
+    volumes:
+      - "./pelias.json:/code/pelias.json:ro"
+      - "${DATA_DIR}:/data"
+      - "./blacklist/:/data/blacklist:ro"
+  polylines:
+    image: pelias/polylines:master-2026-08-04-8c46e5918adb795cc5edac8e10bf0ad8f17348ee
+    container_name: pelias_maine_polylines
+    user: "${DOCKER_USER}"
+    volumes:
+      - "./pelias.json:/code/pelias.json:ro"
+      - "${DATA_DIR}:/data"
+  interpolation:
+    image: pelias/interpolation:master-2026-08-26-ba31064aee23b45f3547e72752c4796d05429d7f
+    container_name: pelias_maine_interpolation
+    user: "${DOCKER_USER}"
+    restart: always
+    # OAPATH: OA converted to the legacy CSV layout by `pelias-prep oa-interp`
+    # (the builder ignores the GeoJSON that OpenAddresses now ships).
+    environment: [ "PORT=4300", "OAPATH=/data/interpolation_oa" ]
+    ports: [ "127.0.0.1:4300:4300" ]
+    volumes:
+      - "./pelias.json:/code/pelias.json:ro"
+      - "${DATA_DIR}:/data"
+  pip:
+    image: pelias/pip-service:master-2026-08-04-1c012678ddb6ec636adf1e1ef24a71f88eaa27ae
+    container_name: pelias_maine_pip
+    user: "${DOCKER_USER}"
+    restart: always
+    environment: [ "PORT=4200" ]
+    ports: [ "127.0.0.1:4200:4200" ]
+    volumes:
+      - "./pelias.json:/code/pelias.json:ro"
+      - "${DATA_DIR}:/data"
+  elasticsearch:
+    image: pelias/elasticsearch:7.17.27-2025-01-22-66b2b704398cecb3f0bccede4286a840972c57f8
+    container_name: pelias_maine_elasticsearch
+    user: "${DOCKER_USER}"
+    restart: always
+    environment:
+      - "ES_JAVA_OPTS=-Xms${ES_HEAP:-2g} -Xmx${ES_HEAP:-2g}"
+      # Snapshot repository location: used to ship the built index to the VM / VPS.
+      - "path.repo=/usr/share/elasticsearch/snapshots"
+    ports: [ "127.0.0.1:9200:9200", "127.0.0.1:9300:9300" ]
+    volumes:
+      - "${DATA_DIR}/elasticsearch:/usr/share/elasticsearch/data"
+      - "${DATA_DIR}/es_snapshots:/usr/share/elasticsearch/snapshots"
+    ulimits:
+      memlock: { soft: -1, hard: -1 }
+      nofile: { soft: 65536, hard: 65536 }
+    cap_add: [ "IPC_LOCK" ]
+  fuzzy-tester:
+    image: pelias/fuzzy-tester:master-2026-08-04-871698b8b19770a65baf25632948b7d280da1122
+    container_name: pelias_maine_fuzzy_tester
+    user: "${DOCKER_USER}"
+    restart: "no"
+    command: "--help"
+    volumes:
+      - "./pelias.json:/code/pelias.json:ro"
+      - "./test_cases:/code/pelias/fuzzy-tester/test_cases:ro"

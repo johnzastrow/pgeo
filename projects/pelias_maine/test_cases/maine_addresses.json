@@ -1,0 +1,67 @@
+{
+  "name": "/v1/search addresses (Maine)",
+  "description": "Well-known street addresses",
+  "priorityThresh": 1,
+  "normalizers": {
+    "name": [
+      "toUpperCase",
+      "removeOrdinals",
+      "stripPunctuation",
+      "abbreviateDirectionals",
+      "abbreviateStreetSuffixes"
+    ]
+  },
+  "tests": [
+    {
+      "id": 1,
+      "status": "pass",
+      "user": "pelias_maine",
+      "in": {
+        "text": "389 Congress St, Portland, ME"
+      },
+      "expected": {
+        "properties": [
+          {
+            "layer": "address",
+            "housenumber": "389",
+            "locality": "Portland"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "status": "pass",
+      "user": "pelias_maine",
+      "in": {
+        "text": "210 State St, Augusta, ME"
+      },
+      "expected": {
+        "properties": [
+          {
+            "layer": "address",
+            "housenumber": "210",
+            "locality": "Augusta"
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "status": "pass",
+      "user": "pelias_maine",
+      "in": {
+        "text": "73 Harlow St, Bangor, Maine"
+      },
+      "expected": {
+        "properties": [
+          {
+            "layer": "address",
+            "housenumber": "73",
+            "locality": "Bangor"
+          }
+        ]
+      }
+    }
+  ]
+}

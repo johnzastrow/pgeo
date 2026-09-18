@@ -1,0 +1,59 @@
+{
+  "name": "/v1/reverse (Maine)",
+  "description": "Coordinates to place",
+  "endpoint": "reverse",
+  "priorityThresh": 5,
+  "tests": [
+    {
+      "id": 1,
+      "status": "pass",
+      "user": "pelias_maine",
+      "in": {
+        "point.lat": 43.6591,
+        "point.lon": -70.2568
+      },
+      "expected": {
+        "properties": [
+          {
+            "locality": "Portland",
+            "region": "Maine"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "status": "pass",
+      "user": "pelias_maine",
+      "in": {
+        "point.lat": 44.3072,
+        "point.lon": -69.7817
+      },
+      "expected": {
+        "properties": [
+          {
+            "locality": "Augusta",
+            "region": "Maine"
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "status": "pass",
+      "user": "pelias_maine",
+      "in": {
+        "point.lat": 46.6812,
+        "point.lon": -68.0159
+      },
+      "expected": {
+        "properties": [
+          {
+            "region": "Maine",
+            "county": "Aroostook County"
+          }
+        ]
+      }
+    }
+  ]
+}

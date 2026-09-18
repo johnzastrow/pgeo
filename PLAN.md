@@ -1,6 +1,6 @@
 # Pelias Maine (+NH) Geocoder -- Project Plan
 
-Status: DRAFT for review (2026-09-18)
+Status: Active -- Phases 1-6 done (2026-09-18); see docs/PROJECT_LOG.md
 
 ## 1. Goal
 
@@ -72,7 +72,7 @@ for Elasticsearch.
 | Proxmox | node `prox82`, 192.0.2.10, PVE 9.2.11, 12 threads, ~46 GB RAM |
 | Host RAM headroom | ~9 GB available with current VMs running -- the binding constraint |
 | Storage choice | `nvme2tb` (Samsung 980 PRO NVMe, dir storage, ~1.0 TB free) -- preferred over `ssd4tb` (SATA 870 EVO, 72% used, ~0.9 TB free) |
-| Network | `vmbr0` (not VLAN-aware) = primary LAN 192.0.2.0/24; VM on DHCP, reserve on router later |
+| Network | `vmbr0` (not VLAN-aware) = primary LAN 192.0.2.0/24; VM 120 on DHCP, reserved as 192.0.2.20 = `geocoder.lan.example` (MAC BC:24:11:00:00:00) |
 | TLS / ingress | Existing Caddy on `wharf` (VM 102; LAN 192.0.2.254, tailnet 100.64.0.2). `*.example.org` resolves to the tailnet IP, so "internal" = LAN + tailnet |
 | Cloud images on host | `debian-13-genericcloud-amd64.qcow2` already present (no Ubuntu image yet) |
 
@@ -145,6 +145,58 @@ other pages later (your requirement #5).
 - Because 10 GB is tight for imports, the full Pelias build (download, prepare, import)
   runs on the workstation (31 GB RAM); the VM runs query services only and receives an
   Elasticsearch snapshot + service data dirs. This is the same path the VPS will use.
+
+### Implementation notes (Step 1, 2026-09-18)
+
+- **Edge on the VM is nginx, not Caddy.** Stock nginx has request rate limiting
+  (`limit_req`), real-IP restore and method limits built in; stock Caddy needs a third-party
+  rate-limit plugin (custom build). TLS stays on the existing wharf Caddy. For the VPS,
+  add TLS to the same nginx (certbot) or front it with Caddy.
+- **Secrets split:** `projects/pelias_maine/secrets.env` (OA token only, read by
+  `scripts/render_config.sh`) is separate from `.env` (compose settings), because the pelias
+  CLI rejects empty variables and should never see secrets.
+- **Images pinned** to dated `master-YYYY-MM-DD-<sha>` tags (non-`-classic` variants, which
+  match upstream `:master`).
+- **GNIS** loaded entirely as layer `venue` with `category` = feature class (incl.
+  `civil` townships/plantations), to avoid competing with WOF admin records; out-of-state
+  primary points dropped. **Overture**: confidence >= 0.5, open/unknown status, clipped to the
+  Maine polygon with a 300 m buffer that requires Maine evidence (region or 039-049 ZIP);
+  non-Maine ZIPs on Maine points are dropped, not guessed.
+- **WOF** downloads the full US SQLite (~5.2 GB) even with `importPlace`.
+
+### Overture Maps evaluation (release 2026-08-19.0, Maine)
+
+Access: anonymous GeoParquet on S3 (`s3://overturemaps-us-west-2/release/<R>/theme=...`) or
+Azure, monthly releases, STAC at stac.overturemaps.org. Esri's ArcGIS Online "Parquet feature
+layers" (beta June 2026, Overture early-access layers) serve the same data for viewing and
+client-side query inside ArcGIS; they need an ArcGIS org account and are not a better
+pipeline source than the GeoParquet itself, but are handy for visual QA if you work in ArcGIS.
+
+| Theme / type | Maine volume | Overlap with what is loaded | Pelias use | Phase 10 (PostGIS) use |
+|--------------|-------------|------------------------------|------------|------------------------|
+| places/place | 76,582 kept (conf >= 0.5) | Complements OSM venues | **Loaded** (`overture` source) | Same |
+| addresses/address | 772,684 (all USDOT NAD) | Same records as OA: every NAD-only row has an OA twin within 5 m differing only in spelling ("East Grand Avenue" vs "E Grand Ave"); 90% of pairs have identical coordinates, p95 offset 1 cm | **Do not load** (pure duplicates). Keep as a token-free fallback if OA downloads fail; re-evaluate per state for NH | Useful for GERS ids and spelled-out street names as aliases |
+| divisions/division + division_area | 1,145 localities, 1,437 neighborhoods, 16 counties; 916 locality polygons | Parallel to WOF (1,591 localities + 532 localadmin) | Not usable for Pelias PIP (WOF only); adding as records would duplicate WOF | **Strong candidate** for the admin hierarchy (clean polygons, stable GERS ids) vs WOF |
+| base/water (named) | 33k features, 9.6k distinct names | Mostly OSM-derived; GNIS covers lakes/streams by name | Low incremental value | Polygon extents for fit-to-bounds results |
+| base/land (named) | 3.4k peaks, 2.3k islands/islets, beaches | OSM-derived; GNIS covers summits/islands | Low | Island/peak polygons |
+| transportation/segment (road) | 500k segments, 218k named, 55k distinct names | OSM-derived; Pelias already has 65k OSM street docs | Redundant | Street geometry for reverse + own interpolation |
+| buildings | not extracted | -- | No | Possible address-to-building snapping later |
+
+### Data retention
+
+All raw and intermediate data is kept on the workstation for later use (Phase 10 loads the
+same inputs into PostGIS). Nothing is pruned there; only query-host deploys ship a subset.
+
+| Location | Contents | Size (2026-09-18) |
+|----------|----------|-------------------|
+| `data/raw/` | OSM PBF, GNIS, ZCTA, state boundaries, Overture extracts, Protomaps basemap | ~0.5 GB (+ Overture themes) |
+| `data/pelias/` | Pelias DATA_DIR: OA GeoJSON, WOF US SQLite (5.2 GB), TIGER, polylines, placeholder, interpolation DBs, ES data | ~6.4 GB |
+| `data/pelias/es_snapshots/` | ES snapshots for deploys | ~0.4 GB each |
+| `data/processed/` | Pelias CSVs + manifest (source hashes) | ~0.1 GB |
+
+Recommended (not yet done): a periodic copy of `data/raw/` and the latest snapshot to the
+`bigblock` PBS or `ObeliskNFS` storage, since upstream sources change monthly and old
+releases are not always re-downloadable.
 
 ## 8. Security baseline (production profile)
 

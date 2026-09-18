@@ -1,0 +1,3 @@
+# Maine street synonyms (Solr synonym format). Applied at index creation.
+route,rte,rt
+us route 1,us 1,route 1,rte 1
