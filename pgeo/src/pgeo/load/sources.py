@@ -73,6 +73,10 @@ def wof_admin(out: Path) -> int:
     return con.execute("SELECT count(*) FROM read_csv(?)", [str(out)]).fetchone()[0]
 
 
+# Note: in DuckDB, `COPY (subquery) TO ?` binds the TO placeholder before placeholders in the
+# subquery, so these statements use explicit numbered parameters ($1 input, $2 output).
+
+
 def openaddresses(out: Path) -> int:
     """OpenAddresses (already converted to CSV for Pelias interpolation) -> address points."""
     src = str(DATA_DIR / "pelias" / "interpolation_oa" / "us" / "me" / "*.csv")
@@ -84,10 +88,10 @@ def openaddresses(out: Path) -> int:
             NUMBER || ' ' || STREET AS name, NUMBER AS housenumber, STREET AS street, UNIT AS unit,
             POSTCODE AS postcode, CITY AS locality_hint, '' AS category, '' AS addendum,
             LON AS lon, LAT AS lat, NULL::REAL AS popularity
-          FROM read_csv(?, all_varchar=true, union_by_name=true)
+          FROM read_csv($1, all_varchar=true, union_by_name=true)
           WHERE coalesce(NUMBER, '') <> '' AND coalesce(STREET, '') <> '' AND coalesce(HASH, '') <> ''
           ORDER BY HASH
-        ) TO ? (FORMAT csv, HEADER true)""",
+        ) TO $2 (FORMAT csv, HEADER true)""",
         [src, str(out)],
     )
     return con.execute("SELECT count(*) FROM read_csv(?)", [str(out)]).fetchone()[0]
@@ -123,8 +127,8 @@ def csv_source(name: str, out: Path) -> int:
                  CASE WHEN {add if add in cols else "NULL"} IS NULL THEN ''
                       ELSE json_object('{name}', json({add})) END AS addendum,
                  lon, lat, {popularity} AS popularity
-          FROM read_csv(?, all_varchar=false)
-        ) TO ? (FORMAT csv, HEADER true)""",  # noqa: S608 (allowlisted names only)
+          FROM read_csv($1, all_varchar=false)
+        ) TO $2 (FORMAT csv, HEADER true)""",  # noqa: S608 (allowlisted names only)
         [src, str(out)],
     )
     return con.execute("SELECT count(*) FROM read_csv(?)", [str(out)]).fetchone()[0]

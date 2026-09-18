@@ -1,0 +1,9 @@
+# Keep pgeo off the CPUs used by the Pelias load tests (stacks on cores 0-3, k6 on core 5):
+#   docker compose --env-file pgeo/pgeo.secrets -f pgeo/compose.yml -f pgeo/compose.pinned.yml up -d
+services:
+  db:
+    cpuset: "4,10"
+  libpostal:
+    cpuset: "4,10"
+  api:
+    cpuset: "4,10"
