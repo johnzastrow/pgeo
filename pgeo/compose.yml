@@ -1,0 +1,53 @@
+# pgeo: PostgreSQL/PostGIS geocoder (Phase 10). Local development and load testing.
+# All ports bind to 127.0.0.1. Secrets come from pgeo/.env (gitignored, mode 600):
+#   PGEO_DB_PASSWORD=<random>          owner/loader role
+#   PGEO_API_PASSWORD=<random>         read-only API role (24+ alphanumeric)
+#   PGEO_DATA_DIR=<absolute path>/data/pgeo
+name: pgeo
+services:
+  db:
+    build: ./docker/db
+    image: pgeo-db:local
+    container_name: pgeo_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pgeo
+      POSTGRES_USER: pgeo
+      POSTGRES_PASSWORD: ${PGEO_DB_PASSWORD:?set PGEO_DB_PASSWORD in pgeo/.env}
+    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
+    ports: ["127.0.0.1:5433:5432"]
+    shm_size: 1g
+    volumes:
+      - "${PGEO_DATA_DIR:?set PGEO_DATA_DIR in pgeo/.env}/pgdata:/var/lib/postgresql/18/docker"
+      - "./docker/db/postgresql.conf:/etc/postgresql/postgresql.conf:ro"
+      - "./docker/db/tuning:/etc/postgresql/tuning:ro"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pgeo -d pgeo"]
+      interval: 5s
+      retries: 30
+
+  libpostal:
+    # Same image as the Pelias stack's parser (service arm of the libpostal A/B).
+    image: pelias/libpostal-service:master-2026-07-08-61c5d6e058f021c42b33781f0b5fd566fdec954d
+    container_name: pgeo_libpostal
+    restart: unless-stopped
+    user: "${DOCKER_USER:-1000:1000}"
+    ports: ["127.0.0.1:4401:4400"]
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/api/Dockerfile
+    image: pgeo-api:local
+    container_name: pgeo_api
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      # read-only role created by the loader (least privilege)
+      PGEO_DSN: "postgresql://pgeo_api:${PGEO_API_PASSWORD:?set PGEO_API_PASSWORD in pgeo/.env}@db:5432/pgeo"
+      PGEO_LIBPOSTAL_URL: "http://libpostal:4400"
+      PGEO_PARSE_MODE: "${PGEO_PARSE_MODE:-service}"
+      PGEO_WORKERS: "${PGEO_WORKERS:-2}"
+      PGEO_POOL_MAX: "${PGEO_POOL_MAX:-8}"
+    ports: ["127.0.0.1:4500:4500"]

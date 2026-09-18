@@ -1,0 +1,109 @@
+-- Build step 2 (search_path = pgeo_build, public): admin hierarchy by point-in-polygon
+-- (the Pelias "pip" service equivalent), normalization, labels, importance, dedupe,
+-- helper tables and indexes.
+
+CREATE INDEX admin_geom_idx ON admin USING gist (geom);
+CREATE INDEX admin_placetype_idx ON admin (placetype);
+ANALYZE admin;
+
+-- Smallest containing polygon per placetype for each raw point.
+CREATE TEMP TABLE hier AS
+SELECT r.rid,
+  (SELECT a.name FROM admin a WHERE a.placetype = 'neighbourhood' AND ST_Intersects(a.geom, r.geom)
+     ORDER BY ST_Area(a.geom) LIMIT 1) AS neighbourhood,
+  (SELECT a.name FROM admin a WHERE a.placetype = 'locality' AND ST_Intersects(a.geom, r.geom)
+     ORDER BY ST_Area(a.geom) LIMIT 1) AS locality,
+  (SELECT a.name FROM admin a WHERE a.placetype = 'localadmin' AND ST_Intersects(a.geom, r.geom)
+     ORDER BY ST_Area(a.geom) LIMIT 1) AS localadmin,
+  (SELECT a.name FROM admin a WHERE a.placetype = 'county' AND ST_Intersects(a.geom, r.geom)
+     ORDER BY ST_Area(a.geom) LIMIT 1) AS county
+FROM feature_raw r;
+
+-- Address dedupe: OpenAddresses and OSM carry most Maine addresses twice. Keep one row per
+-- (house number, street, town) within ~50 m, preferring OpenAddresses. Pelias removes such
+-- duplicates at query time instead; the outcome for users is the same.
+CREATE TEMP TABLE raw_ranked AS
+SELECT r.*, h.neighbourhood, h.locality AS pip_locality, h.localadmin, h.county,
+       geocode.norm(r.name) AS name_norm,
+       geocode.norm(r.street) AS street_norm,
+       geocode.hn_int(r.housenumber) AS hn_int,
+       row_number() OVER (
+         PARTITION BY CASE WHEN r.layer = 'address' THEN
+             lower(r.housenumber) || '|' || geocode.norm(r.street) || '|'
+             || coalesce(geocode.norm(coalesce(h.locality, h.localadmin, r.locality_hint)), '')
+             || '|' || round(ST_X(r.geom)::numeric, 3) || '|' || round(ST_Y(r.geom)::numeric, 3)
+           ELSE r.source || r.layer || r.source_id END
+         ORDER BY CASE r.source WHEN 'openaddresses' THEN 0 WHEN 'openstreetmap' THEN 1 ELSE 2 END
+       ) AS dup_rank
+FROM feature_raw r JOIN hier h USING (rid);
+
+INSERT INTO feature (
+    id, gid, source, layer, source_id, name, housenumber, street, unit, postcode,
+    neighbourhood, locality, localadmin, county, region, region_a, label, category, addendum,
+    geom, bbox, admin_id, importance, name_norm, street_norm, locality_norm, hn_int, tokens)
+SELECT
+    row_number() OVER (ORDER BY r.layer, r.source, r.source_id),
+    r.source || ':' || r.layer || ':' || r.source_id,
+    r.source, r.layer, r.source_id, r.name, r.housenumber, r.street, r.unit, r.postcode,
+    r.neighbourhood,
+    coalesce(r.pip_locality, CASE WHEN r.localadmin IS NULL THEN r.locality_hint END),
+    r.localadmin, r.county, 'Maine', 'ME',
+    -- Pelias-style label
+    CASE r.layer
+      WHEN 'region' THEN 'Maine, USA'
+      WHEN 'county' THEN r.name || ', ME, USA'
+      WHEN 'locality' THEN r.name || ', ME, USA'
+      WHEN 'localadmin' THEN r.name || ', ME, USA'
+      WHEN 'postalcode' THEN r.name || coalesce(', ' || coalesce(r.pip_locality, r.localadmin), '') || ', ME, USA'
+      ELSE r.name || coalesce(', ' || coalesce(r.pip_locality, r.localadmin, r.locality_hint, r.county), '') || ', ME, USA'
+    END,
+    r.category, r.addendum, r.geom, r.bbox, r.admin_id,
+    -- importance: layer prior, then modest boosts from population / popularity
+    least(1.0, CASE r.layer
+        WHEN 'region' THEN 1.0 WHEN 'county' THEN 0.85 WHEN 'locality' THEN 0.75
+        WHEN 'localadmin' THEN 0.65 WHEN 'postalcode' THEN 0.6 WHEN 'neighbourhood' THEN 0.5
+        WHEN 'venue' THEN 0.4 WHEN 'street' THEN 0.35 ELSE 0.3 END
+      + coalesce(r.popularity, 0))::real,
+    r.name_norm, r.street_norm,
+    geocode.norm(coalesce(r.pip_locality, r.localadmin, r.locality_hint)),
+    r.hn_int,
+    to_tsvector('simple', coalesce(r.name_norm, '') || ' ' ||
+                coalesce(geocode.norm(coalesce(r.pip_locality, r.localadmin, r.locality_hint)), ''))
+FROM raw_ranked r
+WHERE r.dup_rank = 1;
+
+-- Distinct streets per town (from addresses and street features).
+INSERT INTO street_name (street_norm, locality_norm, street, locality, n_addresses)
+SELECT street_norm, coalesce(locality_norm, ''), min(street), min(coalesce(locality, localadmin)),
+       count(*) FILTER (WHERE layer = 'address')
+FROM feature
+WHERE street_norm IS NOT NULL AND street_norm <> ''
+GROUP BY street_norm, coalesce(locality_norm, '');
+
+-- Top 25 non-address features per 1-3 character prefix of the name.
+INSERT INTO ac_prefix (prefix, rank, feature_id)
+SELECT prefix, rn, id FROM (
+  SELECT p.prefix, f.id,
+         row_number() OVER (PARTITION BY p.prefix ORDER BY f.importance DESC, length(f.name_norm), f.id) AS rn
+  FROM feature f
+  CROSS JOIN LATERAL (SELECT left(f.name_norm, n) AS prefix FROM generate_series(1, 3) n) p
+  WHERE f.layer <> 'address' AND length(f.name_norm) >= 1
+) t WHERE rn <= 25;
+
+-- Indexes (the tuning log records experiments with alternatives).
+CREATE UNIQUE INDEX feature_gid_idx ON feature (gid);
+CREATE INDEX feature_geom_idx ON feature USING gist (geom);
+CREATE INDEX feature_tokens_idx ON feature USING gin (tokens);
+CREATE INDEX feature_name_trgm_idx ON feature USING gin (name_norm gin_trgm_ops) WHERE layer <> 'address';
+CREATE INDEX feature_name_idx ON feature (name_norm text_pattern_ops) WHERE layer <> 'address';
+CREATE INDEX feature_addr_idx ON feature (street_norm, locality_norm, hn_int) WHERE layer = 'address';
+CREATE INDEX feature_addr_hn_idx ON feature (housenumber, street_norm) WHERE layer = 'address';
+CREATE INDEX feature_street_idx ON feature (street_norm, locality_norm) WHERE layer = 'street';
+CREATE INDEX feature_postcode_idx ON feature (postcode) WHERE layer = 'postalcode';
+CREATE INDEX feature_layer_idx ON feature (layer);
+CREATE INDEX street_name_trgm_idx ON street_name USING gin (street_norm gin_trgm_ops);
+CREATE INDEX street_name_locality_idx ON street_name (locality_norm);
+
+ANALYZE feature;
+ANALYZE street_name;
+ANALYZE ac_prefix;

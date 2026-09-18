@@ -11,3 +11,5 @@ __pycache__/
 /vendor/
 # Rendered Pelias config (may contain the OA token)
 projects/*/pelias.json
+# pgeo local secrets
+pgeo/.env
