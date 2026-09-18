@@ -38,11 +38,15 @@ def _duck() -> duckdb.DuckDBPyConnection:
 def wof_admin(out: Path) -> int:
     """Maine admin areas and postal codes from the WOF SQLite distributions."""
     con = _duck()
-    con.execute("ATTACH ? AS wa (TYPE sqlite, READ_ONLY)", [str(WOF_DIR / "whosonfirst-data-admin-us-latest.db")])
-    con.execute(
-        "ATTACH ? AS wp (TYPE sqlite, READ_ONLY)",
-        [str(WOF_DIR / "whosonfirst-data-postalcode-us-latest.db")],
-    )
+    # ATTACH does not take bind parameters; these are our own fixed paths (checked for quotes).
+    for alias, fname in (
+        ("wa", "whosonfirst-data-admin-us-latest.db"),
+        ("wp", "whosonfirst-data-postalcode-us-latest.db"),
+    ):
+        path = str(WOF_DIR / fname)
+        if "'" in path:
+            raise ValueError(f"unexpected quote in path {path!r}")
+        con.execute(f"ATTACH '{path}' AS {alias} (TYPE sqlite, READ_ONLY)")
     select = """
       SELECT s.id, 'whosonfirst' AS source, CAST(s.id AS VARCHAR) AS source_id, s.placetype, s.name,
              json_extract_string(g.body, '$.properties."wof:abbreviation"') AS abbr,

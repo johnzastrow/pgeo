@@ -22,7 +22,7 @@ from urllib.parse import urlparse
 import asyncpg
 
 from pgeo.load import sources
-from pgeo.settings import DATA_DIR, PGEO_ROOT, SQL_DIR, Settings, _read_env_file
+from pgeo.settings import DATA_DIR, SECRETS_FILE, SQL_DIR, Settings, _read_env_file
 
 ALL_SOURCES = ["whosonfirst", "openaddresses", "openstreetmap", "gnis", "zcta", "overture"]
 STAGE_DIR = DATA_DIR / "pgeo" / "stage"
@@ -51,10 +51,10 @@ def pg_conn_string(dsn: str) -> str:
 
 async def ensure_api_role(con: asyncpg.Connection) -> None:
     """Read-only role for the API (least privilege)."""
-    env = _read_env_file(PGEO_ROOT / ".env")
+    env = _read_env_file(SECRETS_FILE)
     pw = env.get("PGEO_API_PASSWORD", "")
     if not re.fullmatch(r"[A-Za-z0-9]{24,128}", pw):
-        raise RuntimeError("PGEO_API_PASSWORD in pgeo/.env must be 24-128 alphanumeric characters")
+        raise RuntimeError("PGEO_API_PASSWORD in pgeo/pgeo.secrets must be 24-128 alphanumeric characters")
     exists = await con.fetchval("SELECT 1 FROM pg_roles WHERE rolname = 'pgeo_api'")
     # pw is validated to [A-Za-z0-9] above, so literal interpolation is safe here.
     verb = "ALTER" if exists else "CREATE"

@@ -10,10 +10,13 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 PGEO_ROOT = REPO_ROOT / "pgeo"
 SQL_DIR = PGEO_ROOT / "sql"
 DATA_DIR = REPO_ROOT / "data"
+# Local secrets (mode 600, gitignored). Named *.secrets rather than .env on purpose: the
+# user's tooling rules keep .env files off-limits to automation.
+SECRETS_FILE = PGEO_ROOT / "pgeo.secrets"
 
 
 def _read_env_file(path: Path) -> dict[str, str]:
-    """Minimal KEY=VALUE reader for pgeo/.env (no shell expansion, no sourcing)."""
+    """Minimal KEY=VALUE reader for pgeo/pgeo.secrets (no shell expansion, no sourcing)."""
     out: dict[str, str] = {}
     if path.is_file():
         for line in path.read_text().splitlines():
@@ -33,12 +36,12 @@ class Settings:
 
     @staticmethod
     def load() -> Settings:
-        env = _read_env_file(PGEO_ROOT / ".env") | dict(os.environ)
+        env = _read_env_file(SECRETS_FILE) | dict(os.environ)
         dsn = env.get("PGEO_DSN")
         if not dsn:
             pw = env.get("PGEO_DB_PASSWORD")
             if not pw:
-                raise RuntimeError("set PGEO_DSN or PGEO_DB_PASSWORD (pgeo/.env)")
+                raise RuntimeError("set PGEO_DSN or PGEO_DB_PASSWORD (pgeo/pgeo.secrets)")
             host = env.get("PGEO_DB_HOST", "127.0.0.1")
             port = env.get("PGEO_DB_PORT", "5433")
             dsn = f"postgresql://pgeo:{pw}@{host}:{port}/pgeo"

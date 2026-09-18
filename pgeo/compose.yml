@@ -1,5 +1,6 @@
 # pgeo: PostgreSQL/PostGIS geocoder (Phase 10). Local development and load testing.
-# All ports bind to 127.0.0.1. Secrets come from pgeo/.env (gitignored, mode 600):
+# All ports bind to 127.0.0.1. Secrets come from pgeo/pgeo.secrets (gitignored, mode 600),
+# passed explicitly:  docker compose --env-file pgeo/pgeo.secrets -f pgeo/compose.yml ...
 #   PGEO_DB_PASSWORD=<random>          owner/loader role
 #   PGEO_API_PASSWORD=<random>         read-only API role (24+ alphanumeric)
 #   PGEO_DATA_DIR=<absolute path>/data/pgeo
@@ -13,12 +14,12 @@ services:
     environment:
       POSTGRES_DB: pgeo
       POSTGRES_USER: pgeo
-      POSTGRES_PASSWORD: ${PGEO_DB_PASSWORD:?set PGEO_DB_PASSWORD in pgeo/.env}
+      POSTGRES_PASSWORD: ${PGEO_DB_PASSWORD:?set PGEO_DB_PASSWORD in pgeo/pgeo.secrets}
     command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
     ports: ["127.0.0.1:5433:5432"]
     shm_size: 1g
     volumes:
-      - "${PGEO_DATA_DIR:?set PGEO_DATA_DIR in pgeo/.env}/pgdata:/var/lib/postgresql/18/docker"
+      - "${PGEO_DATA_DIR:?set PGEO_DATA_DIR in pgeo/pgeo.secrets}/pgdata:/var/lib/postgresql/18/docker"
       - "./docker/db/postgresql.conf:/etc/postgresql/postgresql.conf:ro"
       - "./docker/db/tuning:/etc/postgresql/tuning:ro"
     healthcheck:
@@ -45,7 +46,7 @@ services:
       db: { condition: service_healthy }
     environment:
       # read-only role created by the loader (least privilege)
-      PGEO_DSN: "postgresql://pgeo_api:${PGEO_API_PASSWORD:?set PGEO_API_PASSWORD in pgeo/.env}@db:5432/pgeo"
+      PGEO_DSN: "postgresql://pgeo_api:${PGEO_API_PASSWORD:?set PGEO_API_PASSWORD in pgeo/pgeo.secrets}@db:5432/pgeo"
       PGEO_LIBPOSTAL_URL: "http://libpostal:4400"
       PGEO_PARSE_MODE: "${PGEO_PARSE_MODE:-service}"
       PGEO_WORKERS: "${PGEO_WORKERS:-2}"

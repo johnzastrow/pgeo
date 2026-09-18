@@ -12,8 +12,8 @@ ARG MODEL_IMAGE=pelias/libpostal-service:master-2026-07-08-61c5d6e058f021c42b337
 FROM ${MODEL_IMAGE} AS model
 
 FROM ${POSTGIS_IMAGE} AS build
-# libpostal v1.1 and pgsql-postal master at review time
-ARG LIBPOSTAL_REF=9c975972985b54491e756efd70e416f18ff97958
+# libpostal master (the v1.1 tag from 2018 does not build with GCC 14) and pgsql-postal master
+ARG LIBPOSTAL_REF=25099c506612b34b23b1bfe286ca6321fcf06f35
 ARG PGSQL_POSTAL_REF=105a6ca855dbf4d33b160ca50d00c3c76a7e2061
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
@@ -24,6 +24,7 @@ RUN git clone https://github.com/openvenues/libpostal /src/libpostal \
  && cd /src/libpostal && git checkout "${LIBPOSTAL_REF}" \
  && ./bootstrap.sh \
  && ./configure --datadir=/usr/share/libpostal --disable-data-download \
+      CFLAGS="-O2 -Wno-error=incompatible-pointer-types" \
  && make -j"$(nproc)" && make install && ldconfig
 RUN git clone https://github.com/pramsey/pgsql-postal /src/pgsql-postal \
  && cd /src/pgsql-postal && git checkout "${PGSQL_POSTAL_REF}" \

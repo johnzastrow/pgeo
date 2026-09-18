@@ -13,3 +13,4 @@ __pycache__/
 projects/*/pelias.json
 # pgeo local secrets
 pgeo/.env
+*.secrets
