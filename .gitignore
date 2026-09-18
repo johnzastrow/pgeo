@@ -1,0 +1,9 @@
+# Raw and processed data (large; rebuilt by scripts)
+data/
+# Secrets
+.env
+*.env
+!*.env.example
+# Python
+__pycache__/
+.venv/
