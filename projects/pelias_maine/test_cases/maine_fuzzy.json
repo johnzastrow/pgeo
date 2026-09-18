@@ -1,0 +1,238 @@
+{
+  "name": "/v1/search typos and off names (Maine)",
+  "description": "Misspellings, abbreviations, word order, missing parts, units. Status set from the 2026-09-18 baseline run.",
+  "priorityThresh": 3,
+  "normalizers": {
+    "name": [
+      "toUpperCase",
+      "removeOrdinals",
+      "stripPunctuation",
+      "abbreviateDirectionals",
+      "abbreviateStreetSuffixes"
+    ]
+  },
+  "tests": [
+    {
+      "id": 1,
+      "status": "fail",
+      "user": "pelias_maine",
+      "description": "typo: dropped letter in town -- baseline 2026-09-18: no results (Pelias has no typo tolerance in search or autocomplete)",
+      "in": {
+        "text": "Portlnd, ME"
+      },
+      "expected": {
+        "properties": [
+          {
+            "layer": "locality",
+            "name": "Portland"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "status": "fail",
+      "user": "pelias_maine",
+      "description": "typo: dropped letter in town -- baseline 2026-09-18: returns the state (Maine) (Pelias has no typo tolerance in search or autocomplete)",
+      "in": {
+        "text": "Bangr Maine"
+      },
+      "expected": {
+        "properties": [
+          {
+            "layer": "locality",
+            "name": "Bangor"
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "status": "fail",
+      "user": "pelias_maine",
+      "description": "typo: dropped letter in lake -- baseline 2026-09-18: no results (Pelias has no typo tolerance in search or autocomplete)",
+      "in": {
+        "text": "Moosehed Lake"
+      },
+      "expected": {
+        "properties": [
+          {
+            "name": "Moosehead Lake"
+          }
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "status": "fail",
+      "user": "pelias_maine",
+      "description": "typo: dropped letter in summit -- baseline 2026-09-18: no results (Pelias has no typo tolerance in search or autocomplete)",
+      "in": {
+        "text": "Katahdn"
+      },
+      "expected": {
+        "properties": [
+          {
+            "name": "Mount Katahdin"
+          }
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "status": "fail",
+      "user": "pelias_maine",
+      "description": "typo: street name -- baseline 2026-09-18: falls back to the town (Pelias has no typo tolerance in search or autocomplete)",
+      "in": {
+        "text": "389 Congres St, Portland, ME"
+      },
+      "expected": {
+        "properties": [
+          {
+            "layer": "address",
+            "housenumber": "389",
+            "locality": "Portland"
+          }
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "status": "fail",
+      "user": "pelias_maine",
+      "description": "typo: swapped letters -- baseline 2026-09-18: falls back to the town (Pelias has no typo tolerance in search or autocomplete)",
+      "in": {
+        "text": "73 Harlwo St, Bangor"
+      },
+      "expected": {
+        "properties": [
+          {
+            "layer": "address",
+            "housenumber": "73",
+            "locality": "Bangor"
+          }
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "status": "pass",
+      "user": "pelias_maine",
+      "description": "variant: suffix spelled out, no state, no commas",
+      "in": {
+        "text": "389 Congress Street Portland"
+      },
+      "expected": {
+        "properties": [
+          {
+            "layer": "address",
+            "housenumber": "389",
+            "locality": "Portland"
+          }
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "status": "pass",
+      "user": "pelias_maine",
+      "description": "variant: unit number",
+      "in": {
+        "text": "210 State St Apt 2, Augusta, ME"
+      },
+      "expected": {
+        "properties": [
+          {
+            "layer": "address",
+            "housenumber": "210",
+            "locality": "Augusta"
+          }
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "status": "pass",
+      "user": "pelias_maine",
+      "description": "variant: all lowercase",
+      "in": {
+        "text": "73 harlow st bangor me"
+      },
+      "expected": {
+        "properties": [
+          {
+            "layer": "address",
+            "housenumber": "73",
+            "locality": "Bangor"
+          }
+        ]
+      }
+    },
+    {
+      "id": 10,
+      "status": "fail",
+      "user": "pelias_maine",
+      "description": "variant: word order -- baseline 2026-09-18: returns Lake Arrowhead",
+      "in": {
+        "text": "Lake Moosehead"
+      },
+      "expected": {
+        "properties": [
+          {
+            "name": "Moosehead Lake"
+          }
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "status": "pass",
+      "user": "pelias_maine",
+      "description": "variant: Mt for Mount",
+      "in": {
+        "text": "Mt Katahdin"
+      },
+      "expected": {
+        "properties": [
+          {
+            "name": "Mount Katahdin"
+          }
+        ]
+      }
+    },
+    {
+      "id": 12,
+      "status": "fail",
+      "user": "pelias_maine",
+      "description": "variant: partial venue name -- baseline 2026-09-18: jetport at rank 6",
+      "in": {
+        "text": "Portland Jetport"
+      },
+      "expected": {
+        "properties": [
+          {
+            "layer": "venue",
+            "name": "Portland International Jetport"
+          }
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "status": "fail",
+      "user": "pelias_maine",
+      "description": "variant: ZIP with town -- baseline 2026-09-18: returns street Portland Way",
+      "in": {
+        "text": "04101 Portland"
+      },
+      "expected": {
+        "properties": [
+          {
+            "layer": "postalcode",
+            "name": "04101"
+          }
+        ]
+      }
+    }
+  ]
+}

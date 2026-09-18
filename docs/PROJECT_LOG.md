@@ -70,6 +70,11 @@ confidence scores; easy loading and updates.
     All third-party assets vendored with pinned integrity (strict same-origin CSP). Local
     preview server with the production CSP; Playwright browser test (light/dark, desktop/
     mobile) passes locally and against the live site. The batch tool surfaced F16 and F17.
+15. **Auth roadmap and capacity testing**: API authorization added to the roadmap (PLAN.md
+    Phase 11: SSO for people + hashed API keys for machines, recommended). Load-test plan
+    written (docs/LOAD_TEST_PLAN.md); k6 harness with typo/variant/miss query types and a
+    cache-control section; accuracy suite extended with typos and off names (F18-F20); trial
+    run found the memory floor (F21); full matrix run started.
 
 ---
 
@@ -99,6 +104,17 @@ confidence scores; easy loading and updates.
 | 2026-09-18 | Proceed with wharf Caddy for `geocoder.example.org`? | Yes; user reserves 192.0.2.20 |
 | 2026-09-18 | Which name do clients use? | `geocoder.example.org` for everything |
 | 2026-09-18 | VM LAN name? | 192.0.2.20 = `geocoder.lan.example` (resolves from workstation and wharf) |
+| 2026-09-18 | Add authorization to the roadmap? | Yes: PLAN.md Phase 11 (options A-D, recommend SSO + API keys) |
+| 2026-09-18 | Minimum resources for 3 concurrent users, and limits? | Measured by load tests (docs/LOAD_TEST_PLAN.md, LOAD_TEST_RESULTS.md) |
+| 2026-09-18 | Include fuzzy, off names and complete misses? | Yes, in both the load corpus and the accuracy suite |
+| 2026-09-18 | Is there caching that affects results? | Yes (ES query cache, OS page cache, JIT); controlled and documented; results are warm steady state |
+| 2026-09-18 | Results format? | Tables + Mermaid charts in Markdown, plus matplotlib PNGs |
+| 2026-09-18 | Is the load testing only Pelias? | Yes for now; the harness is engine-agnostic and reruns unchanged on Phase 10 |
+| 2026-09-18 | When does Phase 10 start? | After the Pelias results are written up |
+| 2026-09-18 | Phase 10 host / search engine? | Workstation first; core Postgres text search first, pg_search as A/B |
+| 2026-09-18 | Tune Postgres/PostGIS? | Yes, first-class: per-budget settings, indexes, query design, pools, tuning log |
+| 2026-09-18 | libpostal for Phase 10? | Try both: service and PG18 extension (plus a no-libpostal arm) |
+| 2026-09-18 | Ask all remaining questions now so work can finish unattended | Answered; recorded as D25 |
 | 2026-09-18 | SSH key for the VM? | `~/.ssh/id_ed25519.pub` (pasted, since `~/.ssh` reads are blocked by permission rules) |
 
 ---
@@ -129,6 +145,8 @@ confidence scores; easy loading and updates.
 | D21 | Demo design "Chart Room": chart-paper palette, magenta aids, graduated neatline, DMS readout; Fraunces + IBM Plex | Distinctive and on-theme for a Maine coast geocoder | Generic dashboard styling |
 | D22 | Vendor all web assets (npm tarballs with pinned sha512, basemap assets at a pinned commit) and serve same-origin | Strict CSP, no third-party requests from clients, reproducible | CDN script tags with SRI |
 | D23 | Demo batch runs client-side: 250 rows, 4 req/s, backoff on 429, CSV export with formula-injection guard | Pelias has no batch endpoint; stays under the edge rate limit | Server-side batch service (Phase 10) |
+| D24 | Phase 10: workstation first; core text search + pg_search A/B; libpostal as service and as PG18 extension; FastAPI API layer; tuning log | See PLAN.md section 10 | Proxmox VM first; PostgREST |
+| D25 | Unattended-session grants (2026-09-18): FastAPI API layer; load-test VM 120 including ramp to crash; commit + push at verified milestones; Phase 10 "finished" = parity (search, autocomplete, reverse, structured, place) + accuracy harness + tuning log + load comparison report; WOF admin with Overture divisions as A/B; demo engine switch (local only); resize VM 120 if clearly needed; official postgis PG18 image by digest + libpostal/pgsql-postal built from pinned commits + pg_search release for A/B | User answered all open questions up front so work can finish without them | Ask at each step |
 | D19 | Phase 10 targets PostgreSQL 18 + PostGIS 3.6 | User choice | PostgreSQL 17 |
 
 ---
@@ -153,6 +171,11 @@ confidence scores; easy loading and updates.
 | F15 | nginx `allow`/`deny` is evaluated after the realip module rewrites `$remote_addr` to the end client, so "allow wharf only" denied every real user (403 through Caddy) | Peer check moved to a `geo` on `$realip_remote_addr`; rate limits still key on the real client IP |
 | F16 | Wrong-town exact match: "12 Park St, Bar Harbor, ME" returns 12 Park Street, **Fairfield** with confidence 1.0 (parse is correct: city = bar harbor). Bar Harbor has no #12, so Pelias drops the town (a boost, not a filter) and its confidence score does not penalize the mismatch. Found by the demo's batch tool | Added as an expected-failure test; a key Phase 10 target (locality as a hard constraint when present, confidence that accounts for admin mismatch) |
 | F17 | Demo batch bug: unquoted addresses in a one-column CSV were split at commas, sending only "210 State St" (-> Bangor) | Fixed: a lone address column rejoins the whole line; browser test asserts the right towns |
+| F18 | Pelias has **no typo tolerance** in `/v1/search` or `/v1/autocomplete`: "Portlnd, ME", "Moosehed Lake", "Katahdn" return nothing; "389 Congres St" falls back to the town | 6 expected-failure tests; strongest Phase 10 opportunity (pg_trgm similarity) |
+| F19 | Off names: suffix spelled out, units, lowercase, "Mt" work; word order ("Lake Moosehead" -> Lake Arrowhead), partial venue names and "ZIP + town" fail | Expected-failure tests |
+| F20 | Complete misses mostly behave (gibberish, out-of-state, offshore reverse -> no result; impossible house numbers -> the street at 0.8), but invented names sharing a common word get confident false positives ("Trumyux Brewing Co" -> Belleflower Brewing, confidence 1.0) | Confidence is not a reliable "did it really match" signal; Phase 10 target |
+| F21 | Memory floor is set by fixed-size services: pip OOM-killed at 0.4 GB under reverse load, interpolation crash-looped at 1.9 GB; ES heap is the only big adjustable | Profiles raised; see LOAD_TEST_PLAN.md |
+| F22 | Pelias API runs one Node.js worker by default (`CPUS` env enables more), so extra vCPUs do not help the API itself unless `CPUS` is set | Tested as C4 vs C4a |
 | F11 | The whole Maine build is small: ~15 min, 1,649,644 documents, 435 MB snapshot | A VPS deploy is cheap to ship |
 
 ---

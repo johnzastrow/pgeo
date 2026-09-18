@@ -96,6 +96,8 @@ port to wharf (192.0.2.254) only. On the VPS the same VM-side Caddy terminates T
 | 8 | Ops: rebuild/update script (monthly OSM/OA refresh into a new index, alias swap), backups (ES snapshot or rebuild-from-scratch), log rotation, monitoring | `scripts/rebuild.sh`, runbook | Dry-run refresh |
 | 9 | (Optional) Add NH | Updated config | Re-run Phase 4-5 |
 | 10 | PostGIS-native geocoder, tuned against Pelias as the reference (section 10) | `pgeo/` service with a Pelias-compatible API | Shared test corpus + differential harness score |
+| 11 | API authorization: only authorized users/clients may call the API (section 12) | Auth at the edge for browsers and machine clients | Unauthorized requests rejected; keys revocable; audit log |
+| 12 | Capacity testing: minimum resources for 3 concurrent users, ramp to limits, repeat for Phase 10 (docs/LOAD_TEST_PLAN.md) | `tests/load/`, `docs/LOAD_TEST_RESULTS.md` | Pelias vs PostGIS comparison at equal resources |
 
 Build-time estimate for Maine: roughly 1-3 hours end-to-end, dominated by downloads,
 Valhalla polyline prep and OA import.
@@ -308,12 +310,24 @@ as a provisional expectation and flagged as such.
 | 10.8 | Confidence scoring | Better calibration than Pelias |
 | 10.9 | Loading/update tooling + admin UI (if needed) | One-command refresh with table swap |
 
-### Decisions deferred to Phase 10 start
+### Phase 10 decisions (2026-09-18)
 
-- Same VM vs separate VM for Postgres
-- `pg_search` (AGPL) as an A/B arm: yes/no
-- libpostal in-DB vs external service
-- PostgREST vs pg_featureserv vs a thin FastAPI layer
+- **Host:** develop and tune on the workstation in Docker (same data and load harness as
+  Pelias, cgroup-constrained per config); deploy to a VM only once competitive.
+- **Text search:** core extensions first (`pg_trgm`, FTS, `unaccent`, `fuzzystrmatch`);
+  ParadeDB `pg_search` (BM25, AGPL-3.0) as an A/B arm, adopted only on a clear harness win.
+- **libpostal:** test both as a service (existing `pelias/libpostal-service` container) and
+  as the in-database `pgsql-postal` extension built for PG18, plus a no-libpostal arm.
+  Early experiment: whether the ~2 GB model loads per backend or once via
+  `shared_preload_libraries` (shared copy-on-write across backends); patch if needed.
+- **API layer:** thin FastAPI service (asyncpg + PgBouncer) returning Pelias-shaped GeoJSON
+  (proposed; user did not object), so parsing mode and query strategy are switchable per
+  request for tuning.
+- **Tuning is first-class:** Postgres settings are tuned per resource budget (as Pelias got
+  a per-config heap); index, query-design, data-layout and pool experiments are recorded in
+  a tuning log with before/after per endpoint and query type. Speed gains that reduce
+  accuracy are rejected.
+- **Start:** after the Pelias load-test results are written up and committed.
 
 ## 11. Portability to the remote VPS
 
@@ -357,3 +371,22 @@ noticeably lighter, which is one of its practical payoffs on a VPS.
 - VPS provider, current specs (RAM/CPU/disk), and OS
 - Domain/subdomain for the public endpoint
 - Public API open to anyone, keyed clients only, or VPN-only
+
+## 12. Phase 11 -- API authorization (roadmap)
+
+Goal: only authorized users and clients can call `/v1/*`; the demo page keeps working for
+signed-in users. Authorization is enforced at the edge (wharf Caddy and/or the VM's
+nginx), so it applies equally to Pelias now and the PostGIS service later.
+
+| Option | How | Fits | Trade-offs |
+|--------|-----|------|-----------|
+| A. API keys for machine clients | Per-client random keys (CSPRNG, 256-bit) sent as `Authorization: Bearer` or `X-API-Key`; edge compares against a list of SHA-256 hashes; per-key rate limits and logging | Scripts, batch jobs, other apps | Key distribution and rotation; keys must never ship in public web pages |
+| B. SSO for browser users | Caddy `forward_auth` (or oauth2-proxy) against the existing identity service at `auth.example.org`; session cookie (Secure, HttpOnly, SameSite=Lax) | Demo page and human users | Depends on the IdP's availability; CSRF is moot for GET-only APIs but cookies still need the flags |
+| C. Network-level only | Tailscale ACLs / LAN allowlist (today's state) | Small trusted group | Authenticates devices, not users; no per-user audit |
+| D. mTLS client certificates | Caddy `client_auth` with an internal CA | Server-to-server | Certificate lifecycle overhead |
+
+Recommended target: **B + A** (SSO for people, hashed API keys for machines), keeping C as
+an outer layer while the service is LAN/tailnet-only, and required before any VPS
+exposure. Requirements to settle when this phase starts: which IdP `auth.wharf` runs, user
+and group model (who may use it), key issuance and revocation workflow, per-key quotas,
+audit log retention (queries contain addresses: treat logs as internal data).
