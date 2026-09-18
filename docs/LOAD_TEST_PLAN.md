@@ -133,14 +133,37 @@ limits + 0.8 GB for the OS (computed by `run_matrix.budget_gb`).
 Minimum resources for 3 users = the smallest configuration whose validation passes, with
 headroom judged from its ramp curve.
 
+### Data-volume dimension (how more data layers affect performance)
+
+Resources fixed at **C3** (2 CPUs, standard memory); the loaded data varies. Each subset
+is its own Elasticsearch index built with `_reindex` from the full index (same mapping, no
+re-import), and the API is pointed at it through a generated `pelias.json`.
+
+| Dataset | Sources | Pelias documents |
+|---------|---------|------------------|
+| D1 | Who's On First (admin areas, postal codes) | 3,280 |
+| D2 | D1 + OpenAddresses | 783,540 |
+| D3 | D2 + OpenStreetMap (addresses, venues, streets) | 1,552,532 |
+| D4 | D3 + GNIS + ZCTA | 1,573,062 |
+| D5 | D4 + Overture places (everything; as deployed) | 1,649,644 |
+
+Per dataset: the 3-user validation and the ramp, plus index size and Elasticsearch memory.
+The same corpus is used throughout, so on small datasets many queries become misses or
+fall back to towns; that is part of the measurement (fallback cost vs index size).
+Growth beyond Maine is measured with real data when New Hampshire is added (Phase 9)
+rather than synthetic duplicates, which would distort ranking. The PostGIS engine gets the
+same subsets through loader flags.
+
 ---
 
-## 5. Validation on the real VM (needs approval)
+## 5. Validation on the real VM (approved 2026-09-18, including ramp to crash)
 
-Re-run the 3-user validation, and optionally a ramp, against the Proxmox VM at the
-recommended minimum size. This affects the live service and shares CPU with other VMs on
-`prox82`, so it runs only with explicit approval, ideally in a quiet window. A crash test
-on the production VM is not planned unless requested.
+Re-run the 3-user validation and a full ramp to the breaking point against VM 120
+(4 vCPU / 10 GB) through an SSH tunnel to the API on 127.0.0.1:4000 (bypassing the edge
+rate limits; no production config change). Resource usage is sampled on the VM over SSH.
+After the crash test the query stack is restarted if needed and the public endpoint and
+demo page are re-verified. If results show the VM is clearly over- or under-sized, it is
+resized (approved) and re-validated.
 
 ---
 

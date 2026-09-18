@@ -6,7 +6,7 @@ users until the breaking point. Resource usage is sampled every 2 s. Results go 
 data/loadtest/<run-id>/ as JSON; tests/load/report.py turns them into Markdown.
 
 Usage (repo root):
-    python3 tests/load/run_matrix.py [--configs M0,C1,...] [--quick] [--no-restore]
+    python3 tests/load/run_matrix.py [--configs M0,C1,...] [--datasets D1,...] [--quick] [--no-restore]
 
 The load generator (k6 in Docker) is pinned to physical core 5 (CPUs 5,11); stacks use
 distinct physical cores starting at 0, so they never share a core with k6.
@@ -53,12 +53,29 @@ CONFIGS = {
     "C1": {"cpus": 1, "heap": "768m", "es_limit": 1.5, "workers": 1, "mem": MEM_FLOOR},
     # Added after C1 hit the floor profile's memory wall (placeholder OOM at 16 users):
     # the same single CPU with standard memory isolates the CPU-bound limit.
-    "C1s": {"cpus": 1, "heap": "768m", "es_limit": 1.5, "workers": 1, "mem": MEM_STD | {"placeholder": 1.0}},
+    "C1s": {
+        "cpus": 1,
+        "heap": "768m",
+        "es_limit": 1.5,
+        "workers": 1,
+        "mem": MEM_STD | {"placeholder": 1.0},
+    },
     "C2": {"cpus": 2, "heap": "768m", "es_limit": 1.5, "workers": 2, "mem": MEM_FLOOR},
     "C3": {"cpus": 2, "heap": "1g", "es_limit": 2.0, "workers": 2, "mem": MEM_STD},
     "C4": {"cpus": 4, "heap": "2g", "es_limit": 3.0, "workers": 4, "mem": MEM_STD},
     "C4a": {"cpus": 4, "heap": "2g", "es_limit": 3.0, "workers": 1, "mem": MEM_STD},
 }
+# Data-volume dimension: cumulative source subsets, each its own ES index built by
+# _reindex from the full index (D5 = the full "pelias" index as deployed).
+ES = "http://127.0.0.1:9200"
+DATASETS = {
+    "D1": ["whosonfirst"],
+    "D2": ["whosonfirst", "openaddresses"],
+    "D3": ["whosonfirst", "openaddresses", "openstreetmap"],
+    "D4": ["whosonfirst", "openaddresses", "openstreetmap", "gnis", "zcta"],
+    "D5": None,
+}
+
 RAMP = [1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256, 384, 512]
 
 
@@ -85,7 +102,81 @@ def budget_gb(cfg: dict) -> float | None:
     )
 
 
-def write_override(cfg: dict, path: Path) -> None:
+def es(method: str, path: str, body: dict | None = None, timeout: int = 3600) -> dict:
+    cmd = [
+        "curl",
+        "-sf",
+        "-m",
+        str(timeout),
+        "-X",
+        method,
+        f"{ES}{path}",
+        "-H",
+        "Content-Type: application/json",
+    ]
+    if body is not None:
+        cmd += ["-d", json.dumps(body)]
+    r = subprocess.run(cmd, text=True, capture_output=True)
+    if r.returncode != 0:
+        raise RuntimeError(f"ES {method} {path} failed: {r.stderr or r.stdout}")
+    return json.loads(r.stdout or "{}")
+
+
+def index_name(dataset: str | None) -> str:
+    return "pelias" if dataset in (None, "D5") else f"pelias_{dataset.lower()}"
+
+
+def ensure_dataset_index(dataset: str) -> int:
+    """Create the subset index (same settings and mappings) by reindexing; return doc count."""
+    name = index_name(dataset)
+    exists = (
+        subprocess.run(["curl", "-sf", "-o", "/dev/null", f"{ES}/{name}"]).returncode
+        == 0
+    )
+    if not exists:
+        src = es("GET", "/pelias")["pelias"]
+        settings = src["settings"]["index"]
+        for k in (
+            "uuid",
+            "creation_date",
+            "version",
+            "provided_name",
+            "routing",
+            "blocks",
+        ):
+            settings.pop(k, None)
+        es(
+            "PUT",
+            f"/{name}",
+            {"settings": {"index": settings}, "mappings": src["mappings"]},
+        )
+        es(
+            "POST",
+            "/_reindex?wait_for_completion=true&refresh=true",
+            {
+                "source": {
+                    "index": "pelias",
+                    "query": {"terms": {"source": DATASETS[dataset]}},
+                },
+                "dest": {"index": name},
+            },
+        )
+        es("POST", f"/{name}/_forcemerge?max_num_segments=1")
+    return es("GET", f"/{name}/_count")["count"]
+
+
+def index_mb(name: str) -> int:
+    rows = es("GET", f"/_cat/indices/{name}?bytes=b&h=store.size&format=json")
+    return round(int(rows[0]["store.size"]) / 1048576)
+
+
+def write_api_config(dataset: str, path: Path) -> None:
+    cfg = json.loads((PROJECT / "pelias.json").read_text())
+    cfg.setdefault("api", {})["indexName"] = index_name(dataset)
+    path.write_text(json.dumps(cfg, indent=1))
+
+
+def write_override(cfg: dict, path: Path, api_config: Path | None = None) -> None:
     """Compose override: cpuset, memory limits (no swap), ES heap, API workers."""
     lines = ["services:"]
     cpuset = (
@@ -113,6 +204,8 @@ def write_override(cfg: dict, path: Path) -> None:
                 f'      - "ES_JAVA_OPTS=-Xms{heap} -Xmx{heap}"',
                 '      - "path.repo=/usr/share/elasticsearch/snapshots"',
             ]
+        if svc == "api" and api_config is not None:
+            lines += ["    volumes:", f'      - "{api_config}:/code/pelias.json:ro"']
         if svc == "api":
             lines += [
                 "    environment:",
@@ -291,10 +384,17 @@ def evaluate(summary: dict) -> dict:
     return res
 
 
-def run_config(cid: str, cfg: dict, out_dir: Path, quick: bool) -> dict:
-    print(f"\n=== {cid} {cfg}", flush=True)
-    override = out_dir / f"override-{cid}.yml"
-    write_override(cfg, override)
+def run_config(
+    cid: str, cfg: dict, out_dir: Path, quick: bool, dataset: str | None = None
+) -> dict:
+    rid = cid if dataset is None else f"{cid}-{dataset}"
+    print(f"\n=== {rid} {cfg}", flush=True)
+    override = out_dir / f"override-{rid}.yml"
+    api_cfg = None
+    if dataset is not None:
+        api_cfg = out_dir / f"pelias-{dataset}.json"
+        write_api_config(dataset, api_cfg)
+    write_override(cfg, override, api_cfg)
     compose(
         [PROJECT / "docker-compose.yml", override],
         "up",
@@ -303,9 +403,13 @@ def run_config(cid: str, cfg: dict, out_dir: Path, quick: bool) -> dict:
         *SERVICES,
     )
     wait_ready()
-    run_k6(2, "30s", "5s", out_dir / cid / "warmup.json")  # warm caches, not recorded
+    run_k6(2, "30s", "5s", out_dir / rid / "warmup.json")  # warm caches, not recorded
     result = {
-        "id": cid,
+        "id": rid,
+        "base_config": cid,
+        "dataset": dataset,
+        "docs": es("GET", f"/{index_name(dataset)}/_count")["count"],
+        "index_mb": index_mb(index_name(dataset)),
         "config": cfg | {"mem": cfg["mem"]},
         "budget_gb": budget_gb(cfg),
         "runs": {},
@@ -315,7 +419,7 @@ def run_config(cid: str, cfg: dict, out_dir: Path, quick: bool) -> dict:
     val_dur, val_warm = ("60s", "15s") if quick else ("180s", "45s")
     sampler = Sampler()
     sampler.start()
-    summ = run_k6(3, val_dur, val_warm, out_dir / cid / "validate-3.json")
+    summ = run_k6(3, val_dur, val_warm, out_dir / rid / "validate-3.json")
     sampler.stop()
     health = container_health()
     v = evaluate(summ) | {
@@ -342,7 +446,7 @@ def run_config(cid: str, cfg: dict, out_dir: Path, quick: bool) -> dict:
     for n in RAMP:
         sampler = Sampler()
         sampler.start()
-        summ = run_k6(n, step_dur, step_warm, out_dir / cid / f"ramp-{n:03d}.json")
+        summ = run_k6(n, step_dur, step_warm, out_dir / rid / f"ramp-{n:03d}.json")
         sampler.stop()
         e = evaluate(summ)
         health = container_health()
@@ -372,7 +476,7 @@ def run_config(cid: str, cfg: dict, out_dir: Path, quick: bool) -> dict:
     result["breaking_users"] = (
         ramp[-1]["vus"] if ramp and (ramp[-1]["broken"] or ramp[-1]["died"]) else None
     )
-    (out_dir / f"{cid}.json").write_text(json.dumps(result, indent=1))
+    (out_dir / f"{rid}.json").write_text(json.dumps(result, indent=1))
     return result
 
 
@@ -385,14 +489,30 @@ def main() -> int:
     ap.add_argument(
         "--no-restore", action="store_true", help="leave the last config running"
     )
+    ap.add_argument(
+        "--datasets",
+        default="",
+        help="comma list of data subsets (D1..D5) to run each config against; default: full index",
+    )
     args = ap.parse_args()
+    datasets = [d for d in args.datasets.split(",") if d] or [None]
+    for d in datasets:
+        if d is not None and d not in DATASETS:
+            ap.error(f"unknown dataset {d}")
     run_id = datetime.now().strftime("%Y%m%d-%H%M")
     out_dir = ROOT / "data" / "loadtest" / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
     print(f"run {run_id} -> {out_dir}", flush=True)
     try:
-        for cid in args.configs.split(","):
-            run_config(cid, CONFIGS[cid], out_dir, args.quick)
+        for d in datasets:
+            if d is not None:
+                print(
+                    f"dataset {d}: {ensure_dataset_index(d):,} docs in {index_name(d)}",
+                    flush=True,
+                )
+        for d in datasets:
+            for cid in args.configs.split(","):
+                run_config(cid, CONFIGS[cid], out_dir, args.quick, d)
     finally:
         if not args.no_restore:
             print("restoring the default stack", flush=True)

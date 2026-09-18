@@ -199,9 +199,84 @@ def plots(results: list[dict], png_dir: Path, engine: str) -> list[str]:
     return files
 
 
+def dataset_section(ds: list[dict], png_dir: Path, rel: Path, engine: str) -> list[str]:
+    """Data-volume dimension: same resources, growing source subsets."""
+    ds = sorted(ds, key=lambda r: r["dataset"])
+    L = [
+        "## Data volume: how more data layers affect performance",
+        "",
+        f"Fixed resources ({cfg_label(ds[0])}); each dataset adds sources "
+        "(see LOAD_TEST_PLAN.md). p95 ms at 3 users.",
+        "",
+        "| Dataset | Documents | Index (MB) | 3 users: pass | ac p95 | search p95 | struct p95 "
+        "| rev p95 | miss p95 | ES mem peak (MB) | Max users in SLO | Breaking point |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|",
+    ]
+    for r in ds:
+        v = r["runs"]["validate"]
+        es_mem = v["resources"].get("elasticsearch", {}).get("mem_max_mb")
+        miss = v.get("qtypes", {}).get("miss", {}).get("p(95)")
+        L.append(
+            f"| {r['dataset']} | {fmt(r.get('docs'))} | {fmt(r.get('index_mb'))} | "
+            f"{'yes' if v['pass'] else '**no**'} | "
+            + " | ".join(fmt(p95(v, ep), 0) for ep in EPS)
+            + f" | {fmt(miss, 0)} | {fmt(es_mem)} | {r['limit_users']} | {r['breaking_users'] or '-'} |"
+        )
+    labels = ", ".join(f'"{r["dataset"]}"' for r in ds)
+    top = max([r["limit_users"] for r in ds] + [1])
+    L += [
+        "",
+        "```mermaid\nxychart-beta\n"
+        '    title "Max concurrent users within SLO by dataset"\n'
+        f"    x-axis [{labels}]\n"
+        f'    y-axis "users" 0 --> {int(top * 1.15) + 1}\n'
+        f"    bar [{', '.join(str(r['limit_users']) for r in ds)}]\n```",
+        "",
+    ]
+    ac = [p95(r["runs"]["validate"], "autocomplete") or 0 for r in ds]
+    se = [p95(r["runs"]["validate"], "search") or 0 for r in ds]
+    L += [
+        "```mermaid\nxychart-beta\n"
+        '    title "p95 at 3 users by dataset (first line autocomplete, second search)"\n'
+        f"    x-axis [{labels}]\n"
+        f'    y-axis "ms" 0 --> {int(max(ac + se + [10]) * 1.2)}\n'
+        f"    line [{', '.join(f'{x:.0f}' for x in ac)}]\n"
+        f"    line [{', '.join(f'{x:.0f}' for x in se)}]\n```",
+        "",
+    ]
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(12, 4.5))
+    docs = [r.get("docs") or 1 for r in ds]
+    for ep in EPS:
+        a1.plot(
+            docs,
+            [p95(r["runs"]["validate"], ep) or 0 for r in ds],
+            marker="o",
+            label=ep,
+        )
+    a1.set_xscale("log")
+    a1.set_xlabel("documents in index")
+    a1.set_ylabel("p95 ms at 3 users")
+    a1.set_title("Latency vs data volume")
+    a1.legend(fontsize=8)
+    a1.grid(alpha=0.3, which="both")
+    a2.bar([r["dataset"] for r in ds], [r["limit_users"] for r in ds], color="#b3246b")
+    a2.set_title("Max users within SLO")
+    a2.grid(alpha=0.3, axis="y")
+    fig.suptitle(f"{engine}: data volume at fixed resources")
+    fig.tight_layout()
+    f = png_dir / f"{engine.lower()}-data-volume.png"
+    fig.savefig(f, dpi=110)
+    plt.close(fig)
+    L += [f"![data volume]({rel / f.name})", ""]
+    return L
+
+
 def report(run_dirs: list[Path], engine: str, out: Path, png_dir: Path) -> None:
-    results = load(run_dirs)
-    pngs = plots(results, png_dir, engine)
+    everything = load(run_dirs)
+    results = [r for r in everything if not r.get("dataset")]
+    datasets = [r for r in everything if r.get("dataset")]
+    png_dir.mkdir(parents=True, exist_ok=True)
+    pngs = plots(results, png_dir, engine) if results else []
     rel = Path("loadtest") if out.parent.name == "docs" else png_dir
     L: list[str] = []
     L += [
@@ -252,8 +327,12 @@ def report(run_dirs: list[Path], engine: str, out: Path, png_dir: Path) -> None:
         L.append(f"| {r['id']} | " + " | ".join(cells) + " |")
     L.append("")
 
+    rel_dir = Path("loadtest") if out.parent.name == "docs" else png_dir
+    if datasets:
+        L += dataset_section(datasets, png_dir, rel_dir, engine)
+
     L += ["## Ramp detail per configuration", ""]
-    for r in results:
+    for r in results + sorted(datasets, key=lambda r: r["dataset"]):
         L += [
             f"### {r['id']}: {cfg_label(r)}",
             "",
