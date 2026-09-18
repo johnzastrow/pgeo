@@ -65,6 +65,22 @@ the API's `sources=` / `layers=` filters work on them.
 Disk: SSD/NVMe-backed storage, virtio-scsi, `discard=on`. Set `vm.max_map_count=262144`
 for Elasticsearch.
 
+### Environment facts (probed 2026-09-18, read-only)
+
+| Item | Value |
+|------|-------|
+| Proxmox | node `prox82`, 192.0.2.10, PVE 9.2.11, 12 threads, ~46 GB RAM |
+| Host RAM headroom | ~9 GB available with current VMs running -- the binding constraint |
+| Storage choice | `nvme2tb` (Samsung 980 PRO NVMe, dir storage, ~1.0 TB free) -- preferred over `ssd4tb` (SATA 870 EVO, 72% used, ~0.9 TB free) |
+| Network | `vmbr0` (not VLAN-aware) = primary LAN 192.0.2.0/24; VM on DHCP, reserve on router later |
+| TLS / ingress | Existing Caddy on `wharf` (VM 102; LAN 192.0.2.254, tailnet 100.64.0.2). `*.example.org` resolves to the tailnet IP, so "internal" = LAN + tailnet |
+| Cloud images on host | `debian-13-genericcloud-amd64.qcow2` already present (no Ubuntu image yet) |
+
+Ingress path: client -> HTTPS -> wharf Caddy (TLS) -> HTTP over LAN -> pelias VM
+Caddy (path allowlist, rate limit, demo static files) -> api:4000 on 127.0.0.1. The VM's
+Caddy runs on the host network (not a Docker-published port) so UFW can restrict its
+port to wharf (192.0.2.254) only. On the VPS the same VM-side Caddy terminates TLS itself.
+
 ## 5. Phases
 
 | Phase | Work | Output | Verification |
@@ -121,6 +137,14 @@ other pages later (your requirement #5).
 - VM on primary VLAN, disk on the best SSD pool (2 TB or 4 TB SSD).
 - D7 Secrets in `.env` (0600, gitignored).
 - Data is downloaded and pre-processed on the workstation, then shipped to the VM.
+- VM: Debian 13 (existing genericcloud image on the host), 4 vCPU, **10 GB RAM**, 120 GB
+  disk on `nvme2tb`, `vmbr0` DHCP (reserve on router later).
+- Ingress: HTTPS at `geocoder.example.org` via the existing wharf Caddy (LAN/tailnet only).
+- No OpenAddresses token yet: first build uses the importer's shared default token; swap
+  in our own token via `.env` when available.
+- Because 10 GB is tight for imports, the full Pelias build (download, prepare, import)
+  runs on the workstation (31 GB RAM); the VM runs query services only and receives an
+  Elasticsearch snapshot + service data dirs. This is the same path the VPS will use.
 
 ## 8. Security baseline (production profile)
 
