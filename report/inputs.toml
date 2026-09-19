@@ -1,0 +1,20 @@
+# Inputs for the report (paths relative to the repository root). Change a run id here to
+# rebuild the report from newer results: scripts/build_report.sh
+
+[load]
+# Pelias capacity matrix: later directories win for the same configuration id
+pelias = ["data/loadtest/20260918-1834", "data/loadtest/20260918-2051"]
+pelias_datasets = ["data/loadtest/20260919-0718"]
+pgeo = ["data/loadtest/20260918-2343-pgeo", "data/loadtest/20260919-0350-pgeo"]
+
+[accuracy]
+# engine key -> result file (tests/accuracy/run_accuracy.py output)
+main = { pelias = "data/accuracy/pelias-default.json", "pgeo-sql" = "data/accuracy/pgeo-sql-rest.json", "pgeo-api" = "data/accuracy/pgeo-api-rule.json", "pgeo-api-svc" = "data/accuracy/pgeo-api-service.json" }
+fuzz = { pelias = "data/accuracy/pelias-fuzz.json", "pgeo-sql" = "data/accuracy/pgeo-fuzz-sql-rest.json" }
+
+[compat]
+result = "report/data/compat.json"      # written by tests/compat/compat_test.py --json
+
+[snapshot]
+# live facts (document counts, sizes, versions) captured by collect.py; reused offline
+file = "report/data/snapshot.json"

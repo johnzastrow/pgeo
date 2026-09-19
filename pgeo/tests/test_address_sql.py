@@ -66,10 +66,14 @@ def test_usps_secondary(unit, want):
     assert (r["designator"], r["unit_number"]) == want
 
 
-def address(**kw):
+def address_doc(**kw) -> dict:
     args = {k: kw.get(k) for k in ("ids", "text", "lat", "lon", "radius", "unit")}
     row = q("SELECT geocode_api.v1_address($1, $2, $3, $4, $5, $6) AS d", *args.values())[0]
-    return json.loads(row["d"])["features"]
+    return json.loads(row["d"])
+
+
+def address(**kw):
+    return address_doc(**kw)["features"]
 
 
 def test_exact_address_with_typed_unit():
@@ -96,5 +100,6 @@ def test_rejects_ambiguous_or_bad_input():
         {"lat": 43.6},
         {"lat": 43.6, "lon": -70.2, "radius": 50.0},
     ):
-        with pytest.raises(asyncpg.InvalidParameterValueError):
-            address(**kw)
+        # input errors come back as a Pelias-style envelope (HTTP 400 through the front ends)
+        doc = address_doc(**kw)
+        assert doc["geocoding"]["errors"] and doc["features"] == []

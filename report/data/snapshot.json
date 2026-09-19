@@ -1,0 +1,332 @@
+{
+ "pgeo": {
+  "by_layer_source": [
+   {
+    "layer": "address",
+    "source": "openaddresses",
+    "n": 677229
+   },
+   {
+    "layer": "address",
+    "source": "openstreetmap",
+    "n": 25472
+   },
+   {
+    "layer": "county",
+    "source": "whosonfirst",
+    "n": 16
+   },
+   {
+    "layer": "localadmin",
+    "source": "whosonfirst",
+    "n": 532
+   },
+   {
+    "layer": "locality",
+    "source": "whosonfirst",
+    "n": 1591
+   },
+   {
+    "layer": "neighbourhood",
+    "source": "whosonfirst",
+    "n": 708
+   },
+   {
+    "layer": "postalcode",
+    "source": "whosonfirst",
+    "n": 441
+   },
+   {
+    "layer": "postalcode",
+    "source": "zcta",
+    "n": 426
+   },
+   {
+    "layer": "region",
+    "source": "whosonfirst",
+    "n": 1
+   },
+   {
+    "layer": "street",
+    "source": "openstreetmap",
+    "n": 67312
+   },
+   {
+    "layer": "venue",
+    "source": "gnis",
+    "n": 20104
+   },
+   {
+    "layer": "venue",
+    "source": "openstreetmap",
+    "n": 35687
+   },
+   {
+    "layer": "venue",
+    "source": "overture",
+    "n": 76582
+   }
+  ],
+  "table_bytes": {
+   "feature": 642023424,
+   "admin": 22749184,
+   "street_name": 17014784,
+   "ac_prefix": 3514368,
+   "town": 172032,
+   "build_info": 65536
+  },
+  "index_bytes": {
+   "feature_gid_idx": 54542336,
+   "feature_geom_idx": 37396480,
+   "feature_addr_idx": 34537472,
+   "feature_addr_street_hn_idx": 24305664,
+   "feature_addr_hn_idx": 23928832,
+   "feature_pkey": 20373504,
+   "feature_tokens_idx": 17932288,
+   "feature_name_trgm_idx": 13139968,
+   "feature_layer_idx": 6299648,
+   "feature_name_idx": 6070272,
+   "street_name_pkey": 4997120,
+   "street_name_trgm_idx": 3907584,
+   "feature_street_idx": 3006464,
+   "ac_prefix_pkey": 1179648,
+   "street_name_locality_idx": 663552,
+   "admin_pkey": 139264,
+   "admin_geom_idx": 114688,
+   "town_pkey": 65536,
+   "feature_postcode_idx": 40960,
+   "admin_placetype_idx": 40960,
+   "build_info_pkey": 16384
+  },
+  "build": {
+   "sources": [
+    "whosonfirst",
+    "openaddresses",
+    "openstreetmap",
+    "gnis",
+    "zcta",
+    "overture"
+   ],
+   "built_at": "2026-09-18T21:28:26-0400",
+   "timings_s": {
+    "osm": 43.0,
+    "stage": 20.0,
+    "enrich_index": 727.4
+   },
+   "raw_counts": {
+    "gnis": 20104,
+    "zcta": 426,
+    "overture": 76582,
+    "whosonfirst": 3289,
+    "openaddresses": 780534
+   },
+   "features_by_layer": {
+    "venue": 132373,
+    "county": 16,
+    "region": 1,
+    "street": 67312,
+    "address": 702701,
+    "locality": 1591,
+    "localadmin": 532,
+    "postalcode": 867,
+    "neighbourhood": 708
+   }
+  },
+  "postgres": "PostgreSQL 18.6 (Debian 18.6-1.pgdg13+2)",
+  "postgis": "3.6.4",
+  "db_bytes": 1400182463,
+  "engine_version": "0+unknown",
+  "captured": "2026-09-19T11:25:10"
+ },
+ "pelias": {
+  "by_layer_source": [
+   {
+    "layer": "address",
+    "source": "openaddresses",
+    "n": 780260
+   },
+   {
+    "layer": "address",
+    "source": "openstreetmap",
+    "n": 641485
+   },
+   {
+    "layer": "venue",
+    "source": "overture",
+    "n": 76582
+   },
+   {
+    "layer": "street",
+    "source": "openstreetmap",
+    "n": 65323
+   },
+   {
+    "layer": "venue",
+    "source": "openstreetmap",
+    "n": 62184
+   },
+   {
+    "layer": "venue",
+    "source": "gnis",
+    "n": 20104
+   },
+   {
+    "layer": "locality",
+    "source": "whosonfirst",
+    "n": 1591
+   },
+   {
+    "layer": "neighbourhood",
+    "source": "whosonfirst",
+    "n": 706
+   },
+   {
+    "layer": "localadmin",
+    "source": "whosonfirst",
+    "n": 532
+   },
+   {
+    "layer": "postalcode",
+    "source": "whosonfirst",
+    "n": 433
+   },
+   {
+    "layer": "postalcode",
+    "source": "zcta",
+    "n": 426
+   },
+   {
+    "layer": "county",
+    "source": "whosonfirst",
+    "n": 16
+   },
+   {
+    "layer": "country",
+    "source": "whosonfirst",
+    "n": 1
+   },
+   {
+    "layer": "region",
+    "source": "whosonfirst",
+    "n": 1
+   }
+  ],
+  "docs": 1649644,
+  "index_bytes": 456027545,
+  "elasticsearch": "7.17.27",
+  "images": [
+   "pelias/api",
+   "pelias/csv-importer",
+   "pelias/elasticsearch",
+   "pelias/fuzzy-tester",
+   "pelias/interpolation",
+   "pelias/libpostal-service",
+   "pelias/openaddresses",
+   "pelias/openstreetmap",
+   "pelias/pip-service",
+   "pelias/placeholder",
+   "pelias/polylines",
+   "pelias/schema",
+   "pelias/transit",
+   "pelias/whosonfirst"
+  ],
+  "captured": "2026-09-19T11:25:10"
+ },
+ "host": {
+  "cpu": "AMD Ryzen 5 3600 6-Core Processor",
+  "logical_cpus": 12,
+  "memory_gb": 31.3,
+  "kernel": "7.0.0-31-generic",
+  "docker": "Docker version 29.1.3, build 29.1.3-0ubuntu4.1",
+  "captured": "2026-09-19T11:25:10"
+ },
+ "raw_data": [
+  {
+   "source": "OpenStreetMap",
+   "what": "Geofabrik Maine extract (PBF)",
+   "path": "data/raw/osm/maine-latest.osm.pbf",
+   "bytes": 90862431
+  },
+  {
+   "source": "OpenAddresses",
+   "what": "Maine statewide addresses",
+   "path": "data/pelias/openaddresses",
+   "bytes": 233067831
+  },
+  {
+   "source": "Who's On First",
+   "what": "admin polygons (US SQLite, Maine subset used)",
+   "path": "data/pelias/whosonfirst",
+   "bytes": 5508923392
+  },
+  {
+   "source": "USGS GNIS",
+   "what": "Domestic Names, Maine",
+   "path": "data/raw/gnis",
+   "bytes": 3673995
+  },
+  {
+   "source": "Census ZCTA",
+   "what": "2025 Gazetteer (national, filtered)",
+   "path": "data/raw/zcta",
+   "bytes": 952026
+  },
+  {
+   "source": "Overture Maps",
+   "what": "places, 2026-08-19 release, Maine bbox",
+   "path": "data/raw/overture/places_2026-08-19.0_me_bbox.parquet",
+   "bytes": 16671289
+  },
+  {
+   "source": "TIGER / OA interpolation",
+   "what": "Pelias interpolation database",
+   "path": "data/pelias/interpolation",
+   "bytes": 348643569
+  }
+ ],
+ "test_sets": {
+  "accuracy_cases": 1560,
+  "accuracy_composition": {
+   "search|address|variant": 93,
+   "search|address|typo": 87,
+   "search|address|exact": 220,
+   "structured|address|exact": 150,
+   "reverse|reverse_address|exact": 200,
+   "search|town|variant": 24,
+   "search|town|exact": 92,
+   "search|town|typo": 34,
+   "search|lake_summit|exact": 83,
+   "search|lake_summit|typo": 35,
+   "search|lake_summit|variant": 32,
+   "search|venue|typo": 42,
+   "search|venue|exact": 108,
+   "search|zip|exact": 60,
+   "autocomplete|town|exact": 75,
+   "autocomplete|venue|exact": 75,
+   "search|miss|miss": 150
+  },
+  "fuzz_cases": 1800,
+  "fuzz_levels": [
+   "F0",
+   "F1",
+   "F2",
+   "F3",
+   "F4",
+   "F5"
+  ],
+  "load_corpus": {
+   "addresses": 3000,
+   "structured": 1000,
+   "oa_points": 1000,
+   "places": 800,
+   "venues": 1000,
+   "zips": 200,
+   "foci": 120,
+   "random_points": 1000,
+   "typos": 1200,
+   "variants": 1200,
+   "misses": 600,
+   "miss_points": 300
+  }
+ }
+}

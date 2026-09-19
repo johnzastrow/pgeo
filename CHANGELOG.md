@@ -23,6 +23,18 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-09-19
+
+### Added
+- Compatibility contract test (`tests/compat/compat_test.py`): 27 documented Pelias requests
+  against Pelias and both pgeo engines; 28 failures -> 0 with pgeo 0.7.0.
+- pgeo edge: `boundary.circle.*` renamed for PostgREST; unsupported parameters return a
+  Pelias-shaped 400.
+- Report pipeline groundwork (`report/`): figures, diagrams (PNG + editable SVG), data snapshot.
+
+### Changed
+- ZIP+4 declined: the address API stays on open data (docs/ADDRESS_API.md).
+
 ## [0.10.1] - 2026-09-19
 
 ### Added
@@ -139,7 +151,8 @@ commits where each milestone was complete.
   (`docs/DATA_PIPELINE.md`).
 - Project plan, environment facts and decision log.
 
-[Unreleased]: https://git.example.org/jcz/pelias_maine/compare/v0.10.1...HEAD
+[Unreleased]: https://git.example.org/jcz/pelias_maine/compare/v0.11.0...HEAD
+[0.11.0]: https://git.example.org/jcz/pelias_maine/compare/v0.10.1...v0.11.0
 [0.10.1]: https://git.example.org/jcz/pelias_maine/compare/v0.10.0...v0.10.1
 [0.10.0]: https://git.example.org/jcz/pelias_maine/compare/v0.9.0...v0.10.0
 [0.9.0]: https://git.example.org/jcz/pelias_maine/compare/v0.8.0...v0.9.0

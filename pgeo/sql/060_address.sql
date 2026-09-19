@@ -16,6 +16,7 @@
 -- Reference data (schema geocode: survives rebuilds; recreated here so edits apply)
 -- ---------------------------------------------------------------------------------------
 DROP TABLE IF EXISTS geocode.usps_suffix, geocode.usps_unit, geocode.usps_direction, geocode.county_fips CASCADE;
+-- county FIPS codes live in geocode.county_ref (010_base.sql), shared with the build
 -- OUT-parameter functions cannot change their result columns in place
 DROP FUNCTION IF EXISTS geocode.usps_street(text), geocode.usps_secondary(text),
   geocode.nearest_address(geometry, double precision),
@@ -123,15 +124,7 @@ INSERT INTO geocode.usps_direction (variant, standard) VALUES
   ('NE','NE'),('NORTHEAST','NE'),('NW','NW'),('NORTHWEST','NW'),('SE','SE'),('SOUTHEAST','SE'),
   ('SW','SW'),('SOUTHWEST','SW');
 
--- Census FIPS codes for Maine's 16 counties (state 23)
-CREATE TABLE geocode.county_fips (county text PRIMARY KEY, fips text NOT NULL);
-INSERT INTO geocode.county_fips (county, fips) VALUES
-  ('androscoggin','23001'),('aroostook','23003'),('cumberland','23005'),('franklin','23007'),
-  ('hancock','23009'),('kennebec','23011'),('knox','23013'),('lincoln','23015'),('oxford','23017'),
-  ('penobscot','23019'),('piscataquis','23021'),('sagadahoc','23023'),('somerset','23025'),
-  ('waldo','23027'),('washington','23029'),('york','23031');
-
-GRANT SELECT ON geocode.usps_suffix, geocode.usps_unit, geocode.usps_direction, geocode.county_fips TO pgeo_api;
+GRANT SELECT ON geocode.usps_suffix, geocode.usps_unit, geocode.usps_direction, geocode.county_ref TO pgeo_api;
 
 -- Invalid input: same error code as the 050 helpers, which the APIs return as HTTP 400
 CREATE OR REPLACE FUNCTION geocode.check_fail(msg text) RETURNS void
@@ -299,7 +292,7 @@ AS $$
     'municipality', coalesce(f.locality, f.localadmin),
     'neighbourhood', f.neighbourhood,
     'county', f.county,
-    'county_fips', (SELECT c.fips FROM geocode.county_fips c
+    'county_fips', (SELECT c.fips FROM geocode.county_ref c
                     WHERE c.county = lower(regexp_replace(coalesce(f.county, ''), '\s+County$', '', 'i'))),
     'state', f.region,
     'state_code', coalesce(f.region_a, 'ME'),
@@ -362,7 +355,8 @@ $$;
 CREATE OR REPLACE FUNCTION geocode_api.v1_address(
     ids text DEFAULT NULL, text text DEFAULT NULL,
     lat double precision DEFAULT NULL, lon double precision DEFAULT NULL,
-    radius double precision DEFAULT NULL, unit text DEFAULT NULL)
+    radius double precision DEFAULT NULL, unit text DEFAULT NULL,
+    lang text DEFAULT NULL, api_key text DEFAULT NULL, debug text DEFAULT NULL)
 RETURNS jsonb LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
 DECLARE
@@ -377,6 +371,7 @@ DECLARE
   q        jsonb;
   unit_q   text;
 BEGIN
+  PERFORM geocode.check_extras(NULL, NULL, NULL, lang, api_key);
   IF n_inputs <> 1 THEN
     PERFORM geocode.check_fail('give exactly one of ids, text, or point.lat + point.lon');
   END IF;
@@ -453,6 +448,9 @@ BEGIN
       'timestamp', (extract(epoch FROM clock_timestamp()) * 1000)::bigint),
     'type', 'FeatureCollection',
     'features', feats);
+EXCEPTION WHEN SQLSTATE '22023' THEN
+  RETURN geocode.api_error(jsonb_strip_nulls(jsonb_build_object('ids', ids, 'text', text, 'point.lat', lat,
+                                                                'point.lon', lon)), SQLERRM);
 END
 $$;
 

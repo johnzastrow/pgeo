@@ -1,0 +1,399 @@
+{
+ "engines": {
+  "pelias": "http://127.0.0.1:4000",
+  "pgeo-api": "http://127.0.0.1:4500",
+  "pgeo-sql": "http://127.0.0.1:4700"
+ },
+ "cases": [
+  {
+   "case": "search basic",
+   "path": "search",
+   "params": {
+    "text": "389 Congress St, Portland, ME"
+   },
+   "expect": 200,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "search properties",
+   "path": "search",
+   "params": {
+    "text": "389 Congress St, Portland, ME"
+   },
+   "expect": 200,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "search focus",
+   "path": "search",
+   "params": {
+    "text": "main st",
+    "focus.point.lat": "44.8016",
+    "focus.point.lon": "-68.7712"
+   },
+   "expect": 200,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "search boundary.rect",
+   "path": "search",
+   "params": {
+    "text": "main st",
+    "boundary.rect.min_lat": "44.7",
+    "boundary.rect.max_lat": "44.9",
+    "boundary.rect.min_lon": "-68.9",
+    "boundary.rect.max_lon": "-68.6"
+   },
+   "expect": 200,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "search boundary.circle",
+   "path": "search",
+   "params": {
+    "text": "main st",
+    "boundary.circle.lat": "44.8016",
+    "boundary.circle.lon": "-68.7712",
+    "boundary.circle.radius": "15"
+   },
+   "expect": 200,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "search circle + focus",
+   "path": "search",
+   "params": {
+    "text": "main st",
+    "boundary.circle.lat": "44.8016",
+    "boundary.circle.lon": "-68.7712",
+    "boundary.circle.radius": "15",
+    "focus.point.lat": "44.8016",
+    "focus.point.lon": "-68.7712"
+   },
+   "expect": 200,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "search boundary.gid",
+   "path": "search",
+   "params": {
+    "text": "congress st",
+    "boundary.gid": "whosonfirst:locality:85948877"
+   },
+   "expect": 200,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "search boundary.country USA",
+   "path": "search",
+   "params": {
+    "text": "bangor",
+    "boundary.country": "USA"
+   },
+   "expect": 200,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "search boundary.country FRA",
+   "path": "search",
+   "params": {
+    "text": "bangor",
+    "boundary.country": "FRA"
+   },
+   "expect": 200,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "search layers+sources",
+   "path": "search",
+   "params": {
+    "text": "portland",
+    "layers": "locality",
+    "sources": "wof"
+   },
+   "expect": 200,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "search lang + api_key",
+   "path": "search",
+   "params": {
+    "text": "bangor",
+    "lang": "en",
+    "api_key": "abc123"
+   },
+   "expect": 200,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "search size",
+   "path": "search",
+   "params": {
+    "text": "main st",
+    "size": "3"
+   },
+   "expect": 200,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "structured",
+   "path": "search/structured",
+   "params": {
+    "address": "389 Congress St",
+    "locality": "Portland",
+    "region": "ME"
+   },
+   "expect": 200,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "structured circle",
+   "path": "search/structured",
+   "params": {
+    "address": "Main St",
+    "boundary.circle.lat": "44.8016",
+    "boundary.circle.lon": "-68.7712",
+    "boundary.circle.radius": "15"
+   },
+   "expect": 200,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "autocomplete",
+   "path": "autocomplete",
+   "params": {
+    "text": "389 congress"
+   },
+   "expect": 200,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "autocomplete circle",
+   "path": "autocomplete",
+   "params": {
+    "text": "main",
+    "boundary.circle.lat": "44.8016",
+    "boundary.circle.lon": "-68.7712",
+    "boundary.circle.radius": "15"
+   },
+   "expect": 200,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "autocomplete gid",
+   "path": "autocomplete",
+   "params": {
+    "text": "congress",
+    "boundary.gid": "whosonfirst:locality:85948877"
+   },
+   "expect": 200,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "reverse",
+   "path": "reverse",
+   "params": {
+    "point.lat": "43.6568",
+    "point.lon": "-70.2626"
+   },
+   "expect": 200,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "reverse radius",
+   "path": "reverse",
+   "params": {
+    "point.lat": "43.6568",
+    "point.lon": "-70.2626",
+    "boundary.circle.radius": "1"
+   },
+   "expect": 200,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "reverse properties",
+   "path": "reverse",
+   "params": {
+    "point.lat": "43.6568",
+    "point.lon": "-70.2626",
+    "layers": "address"
+   },
+   "expect": 200,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "reverse country",
+   "path": "reverse",
+   "params": {
+    "point.lat": "43.6568",
+    "point.lon": "-70.2626",
+    "boundary.country": "US"
+   },
+   "expect": 200,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "place",
+   "path": "place",
+   "params": {
+    "ids": "whosonfirst:locality:85948877"
+   },
+   "expect": 200,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "error: search without text",
+   "path": "search",
+   "params": {},
+   "expect": 400,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "error: bad focus",
+   "path": "search",
+   "params": {
+    "text": "x",
+    "focus.point.lat": "999",
+    "focus.point.lon": "0"
+   },
+   "expect": 400,
+   "results": {
+    "pelias": "HTTP 200 (want 400): {'geocoding': {'version': '0.2', 'attribution': 'http://127.0.0.1:4000/attribution', 'quer",
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "error: bad layer",
+   "path": "search",
+   "params": {
+    "text": "x",
+    "layers": "planet"
+   },
+   "expect": 400,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "error: reverse without point",
+   "path": "reverse",
+   "params": {},
+   "expect": 400,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
+   "case": "error: circle without lon",
+   "path": "search",
+   "params": {
+    "text": "x",
+    "boundary.circle.lat": "44.8"
+   },
+   "expect": 400,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  }
+ ],
+ "failures": 0
+}

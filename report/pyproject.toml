@@ -1,0 +1,16 @@
+[project]
+name = "pelias-maine-report"
+version = "1.0.0"
+description = "Builds the Pelias Maine / pgeo study report (Markdown + PDF) from saved results"
+requires-python = ">=3.12"
+dependencies = [
+    "matplotlib==3.11.2",
+    "numpy==2.5.3",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"

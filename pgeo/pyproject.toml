@@ -1,6 +1,6 @@
 [project]
 name = "pgeo"
-version = "0.6.0"
+version = "0.7.0"
 description = "PostgreSQL/PostGIS geocoder with a Pelias-compatible API (Phase 10)"
 requires-python = ">=3.12"
 dependencies = [

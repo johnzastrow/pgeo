@@ -61,6 +61,7 @@ CREATE TABLE feature (
     geom          geometry(Point, 4326) NOT NULL,
     bbox          double precision[],
     admin_id      bigint,                   -- admin rows that are also features
+    hier          jsonb,                    -- Pelias hierarchy ids: locality_gid, county_gid, county_a, ...
     importance    real NOT NULL DEFAULT 0,
     -- normalized forms, filled by the enrich step
     name_norm     text,

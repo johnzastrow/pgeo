@@ -94,7 +94,7 @@ geometry (for a `nearest` match, the place itself, not the address point).
 
 - **Not CASS-certified and not a deliverability check**: it standardizes what the open data
   says. It cannot tell whether USPS delivers to the address.
-- **No ZIP+4**: not in open data (see "ZIP+4" below).
+- **No ZIP+4**: not in open data, and the licensed USPS file was declined (see "ZIP+4" below).
 - **Last-line city** follows the source data. Where OpenAddresses gives the town ("PARIS")
   and USPS prefers another name for the ZIP ("SOUTH PARIS" for 04281), the USPS preference
   is not known without the USPS City State file.
@@ -102,6 +102,9 @@ geometry (for a `nearest` match, the place itself, not the address point).
   into one, so a record's own unit would be arbitrary.
 
 ## ZIP+4 and USPS reference data
+
+**Decision (2026-09-19): ZIP+4 is dropped.** The API stays on open data; the research below
+is kept for reference if the question comes back.
 
 USPS sells the data that would close the last three gaps (checked 2026-09-19):
 

@@ -1,0 +1,19 @@
+{
+ "source": "docs/PGEO_TUNING.md (tuning log); each value is the measured accuracy after that step on the 1,560-case set",
+ "note": "The word_similarity step also corrected the test set (non-unique names qualified with a town), for both engines.",
+ "steps": [
+  {"step": "Baseline", "correct": 80.3, "what": "first pgeo build, libpostal service parser"},
+  {"step": "Norm + towns", "correct": 90.4, "what": "abbreviations expanded; towns matched on WOF and postal city; ZIP only as fallback; OA/OSM dedupe"},
+  {"step": "word_similarity", "correct": 92.7, "what": "similarity direction (query, name); test set qualified non-unique names"},
+  {"step": "Calibration", "correct": 92.9, "what": "ambiguity-aware confidence"},
+  {"step": "Ties + focus", "correct": 93.1, "what": "state suffix dropped; focus tie-break before candidate limits; name tie-breaker"},
+  {"step": "Town-aware", "correct": 95.8, "what": "queried town as a location; admin auto-agreement only for bare towns"},
+  {"step": "Address in any town", "correct": 95.8, "what": "house number looked up on best street names in every town (calibration)"}
+ ],
+ "pelias": 75.5,
+ "calibration": [
+  {"step": "Before", "right": 0.94, "wrong": 0.90},
+  {"step": "Ambiguity penalty", "right": 0.91, "wrong": 0.70},
+  {"step": "Address in any town", "right": 0.92, "wrong": 0.69}
+ ]
+}

@@ -10,6 +10,23 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-09-19
+
+### Added
+- Pelias API compatibility (docs/PELIAS_COMPATIBILITY.md): `boundary.circle.*`,
+  `boundary.gid`, `boundary.country` and `categories` on search, structured, autocomplete
+  (and gid/country/categories on reverse); `lang`, `api_key`, `debug` accepted; Pelias
+  hierarchy properties (`*_gid`, `county_a`, `country_code`, `country_gid`) from WOF ids
+  recorded at build time (`feature.hier`); counties named "X County" as in Pelias.
+- Pelias-shaped HTTP 400 errors from the pure-SQL API (PostgREST `response.status`).
+
+### Fixed
+- `boundary.rect` returned no results (filter applied after the candidate cut).
+- Reverse geocoding scanned all features per request: new index `feature_admin_idx`.
+
+### Changed
+- `/v1/address` returns input errors as a Pelias-style envelope (HTTP 400) instead of raising.
+
 ## [0.6.0] - 2026-09-19
 
 ### Added

@@ -6,24 +6,32 @@ CREATE INDEX admin_geom_idx ON admin USING gist (geom);
 CREATE INDEX admin_placetype_idx ON admin (placetype);
 ANALYZE admin;
 
--- Smallest containing polygon per placetype for each raw point.
+-- Smallest containing polygon per placetype for each raw point: its name, and its WOF id
+-- for the Pelias hierarchy fields (locality_gid, county_gid, ...).
 CREATE TEMP TABLE hier AS
 SELECT r.rid,
-  (SELECT a.name FROM admin a WHERE a.placetype = 'neighbourhood' AND ST_Intersects(a.geom, r.geom)
-     ORDER BY ST_Area(a.geom) LIMIT 1) AS neighbourhood,
-  (SELECT a.name FROM admin a WHERE a.placetype = 'locality' AND ST_Intersects(a.geom, r.geom)
-     ORDER BY ST_Area(a.geom) LIMIT 1) AS locality,
-  (SELECT a.name FROM admin a WHERE a.placetype = 'localadmin' AND ST_Intersects(a.geom, r.geom)
-     ORDER BY ST_Area(a.geom) LIMIT 1) AS localadmin,
-  (SELECT a.name FROM admin a WHERE a.placetype = 'county' AND ST_Intersects(a.geom, r.geom)
-     ORDER BY ST_Area(a.geom) LIMIT 1) AS county
-FROM feature_raw r;
+  nb.name AS neighbourhood, lo.name AS locality, la.name AS localadmin, co.name AS county,
+  jsonb_strip_nulls(jsonb_build_object(
+    'neighbourhood_gid', 'whosonfirst:neighbourhood:' || nb.source_id,
+    'locality_gid', 'whosonfirst:locality:' || lo.source_id,
+    'localadmin_gid', 'whosonfirst:localadmin:' || la.source_id,
+    'county_gid', 'whosonfirst:county:' || co.source_id,
+    'county_a', (SELECT c.abbr FROM geocode.county_ref c WHERE c.county = lower(co.name)))) AS hier
+FROM feature_raw r
+LEFT JOIN LATERAL (SELECT a.name, a.source_id FROM admin a WHERE a.placetype = 'neighbourhood'
+                   AND ST_Intersects(a.geom, r.geom) ORDER BY ST_Area(a.geom) LIMIT 1) nb ON true
+LEFT JOIN LATERAL (SELECT a.name, a.source_id FROM admin a WHERE a.placetype = 'locality'
+                   AND ST_Intersects(a.geom, r.geom) ORDER BY ST_Area(a.geom) LIMIT 1) lo ON true
+LEFT JOIN LATERAL (SELECT a.name, a.source_id FROM admin a WHERE a.placetype = 'localadmin'
+                   AND ST_Intersects(a.geom, r.geom) ORDER BY ST_Area(a.geom) LIMIT 1) la ON true
+LEFT JOIN LATERAL (SELECT a.name, a.source_id FROM admin a WHERE a.placetype = 'county'
+                   AND ST_Intersects(a.geom, r.geom) ORDER BY ST_Area(a.geom) LIMIT 1) co ON true;
 
 -- Address dedupe: OpenAddresses and OSM carry most Maine addresses twice. Keep one row per
 -- (house number, street, town), preferring OpenAddresses (authoritative E911 points). Pelias removes such
 -- duplicates at query time instead; the outcome for users is the same.
 CREATE TEMP TABLE raw_ranked AS
-SELECT r.*, h.neighbourhood, h.locality AS pip_locality, h.localadmin, h.county,
+SELECT r.*, h.neighbourhood, h.locality AS pip_locality, h.localadmin, h.county, h.hier,
        geocode.norm(r.name) AS name_norm,
        geocode.norm(r.street) AS street_norm,
        geocode.hn_int(r.housenumber) AS hn_int,
@@ -39,7 +47,7 @@ FROM feature_raw r JOIN hier h USING (rid);
 INSERT INTO feature (
     id, gid, source, layer, source_id, name, housenumber, street, unit, postcode,
     neighbourhood, locality, localadmin, county, region, region_a, label, category, addendum,
-    geom, bbox, admin_id, importance, name_norm, street_norm, locality_norm, postal_locality_norm,
+    geom, bbox, admin_id, hier, importance, name_norm, street_norm, locality_norm, postal_locality_norm,
     hn_int, tokens)
 SELECT
     row_number() OVER (ORDER BY r.layer, r.source, r.source_id),
@@ -58,6 +66,8 @@ SELECT
       ELSE r.name || coalesce(', ' || coalesce(r.pip_locality, r.localadmin, r.locality_hint, r.county), '') || ', ME, USA'
     END,
     r.category, r.addendum, r.geom, r.bbox, r.admin_id,
+    -- the region and country are the same for every Maine feature
+    r.hier || jsonb_build_object('region_gid', 'whosonfirst:region:85688769'),
     -- importance: layer prior, then modest boosts from population / popularity
     least(1.0, CASE r.layer
         WHEN 'region' THEN 1.0 WHEN 'county' THEN 0.85 WHEN 'locality' THEN 0.75
@@ -116,6 +126,9 @@ CREATE INDEX feature_addr_street_hn_idx ON feature (street_norm, hn_int) WHERE l
 CREATE INDEX feature_street_idx ON feature (street_norm, locality_norm) WHERE layer = 'street';
 CREATE INDEX feature_postcode_idx ON feature (postcode) WHERE layer = 'postalcode';
 CREATE INDEX feature_layer_idx ON feature (layer);
+-- Admin features by their admin row (3,289 rows): reverse joins containing polygons to their
+-- features; without it every reverse request scanned the whole table.
+CREATE INDEX feature_admin_idx ON feature (admin_id) WHERE admin_id IS NOT NULL;
 CREATE INDEX street_name_trgm_idx ON street_name USING gin (street_norm gin_trgm_ops);
 CREATE INDEX street_name_locality_idx ON street_name (locality_norm);
 

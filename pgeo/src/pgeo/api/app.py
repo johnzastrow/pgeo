@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import logging
 import math
+import re
 import time
 from contextlib import asynccontextmanager
 from importlib.metadata import PackageNotFoundError, version
@@ -135,8 +136,49 @@ def size_param(v: str | None) -> int:
     return max(1, min(n, 40))
 
 
+COUNTRY_RE = re.compile(r"^[A-Za-z]{2,3}$")
+GID_RE = re.compile(r"^[a-z_]+:[a-z]+:[A-Za-z0-9_/.:-]+$")
+LANG_RE = re.compile(r"^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$")
+CATEGORY_RE = re.compile(r"^[a-z0-9_=:.-]{1,60}$")
+
+
+def extras(q: dict) -> dict:
+    """boundary.country, boundary.gid, categories; lang and api_key are validated and ignored
+    (same rules as geocode.check_extras in pgeo/sql/050_api.sql)."""
+    country = (q.get("boundary.country") or "").strip() or None
+    if country and not COUNTRY_RE.match(country):
+        raise BadRequest("boundary.country must be an ISO 3166 alpha-2 or alpha-3 code")
+    gid = (q.get("boundary.gid") or "").strip() or None
+    if gid and (len(gid) > 200 or not GID_RE.match(gid)):
+        raise BadRequest("boundary.gid must look like whosonfirst:locality:85948877")
+    lang = q.get("lang")
+    if lang and not LANG_RE.match(lang):
+        raise BadRequest("invalid lang")
+    if len(q.get("api_key") or "") > 200:
+        raise BadRequest("invalid api_key")
+    cats = [c.strip().lower() for c in (q.get("categories") or "").split(",") if c.strip()] or None
+    if cats and (len(cats) > 20 or not all(CATEGORY_RE.match(c) for c in cats)):
+        raise BadRequest("invalid categories")
+    return {"country": country, "gid": gid, "categories": cats}
+
+
+def circle(q: dict) -> list[float] | None:
+    """boundary.circle.lat/lon/radius (km, default 50) as [lon, lat, radius], or None."""
+    lat = finite(q.get("boundary.circle.lat"), "boundary.circle.lat", -90, 90)
+    lon = finite(q.get("boundary.circle.lon"), "boundary.circle.lon", -180, 180)
+    radius = finite(q.get("boundary.circle.radius"), "boundary.circle.radius", 0.001, 1000)
+    if lat is None and lon is None:
+        if radius is not None:
+            raise BadRequest("boundary.circle.radius needs boundary.circle.lat and boundary.circle.lon")
+        return None
+    if lat is None or lon is None:
+        raise BadRequest("boundary.circle needs both lat and lon")
+    return [lon, lat, 50.0 if radius is None else radius]
+
+
 def common(q: dict) -> dict:
-    """focus.point, boundary.rect, layers, sources, size (Pelias parameter names)."""
+    """focus.point, boundary.rect, boundary.circle, boundary.country, boundary.gid, categories,
+    layers, sources, size (Pelias parameter names)."""
     flat = finite(q.get("focus.point.lat"), "focus.point.lat", -90, 90)
     flon = finite(q.get("focus.point.lon"), "focus.point.lon", -180, 180)
     if (flat is None) != (flon is None):
@@ -154,7 +196,8 @@ def common(q: dict) -> dict:
         "layers": layers_param(q.get("layers")),
         "sources": sources_param(q.get("sources")),
         "size": size_param(q.get("size")),
-    }
+        "circle": circle(q),
+    } | extras(q)
 
 
 # ---- parsing -------------------------------------------------------------------------------
@@ -199,10 +242,13 @@ def feature_json(r: asyncpg.Record) -> dict:
         "accuracy": r["accuracy"],
         "distance": None if r["distance_km"] is None else round(float(r["distance_km"]), 3),
         "country": "United States",
+        "country_gid": "whosonfirst:country:85633793",
         "country_a": "USA",
+        "country_code": "US",
         "region": r["region"],
         "region_a": r["region_a"],
-        "county": r["county"],
+        # Pelias (WOF) names counties "Cumberland County"
+        "county": r["county"] if not r["county"] or r["county"].endswith(" County") else f"{r['county']} County",
         "localadmin": r["localadmin"],
         "locality": r["locality"],
         "neighbourhood": r["neighbourhood"],
@@ -212,6 +258,8 @@ def feature_json(r: asyncpg.Record) -> dict:
         props["category"] = list(r["category"])
     if r["addendum"]:
         props["addendum"] = json.loads(r["addendum"]) if isinstance(r["addendum"], str) else r["addendum"]
+    if r["hier"]:  # locality_gid, county_gid, county_a, ... (set at build time)
+        props |= json.loads(r["hier"]) if isinstance(r["hier"], str) else dict(r["hier"])
     props = {k: v for k, v in props.items() if v is not None}
     f = {"type": "Feature", "geometry": {"type": "Point", "coordinates": [r["lon"], r["lat"]]}, "properties": props}
     if r["bbox"]:
@@ -253,7 +301,7 @@ def envelope(query: dict, rows: list, errors: list[str] | None = None, parsed: P
 
 # ---- endpoints -----------------------------------------------------------------------------
 
-SEARCH_SQL = "SELECT * FROM geocode.search($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)"
+SEARCH_SQL = "SELECT * FROM geocode.search($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)"
 
 
 async def run_search(request: Request, text: str | None, p: Parsed, c: dict) -> list:
@@ -272,6 +320,10 @@ async def run_search(request: Request, text: str | None, p: Parsed, c: dict) -> 
             c["sources"],
             c["rect"],
             c["size"],
+            c["circle"],
+            c["gid"],
+            c["categories"],
+            c["country"],
         )
 
 
@@ -320,6 +372,10 @@ async def structured(request: Request):
             c["sources"],
             c["rect"],
             c["size"],
+            c["circle"],
+            c["gid"],
+            c["categories"],
+            c["country"],
         )
     return envelope({k: v for k, v in fields.items() if v} | {"size": c["size"]}, rows, parsed=p)
 
@@ -331,7 +387,7 @@ async def autocomplete(request: Request, text: Annotated[str | None, Query()] = 
     c = common(q)
     async with request.app.state.pool.acquire() as con:
         rows = await con.fetch(
-            "SELECT * FROM geocode.autocomplete($1, $2, $3, $4, $5, $6, $7)",
+            "SELECT * FROM geocode.autocomplete($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
             text,
             c["focus_lon"],
             c["focus_lat"],
@@ -339,6 +395,10 @@ async def autocomplete(request: Request, text: Annotated[str | None, Query()] = 
             c["sources"],
             c["rect"],
             c["size"],
+            c["circle"],
+            c["gid"],
+            c["categories"],
+            c["country"],
         )
     return envelope({"text": text, "size": c["size"]}, rows)
 
@@ -351,16 +411,19 @@ async def reverse(request: Request):
     if lat is None or lon is None:
         raise BadRequest("point.lat and point.lon are required")
     radius = finite(q.get("boundary.circle.radius"), "boundary.circle.radius", 0.001, 50)
-    c = common({k: v for k, v in q.items() if not k.startswith(("focus.", "boundary.rect"))})
+    c = common({k: v for k, v in q.items() if not k.startswith(("focus.", "boundary.rect", "boundary.circle"))})
     async with request.app.state.pool.acquire() as con:
         rows = await con.fetch(
-            "SELECT * FROM geocode.reverse($1, $2, $3, $4, $5, $6)",
+            "SELECT * FROM geocode.reverse($1, $2, $3, $4, $5, $6, $7, $8, $9)",
             lon,
             lat,
             c["layers"],
             c["sources"],
             radius,
             c["size"],
+            c["gid"],
+            c["categories"],
+            c["country"],
         )
     return envelope({"point.lat": lat, "point.lon": lon, "size": c["size"]}, rows)
 
@@ -397,7 +460,10 @@ async def address(request: Request):
             )
         except asyncpg.exceptions.InvalidParameterValueError as e:  # SQLSTATE 22023: bad input
             raise BadRequest(e.message) from None
-    return json.loads(doc) if isinstance(doc, str) else doc
+    doc = json.loads(doc) if isinstance(doc, str) else doc
+    if doc.get("geocoding", {}).get("errors"):  # the SQL function returns input errors as data
+        return JSONResponse(status_code=400, content=doc)
+    return doc
 
 
 @app.get("/health")

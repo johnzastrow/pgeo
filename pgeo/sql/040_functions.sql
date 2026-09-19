@@ -13,7 +13,8 @@ CREATE TYPE geocode.hit AS (
     neighbourhood text, locality text, localadmin text, county text, region text, region_a text,
     label text, category text[], addendum jsonb,
     lon double precision, lat double precision, bbox double precision[],
-    confidence real, match_type text, accuracy text, distance_km double precision, score real
+    confidence real, match_type text, accuracy text, distance_km double precision, score real,
+    hier jsonb                                   -- Pelias hierarchy ids (locality_gid, county_gid, county_a, ...)
 );
 
 -- Focus-point boost: 1 at the focus, ~0.37 at 50 km, fading with distance.
@@ -23,11 +24,37 @@ AS $$ SELECT CASE WHEN focus IS NULL THEN 0
        ELSE exp(-(ST_Distance(g::geography, focus::geography) / 50000.0)) END $$;
 
 -- Shared filter: layers, sources, bounding rectangle.
-CREATE OR REPLACE FUNCTION geocode.keep(f pgeo.feature, layers text[], sources text[], rect geometry)
+DROP FUNCTION IF EXISTS geocode.keep(pgeo.feature, text[], text[], geometry) CASCADE;
+-- Shared filter: layers, sources, area (boundary.rect and/or boundary.circle), boundary.gid
+-- (the feature is, or lies in, that admin area), categories (any overlap).
+CREATE OR REPLACE FUNCTION geocode.keep(f pgeo.feature, layers text[], sources text[], rect geometry,
+                                        gid text DEFAULT NULL, cats text[] DEFAULT NULL)
 RETURNS boolean LANGUAGE sql STABLE PARALLEL SAFE
 AS $$ SELECT (layers IS NULL OR cardinality(layers) = 0 OR f.layer = ANY (layers))
          AND (sources IS NULL OR cardinality(sources) = 0 OR f.source = ANY (sources))
-         AND (rect IS NULL OR ST_Intersects(f.geom, rect)) $$;
+         AND (rect IS NULL OR ST_Intersects(f.geom, rect))
+         AND (gid IS NULL OR f.gid = gid OR gid IN ('whosonfirst:country:85633793', 'whosonfirst:region:85688769')
+              OR EXISTS (SELECT 1 FROM jsonb_each_text(f.hier) e WHERE e.value = gid))
+         AND (cats IS NULL OR cardinality(cats) = 0 OR f.category && cats) $$;
+
+-- Search area from boundary.rect (min_lon, min_lat, max_lon, max_lat) and boundary.circle
+-- (lon, lat, radius km); NULL when neither is given.
+CREATE OR REPLACE FUNCTION geocode.search_area(p_rect double precision[], p_circle double precision[])
+RETURNS geometry LANGUAGE sql IMMUTABLE PARALLEL SAFE
+AS $$
+  WITH r AS (SELECT CASE WHEN cardinality(p_rect) = 4
+                         THEN ST_MakeEnvelope(p_rect[1], p_rect[2], p_rect[3], p_rect[4], 4326) END AS g),
+       c AS (SELECT CASE WHEN cardinality(p_circle) = 3
+                         THEN ST_Buffer(ST_SetSRID(ST_MakePoint(p_circle[1], p_circle[2]), 4326)::geography,
+                                        p_circle[3] * 1000)::geometry END AS g)
+  SELECT CASE WHEN r.g IS NOT NULL AND c.g IS NOT NULL THEN ST_Intersection(r.g, c.g) ELSE coalesce(r.g, c.g) END
+  FROM r, c
+$$;
+
+-- boundary.country: the data is Maine only, so any country other than the US matches nothing.
+CREATE OR REPLACE FUNCTION geocode.country_ok(p_country text) RETURNS boolean
+LANGUAGE sql IMMUTABLE PARALLEL SAFE
+AS $$ SELECT p_country IS NULL OR upper(btrim(p_country)) IN ('US', 'USA') $$;
 
 -- Copy of a hit with a different confidence.
 CREATE OR REPLACE FUNCTION geocode.set_conf(h geocode.hit, c real) RETURNS geocode.hit
@@ -35,7 +62,7 @@ LANGUAGE sql IMMUTABLE PARALLEL SAFE
 AS $$ SELECT ROW(h.id, h.gid, h.source, h.layer, h.source_id, h.name, h.housenumber, h.street, h.postcode,
               h.neighbourhood, h.locality, h.localadmin, h.county, h.region, h.region_a, h.label,
               h.category, h.addendum, h.lon, h.lat, h.bbox, c, h.match_type, h.accuracy,
-              h.distance_km, h.score)::geocode.hit $$;
+              h.distance_km, h.score, h.hier)::geocode.hit $$;
 
 CREATE OR REPLACE FUNCTION geocode.to_hit(f pgeo.feature, conf real, mt text, acc text,
                                           dist_km double precision, score real)
@@ -43,7 +70,7 @@ RETURNS geocode.hit LANGUAGE sql IMMUTABLE PARALLEL SAFE
 AS $$ SELECT ROW(f.id, f.gid, f.source, f.layer, f.source_id, f.name, f.housenumber, f.street,
               f.postcode, f.neighbourhood, f.locality, f.localadmin, f.county, f.region, f.region_a,
               f.label, f.category, f.addendum, ST_X(f.geom), ST_Y(f.geom), f.bbox,
-              conf, mt, acc, dist_km, score)::geocode.hit $$;
+              conf, mt, acc, dist_km, score, f.hier)::geocode.hit $$;
 
 -- ---------------------------------------------------------------------------------------
 -- search: unstructured and structured forward geocoding.
@@ -55,7 +82,9 @@ CREATE OR REPLACE FUNCTION geocode.search(
     p_text text, p_name text, p_hn text, p_street text, p_locality text, p_postcode text,
     p_focus_lon double precision DEFAULT NULL, p_focus_lat double precision DEFAULT NULL,
     p_layers text[] DEFAULT NULL, p_sources text[] DEFAULT NULL,
-    p_rect double precision[] DEFAULT NULL, p_size integer DEFAULT 10)
+    p_rect double precision[] DEFAULT NULL, p_size integer DEFAULT 10,
+    p_circle double precision[] DEFAULT NULL, p_gid text DEFAULT NULL,
+    p_categories text[] DEFAULT NULL, p_country text DEFAULT NULL)
 RETURNS SETOF geocode.hit
 LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
@@ -76,8 +105,7 @@ DECLARE
   pc    text := substring(p_postcode from '\d{5}');
   focus geometry := CASE WHEN p_focus_lon IS NOT NULL AND p_focus_lat IS NOT NULL
                          THEN ST_SetSRID(ST_MakePoint(p_focus_lon, p_focus_lat), 4326) END;
-  rect  geometry := CASE WHEN cardinality(p_rect) = 4
-                         THEN ST_MakeEnvelope(p_rect[1], p_rect[2], p_rect[3], p_rect[4], 4326) END;
+  rect  geometry := geocode.search_area(p_rect, p_circle);
   lim   integer := least(greatest(coalesce(p_size, 10), 1), 40);
   townpt geometry;   -- the queried town's location(s), when the town name is known
   anchor geometry;   -- tie-break point for same-named candidates: focus, else the town
@@ -89,7 +117,17 @@ BEGIN
       WHERE f.layer IN ('locality', 'localadmin', 'neighbourhood') AND f.name_norm = loc
       ORDER BY f.importance DESC LIMIT 5) t;
   END IF;
-  anchor := coalesce(focus, townpt);
+  IF NOT geocode.country_ok(p_country) THEN
+    RETURN;
+  END IF;
+  -- tie-break anchor: focus, else the circle or rectangle centre, else the boundary.gid area,
+  -- else the town. Candidates are cut to 40/60 rows before the area filter applies, so without
+  -- an anchor inside the area the survivors could all lie outside it.
+  anchor := coalesce(focus,
+                     CASE WHEN cardinality(p_circle) = 3 THEN ST_SetSRID(ST_MakePoint(p_circle[1], p_circle[2]), 4326) END,
+                     CASE WHEN rect IS NOT NULL THEN ST_Centroid(rect) END,
+                     (SELECT x.geom FROM pgeo.feature x WHERE x.gid = p_gid LIMIT 1),
+                     townpt);
   PERFORM set_config('pg_trgm.word_similarity_threshold', '0.5', true);
   -- Name strings to try: the parser's name part; the full text unless an address was parsed;
   -- a bare town ("Portland, Maine") only when no name part was parsed: in "Subway, Cumberland
@@ -243,7 +281,7 @@ BEGIN
                        THEN exp(-ST_Distance(f.geom::geography, townpt::geography) / 6000.0) ELSE 0 END)
            END AS agree
     FROM cand c JOIN pgeo.feature f ON f.id = c.id
-    WHERE geocode.keep(f, p_layers, p_sources, rect)
+    WHERE geocode.keep(f, p_layers, p_sources, rect, p_gid, p_categories)
     ORDER BY c.id, c.ihn, c.base DESC
   ),
   final AS (
@@ -275,7 +313,8 @@ BEGIN
           fi.ihn || ' ' || (fi.f).street || coalesce(', ' || coalesce((fi.f).locality, (fi.f).localadmin), '') || ', ME, USA',
           NULL, NULL, ST_X(fi.igeom), ST_Y(fi.igeom), NULL, fi.conf, 'interpolated', 'point',
           CASE WHEN focus IS NULL THEN NULL ELSE ST_Distance(fi.igeom::geography, focus::geography) / 1000 END,
-          (fi.conf + 0.05 * (fi.f).importance + 0.1 * geocode.focus_boost(fi.igeom, focus))::real)::geocode.hit
+          (fi.conf + 0.05 * (fi.f).importance + 0.1 * geocode.focus_boost(fi.igeom, focus))::real,
+          (fi.f).hier)::geocode.hit
     END AS h
   ) z
   WHERE fi.conf >= 0.3                         -- drop weak matches: misses return nothing
@@ -318,7 +357,9 @@ CREATE OR REPLACE FUNCTION geocode.autocomplete(
     p_text text,
     p_focus_lon double precision DEFAULT NULL, p_focus_lat double precision DEFAULT NULL,
     p_layers text[] DEFAULT NULL, p_sources text[] DEFAULT NULL,
-    p_rect double precision[] DEFAULT NULL, p_size integer DEFAULT 10)
+    p_rect double precision[] DEFAULT NULL, p_size integer DEFAULT 10,
+    p_circle double precision[] DEFAULT NULL, p_gid text DEFAULT NULL,
+    p_categories text[] DEFAULT NULL, p_country text DEFAULT NULL)
 RETURNS SETOF geocode.hit
 LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
@@ -335,12 +376,11 @@ DECLARE
   tsq   tsquery;
   focus geometry := CASE WHEN p_focus_lon IS NOT NULL AND p_focus_lat IS NOT NULL
                          THEN ST_SetSRID(ST_MakePoint(p_focus_lon, p_focus_lat), 4326) END;
-  rect  geometry := CASE WHEN cardinality(p_rect) = 4
-                         THEN ST_MakeEnvelope(p_rect[1], p_rect[2], p_rect[3], p_rect[4], 4326) END;
+  rect  geometry := geocode.search_area(p_rect, p_circle);
   lim   integer := least(greatest(coalesce(p_size, 10), 1), 40);
   found integer := 0;
 BEGIN
-  IF n = 0 THEN
+  IF n = 0 OR NOT geocode.country_ok(p_country) THEN
     RETURN;
   END IF;
   -- All tokens must match; the last one as a prefix (the user is still typing it). norm()
@@ -367,7 +407,7 @@ BEGIN
              CASE WHEN focus IS NULL THEN NULL ELSE ST_Distance(f.geom::geography, focus::geography) / 1000 END,
              (f.importance + 0.3 * geocode.focus_boost(f.geom, focus))::real) AS h) z
     WHERE f.layer = 'address' AND f.housenumber = toks[1] AND f.tokens @@ tsq
-      AND geocode.keep(f, p_layers, p_sources, rect)
+      AND geocode.keep(f, p_layers, p_sources, rect, p_gid, p_categories)
     ORDER BY (z.h).score DESC, f.id
     LIMIT lim;
     GET DIAGNOSTICS found = ROW_COUNT;
@@ -378,7 +418,7 @@ BEGIN
     FROM pgeo.ac_prefix p JOIN pgeo.feature f ON f.id = p.feature_id
     CROSS JOIN LATERAL (SELECT geocode.to_hit(f, NULL, NULL, 'centroid', NULL,
              (f.importance + 0.3 * geocode.focus_boost(f.geom, focus))::real) AS h) z
-    WHERE p.prefix = q AND geocode.keep(f, p_layers, p_sources, rect)
+    WHERE p.prefix = q AND geocode.keep(f, p_layers, p_sources, rect, p_gid, p_categories)
     ORDER BY (z.h).score DESC
     LIMIT lim;
     GET DIAGNOSTICS found = ROW_COUNT;
@@ -387,6 +427,7 @@ BEGIN
     SELECT (z.h).*
     FROM (SELECT DISTINCT ON (y.label) y.* FROM
             (SELECT * FROM pgeo.feature x WHERE x.tokens @@ tsq AND x.layer <> 'address'
+               AND geocode.keep(x, p_layers, p_sources, rect, p_gid, p_categories)  -- filter before the cut
              ORDER BY x.importance DESC LIMIT 400) y
           ORDER BY y.label, y.importance DESC) f
     CROSS JOIN LATERAL (SELECT geocode.to_hit(f, NULL, NULL, 'centroid',
@@ -394,7 +435,7 @@ BEGIN
              (f.importance
               + CASE WHEN f.name_norm LIKE q || '%' THEN 0.25 ELSE 0 END
               + 0.3 * geocode.focus_boost(f.geom, focus))::real) AS h) z
-    WHERE geocode.keep(f, p_layers, p_sources, rect)
+    WHERE geocode.keep(f, p_layers, p_sources, rect, p_gid, p_categories)
     ORDER BY (z.h).score DESC
     LIMIT lim;
     GET DIAGNOSTICS found = ROW_COUNT;
@@ -412,7 +453,7 @@ BEGIN
              CASE WHEN focus IS NULL THEN NULL ELSE ST_Distance(f.geom::geography, focus::geography) / 1000 END,
              (similarity(f.name_norm, q) + 0.2 * f.importance
               + 0.2 * geocode.focus_boost(f.geom, focus))::real) AS h) z
-    WHERE geocode.keep(f, p_layers, p_sources, rect)
+    WHERE geocode.keep(f, p_layers, p_sources, rect, p_gid, p_categories)
     ORDER BY (z.h).score DESC
     LIMIT lim - found;
   END IF;
@@ -425,7 +466,8 @@ $$;
 CREATE OR REPLACE FUNCTION geocode.reverse(
     p_lon double precision, p_lat double precision,
     p_layers text[] DEFAULT NULL, p_sources text[] DEFAULT NULL,
-    p_radius_km double precision DEFAULT NULL, p_size integer DEFAULT 10)
+    p_radius_km double precision DEFAULT NULL, p_size integer DEFAULT 10,
+    p_gid text DEFAULT NULL, p_categories text[] DEFAULT NULL, p_country text DEFAULT NULL)
 RETURNS SETOF geocode.hit
 LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
@@ -441,12 +483,16 @@ DECLARE
                                          SELECT unnest(ARRAY['neighbourhood','locality','localadmin','county','region','postalcode']))
                               ELSE ARRAY['neighbourhood','locality','localadmin','county','region'] END;
 BEGIN
+  IF NOT geocode.country_ok(p_country) THEN
+    RETURN;
+  END IF;
   RETURN QUERY
   WITH nearest AS (
     SELECT x AS f, ST_Distance(x.geom::geography, pt::geography) AS d
     FROM pgeo.feature x
     WHERE x.layer = ANY (point_layers)
       AND (p_sources IS NULL OR cardinality(p_sources) = 0 OR x.source = ANY (p_sources))
+      AND (p_gid IS NULL AND p_categories IS NULL OR geocode.keep(x, NULL, NULL, NULL, p_gid, p_categories))
     ORDER BY x.geom <-> pt
     LIMIT lim * 3
   ),
@@ -457,6 +503,10 @@ BEGIN
     WHERE cardinality(admin_layers) > 0 AND a.placetype = ANY (admin_layers)
       AND ST_Intersects(a.geom, pt)
       AND (p_sources IS NULL OR cardinality(p_sources) = 0 OR f.source = ANY (p_sources))
+      -- boundary.gid, written inline: a function call here stopped the planner from using the
+      -- admin_id index (13 s per request instead of milliseconds)
+      AND (p_gid IS NULL OR f.gid = p_gid OR f.hier ->> 'county_gid' = p_gid OR f.hier ->> 'localadmin_gid' = p_gid
+           OR p_gid IN ('whosonfirst:country:85633793', 'whosonfirst:region:85688769'))
   )
   SELECT (x.h).* FROM (
     SELECT geocode.to_hit(n.f, geocode.distance_confidence(n.d), NULL,

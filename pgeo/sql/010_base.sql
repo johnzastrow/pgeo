@@ -62,6 +62,17 @@ CREATE OR REPLACE FUNCTION geocode.engine_version() RETURNS text
 LANGUAGE sql IMMUTABLE PARALLEL SAFE
 AS $$ SELECT '0+unknown'::text $$;
 
+-- Maine counties: Census FIPS codes and the Pelias/WOF abbreviations (county_a), which do
+-- not follow one rule (Waldo WL, Washington WS). Reference data, rebuilt on every apply.
+DROP TABLE IF EXISTS geocode.county_ref CASCADE;
+CREATE TABLE geocode.county_ref (county text PRIMARY KEY, abbr text NOT NULL, fips text NOT NULL);
+INSERT INTO geocode.county_ref (county, abbr, fips) VALUES
+  ('androscoggin','AN','23001'),('aroostook','AR','23003'),('cumberland','CU','23005'),
+  ('franklin','FR','23007'),('hancock','HA','23009'),('kennebec','KE','23011'),('knox','KN','23013'),
+  ('lincoln','LI','23015'),('oxford','OX','23017'),('penobscot','PE','23019'),
+  ('piscataquis','PI','23021'),('sagadahoc','SA','23023'),('somerset','SO','23025'),
+  ('waldo','WL','23027'),('washington','WS','23029'),('york','YO','23031');
+
 -- Pelias reverse-geocoding confidence bands by distance.
 CREATE OR REPLACE FUNCTION geocode.distance_confidence(meters double precision) RETURNS real
 LANGUAGE sql IMMUTABLE PARALLEL SAFE
