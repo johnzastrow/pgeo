@@ -6,6 +6,12 @@ full plan, decisions, and security baseline, and
 [docs/DATA_PIPELINE.md](docs/DATA_PIPELINE.md) for the step-by-step data extraction and
 loading runbook (every step with manual commands, checks, and reference counts).
 
+**Rebuild everything** (data, Pelias, pgeo, verification, report, deployment):
+[docs/REBUILD.md](docs/REBUILD.md) is the authoritative runbook, and
+`scripts/rebuild_all.sh` runs it end to end (`scripts/rebuild_all.sh --help` lists the stages).
+The study that compares the two engines is [docs/REPORT.md](docs/REPORT.md)
+([PDF](docs/REPORT.pdf)).
+
 Version: see [VERSION](VERSION) and [CHANGELOG.md](CHANGELOG.md) (semver; pgeo and
 pelias-prep are versioned separately in their own changelogs).
 
@@ -33,7 +39,7 @@ curl 'https://geocoder.example.org/v1/search?text=389%20Congress%20St,%20Portlan
 | `web/` | Demo page (MapLibre + self-hosted Protomaps basemap), reusable `pelias-client.js` and `<pelias-search>` element; `web/vendor/` holds pinned third-party assets |
 | `tests/web/` | Browser smoke test (Playwright) for the demo page |
 | `tests/accuracy/`, `tests/load/` | Accuracy set (1,560 cases), fuzz rounds, regression gate; capacity tests (k6) for both engines |
-| `docs/` | `DATA_PIPELINE.md` (runbook), `PROJECT_LOG.md` (goals, questions, decisions, findings), `TESTING_GUIDE.md` (how the tests work, in plain language), `LOAD_TEST_PLAN.md`, `PGEO_DESIGN.md`, `TUNING_REPORT.md` (all tuning and how to re-apply it), `PGEO_TUNING.md` (change log), `ACCURACY_RESULTS.md`, `HTTP_OPTIONS.md` |
+| `docs/` | `DATA_PIPELINE.md` (runbook), `PROJECT_LOG.md` (goals, questions, decisions, findings), `TESTING_GUIDE.md` (how the tests work, in plain language), `LOAD_TEST_PLAN.md`, `PGEO_DESIGN.md`, `REBUILD.md` (rebuild everything), `REPORT.md`/`REPORT.pdf` (the study), `TUNING_REPORT.md` (all tuning and how to re-apply it), `DEPLOY_PGEO.md`, `PELIAS_COMPATIBILITY.md`, `ADDRESS_API.md`, `ENGINE_COMPARISON.md`, `PGEO_TUNING.md` (change log), `ACCURACY_RESULTS.md`, `HTTP_OPTIONS.md` |
 | `data/` | Raw downloads, processed CSVs, Pelias data dir (gitignored) |
 
 ## Build on the workstation
@@ -62,9 +68,10 @@ cd infra/ansible && ansible-playbook site.yml -e pelias_snapshot_name=<snapshot>
 Then add the `geocoder.example.org` site on the wharf Caddy, reverse-proxying to
 `<vm-ip>:8080`.
 
-## pgeo: rebuild with all tuning applied
+## pgeo: set up, then rebuild with all tuning applied
 
 ```bash
+scripts/pgeo_setup.sh                      # once: secrets, images, containers, local edge
 scripts/pgeo_rebuild.sh --profile medium   # build, tuning profile, known-answer checks, accuracy gate
 uv run --project pgeo pgeo-tune list       # profiles (tiny, small, medium, large, workstation)
 ```

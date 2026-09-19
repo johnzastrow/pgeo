@@ -163,6 +163,10 @@ in atomically; it took {{value:pgeo_build_min}} in the latest run on one core.
 
 {{table:pgeo_build_steps|pgeo build steps and their duration (latest build).}}
 
+Both builds, the verification suites and the deployment are scripted; `docs/REBUILD.md` in the
+repository is the step-by-step runbook and `scripts/rebuild_all.sh` runs it end to end
+(Appendix A).
+
 <!-- PENDING: build resource profiles (CPU, peak memory, disk) for both engines from the dedicated measurement runs -->
 
 ### 2.4 Accuracy testing
@@ -575,7 +579,19 @@ candidate queries and scoring steps per request in an interpreted language insid
   the service; strip query strings from access logs.
 - **Continuous checks**: run the accuracy gate and the compatibility contract on every build.
 
-## Appendix A. Reproducing this report
+## Appendix A. Reproducing this study
+
+Everything in this report can be rebuilt from the repository. The authoritative runbook is
+**`docs/REBUILD.md`**: requirements, every stage with its commands, expected results and times,
+the load tests and experiments, and troubleshooting. `scripts/rebuild_all.sh` runs the stages end
+to end (data, Pelias, pgeo, verification, report; deployment on request):
+
+```bash
+scripts/rebuild_all.sh                     # check, data, pelias, pgeo, verify, report
+scripts/rebuild_all.sh deploy              # ship both engines to the query host
+```
+
+The report itself:
 
 ```bash
 scripts/build_report.sh                    # rebuild from saved results

@@ -24,6 +24,10 @@ commits where each milestone was complete.
 ## [Unreleased]
 
 ### Added
+- `docs/REBUILD.md`: authoritative runbook to rebuild both platforms, the demo, verification,
+  deployment and the report; `scripts/rebuild_all.sh` runs it in stages; `scripts/pgeo_setup.sh`
+  scripts pgeo's first-time setup (secrets, images, containers, edge), previously manual.
+  Referenced from the README and the report (Appendix A).
 - Demo page: engine switch announced by the server (Pelias / pgeo), Address tab (type-ahead
   with a best-match suggestion, USPS block with copy, nearest-address link on the map, map
   click), Compare tab (the same search on both engines, timings, agreement), Search tab

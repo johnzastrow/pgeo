@@ -115,3 +115,5 @@ and observations made during the work (marked "session").
       search (tests/load/find_floor.py: shrink CPU quota and each service's memory at 3 users)
       and confirmed on a temporary Proxmox VM of that size.
 - [ ] On that minimum VM, how many users each platform scales to (full ramp on the VM).
+
+- [x] (report Appendix A, Section 2.3) Rebuild runbook docs/REBUILD.md and scripts/rebuild_all.sh referenced (user request 2026-09-19).
