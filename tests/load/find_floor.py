@@ -1,6 +1,7 @@
 """Find the smallest server that still serves 3 concurrent users within every latency target.
 
     python3 tests/load/find_floor.py [--engines pgeo,pelias] [--minutes 5]
+    python3 tests/load/find_floor.py --resume data/loadtest/<run>-floor --only cpus
 
 For each engine, start from a configuration known to pass and shrink one resource at a time
 (CPU quota, then each service's memory), keeping a step only if a 3-user run of --minutes stays
@@ -116,8 +117,18 @@ def trial(engine: str, c: dict, out: Path, n: int, minutes: int) -> dict:
     return out_doc
 
 
-def search(engine: str, out: Path, minutes: int) -> dict:
+def search(engine: str, out: Path, minutes: int, resume: Path | None = None,
+           only: list[str] | None = None) -> dict:
     start, steps = (PGEO_START, PGEO_STEPS) if engine == "pgeo" else (PELIAS_START, PELIAS_STEPS)
+    if resume:  # continue from an earlier floor, e.g. to probe a step list that has grown
+        found = json.loads((resume / f"floor-{engine}.json").read_text()).get("result")
+        if found:
+            start = found["config"]
+    if only:
+        steps = [(k, vs) for k, vs in steps if k in only]
+    # a resumed search only tries values smaller than the ones already reached
+    steps = [(k, [v for v in vs if v < start.get(k, float("inf"))]) for k, vs in steps]
+    steps = [(k, vs) for k, vs in steps if vs]
     best = dict(start)
     path = []
     n = 0
@@ -149,13 +160,15 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--engines", default="pgeo,pelias")
     ap.add_argument("--minutes", type=int, default=5)
+    ap.add_argument("--resume", type=Path, help="an earlier -floor directory: start from its result")
+    ap.add_argument("--only", help="comma-separated resources to shrink (default: all), e.g. cpus")
     a = ap.parse_args()
     out = rm.ROOT / "data" / "loadtest" / (datetime.now().astimezone().strftime("%Y%m%d-%H%M") + "-floor")
     out.mkdir(parents=True, exist_ok=True)
     print(f"run {out.name}", flush=True)
     try:
         for e in a.engines.split(","):
-            search(e, out, a.minutes)
+            search(e, out, a.minutes, a.resume, a.only.split(",") if a.only else None)
     finally:
         print("restoring default stacks", flush=True)
         rm.compose([rm.PROJECT / "docker-compose.yml"], "up", "-d", "--force-recreate", *rm.SERVICES)
