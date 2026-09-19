@@ -117,6 +117,8 @@ def drop_component(case: dict, text: str, rng: random.Random) -> str:
             words = parts[0].split()
             parts[0] = " ".join(words[:-1]) if len(words) > 2 else parts[0]
         return ", ".join(parts)
+    if case["kind"] in ("lake_summit", "venue") and "," in text:
+        return text.split(",")[0].strip()  # drop the qualifying town
     words = text.replace(",", "").split()
     if case["kind"] in ("lake_summit", "venue") and len(words) >= 2:
         return " ".join(words[1:] + words[:1])  # "Moosehead Lake" -> "Lake Moosehead"

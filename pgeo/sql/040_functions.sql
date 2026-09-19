@@ -136,7 +136,10 @@ BEGIN
     FROM unnest(targets) AS q(txt)
     CROSS JOIN LATERAL (
       SELECT f.id,
-             greatest(similarity(f.name_norm, q.txt), 0.9 * word_similarity(f.name_norm, q.txt))::double precision AS nsim
+             -- word_similarity(query, name): how well the query appears inside the name ("jetport"
+             -- in "portland international jetport"). The reverse direction let one-word generic
+             -- names ("Mountain", "Hill") match any query that contains that word.
+             greatest(similarity(f.name_norm, q.txt), 0.9 * word_similarity(q.txt, f.name_norm))::double precision AS nsim
       FROM pgeo.feature f
       WHERE f.layer <> 'address' AND f.name_norm % q.txt
       ORDER BY similarity(f.name_norm, q.txt) DESC

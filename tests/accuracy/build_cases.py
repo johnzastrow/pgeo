@@ -112,12 +112,33 @@ def main() -> None:
         text = f"{name}, Maine" if r < 0.6 else (typo(name) if r < 0.8 else name.lower())
         add("search", "exact" if r < 0.6 else ("typo" if r < 0.8 else "variant"), "town", {"text": text}, truth)
 
+    # Nearest WOF town, used to qualify names that are not unique (Maine has dozens of
+    # "Mud Pond"s: a bare "Mud Pond" has no single right answer, so the query names the town
+    # the way a person would: "Mud Pond, Beaver Cove").
+    con.execute(
+        "CREATE TABLE towns AS SELECT s.name, s.latitude AS lat, s.longitude AS lon FROM w.spr s "
+        "JOIN w.ancestors a ON a.id = s.id WHERE a.ancestor_id = 85688769 AND s.placetype = 'locality' "
+        "AND s.is_current <> 0 AND s.is_deprecated = 0"
+    )
+
+    def qualify(name: str, lat: float, lon: float, dup: int) -> str:
+        if dup <= 1:
+            return name
+        town = rows(
+            "SELECT name FROM towns ORDER BY (lat - ?) * (lat - ?) + ((lon - ?) * 0.72) * ((lon - ?) * 0.72) LIMIT 1",
+            [lat, lat, lon, lon],
+        )[0][0]
+        return f"{name}, {town}"
+
     # Lakes and summits (GNIS).
     gnis = str(DATA / "processed" / "csv" / "gnis.csv")
-    for name, lat, lon in rows(
-        "SELECT name, lat, lon FROM read_csv(?) WHERE category IN ('lake', 'summit') ORDER BY random() LIMIT ?",
+    for name, lat, lon, dup in rows(
+        "WITH g AS (SELECT name, lat, lon, category, count(*) OVER (PARTITION BY lower(name)) AS dup "
+        "FROM read_csv(?)) SELECT name, lat, lon, dup FROM g WHERE category IN ('lake', 'summit') "
+        "ORDER BY random() LIMIT ?",
         [gnis, N["lake_summit"]],
     ):
+        name = qualify(name, lat, lon, dup)
         truth = {"lat": lat, "lon": lon, "radius_m": RADIUS_M["lake_summit"]}
         r = RNG.random()
         if r < 0.55:
@@ -129,11 +150,14 @@ def main() -> None:
 
     # Venues (Overture, confident ones) with their town.
     ov = str(DATA / "processed" / "csv" / "overture.csv")
-    for name, lat, lon in rows(
-        "SELECT name, lat, lon FROM read_csv(?) WHERE TRY_CAST(json_extract_string(addendum_json_overture, "
-        "'$.confidence') AS DOUBLE) >= 0.9 ORDER BY random() LIMIT ?",
-        [ov, N["venue"]],
-    ):
+    venues_sql = (
+        "WITH o AS (SELECT name, lat, lon, addendum_json_overture AS a, "
+        "count(*) OVER (PARTITION BY lower(name)) AS dup FROM read_csv(?)) "
+        "SELECT name, lat, lon, dup FROM o WHERE TRY_CAST(json_extract_string(a, '$.confidence') AS DOUBLE) >= 0.9 "
+        "ORDER BY random() LIMIT ?"
+    )
+    for name, lat, lon, dup in rows(venues_sql, [ov, N["venue"]]):
+        name = qualify(name, lat, lon, dup)
         truth = {"lat": lat, "lon": lon, "radius_m": RADIUS_M["venue"]}
         r = RNG.random()
         add("search", "exact" if r < 0.7 else "typo", "venue", {"text": name if r < 0.7 else typo(name)}, truth)
@@ -146,14 +170,8 @@ def main() -> None:
         add("search", "exact", "zip", {"text": z}, {"lat": float(lat), "lon": float(lon), "radius_m": RADIUS_M["zip"]})
 
     # Autocomplete: a prefix (60-80% of the text) of towns and venues; hit if in the top 5.
-    for name, lat, lon, kind in [(t[0], t[1], t[2], "town") for t in towns[: N["autocomplete"] // 2]] + [
-        (v[0], v[1], v[2], "venue")
-        for v in rows(
-            "SELECT name, lat, lon FROM read_csv(?) WHERE TRY_CAST(json_extract_string(addendum_json_overture, "
-            "'$.confidence') AS DOUBLE) >= 0.9 ORDER BY random() LIMIT ?",
-            [ov, N["autocomplete"] // 2],
-        )
-    ]:
+    ac_venues = [(v[0], v[1], v[2], "venue") for v in rows(venues_sql, [ov, N["autocomplete"] // 2])]
+    for name, lat, lon, kind in [(t[0], t[1], t[2], "town") for t in towns[: N["autocomplete"] // 2]] + ac_venues:
         cut = max(3, int(len(name) * RNG.uniform(0.6, 0.8)))
         add("autocomplete", "exact", kind, {"text": name[:cut]}, {"lat": lat, "lon": lon, "radius_m": RADIUS_M[kind]})
 

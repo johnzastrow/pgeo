@@ -3505,11 +3505,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Lily Pond"
+   "text": "West Georgetown Hill"
   },
   "truth": {
-   "lat": 43.6599629,
-   "lon": -70.6369016,
+   "lat": 43.8005337,
+   "lon": -69.7786372,
    "radius_m": 4000
   },
   "base_id": 958,
@@ -3521,11 +3521,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Labbe Pond"
+   "text": "Pleasant Mountain, Houghton"
   },
   "truth": {
-   "lat": 47.146383,
-   "lon": -68.6264401,
+   "lat": 44.7344647,
+   "lon": -70.6908308,
    "radius_m": 4000
   },
   "base_id": 932,
@@ -3537,11 +3537,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "High Cut"
+   "text": "Johns Pond, Davis Town"
   },
   "truth": {
-   "lat": 45.0768356,
-   "lon": -69.1315286,
+   "lat": 45.0697749,
+   "lon": -70.7914576,
    "radius_m": 4000
   },
   "base_id": 904,
@@ -3553,11 +3553,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Whitney Hill"
+   "text": "Frost Hill, Sodom"
   },
   "truth": {
-   "lat": 44.183851,
-   "lon": -70.4847795,
+   "lat": 44.180821,
+   "lon": -70.6031595,
    "radius_m": 4000
   },
   "base_id": 1009,
@@ -3569,11 +3569,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Gray Pond"
+   "text": "Sewall Hill"
   },
   "truth": {
-   "lat": 44.863057,
-   "lon": -68.0435815,
+   "lat": 43.132024,
+   "lon": -70.6622742,
    "radius_m": 4000
   },
   "base_id": 908,
@@ -3585,11 +3585,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Great Moose Lake"
+   "text": "Stetson Pond"
   },
   "truth": {
-   "lat": 44.9230285,
-   "lon": -69.5172258,
+   "lat": 44.8482106,
+   "lon": -70.4774848,
    "radius_m": 4000
   },
   "base_id": 975,
@@ -3601,11 +3601,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Hay Pond"
+   "text": "Eagles Crag"
   },
   "truth": {
-   "lat": 46.167187,
-   "lon": -68.7515527,
+   "lat": 44.3258509,
+   "lon": -68.2197302,
    "radius_m": 4000
   },
   "base_id": 1003,
@@ -3617,11 +3617,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Upper Togue Pond"
+   "text": "Tea Mountain"
   },
   "truth": {
-   "lat": 45.8237943,
-   "lon": -68.8956835,
+   "lat": 45.2281712,
+   "lon": -70.5389367,
    "radius_m": 4000
   },
   "base_id": 1024,
@@ -3633,11 +3633,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Skilly Hills"
+   "text": "Great Hill, Lower Village"
   },
   "truth": {
-   "lat": 43.5867398,
-   "lon": -70.4756071,
+   "lat": 43.3440346,
+   "lon": -70.5130859,
    "radius_m": 4000
   },
   "base_id": 993,
@@ -3649,11 +3649,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Sunday River Whitecap"
+   "text": "Weymouth Hill"
   },
   "truth": {
-   "lat": 44.5489609,
-   "lon": -70.8966993,
+   "lat": 44.228601,
+   "lon": -70.8085394,
    "radius_m": 4000
   },
   "base_id": 939,
@@ -3665,11 +3665,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Mount Veto"
+   "text": "Uncle Dick Hill"
   },
   "truth": {
-   "lat": 45.940779,
-   "lon": -69.0920503,
+   "lat": 44.3516809,
+   "lon": -68.3859002,
    "radius_m": 4000
   },
   "base_id": 1048,
@@ -3681,11 +3681,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Iron Mine Hill"
+   "text": "Browns Pond"
   },
   "truth": {
-   "lat": 44.2126853,
-   "lon": -69.7847859,
+   "lat": 43.9129819,
+   "lon": -70.7277363,
    "radius_m": 4000
   },
   "base_id": 936,
@@ -3697,11 +3697,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Great Hill"
+   "text": "Stafford Pond"
   },
   "truth": {
-   "lat": 44.3859422,
-   "lon": -68.2318132,
+   "lat": 44.8911979,
+   "lon": -69.5037708,
    "radius_m": 4000
   },
   "base_id": 974,
@@ -3713,11 +3713,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Parker Pond"
+   "text": "Camp Pond"
   },
   "truth": {
-   "lat": 44.5085098,
-   "lon": -70.1418107,
+   "lat": 45.4291257,
+   "lon": -69.2687466,
    "radius_m": 4000
   },
   "base_id": 998,
@@ -3729,11 +3729,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Isaiah Mountain"
+   "text": "Youngs Pond"
   },
   "truth": {
-   "lat": 44.2819222,
-   "lon": -70.8754577,
+   "lat": 44.7165898,
+   "lon": -68.4476393,
    "radius_m": 4000
   },
   "base_id": 949,
@@ -3745,11 +3745,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Moody Pond"
+   "text": "Pickerel Pond, Alton"
   },
   "truth": {
-   "lat": 43.5624821,
-   "lon": -70.7387476,
+   "lat": 45.0465982,
+   "lon": -68.7700584,
    "radius_m": 4000
   },
   "base_id": 1019,
@@ -3761,11 +3761,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Gilman Pond"
+   "text": "Lunksoos Mountain"
   },
   "truth": {
-   "lat": 44.9580266,
-   "lon": -70.0543385,
+   "lat": 45.9583006,
+   "lon": -68.68061,
    "radius_m": 4000
   },
   "base_id": 980,
@@ -3777,11 +3777,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Big Moose Pond"
+   "text": "Shaw Mountain, Kineo"
   },
   "truth": {
-   "lat": 45.4543916,
-   "lon": -69.6795308,
+   "lat": 45.7197907,
+   "lon": -69.7087324,
    "radius_m": 4000
   },
   "base_id": 1046,
@@ -3793,11 +3793,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Mud Pond"
+   "text": "Farrow Lake"
   },
   "truth": {
-   "lat": 45.6679554,
-   "lon": -69.0109466,
+   "lat": 45.4253968,
+   "lon": -67.7660586,
    "radius_m": 4000
   },
   "base_id": 923,
@@ -3809,11 +3809,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Conary Head"
+   "text": "Pine Hill, Fayette Corner"
   },
   "truth": {
-   "lat": 44.2312309,
-   "lon": -68.5814801,
+   "lat": 44.4479809,
+   "lon": -70.0832396,
    "radius_m": 4000
   },
   "base_id": 967,
@@ -3825,11 +3825,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Butcher Lake"
+   "text": "Shaw Hill"
   },
   "truth": {
-   "lat": 45.4689223,
-   "lon": -67.6640598,
+   "lat": 44.1268088,
+   "lon": -70.3132539,
    "radius_m": 4000
   },
   "base_id": 959,
@@ -3841,11 +3841,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Bradbury Mountain"
+   "text": "Forty Acre Hill"
   },
   "truth": {
-   "lat": 43.9023677,
-   "lon": -70.1818227,
+   "lat": 43.1140412,
+   "lon": -70.6933695,
    "radius_m": 4000
   },
   "base_id": 1007,
@@ -3857,11 +3857,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Pooler Ponds"
+   "text": "Soule Pond"
   },
   "truth": {
-   "lat": 45.2910508,
-   "lon": -69.9899155,
+   "lat": 46.2747876,
+   "lon": -68.8165277,
    "radius_m": 4000
   },
   "base_id": 976,
@@ -3873,11 +3873,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Howe Peak"
+   "text": "Second Musquacook Lake"
   },
   "truth": {
-   "lat": 46.0708706,
-   "lon": -68.9982999,
+   "lat": 46.6338666,
+   "lon": -69.1736999,
    "radius_m": 4000
   },
   "base_id": 995,
@@ -3889,11 +3889,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Meadow Pond"
+   "text": "Jerusalem Mountain"
   },
   "truth": {
-   "lat": 45.3450306,
-   "lon": -69.4657716,
+   "lat": 44.0499809,
+   "lon": -68.6228901,
    "radius_m": 4000
   },
   "base_id": 992,
@@ -3905,11 +3905,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Red Rock Mountain"
+   "text": "Cunningham Mountain, Hibberts"
   },
   "truth": {
-   "lat": 44.309501,
-   "lon": -70.8983193,
+   "lat": 44.324648,
+   "lon": -69.4099165,
    "radius_m": 4000
   },
   "base_id": 931,
@@ -3921,11 +3921,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Pickerel Pond"
+   "text": "Little Penobscot Pond"
   },
   "truth": {
-   "lat": 45.4670738,
-   "lon": -67.7598152,
+   "lat": 45.6799815,
+   "lon": -69.1782677,
    "radius_m": 4000
   },
   "base_id": 991,
@@ -3937,11 +3937,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Howland Hill"
+   "text": "Short Pond"
   },
   "truth": {
-   "lat": 44.5633107,
-   "lon": -69.7807472,
+   "lat": 43.4736536,
+   "lon": -70.3866543,
    "radius_m": 4000
   },
   "base_id": 1012,
@@ -3953,11 +3953,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Chandler Hill"
+   "text": "Crow Hill, Burdin Corner"
   },
   "truth": {
-   "lat": 45.0004108,
-   "lon": -70.0166096,
+   "lat": 45.1093527,
+   "lon": -69.5061565,
    "radius_m": 4000
   },
   "base_id": 984,
@@ -3969,11 +3969,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Varney Hill"
+   "text": "Turner Hill, Wyman"
   },
   "truth": {
-   "lat": 45.2490907,
-   "lon": -68.4819501,
+   "lat": 44.502847,
+   "lon": -67.8625007,
    "radius_m": 4000
   },
   "base_id": 934,
@@ -3985,11 +3985,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Round Pond"
+   "text": "Mount Seeall"
   },
   "truth": {
-   "lat": 43.4017812,
-   "lon": -70.7584382,
+   "lat": 45.1161324,
+   "lon": -67.238463,
    "radius_m": 4000
   },
   "base_id": 1005,
@@ -4001,11 +4001,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Roberts Hill"
+   "text": "Little Fish Ponds"
   },
   "truth": {
-   "lat": 44.5685109,
-   "lon": -69.0793099,
+   "lat": 45.9077405,
+   "lon": -70.2473704,
    "radius_m": 4000
   },
   "base_id": 937,
@@ -4017,11 +4017,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Selmore Pond"
+   "text": "Meadow Pond, Islesboro"
   },
   "truth": {
-   "lat": 45.196334,
-   "lon": -68.0464594,
+   "lat": 44.3566458,
+   "lon": -68.8992566,
    "radius_m": 4000
   },
   "base_id": 906,
@@ -4033,11 +4033,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Bear Mountain"
+   "text": "Mud Pond, Skillings Corner"
   },
   "truth": {
-   "lat": 44.669924,
-   "lon": -69.7520049,
+   "lat": 44.2198675,
+   "lon": -70.2980186,
    "radius_m": 4000
   },
   "base_id": 997,
@@ -4049,11 +4049,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Horse Hill"
+   "text": "Norton Pond, Knights Landing"
   },
   "truth": {
-   "lat": 44.178761,
-   "lon": -70.5489895,
+   "lat": 45.3717264,
+   "lon": -68.9696469,
    "radius_m": 4000
   },
   "base_id": 920,
@@ -4065,11 +4065,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Roxbury Mountain"
+   "text": "Plummer Mountain"
   },
   "truth": {
-   "lat": 44.6413488,
-   "lon": -70.5307094,
+   "lat": 44.1162118,
+   "lon": -70.800689,
    "radius_m": 4000
   },
   "base_id": 1017,
@@ -4081,11 +4081,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Little Coffeelos Pond"
+   "text": "Dean Hill"
   },
   "truth": {
-   "lat": 46.1606556,
-   "lon": -69.1085389,
+   "lat": 44.0842292,
+   "lon": -70.4800574,
    "radius_m": 4000
   },
   "base_id": 1043,
@@ -4097,11 +4097,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Burnt Pond"
+   "text": "Seboeis Deadwater"
   },
   "truth": {
-   "lat": 44.7459627,
-   "lon": -68.5273792,
+   "lat": 46.2044909,
+   "lon": -68.5892065,
    "radius_m": 4000
   },
   "base_id": 951,
@@ -4113,11 +4113,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Hobbs Hill"
+   "text": "Little Mountain, Sunset"
   },
   "truth": {
-   "lat": 44.1179412,
-   "lon": -70.6563851,
+   "lat": 44.2296609,
+   "lon": -68.7851301,
    "radius_m": 4000
   },
   "base_id": 947,
@@ -4129,11 +4129,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "West Carry Pond"
+   "text": "Caldin Hill"
   },
   "truth": {
-   "lat": 45.1689736,
-   "lon": -70.1112333,
+   "lat": 44.6940909,
+   "lon": -70.2679895,
    "radius_m": 4000
   },
   "base_id": 912,
@@ -4145,11 +4145,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Little Bear Pond"
+   "text": "Big Rocks"
   },
   "truth": {
-   "lat": 44.3535201,
-   "lon": -70.2903553,
+   "lat": 44.2434048,
+   "lon": -68.3361283,
    "radius_m": 4000
   },
   "base_id": 938,
@@ -4161,11 +4161,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Great Pond"
+   "text": "Taylor Brook Pond"
   },
   "truth": {
-   "lat": 44.6500788,
-   "lon": -67.2927648,
+   "lat": 44.7804178,
+   "lon": -67.8435757,
    "radius_m": 4000
   },
   "base_id": 907,
@@ -4177,11 +4177,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Deer Bog"
+   "text": "Cobble Hill, Carthage"
   },
   "truth": {
-   "lat": 45.2060301,
-   "lon": -69.9195189,
+   "lat": 44.6661627,
+   "lon": -70.4889541,
    "radius_m": 4000
   },
   "base_id": 983,
@@ -4193,11 +4193,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Lost Pond"
+   "text": "Third Lake, North Washington"
   },
   "truth": {
-   "lat": 45.3647244,
-   "lon": -70.4136993,
+   "lat": 45.0202141,
+   "lon": -67.7967975,
    "radius_m": 4000
   },
   "base_id": 994,
@@ -4209,11 +4209,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "C Pond"
+   "text": "South Twin Mountain"
   },
   "truth": {
-   "lat": 44.7176418,
-   "lon": -70.8819261,
+   "lat": 44.6040651,
+   "lon": -70.6132753,
    "radius_m": 4000
   },
   "base_id": 909,
@@ -4225,11 +4225,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Crooked Brook Lake"
+   "text": "Smith Brook Pond, Round Mountain"
   },
   "truth": {
-   "lat": 45.5519987,
-   "lon": -67.7217126,
+   "lat": 46.4623066,
+   "lon": -68.9716513,
    "radius_m": 4000
   },
   "base_id": 1001,
@@ -4241,11 +4241,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Fresh Pond"
+   "text": "Fifth Musquacook Lake"
   },
   "truth": {
-   "lat": 44.345159,
-   "lon": -68.7915825,
+   "lat": 46.5465082,
+   "lon": -69.1099686,
    "radius_m": 4000
   },
   "base_id": 925,
@@ -4257,11 +4257,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Frost Mountain"
+   "text": "Fuller Mountain"
   },
   "truth": {
-   "lat": 43.952791,
-   "lon": -70.9173394,
+   "lat": 43.8146738,
+   "lon": -69.8373328,
    "radius_m": 4000
   },
   "base_id": 972,
@@ -4273,11 +4273,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Hamblin Hill"
+   "text": "Withee Pond"
   },
   "truth": {
-   "lat": 44.1960853,
-   "lon": -70.8924621,
+   "lat": 45.0866752,
+   "lon": -69.7733146,
    "radius_m": 4000
   },
   "base_id": 901,
@@ -4289,11 +4289,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Breakheart Hill"
+   "text": "Hastings Pond"
   },
   "truth": {
-   "lat": 43.729714,
-   "lon": -70.5652424,
+   "lat": 43.9119625,
+   "lon": -69.4923248,
    "radius_m": 4000
   },
   "base_id": 1041,
@@ -4305,11 +4305,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Full Circle Artisan's "
+   "text": "Totally "
   },
   "truth": {
-   "lat": 43.8050699,
-   "lon": -70.80292426,
+   "lat": 43.4396432513328,
+   "lon": -70.77563140023753,
    "radius_m": 300
   },
   "base_id": 1372,
@@ -4321,11 +4321,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "The Learning Place "
+   "text": "Peacock Consignmen"
   },
   "truth": {
-   "lat": 43.3416278,
-   "lon": -70.5677037,
+   "lat": 44.7784663,
+   "lon": -68.77671469,
    "radius_m": 300
   },
   "base_id": 1376,
@@ -4337,11 +4337,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Maine Mi"
+   "text": "Aeropo"
   },
   "truth": {
-   "lat": 44.205911,
-   "lon": -69.061675,
+   "lat": 43.63302001423414,
+   "lon": -70.33393944618143,
    "radius_m": 300
   },
   "base_id": 1354,
@@ -4353,11 +4353,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Buxton United Methodist Church"
+   "text": "Mrs. Smith’s Pianists"
   },
   "truth": {
-   "lat": 43.7005503,
-   "lon": -70.55214356,
+   "lat": 44.64516418,
+   "lon": -67.59655936,
    "radius_m": 300
   },
   "base_id": 1057,
@@ -4369,11 +4369,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Northern Light Acadia Hospital"
+   "text": "Marcel's Barber Shop"
   },
   "truth": {
-   "lat": 44.8206692,
-   "lon": -68.76334921,
+   "lat": 44.0875299,
+   "lon": -70.2233437,
    "radius_m": 300
   },
   "base_id": 1196,
@@ -4385,11 +4385,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Island Watch Bed & Breakfast"
+   "text": "UPS Authorized Shipping Provider, Farmington"
   },
   "truth": {
-   "lat": 44.2795800878689,
-   "lon": -68.33215729816078,
+   "lat": 44.6682668,
+   "lon": -70.1509078,
    "radius_m": 300
   },
   "base_id": 1189,
@@ -4401,11 +4401,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Ne're Beach Family Campground"
+   "text": "Shannon Bennett, D.O."
   },
   "truth": {
-   "lat": 43.5150586,
-   "lon": -70.380575,
+   "lat": 43.6533244,
+   "lon": -70.2751542,
    "radius_m": 300
   },
   "base_id": 1098,
@@ -4417,11 +4417,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Eyes on R"
+   "text": "Burgess Construction & Pro"
   },
   "truth": {
-   "lat": 43.65815585,
-   "lon": -70.25362002,
+   "lat": 44.98407791233106,
+   "lon": -70.65873917161707,
    "radius_m": 300
   },
   "base_id": 1399,
@@ -4433,11 +4433,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Western Un"
+   "text": "Regional Medical Center A"
   },
   "truth": {
-   "lat": 46.137622,
-   "lon": -67.83868,
+   "lat": 44.7154591,
+   "lon": -67.4615236,
    "radius_m": 300
   },
   "base_id": 1391,
@@ -4449,11 +4449,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Easy Street Aut"
+   "text": "Mary Snow S"
   },
   "truth": {
-   "lat": 43.65699005074917,
-   "lon": -70.25035858154297,
+   "lat": 44.81737415,
+   "lon": -68.77298358,
    "radius_m": 300
   },
   "base_id": 1364,
@@ -4465,11 +4465,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Congregation Bet Ha'am"
+   "text": "Maine Mountain Timber Frames"
   },
   "truth": {
-   "lat": 43.62220563,
-   "lon": -70.30558284,
+   "lat": 44.8137137,
+   "lon": -70.34238607,
    "radius_m": 300
   },
   "base_id": 1137,
@@ -4481,11 +4481,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Hometown Hair"
+   "text": "Genest Concrete: Landscape Masonry Supply"
   },
   "truth": {
-   "lat": 46.68189757,
-   "lon": -68.15891846,
+   "lat": 43.439104431451085,
+   "lon": -70.76183438301088,
    "radius_m": 300
   },
   "base_id": 1363,
@@ -4497,11 +4497,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Dad's Maple Sugar Shack"
+   "text": "Joshua L. Chamberlain Museum"
   },
   "truth": {
-   "lat": 44.04605331,
-   "lon": -70.63682773,
+   "lat": 43.910461626037744,
+   "lon": -69.96397378052482,
    "radius_m": 300
   },
   "base_id": 1072,
@@ -4513,11 +4513,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Field's "
+   "text": "Town of Har"
   },
   "truth": {
-   "lat": 43.80511981,
-   "lon": -69.98982388,
+   "lat": 43.8137763,
+   "lon": -69.94313945,
    "radius_m": 300
   },
   "base_id": 1375,
@@ -4529,11 +4529,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Maine Hospitality "
+   "text": "Rent-A-C"
   },
   "truth": {
-   "lat": 44.31142439,
-   "lon": -69.79202049,
+   "lat": 45.02444519,
+   "lon": -69.29043394,
    "radius_m": 300
   },
   "base_id": 1341,
@@ -4545,11 +4545,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Community Radio W"
+   "text": "Bennett's Gems "
   },
   "truth": {
-   "lat": 44.56499352588156,
-   "lon": -68.66632348463081,
+   "lat": 44.4333355,
+   "lon": -68.99819472,
    "radius_m": 300
   },
   "base_id": 1358,
@@ -4561,11 +4561,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Elements Books Coff"
+   "text": "Harold Mac Quin"
   },
   "truth": {
-   "lat": 43.4940468,
-   "lon": -70.45802568,
+   "lat": 44.5236167,
+   "lon": -68.36158642,
    "radius_m": 300
   },
   "base_id": 1346,
@@ -4577,11 +4577,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Eye Center Northeast"
+   "text": "Calvary Cemetery, South Portland"
   },
   "truth": {
-   "lat": 44.83149056,
-   "lon": -68.78627582,
+   "lat": 43.63021801,
+   "lon": -70.29388485,
    "radius_m": 300
   },
   "base_id": 1082,
@@ -4593,11 +4593,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Hilton Garden Inn"
+   "text": "Natalie H. Rockwell, CNM"
   },
   "truth": {
-   "lat": 43.64948677,
-   "lon": -70.31540594,
+   "lat": 43.906285165142975,
+   "lon": -69.89137374668397,
    "radius_m": 300
   },
   "base_id": 1067,
@@ -4609,11 +4609,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Woodfords Congregational Church"
+   "text": "Dewey's Lumber and Cedar Mill"
   },
   "truth": {
-   "lat": 43.67077464,
-   "lon": -70.28757478,
+   "lat": 44.37109,
+   "lon": -69.361436,
    "radius_m": 300
   },
   "base_id": 1099,
@@ -4625,11 +4625,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "INKredib"
+   "text": "Duguay El"
   },
   "truth": {
-   "lat": 44.76603213,
-   "lon": -69.71752025,
+   "lat": 44.54735019,
+   "lon": -70.56040705,
    "radius_m": 300
   },
   "base_id": 1345,
@@ -4641,11 +4641,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Massage Therapy"
+   "text": "North Whitefield Superette"
   },
   "truth": {
-   "lat": 46.86944573,
-   "lon": -68.00509949,
+   "lat": 44.222029,
+   "lon": -69.587287,
    "radius_m": 300
   },
   "base_id": 1116,
@@ -4657,11 +4657,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Peaks Island Strength and Wellness"
+   "text": "Casco Bay Furniture"
   },
   "truth": {
-   "lat": 43.65785078,
-   "lon": -70.19825303,
+   "lat": 43.6569639,
+   "lon": -70.2567261,
    "radius_m": 300
   },
   "base_id": 1152,
@@ -4673,11 +4673,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Rudman Winchell"
+   "text": "Mainely Gallery and Studio"
   },
   "truth": {
-   "lat": 44.54399086395939,
-   "lon": -68.42498856549535,
+   "lat": 44.42940642,
+   "lon": -68.97388277,
    "radius_m": 300
   },
   "base_id": 1136,
@@ -4689,11 +4689,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Botma Farm"
+   "text": "Early Bird Restaurant, Oakland"
   },
   "truth": {
-   "lat": 44.03005554,
-   "lon": -70.0881532,
+   "lat": 44.55262505074715,
+   "lon": -69.74439292784336,
    "radius_m": 300
   },
   "base_id": 1138,
@@ -4705,11 +4705,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Mad Kat's Restaurant and Bar"
+   "text": "West Bowdoin Baptist Church"
   },
   "truth": {
-   "lat": 44.79932669,
-   "lon": -68.75381463,
+   "lat": 44.0496503,
+   "lon": -70.0214776,
    "radius_m": 300
   },
   "base_id": 1117,
@@ -4721,11 +4721,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Cherished Posse"
+   "text": "Bosal Fa"
   },
   "truth": {
-   "lat": 43.70233113,
-   "lon": -70.28961995,
+   "lat": 43.57113025,
+   "lon": -70.38819049,
    "radius_m": 300
   },
   "base_id": 1339,
@@ -4737,11 +4737,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Portland Art"
+   "text": "Mexico Congregati"
   },
   "truth": {
-   "lat": 43.65802002,
-   "lon": -70.25383407,
+   "lat": 44.55549418,
+   "lon": -70.53990307,
    "radius_m": 300
   },
   "base_id": 1384,
@@ -4753,11 +4753,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Rustic Ridge Photography"
+   "text": "Capital Family Practice, P.a."
   },
   "truth": {
-   "lat": 43.92756421204877,
-   "lon": -70.43733853221903,
+   "lat": 44.303478,
+   "lon": -69.765213,
    "radius_m": 300
   },
   "base_id": 1153,
@@ -4769,11 +4769,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Mc Kennel's Anim"
+   "text": "Centerline Auto"
   },
   "truth": {
-   "lat": 44.51305579,
-   "lon": -70.54797657,
+   "lat": 44.47862256,
+   "lon": -70.64327188,
    "radius_m": 300
   },
   "base_id": 1356,
@@ -4785,11 +4785,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Back Road Bakery"
+   "text": "Colby Woods Cattle"
   },
   "truth": {
-   "lat": 43.49047181,
-   "lon": -70.712269,
+   "lat": 44.56416415,
+   "lon": -70.14185603,
    "radius_m": 300
   },
   "base_id": 1054,
@@ -4801,11 +4801,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Twilite Motel"
+   "text": "Bella Amica Salon"
   },
   "truth": {
-   "lat": 44.539745467831466,
-   "lon": -68.44215971352925,
+   "lat": 44.3143031,
+   "lon": -69.7744112,
    "radius_m": 300
   },
   "base_id": 1131,
@@ -4817,11 +4817,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Barrett's Park"
+   "text": "Walgreens, Lisbon Falls"
   },
   "truth": {
-   "lat": 43.848117,
-   "lon": -69.61794,
+   "lat": 44.004666,
+   "lon": -70.074845,
    "radius_m": 300
   },
   "base_id": 1139,
@@ -4833,11 +4833,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Gerard's "
+   "text": "Lighthouse"
   },
   "truth": {
-   "lat": 44.22971,
-   "lon": -69.772115,
+   "lat": 43.64040487,
+   "lon": -70.254654,
    "radius_m": 300
   },
   "base_id": 1383,
@@ -4849,11 +4849,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Andre Achenbach, OD - Lewiston"
+   "text": "Lash Haus"
   },
   "truth": {
-   "lat": 44.1146822,
-   "lon": -70.2067618,
+   "lat": 43.51776753,
+   "lon": -70.4000003,
    "radius_m": 300
   },
   "base_id": 1092,
@@ -4865,11 +4865,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Mard"
+   "text": "Lebel Dog "
   },
   "truth": {
-   "lat": 44.84224,
-   "lon": -68.73779,
+   "lat": 43.32038302,
+   "lon": -70.58153901,
    "radius_m": 300
   },
   "base_id": 1348,
@@ -4881,11 +4881,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Personal Best Hea"
+   "text": "Dermatology Ass"
   },
   "truth": {
-   "lat": 44.2273097,
-   "lon": -70.519013,
+   "lat": 43.65533739,
+   "lon": -70.29003533,
    "radius_m": 300
   },
   "base_id": 1342,
@@ -4897,11 +4897,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Blvd Gr"
+   "text": "Boothbay Harbo"
   },
   "truth": {
-   "lat": 46.91096441,
-   "lon": -67.82536957,
+   "lat": 43.85132553,
+   "lon": -69.62776007,
    "radius_m": 300
   },
   "base_id": 1407,
@@ -4913,11 +4913,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Riverside Survey, LLC"
+   "text": "Kimball Cottage"
   },
   "truth": {
-   "lat": 44.115526071170144,
-   "lon": -70.59547424316408,
+   "lat": 43.27582278,
+   "lon": -70.58221631,
    "radius_m": 300
   },
   "base_id": 1167,
@@ -4929,11 +4929,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Main Line Fence Co"
+   "text": "Steven's Pond"
   },
   "truth": {
-   "lat": 43.78163,
-   "lon": -70.199569,
+   "lat": 44.38198011,
+   "lon": -69.29741726,
    "radius_m": 300
   },
   "base_id": 1055,
@@ -4945,11 +4945,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Penske Truck Rental"
+   "text": "Bonnie Hart, PT"
   },
   "truth": {
-   "lat": 44.82451876,
-   "lon": -68.75897217,
+   "lat": 43.86198242220213,
+   "lon": -70.10562240970796,
    "radius_m": 300
   },
   "base_id": 1134,
@@ -4961,11 +4961,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Patriot Insurance "
+   "text": "Black Element T"
   },
   "truth": {
-   "lat": 43.80301554,
-   "lon": -70.18191736,
+   "lat": 43.91123841,
+   "lon": -69.97573844,
    "radius_m": 300
   },
   "base_id": 1378,
@@ -4977,11 +4977,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Jeff's Vacuum LLC"
+   "text": "Hammond Street Congregational Church"
   },
   "truth": {
-   "lat": 44.1845764,
-   "lon": -69.11931406,
+   "lat": 44.80096019,
+   "lon": -68.77417537,
    "radius_m": 300
   },
   "base_id": 1130,
@@ -4993,11 +4993,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Central Maine Sports"
+   "text": "KIYA"
   },
   "truth": {
-   "lat": 44.3210978,
-   "lon": -69.82368018,
+   "lat": 43.08600168954892,
+   "lon": -70.74299391602509,
    "radius_m": 300
   },
   "base_id": 1179,
@@ -5009,11 +5009,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "The Corner "
+   "text": "The 1909 Ho"
   },
   "truth": {
-   "lat": 45.45881808,
-   "lon": -69.59178355,
+   "lat": 44.77152708097523,
+   "lon": -69.7220336907615,
    "radius_m": 300
   },
   "base_id": 1340,
@@ -5025,11 +5025,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Kennebunk Family "
+   "text": "If You Sa"
   },
   "truth": {
-   "lat": 43.38428154,
-   "lon": -70.54492681,
+   "lat": 43.94785006,
+   "lon": -70.19978593,
    "radius_m": 300
   },
   "base_id": 1374,
@@ -5041,11 +5041,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Ground Floor"
+   "text": "Freeport Mind-Body Fitness/Gyrotonic Studio in Freeport, Maine"
   },
   "truth": {
-   "lat": 43.8582426,
-   "lon": -70.10094733,
+   "lat": 43.85468718,
+   "lon": -70.10759444,
    "radius_m": 300
   },
   "base_id": 1070,
@@ -5057,11 +5057,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Reunion Station"
+   "text": "Spirit Halloween, Crocketts Corner"
   },
   "truth": {
-   "lat": 44.06077244,
-   "lon": -69.49642696,
+   "lat": 43.6345183773483,
+   "lon": -70.336337880139,
    "radius_m": 300
   },
   "base_id": 1154,
@@ -5073,11 +5073,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Barn on 26 An"
+   "text": "Party C"
   },
   "truth": {
-   "lat": 43.93233153185235,
-   "lon": -70.35288339118601,
+   "lat": 44.347132,
+   "lon": -69.789185,
    "radius_m": 300
   },
   "base_id": 1352,
@@ -5089,11 +5089,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Tooth Protectors Inc"
+   "text": "Still Waters Auto Sales and Service"
   },
   "truth": {
-   "lat": 44.074457,
-   "lon": -70.1757984,
+   "lat": 43.73195802,
+   "lon": -70.58819736,
    "radius_m": 300
   },
   "base_id": 1180,
@@ -8605,11 +8605,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Lilu Pond"
+   "text": "West Geogretown Hill"
   },
   "truth": {
-   "lat": 43.6599629,
-   "lon": -70.6369016,
+   "lat": 43.8005337,
+   "lon": -69.7786372,
    "radius_m": 4000
   },
   "base_id": 958,
@@ -8621,11 +8621,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Labbe Ponnd"
+   "text": "Pleasannt Mountain, Houghton"
   },
   "truth": {
-   "lat": 47.146383,
-   "lon": -68.6264401,
+   "lat": 44.7344647,
+   "lon": -70.6908308,
    "radius_m": 4000
   },
   "base_id": 932,
@@ -8637,11 +8637,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Higgh Cut"
+   "text": "Johns Pond, Davis Tow"
   },
   "truth": {
-   "lat": 45.0768356,
-   "lon": -69.1315286,
+   "lat": 45.0697749,
+   "lon": -70.7914576,
    "radius_m": 4000
   },
   "base_id": 904,
@@ -8653,11 +8653,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Whutney Hill"
+   "text": "Frost Hill, Sodomm"
   },
   "truth": {
-   "lat": 44.183851,
-   "lon": -70.4847795,
+   "lat": 44.180821,
+   "lon": -70.6031595,
    "radius_m": 4000
   },
   "base_id": 1009,
@@ -8669,11 +8669,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Graj Pond"
+   "text": "Seqall Hill"
   },
   "truth": {
-   "lat": 44.863057,
-   "lon": -68.0435815,
+   "lat": 43.132024,
+   "lon": -70.6622742,
    "radius_m": 4000
   },
   "base_id": 908,
@@ -8685,11 +8685,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Great Moose Lae"
+   "text": "Stetspn Pond"
   },
   "truth": {
-   "lat": 44.9230285,
-   "lon": -69.5172258,
+   "lat": 44.8482106,
+   "lon": -70.4774848,
    "radius_m": 4000
   },
   "base_id": 975,
@@ -8701,11 +8701,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Hzy Pond"
+   "text": "Eables Crag"
   },
   "truth": {
-   "lat": 46.167187,
-   "lon": -68.7515527,
+   "lat": 44.3258509,
+   "lon": -68.2197302,
    "radius_m": 4000
   },
   "base_id": 1003,
@@ -8717,11 +8717,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Upper Togue Poond"
+   "text": "Tea Mountainn"
   },
   "truth": {
-   "lat": 45.8237943,
-   "lon": -68.8956835,
+   "lat": 45.2281712,
+   "lon": -70.5389367,
    "radius_m": 4000
   },
   "base_id": 1024,
@@ -8733,11 +8733,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Skilly Hill"
+   "text": "Great Hill, Lower Villag"
   },
   "truth": {
-   "lat": 43.5867398,
-   "lon": -70.4756071,
+   "lat": 43.3440346,
+   "lon": -70.5130859,
    "radius_m": 4000
   },
   "base_id": 993,
@@ -8749,11 +8749,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Sunday River Witecap"
+   "text": "Weymoth Hill"
   },
   "truth": {
-   "lat": 44.5489609,
-   "lon": -70.8966993,
+   "lat": 44.228601,
+   "lon": -70.8085394,
    "radius_m": 4000
   },
   "base_id": 939,
@@ -8765,11 +8765,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Mount Vto"
+   "text": "Uncle Dick Hil"
   },
   "truth": {
-   "lat": 45.940779,
-   "lon": -69.0920503,
+   "lat": 44.3516809,
+   "lon": -68.3859002,
    "radius_m": 4000
   },
   "base_id": 1048,
@@ -8781,11 +8781,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Irn Mine Hill"
+   "text": "Brwns Pond"
   },
   "truth": {
-   "lat": 44.2126853,
-   "lon": -69.7847859,
+   "lat": 43.9129819,
+   "lon": -70.7277363,
    "radius_m": 4000
   },
   "base_id": 936,
@@ -8797,11 +8797,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Greeat Hill"
+   "text": "Staffford Pond"
   },
   "truth": {
-   "lat": 44.3859422,
-   "lon": -68.2318132,
+   "lat": 44.8911979,
+   "lon": -69.5037708,
    "radius_m": 4000
   },
   "base_id": 974,
@@ -8813,11 +8813,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Parkee Pond"
+   "text": "Camp Pondd"
   },
   "truth": {
-   "lat": 44.5085098,
-   "lon": -70.1418107,
+   "lat": 45.4291257,
+   "lon": -69.2687466,
    "radius_m": 4000
   },
   "base_id": 998,
@@ -8829,11 +8829,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Isaian Mountain"
+   "text": "Youngs Podn"
   },
   "truth": {
-   "lat": 44.2819222,
-   "lon": -70.8754577,
+   "lat": 44.7165898,
+   "lon": -68.4476393,
    "radius_m": 4000
   },
   "base_id": 949,
@@ -8845,11 +8845,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Mooody Pond"
+   "text": "Pickerel Pond, Altonn"
   },
   "truth": {
-   "lat": 43.5624821,
-   "lon": -70.7387476,
+   "lat": 45.0465982,
+   "lon": -68.7700584,
    "radius_m": 4000
   },
   "base_id": 1019,
@@ -8861,11 +8861,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Gilmwn Pond"
+   "text": "Linksoos Mountain"
   },
   "truth": {
-   "lat": 44.9580266,
-   "lon": -70.0543385,
+   "lat": 45.9583006,
+   "lon": -68.68061,
    "radius_m": 4000
   },
   "base_id": 980,
@@ -8877,11 +8877,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Big Mosoe Pond"
+   "text": "Shaw Mountainn, Kineo"
   },
   "truth": {
-   "lat": 45.4543916,
-   "lon": -69.6795308,
+   "lat": 45.7197907,
+   "lon": -69.7087324,
    "radius_m": 4000
   },
   "base_id": 1046,
@@ -8893,11 +8893,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Mud Pknd"
+   "text": "Farrpw Lake"
   },
   "truth": {
-   "lat": 45.6679554,
-   "lon": -69.0109466,
+   "lat": 45.4253968,
+   "lon": -67.7660586,
    "radius_m": 4000
   },
   "base_id": 923,
@@ -8909,11 +8909,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Conary Haed"
+   "text": "Pine Hill, Faeytte Corner"
   },
   "truth": {
-   "lat": 44.2312309,
-   "lon": -68.5814801,
+   "lat": 44.4479809,
+   "lon": -70.0832396,
    "radius_m": 4000
   },
   "base_id": 967,
@@ -8925,11 +8925,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Buthcer Lake"
+   "text": "Shaa Hill"
   },
   "truth": {
-   "lat": 45.4689223,
-   "lon": -67.6640598,
+   "lat": 44.1268088,
+   "lon": -70.3132539,
    "radius_m": 4000
   },
   "base_id": 959,
@@ -8941,11 +8941,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Bradburry Mountain"
+   "text": "Forty Acre Hilll"
   },
   "truth": {
-   "lat": 43.9023677,
-   "lon": -70.1818227,
+   "lat": 43.1140412,
+   "lon": -70.6933695,
    "radius_m": 4000
   },
   "base_id": 1007,
@@ -8957,11 +8957,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Pooler Pondc"
+   "text": "Sule Pond"
   },
   "truth": {
-   "lat": 45.2910508,
-   "lon": -69.9899155,
+   "lat": 46.2747876,
+   "lon": -68.8165277,
    "radius_m": 4000
   },
   "base_id": 976,
@@ -8973,11 +8973,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Howe Peaak"
+   "text": "Seconnd Musquacook Lake"
   },
   "truth": {
-   "lat": 46.0708706,
-   "lon": -68.9982999,
+   "lat": 46.6338666,
+   "lon": -69.1736999,
    "radius_m": 4000
   },
   "base_id": 995,
@@ -8989,11 +8989,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Meadow Poond"
+   "text": "Jerusalem Mounntain"
   },
   "truth": {
-   "lat": 45.3450306,
-   "lon": -69.4657716,
+   "lat": 44.0499809,
+   "lon": -68.6228901,
    "radius_m": 4000
   },
   "base_id": 992,
@@ -9005,11 +9005,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Rrd Rock Mountain"
+   "text": "Cunningham Mountain, Hbiberts"
   },
   "truth": {
-   "lat": 44.309501,
-   "lon": -70.8983193,
+   "lat": 44.324648,
+   "lon": -69.4099165,
    "radius_m": 4000
   },
   "base_id": 931,
@@ -9021,11 +9021,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Pickkerel Pond"
+   "text": "Little Penobscot Pondd"
   },
   "truth": {
-   "lat": 45.4670738,
-   "lon": -67.7598152,
+   "lat": 45.6799815,
+   "lon": -69.1782677,
    "radius_m": 4000
   },
   "base_id": 991,
@@ -9037,11 +9037,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Howlwnd Hill"
+   "text": "Shorrt Pond"
   },
   "truth": {
-   "lat": 44.5633107,
-   "lon": -69.7807472,
+   "lat": 43.4736536,
+   "lon": -70.3866543,
    "radius_m": 4000
   },
   "base_id": 1012,
@@ -9053,11 +9053,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Chandler Hkll"
+   "text": "Crpw Hill, Burdin Corner"
   },
   "truth": {
-   "lat": 45.0004108,
-   "lon": -70.0166096,
+   "lat": 45.1093527,
+   "lon": -69.5061565,
    "radius_m": 4000
   },
   "base_id": 984,
@@ -9069,11 +9069,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Varndy Hill"
+   "text": "Turnner Hill, Wyman"
   },
   "truth": {
-   "lat": 45.2490907,
-   "lon": -68.4819501,
+   "lat": 44.502847,
+   "lon": -67.8625007,
    "radius_m": 4000
   },
   "base_id": 934,
@@ -9085,11 +9085,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Round Pod"
+   "text": "Mouny Seeall"
   },
   "truth": {
-   "lat": 43.4017812,
-   "lon": -70.7584382,
+   "lat": 45.1161324,
+   "lon": -67.238463,
    "radius_m": 4000
   },
   "base_id": 1005,
@@ -9101,11 +9101,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Rberts Hill"
+   "text": "Little Fisn Ponds"
   },
   "truth": {
-   "lat": 44.5685109,
-   "lon": -69.0793099,
+   "lat": 45.9077405,
+   "lon": -70.2473704,
    "radius_m": 4000
   },
   "base_id": 937,
@@ -9117,11 +9117,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Selmor Pond"
+   "text": "Meadow Ponc, Islesboro"
   },
   "truth": {
-   "lat": 45.196334,
-   "lon": -68.0464594,
+   "lat": 44.3566458,
+   "lon": -68.8992566,
    "radius_m": 4000
   },
   "base_id": 906,
@@ -9133,11 +9133,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Bear Mohntain"
+   "text": "Mud Pond, Sikllings Corner"
   },
   "truth": {
-   "lat": 44.669924,
-   "lon": -69.7520049,
+   "lat": 44.2198675,
+   "lon": -70.2980186,
    "radius_m": 4000
   },
   "base_id": 997,
@@ -9149,11 +9149,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Hirse Hill"
+   "text": "Nortonn Pond, Knights Landing"
   },
   "truth": {
-   "lat": 44.178761,
-   "lon": -70.5489895,
+   "lat": 45.3717264,
+   "lon": -68.9696469,
    "radius_m": 4000
   },
   "base_id": 920,
@@ -9165,11 +9165,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Roxbury Mountaij"
+   "text": "Plummmer Mountain"
   },
   "truth": {
-   "lat": 44.6413488,
-   "lon": -70.5307094,
+   "lat": 44.1162118,
+   "lon": -70.800689,
    "radius_m": 4000
   },
   "base_id": 1017,
@@ -9181,11 +9181,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Little Coffeelks Pond"
+   "text": "Dean Hipl"
   },
   "truth": {
-   "lat": 46.1606556,
-   "lon": -69.1085389,
+   "lat": 44.0842292,
+   "lon": -70.4800574,
    "radius_m": 4000
   },
   "base_id": 1043,
@@ -9197,11 +9197,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Burnt Pnd"
+   "text": "Swboeis Deadwater"
   },
   "truth": {
-   "lat": 44.7459627,
-   "lon": -68.5273792,
+   "lat": 46.2044909,
+   "lon": -68.5892065,
    "radius_m": 4000
   },
   "base_id": 951,
@@ -9213,11 +9213,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Hobbss Hill"
+   "text": "Little Mountain, Sunseet"
   },
   "truth": {
-   "lat": 44.1179412,
-   "lon": -70.6563851,
+   "lat": 44.2296609,
+   "lon": -68.7851301,
    "radius_m": 4000
   },
   "base_id": 947,
@@ -9229,11 +9229,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "West Crry Pond"
+   "text": "Caldin Hlll"
   },
   "truth": {
-   "lat": 45.1689736,
-   "lon": -70.1112333,
+   "lat": 44.6940909,
+   "lon": -70.2679895,
    "radius_m": 4000
   },
   "base_id": 912,
@@ -9245,11 +9245,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Ltitle Bear Pond"
+   "text": "Big Rcks"
   },
   "truth": {
-   "lat": 44.3535201,
-   "lon": -70.2903553,
+   "lat": 44.2434048,
+   "lon": -68.3361283,
    "radius_m": 4000
   },
   "base_id": 938,
@@ -9261,11 +9261,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Grat Pond"
+   "text": "Taylor Broook Pond"
   },
   "truth": {
-   "lat": 44.6500788,
-   "lon": -67.2927648,
+   "lat": 44.7804178,
+   "lon": -67.8435757,
    "radius_m": 4000
   },
   "base_id": 907,
@@ -9277,11 +9277,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Dere Bog"
+   "text": "Cobbe Hill, Carthage"
   },
   "truth": {
-   "lat": 45.2060301,
-   "lon": -69.9195189,
+   "lat": 44.6661627,
+   "lon": -70.4889541,
    "radius_m": 4000
   },
   "base_id": 983,
@@ -9293,11 +9293,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Lsot Pond"
+   "text": "Tihrd Lake, North Washington"
   },
   "truth": {
-   "lat": 45.3647244,
-   "lon": -70.4136993,
+   "lat": 45.0202141,
+   "lon": -67.7967975,
    "radius_m": 4000
   },
   "base_id": 994,
@@ -9309,11 +9309,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "C Pobd"
+   "text": "Souh Twin Mountain"
   },
   "truth": {
-   "lat": 44.7176418,
-   "lon": -70.8819261,
+   "lat": 44.6040651,
+   "lon": -70.6132753,
    "radius_m": 4000
   },
   "base_id": 909,
@@ -9325,11 +9325,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Crookde Brook Lake"
+   "text": "Smith Broou Pond, Round Mountain"
   },
   "truth": {
-   "lat": 45.5519987,
-   "lon": -67.7217126,
+   "lat": 46.4623066,
+   "lon": -68.9716513,
    "radius_m": 4000
   },
   "base_id": 1001,
@@ -9341,11 +9341,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Fresh Poond"
+   "text": "Fkfth Musquacook Lake"
   },
   "truth": {
-   "lat": 44.345159,
-   "lon": -68.7915825,
+   "lat": 46.5465082,
+   "lon": -69.1099686,
    "radius_m": 4000
   },
   "base_id": 925,
@@ -9357,11 +9357,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Frost Mounain"
+   "text": "Fuller Mounntain"
   },
   "truth": {
-   "lat": 43.952791,
-   "lon": -70.9173394,
+   "lat": 43.8146738,
+   "lon": -69.8373328,
    "radius_m": 4000
   },
   "base_id": 972,
@@ -9373,11 +9373,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Hamblni Hill"
+   "text": "Witthee Pond"
   },
   "truth": {
-   "lat": 44.1960853,
-   "lon": -70.8924621,
+   "lat": 45.0866752,
+   "lon": -69.7733146,
    "radius_m": 4000
   },
   "base_id": 901,
@@ -9389,11 +9389,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Brreakheart Hill"
+   "text": "Hastings Pnd"
   },
   "truth": {
-   "lat": 43.729714,
-   "lon": -70.5652424,
+   "lat": 43.9119625,
+   "lon": -69.4923248,
    "radius_m": 4000
   },
   "base_id": 1041,
@@ -9405,11 +9405,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Full Cicrle Artisan's "
+   "text": "Totlaly "
   },
   "truth": {
-   "lat": 43.8050699,
-   "lon": -70.80292426,
+   "lat": 43.4396432513328,
+   "lon": -70.77563140023753,
    "radius_m": 300
   },
   "base_id": 1372,
@@ -9421,11 +9421,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Thee Learning Place "
+   "text": "Peeacock Consignmen"
   },
   "truth": {
-   "lat": 43.3416278,
-   "lon": -70.5677037,
+   "lat": 44.7784663,
+   "lon": -68.77671469,
    "radius_m": 300
   },
   "base_id": 1376,
@@ -9437,11 +9437,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Maine Mu"
+   "text": "Aerpoo"
   },
   "truth": {
-   "lat": 44.205911,
-   "lon": -69.061675,
+   "lat": 43.63302001423414,
+   "lon": -70.33393944618143,
    "radius_m": 300
   },
   "base_id": 1354,
@@ -9453,11 +9453,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Buxto United Methodist Church"
+   "text": "Mrss. Smith’s Pianists"
   },
   "truth": {
-   "lat": 43.7005503,
-   "lon": -70.55214356,
+   "lat": 44.64516418,
+   "lon": -67.59655936,
    "radius_m": 300
   },
   "base_id": 1057,
@@ -9469,11 +9469,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Northern Light Accadia Hospital"
+   "text": "Marcel's Barbre Shop"
   },
   "truth": {
-   "lat": 44.8206692,
-   "lon": -68.76334921,
+   "lat": 44.0875299,
+   "lon": -70.2233437,
    "radius_m": 300
   },
   "base_id": 1196,
@@ -9485,11 +9485,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Isoand Watch Bed & Breakfast"
+   "text": "US Authorized Shipping Provider, Farmington"
   },
   "truth": {
-   "lat": 44.2795800878689,
-   "lon": -68.33215729816078,
+   "lat": 44.6682668,
+   "lon": -70.1509078,
    "radius_m": 300
   },
   "base_id": 1189,
@@ -9501,11 +9501,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Ne're Beach Family Cwmpground"
+   "text": "Shannon Benntt, D.O."
   },
   "truth": {
-   "lat": 43.5150586,
-   "lon": -70.380575,
+   "lat": 43.6533244,
+   "lon": -70.2751542,
    "radius_m": 300
   },
   "base_id": 1098,
@@ -9517,11 +9517,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Eges on R"
+   "text": "Burgess Construuction & Pro"
   },
   "truth": {
-   "lat": 43.65815585,
-   "lon": -70.25362002,
+   "lat": 44.98407791233106,
+   "lon": -70.65873917161707,
    "radius_m": 300
   },
   "base_id": 1399,
@@ -9533,11 +9533,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Westrrn Un"
+   "text": "Refional Medical Center A"
   },
   "truth": {
-   "lat": 46.137622,
-   "lon": -67.83868,
+   "lat": 44.7154591,
+   "lon": -67.4615236,
    "radius_m": 300
   },
   "base_id": 1391,
@@ -9549,11 +9549,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Eazy Street Aut"
+   "text": "Maru Snow S"
   },
   "truth": {
-   "lat": 43.65699005074917,
-   "lon": -70.25035858154297,
+   "lat": 44.81737415,
+   "lon": -68.77298358,
    "radius_m": 300
   },
   "base_id": 1364,
@@ -9565,11 +9565,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Congregattion Bet Ha'am"
+   "text": "Msine Mountain Timber Frames"
   },
   "truth": {
-   "lat": 43.62220563,
-   "lon": -70.30558284,
+   "lat": 44.8137137,
+   "lon": -70.34238607,
    "radius_m": 300
   },
   "base_id": 1137,
@@ -9581,11 +9581,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Hometowwn Hair"
+   "text": "Genest Concrete: Lahdscape Masonry Supply"
   },
   "truth": {
-   "lat": 46.68189757,
-   "lon": -68.15891846,
+   "lat": 43.439104431451085,
+   "lon": -70.76183438301088,
    "radius_m": 300
   },
   "base_id": 1363,
@@ -9597,11 +9597,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Dad's Maple Sugra Shack"
+   "text": "Joshha L. Chamberlain Museum"
   },
   "truth": {
-   "lat": 44.04605331,
-   "lon": -70.63682773,
+   "lat": 43.910461626037744,
+   "lon": -69.96397378052482,
    "radius_m": 300
   },
   "base_id": 1072,
@@ -9613,11 +9613,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Filed's "
+   "text": "Town off Har"
   },
   "truth": {
-   "lat": 43.80511981,
-   "lon": -69.98982388,
+   "lat": 43.8137763,
+   "lon": -69.94313945,
    "radius_m": 300
   },
   "base_id": 1375,
@@ -9629,11 +9629,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Maine Hopitality "
+   "text": "Rennt-A-C"
   },
   "truth": {
-   "lat": 44.31142439,
-   "lon": -69.79202049,
+   "lat": 45.02444519,
+   "lon": -69.29043394,
    "radius_m": 300
   },
   "base_id": 1341,
@@ -9645,11 +9645,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Community Radik W"
+   "text": "Bennett's Gema "
   },
   "truth": {
-   "lat": 44.56499352588156,
-   "lon": -68.66632348463081,
+   "lat": 44.4333355,
+   "lon": -68.99819472,
    "radius_m": 300
   },
   "base_id": 1358,
@@ -9661,11 +9661,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Elementa Books Coff"
+   "text": "Haarold Mac Quin"
   },
   "truth": {
-   "lat": 43.4940468,
-   "lon": -70.45802568,
+   "lat": 44.5236167,
+   "lon": -68.36158642,
    "radius_m": 300
   },
   "base_id": 1346,
@@ -9677,11 +9677,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Eye Centfr Northeast"
+   "text": "Calvary Cemetery, South Portlnd"
   },
   "truth": {
-   "lat": 44.83149056,
-   "lon": -68.78627582,
+   "lat": 43.63021801,
+   "lon": -70.29388485,
    "radius_m": 300
   },
   "base_id": 1082,
@@ -9693,11 +9693,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Hilton Garden In"
+   "text": "Natalie H. Rockwepl, CNM"
   },
   "truth": {
-   "lat": 43.64948677,
-   "lon": -70.31540594,
+   "lat": 43.906285165142975,
+   "lon": -69.89137374668397,
    "radius_m": 300
   },
   "base_id": 1067,
@@ -9709,11 +9709,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Woodfords Congregatoinal Church"
+   "text": "Dewey's Lumber and Cesar Mill"
   },
   "truth": {
-   "lat": 43.67077464,
-   "lon": -70.28757478,
+   "lat": 44.37109,
+   "lon": -69.361436,
    "radius_m": 300
   },
   "base_id": 1099,
@@ -9725,11 +9725,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "IKredib"
+   "text": "Dugkay El"
   },
   "truth": {
-   "lat": 44.76603213,
-   "lon": -69.71752025,
+   "lat": 44.54735019,
+   "lon": -70.56040705,
    "radius_m": 300
   },
   "base_id": 1345,
@@ -9741,11 +9741,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Massage Therayp"
+   "text": "North Whietfield Superette"
   },
   "truth": {
-   "lat": 46.86944573,
-   "lon": -68.00509949,
+   "lat": 44.222029,
+   "lon": -69.587287,
    "radius_m": 300
   },
   "base_id": 1116,
@@ -9757,11 +9757,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Peakw Island Strength and Wellness"
+   "text": "Csco Bay Furniture"
   },
   "truth": {
-   "lat": 43.65785078,
-   "lon": -70.19825303,
+   "lat": 43.6569639,
+   "lon": -70.2567261,
    "radius_m": 300
   },
   "base_id": 1152,
@@ -9773,11 +9773,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Rudman Wincchell"
+   "text": "Maniely Gallery and Studio"
   },
   "truth": {
-   "lat": 44.54399086395939,
-   "lon": -68.42498856549535,
+   "lat": 44.42940642,
+   "lon": -68.97388277,
    "radius_m": 300
   },
   "base_id": 1136,
@@ -9789,11 +9789,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Botma Far"
+   "text": "Earlh Bird Restaurant, Oakland"
   },
   "truth": {
-   "lat": 44.03005554,
-   "lon": -70.0881532,
+   "lat": 44.55262505074715,
+   "lon": -69.74439292784336,
    "radius_m": 300
   },
   "base_id": 1138,
@@ -9805,11 +9805,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Mad Kat's Resturant and Bar"
+   "text": "West Bowdoi Baptist Church"
   },
   "truth": {
-   "lat": 44.79932669,
-   "lon": -68.75381463,
+   "lat": 44.0496503,
+   "lon": -70.0214776,
    "radius_m": 300
   },
   "base_id": 1117,
@@ -9821,11 +9821,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Cherished Posse"
+   "text": "Boal Fa"
   },
   "truth": {
-   "lat": 43.70233113,
-   "lon": -70.28961995,
+   "lat": 43.57113025,
+   "lon": -70.38819049,
    "radius_m": 300
   },
   "base_id": 1339,
@@ -9837,11 +9837,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Portlan Art"
+   "text": "Mexico Congrgeati"
   },
   "truth": {
-   "lat": 43.65802002,
-   "lon": -70.25383407,
+   "lat": 44.55549418,
+   "lon": -70.53990307,
    "radius_m": 300
   },
   "base_id": 1384,
@@ -9853,11 +9853,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Rustic Ridge Phofography"
+   "text": "Capital Family Prctice, P.a."
   },
   "truth": {
-   "lat": 43.92756421204877,
-   "lon": -70.43733853221903,
+   "lat": 44.303478,
+   "lon": -69.765213,
    "radius_m": 300
   },
   "base_id": 1153,
@@ -9869,11 +9869,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Mc Kenel's Anim"
+   "text": "Centerpine Auto"
   },
   "truth": {
-   "lat": 44.51305579,
-   "lon": -70.54797657,
+   "lat": 44.47862256,
+   "lon": -70.64327188,
    "radius_m": 300
   },
   "base_id": 1356,
@@ -9885,11 +9885,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Backk Road Bakery"
+   "text": "Colby Woods Catle"
   },
   "truth": {
-   "lat": 43.49047181,
-   "lon": -70.712269,
+   "lat": 44.56416415,
+   "lon": -70.14185603,
    "radius_m": 300
   },
   "base_id": 1054,
@@ -9901,11 +9901,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Twilite Mottel"
+   "text": "Bela Amica Salon"
   },
   "truth": {
-   "lat": 44.539745467831466,
-   "lon": -68.44215971352925,
+   "lat": 44.3143031,
+   "lon": -69.7744112,
    "radius_m": 300
   },
   "base_id": 1131,
@@ -9917,11 +9917,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Brrett's Park"
+   "text": "Walgreens, Lishon Falls"
   },
   "truth": {
-   "lat": 43.848117,
-   "lon": -69.61794,
+   "lat": 44.004666,
+   "lon": -70.074845,
    "radius_m": 300
   },
   "base_id": 1139,
@@ -9933,11 +9933,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Gerrard's "
+   "text": "Lghthouse"
   },
   "truth": {
-   "lat": 44.22971,
-   "lon": -69.772115,
+   "lat": 43.64040487,
+   "lon": -70.254654,
    "radius_m": 300
   },
   "base_id": 1383,
@@ -9949,11 +9949,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Andre Achenbahc, OD - Lewiston"
+   "text": "Lassh Haus"
   },
   "truth": {
-   "lat": 44.1146822,
-   "lon": -70.2067618,
+   "lat": 43.51776753,
+   "lon": -70.4000003,
    "radius_m": 300
   },
   "base_id": 1092,
@@ -9965,11 +9965,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Mqrd"
+   "text": "Lebel Dogg "
   },
   "truth": {
-   "lat": 44.84224,
-   "lon": -68.73779,
+   "lat": 43.32038302,
+   "lon": -70.58153901,
    "radius_m": 300
   },
   "base_id": 1348,
@@ -9981,11 +9981,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Personal Bset Hea"
+   "text": "Demratology Ass"
   },
   "truth": {
-   "lat": 44.2273097,
-   "lon": -70.519013,
+   "lat": 43.65533739,
+   "lon": -70.29003533,
    "radius_m": 300
   },
   "base_id": 1342,
@@ -9997,11 +9997,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Bivd Gr"
+   "text": "Boothbay Haebo"
   },
   "truth": {
-   "lat": 46.91096441,
-   "lon": -67.82536957,
+   "lat": 43.85132553,
+   "lon": -69.62776007,
    "radius_m": 300
   },
   "base_id": 1407,
@@ -10013,11 +10013,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Riderside Survey, LLC"
+   "text": "Kimball Cottage"
   },
   "truth": {
-   "lat": 44.115526071170144,
-   "lon": -70.59547424316408,
+   "lat": 43.27582278,
+   "lon": -70.58221631,
    "radius_m": 300
   },
   "base_id": 1167,
@@ -10029,11 +10029,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Man Line Fence Co"
+   "text": "Sreven's Pond"
   },
   "truth": {
-   "lat": 43.78163,
-   "lon": -70.199569,
+   "lat": 44.38198011,
+   "lon": -69.29741726,
    "radius_m": 300
   },
   "base_id": 1055,
@@ -10045,11 +10045,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Penske Truck Renntal"
+   "text": "Bognie Hart, PT"
   },
   "truth": {
-   "lat": 44.82451876,
-   "lon": -68.75897217,
+   "lat": 43.86198242220213,
+   "lon": -70.10562240970796,
    "radius_m": 300
   },
   "base_id": 1134,
@@ -10061,11 +10061,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Patriot Insuarnce "
+   "text": "Blck Element T"
   },
   "truth": {
-   "lat": 43.80301554,
-   "lon": -70.18191736,
+   "lat": 43.91123841,
+   "lon": -69.97573844,
    "radius_m": 300
   },
   "base_id": 1378,
@@ -10077,11 +10077,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Jeff's Vacuuj LLC"
+   "text": "Hammond Street Congregationnal Church"
   },
   "truth": {
-   "lat": 44.1845764,
-   "lon": -69.11931406,
+   "lat": 44.80096019,
+   "lon": -68.77417537,
    "radius_m": 300
   },
   "base_id": 1130,
@@ -10093,11 +10093,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Central Maine Spports"
+   "text": "KIYz"
   },
   "truth": {
-   "lat": 44.3210978,
-   "lon": -69.82368018,
+   "lat": 43.08600168954892,
+   "lon": -70.74299391602509,
    "radius_m": 300
   },
   "base_id": 1179,
@@ -10109,11 +10109,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "The Cornef "
+   "text": "Te 1909 Ho"
   },
   "truth": {
-   "lat": 45.45881808,
-   "lon": -69.59178355,
+   "lat": 44.77152708097523,
+   "lon": -69.7220336907615,
    "radius_m": 300
   },
   "base_id": 1340,
@@ -10125,11 +10125,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Kennebunk Famiky "
+   "text": "If Yoj Sa"
   },
   "truth": {
-   "lat": 43.38428154,
-   "lon": -70.54492681,
+   "lat": 43.94785006,
+   "lon": -70.19978593,
    "radius_m": 300
   },
   "base_id": 1374,
@@ -10141,11 +10141,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Ground Floog"
+   "text": "Freeport Mind-Body Fitness/Gyrotoniv Studio in Freeport, Maine"
   },
   "truth": {
-   "lat": 43.8582426,
-   "lon": -70.10094733,
+   "lat": 43.85468718,
+   "lon": -70.10759444,
    "radius_m": 300
   },
   "base_id": 1070,
@@ -10157,11 +10157,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Reunion Statino"
+   "text": "Spirit Halloween, Crocketts Conrer"
   },
   "truth": {
-   "lat": 44.06077244,
-   "lon": -69.49642696,
+   "lat": 43.6345183773483,
+   "lon": -70.336337880139,
    "radius_m": 300
   },
   "base_id": 1154,
@@ -10173,11 +10173,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Baarn on 26 An"
+   "text": "Praty C"
   },
   "truth": {
-   "lat": 43.93233153185235,
-   "lon": -70.35288339118601,
+   "lat": 44.347132,
+   "lon": -69.789185,
    "radius_m": 300
   },
   "base_id": 1352,
@@ -10189,11 +10189,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Tooth Protectors Incc"
+   "text": "Still Waters Auto Sales and Servicce"
   },
   "truth": {
-   "lat": 44.074457,
-   "lon": -70.1757984,
+   "lat": 43.73195802,
+   "lon": -70.58819736,
    "radius_m": 300
   },
   "base_id": 1180,
@@ -13705,11 +13705,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Lilj Pod"
+   "text": "West Gerogetown Hilo"
   },
   "truth": {
-   "lat": 43.6599629,
-   "lon": -70.6369016,
+   "lat": 43.8005337,
+   "lon": -69.7786372,
    "radius_m": 4000
   },
   "base_id": 958,
@@ -13721,11 +13721,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Labbf Pondd"
+   "text": "Pleasant Mountqin, Hkughton"
   },
   "truth": {
-   "lat": 47.146383,
-   "lon": -68.6264401,
+   "lat": 44.7344647,
+   "lon": -70.6908308,
    "radius_m": 4000
   },
   "base_id": 932,
@@ -13737,11 +13737,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Highh Cur"
+   "text": "Johns Pond, Davvis Ton"
   },
   "truth": {
-   "lat": 45.0768356,
-   "lon": -69.1315286,
+   "lat": 45.0697749,
+   "lon": -70.7914576,
    "radius_m": 4000
   },
   "base_id": 904,
@@ -13753,11 +13753,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Whitneyy Hil"
+   "text": "Frost Hil, Sodomm"
   },
   "truth": {
-   "lat": 44.183851,
-   "lon": -70.4847795,
+   "lat": 44.180821,
+   "lon": -70.6031595,
    "radius_m": 4000
   },
   "base_id": 1009,
@@ -13769,11 +13769,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Grayy Pon"
+   "text": "Sewal Hll"
   },
   "truth": {
-   "lat": 44.863057,
-   "lon": -68.0435815,
+   "lat": 43.132024,
+   "lon": -70.6622742,
    "radius_m": 4000
   },
   "base_id": 908,
@@ -13785,11 +13785,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Greay Moos Lake"
+   "text": "Sttetson Pod"
   },
   "truth": {
-   "lat": 44.9230285,
-   "lon": -69.5172258,
+   "lat": 44.8482106,
+   "lon": -70.4774848,
    "radius_m": 4000
   },
   "base_id": 975,
@@ -13801,11 +13801,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Haay Pohd"
+   "text": "Eagleq Ctag"
   },
   "truth": {
-   "lat": 46.167187,
-   "lon": -68.7515527,
+   "lat": 44.3258509,
+   "lon": -68.2197302,
    "radius_m": 4000
   },
   "base_id": 1003,
@@ -13817,11 +13817,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Uppef Togue Pind"
+   "text": "Teaa Mojntain"
   },
   "truth": {
-   "lat": 45.8237943,
-   "lon": -68.8956835,
+   "lat": 45.2281712,
+   "lon": -70.5389367,
    "radius_m": 4000
   },
   "base_id": 1024,
@@ -13833,11 +13833,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Skkilly Hiills"
+   "text": "Greatt Hill, Lowwr Village"
   },
   "truth": {
-   "lat": 43.5867398,
-   "lon": -70.4756071,
+   "lat": 43.3440346,
+   "lon": -70.5130859,
    "radius_m": 4000
   },
   "base_id": 993,
@@ -13849,11 +13849,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Sunday Riverr Whutecap"
+   "text": "Wyemouth Hilll"
   },
   "truth": {
-   "lat": 44.5489609,
-   "lon": -70.8966993,
+   "lat": 44.228601,
+   "lon": -70.8085394,
    "radius_m": 4000
   },
   "base_id": 939,
@@ -13865,11 +13865,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Muont Veot"
+   "text": "Uncle Dikc Hlil"
   },
   "truth": {
-   "lat": 45.940779,
-   "lon": -69.0920503,
+   "lat": 44.3516809,
+   "lon": -68.3859002,
    "radius_m": 4000
   },
   "base_id": 1048,
@@ -13881,11 +13881,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Iroon Mine Hilll"
+   "text": "Brownss Pondd"
   },
   "truth": {
-   "lat": 44.2126853,
-   "lon": -69.7847859,
+   "lat": 43.9129819,
+   "lon": -70.7277363,
    "radius_m": 4000
   },
   "base_id": 936,
@@ -13897,11 +13897,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Greta Hilll"
+   "text": "Sfafford Pondd"
   },
   "truth": {
-   "lat": 44.3859422,
-   "lon": -68.2318132,
+   "lat": 44.8911979,
+   "lon": -69.5037708,
    "radius_m": 4000
   },
   "base_id": 974,
@@ -13913,11 +13913,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Parer Ponnd"
+   "text": "Cam Pod"
   },
   "truth": {
-   "lat": 44.5085098,
-   "lon": -70.1418107,
+   "lat": 45.4291257,
+   "lon": -69.2687466,
    "radius_m": 4000
   },
   "base_id": 998,
@@ -13929,11 +13929,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Isaia Muontain"
+   "text": "Yonugs Ponnd"
   },
   "truth": {
-   "lat": 44.2819222,
-   "lon": -70.8754577,
+   "lat": 44.7165898,
+   "lon": -68.4476393,
    "radius_m": 4000
   },
   "base_id": 949,
@@ -13945,11 +13945,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Moodyy Pnd"
+   "text": "Pickrel Pond, Algon"
   },
   "truth": {
-   "lat": 43.5624821,
-   "lon": -70.7387476,
+   "lat": 45.0465982,
+   "lon": -68.7700584,
    "radius_m": 4000
   },
   "base_id": 1019,
@@ -13961,11 +13961,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Gilkan Pomd"
+   "text": "Lunksood Mounntain"
   },
   "truth": {
-   "lat": 44.9580266,
-   "lon": -70.0543385,
+   "lat": 45.9583006,
+   "lon": -68.68061,
    "radius_m": 4000
   },
   "base_id": 980,
@@ -13977,11 +13977,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Big Moosr Pon"
+   "text": "Shaw Mouhtain, Kieo"
   },
   "truth": {
-   "lat": 45.4543916,
-   "lon": -69.6795308,
+   "lat": 45.7197907,
+   "lon": -69.7087324,
    "radius_m": 4000
   },
   "base_id": 1046,
@@ -13993,11 +13993,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Mux Pondd"
+   "text": "Farrkw Lakee"
   },
   "truth": {
-   "lat": 45.6679554,
-   "lon": -69.0109466,
+   "lat": 45.4253968,
+   "lon": -67.7660586,
    "radius_m": 4000
   },
   "base_id": 923,
@@ -14009,11 +14009,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Conarg Heax"
+   "text": "Pine Hill, Fayeette Corenr"
   },
   "truth": {
-   "lat": 44.2312309,
-   "lon": -68.5814801,
+   "lat": 44.4479809,
+   "lon": -70.0832396,
    "radius_m": 4000
   },
   "base_id": 967,
@@ -14025,11 +14025,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Buther Lkae"
+   "text": "Shaww Hill"
   },
   "truth": {
-   "lat": 45.4689223,
-   "lon": -67.6640598,
+   "lat": 44.1268088,
+   "lon": -70.3132539,
    "radius_m": 4000
   },
   "base_id": 959,
@@ -14041,11 +14041,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Bradbruy Moountain"
+   "text": "Forrty Acrs Hill"
   },
   "truth": {
-   "lat": 43.9023677,
-   "lon": -70.1818227,
+   "lat": 43.1140412,
+   "lon": -70.6933695,
    "radius_m": 4000
   },
   "base_id": 1007,
@@ -14057,11 +14057,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Poooler Pods"
+   "text": "Sooule Pnod"
   },
   "truth": {
-   "lat": 45.2910508,
-   "lon": -69.9899155,
+   "lat": 46.2747876,
+   "lon": -68.8165277,
    "radius_m": 4000
   },
   "base_id": 976,
@@ -14073,11 +14073,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Howf Peka"
+   "text": "Seecond Musuacook Lake"
   },
   "truth": {
-   "lat": 46.0708706,
-   "lon": -68.9982999,
+   "lat": 46.6338666,
+   "lon": -69.1736999,
    "radius_m": 4000
   },
   "base_id": 995,
@@ -14089,11 +14089,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Meeadow Pnd"
+   "text": "Jerusaelm Mountainn"
   },
   "truth": {
-   "lat": 45.3450306,
-   "lon": -69.4657716,
+   "lat": 44.0499809,
+   "lon": -68.6228901,
    "radius_m": 4000
   },
   "base_id": 992,
@@ -14105,11 +14105,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Re Roc Mountain"
+   "text": "Cunningham Moutain, Hibberst"
   },
   "truth": {
-   "lat": 44.309501,
-   "lon": -70.8983193,
+   "lat": 44.324648,
+   "lon": -69.4099165,
    "radius_m": 4000
   },
   "base_id": 931,
@@ -14121,11 +14121,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Pikerel Pons"
+   "text": "Liittle Penobcot Pond"
   },
   "truth": {
-   "lat": 45.4670738,
-   "lon": -67.7598152,
+   "lat": 45.6799815,
+   "lon": -69.1782677,
    "radius_m": 4000
   },
   "base_id": 991,
@@ -14137,11 +14137,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Howlad Hiill"
+   "text": "Shrot Podn"
   },
   "truth": {
-   "lat": 44.5633107,
-   "lon": -69.7807472,
+   "lat": 43.4736536,
+   "lon": -70.3866543,
    "radius_m": 4000
   },
   "base_id": 1012,
@@ -14153,11 +14153,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Chandelr Hjll"
+   "text": "Crow Hill, Buurdin Corner"
   },
   "truth": {
-   "lat": 45.0004108,
-   "lon": -70.0166096,
+   "lat": 45.1093527,
+   "lon": -69.5061565,
    "radius_m": 4000
   },
   "base_id": 984,
@@ -14169,11 +14169,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Varey Hilll"
+   "text": "Turer Hilll, Wyman"
   },
   "truth": {
-   "lat": 45.2490907,
-   "lon": -68.4819501,
+   "lat": 44.502847,
+   "lon": -67.8625007,
    "radius_m": 4000
   },
   "base_id": 934,
@@ -14185,11 +14185,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Roumd Pondd"
+   "text": "Mont Seealll"
   },
   "truth": {
-   "lat": 43.4017812,
-   "lon": -70.7584382,
+   "lat": 45.1161324,
+   "lon": -67.238463,
    "radius_m": 4000
   },
   "base_id": 1005,
@@ -14201,11 +14201,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Robedts Hilll"
+   "text": "Little Fsh Pknds"
   },
   "truth": {
-   "lat": 44.5685109,
-   "lon": -69.0793099,
+   "lat": 45.9077405,
+   "lon": -70.2473704,
    "radius_m": 4000
   },
   "base_id": 937,
@@ -14217,11 +14217,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Selmlre Pnod"
+   "text": "Meadkw Pond, Isledboro"
   },
   "truth": {
-   "lat": 45.196334,
-   "lon": -68.0464594,
+   "lat": 44.3566458,
+   "lon": -68.8992566,
    "radius_m": 4000
   },
   "base_id": 906,
@@ -14233,11 +14233,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Beat Mountzin"
+   "text": "Mud Pond, Sklilings Corneer"
   },
   "truth": {
-   "lat": 44.669924,
-   "lon": -69.7520049,
+   "lat": 44.2198675,
+   "lon": -70.2980186,
    "radius_m": 4000
   },
   "base_id": 997,
@@ -14249,11 +14249,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Hose Hilll"
+   "text": "Norton Ponv, Knightc Landing"
   },
   "truth": {
-   "lat": 44.178761,
-   "lon": -70.5489895,
+   "lat": 45.3717264,
+   "lon": -68.9696469,
    "radius_m": 4000
   },
   "base_id": 920,
@@ -14265,11 +14265,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Rixbury Miuntain"
+   "text": "Pluummer Mountani"
   },
   "truth": {
-   "lat": 44.6413488,
-   "lon": -70.5307094,
+   "lat": 44.1162118,
+   "lon": -70.800689,
    "radius_m": 4000
   },
   "base_id": 1017,
@@ -14281,11 +14281,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Litle Coffeelo Pond"
+   "text": "Den Hiil"
   },
   "truth": {
-   "lat": 46.1606556,
-   "lon": -69.1085389,
+   "lat": 44.0842292,
+   "lon": -70.4800574,
    "radius_m": 4000
   },
   "base_id": 1043,
@@ -14297,11 +14297,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Burtn Pondd"
+   "text": "Swboeis Dedwater"
   },
   "truth": {
-   "lat": 44.7459627,
-   "lon": -68.5273792,
+   "lat": 46.2044909,
+   "lon": -68.5892065,
    "radius_m": 4000
   },
   "base_id": 951,
@@ -14313,11 +14313,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Hobbe Hll"
+   "text": "Littls Mountain, Sunet"
   },
   "truth": {
-   "lat": 44.1179412,
-   "lon": -70.6563851,
+   "lat": 44.2296609,
+   "lon": -68.7851301,
    "radius_m": 4000
   },
   "base_id": 947,
@@ -14329,11 +14329,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Wesy Carry Ponnd"
+   "text": "Cadin Hilo"
   },
   "truth": {
-   "lat": 45.1689736,
-   "lon": -70.1112333,
+   "lat": 44.6940909,
+   "lon": -70.2679895,
    "radius_m": 4000
   },
   "base_id": 912,
@@ -14345,11 +14345,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Littlf Bear Ponw"
+   "text": "Biy Rockks"
   },
   "truth": {
-   "lat": 44.3535201,
-   "lon": -70.2903553,
+   "lat": 44.2434048,
+   "lon": -68.3361283,
    "radius_m": 4000
   },
   "base_id": 938,
@@ -14361,11 +14361,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Greatt Ponf"
+   "text": "Taylog Brook Ponw"
   },
   "truth": {
-   "lat": 44.6500788,
-   "lon": -67.2927648,
+   "lat": 44.7804178,
+   "lon": -67.8435757,
    "radius_m": 4000
   },
   "base_id": 907,
@@ -14377,11 +14377,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Derr Boog"
+   "text": "Cobble Hilll, Carthahe"
   },
   "truth": {
-   "lat": 45.2060301,
-   "lon": -69.9195189,
+   "lat": 44.6661627,
+   "lon": -70.4889541,
    "radius_m": 4000
   },
   "base_id": 983,
@@ -14393,11 +14393,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Lostt Pod"
+   "text": "Thiird Lakr, North Washington"
   },
   "truth": {
-   "lat": 45.3647244,
-   "lon": -70.4136993,
+   "lat": 45.0202141,
+   "lon": -67.7967975,
    "radius_m": 4000
   },
   "base_id": 994,
@@ -14409,11 +14409,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "C Pkn"
+   "text": "South Twiin Moutain"
   },
   "truth": {
-   "lat": 44.7176418,
-   "lon": -70.8819261,
+   "lat": 44.6040651,
+   "lon": -70.6132753,
    "radius_m": 4000
   },
   "base_id": 909,
@@ -14425,11 +14425,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Croooked Broom Lake"
+   "text": "Smith Brooo Ponx, Round Mountain"
   },
   "truth": {
-   "lat": 45.5519987,
-   "lon": -67.7217126,
+   "lat": 46.4623066,
+   "lon": -68.9716513,
    "radius_m": 4000
   },
   "base_id": 1001,
@@ -14441,11 +14441,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Frezh Pnd"
+   "text": "Fifhh Musquacoom Lake"
   },
   "truth": {
-   "lat": 44.345159,
-   "lon": -68.7915825,
+   "lat": 46.5465082,
+   "lon": -69.1099686,
    "radius_m": 4000
   },
   "base_id": 925,
@@ -14457,11 +14457,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Frsot Mouuntain"
+   "text": "Fuller Muntain"
   },
   "truth": {
-   "lat": 43.952791,
-   "lon": -70.9173394,
+   "lat": 43.8146738,
+   "lon": -69.8373328,
    "radius_m": 4000
   },
   "base_id": 972,
@@ -14473,11 +14473,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Hamblim Hiol"
+   "text": "Wthee Ponnd"
   },
   "truth": {
-   "lat": 44.1960853,
-   "lon": -70.8924621,
+   "lat": 45.0866752,
+   "lon": -69.7733146,
    "radius_m": 4000
   },
   "base_id": 901,
@@ -14489,11 +14489,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "Breakeart Hikl"
+   "text": "Haxtings Poond"
   },
   "truth": {
-   "lat": 43.729714,
-   "lon": -70.5652424,
+   "lat": 43.9119625,
+   "lon": -69.4923248,
    "radius_m": 4000
   },
   "base_id": 1041,
@@ -14505,11 +14505,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Fulll Clrcle Artisan's "
+   "text": "Togaly "
   },
   "truth": {
-   "lat": 43.8050699,
-   "lon": -70.80292426,
+   "lat": 43.4396432513328,
+   "lon": -70.77563140023753,
    "radius_m": 300
   },
   "base_id": 1372,
@@ -14521,11 +14521,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "The Larning Placce "
+   "text": "Peaock Consitnmen"
   },
   "truth": {
-   "lat": 43.3416278,
-   "lon": -70.5677037,
+   "lat": 44.7784663,
+   "lon": -68.77671469,
    "radius_m": 300
   },
   "base_id": 1376,
@@ -14537,11 +14537,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Maibe Mo"
+   "text": "Aerfopo"
   },
   "truth": {
-   "lat": 44.205911,
-   "lon": -69.061675,
+   "lat": 43.63302001423414,
+   "lon": -70.33393944618143,
    "radius_m": 300
   },
   "base_id": 1354,
@@ -14553,11 +14553,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Buxton Unietd Methodist Chuurch"
+   "text": "Mts. Smith’s Pianistts"
   },
   "truth": {
-   "lat": 43.7005503,
-   "lon": -70.55214356,
+   "lat": 44.64516418,
+   "lon": -67.59655936,
    "radius_m": 300
   },
   "base_id": 1057,
@@ -14569,11 +14569,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Norther Light Accadia Hospital"
+   "text": "Macel's Barber Sho"
   },
   "truth": {
-   "lat": 44.8206692,
-   "lon": -68.76334921,
+   "lat": 44.0875299,
+   "lon": -70.2233437,
    "radius_m": 300
   },
   "base_id": 1196,
@@ -14585,11 +14585,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Ieland Watch Bed & Breaakfast"
+   "text": "UPS Authorized Shiping Provider, Farmingtonn"
   },
   "truth": {
-   "lat": 44.2795800878689,
-   "lon": -68.33215729816078,
+   "lat": 44.6682668,
+   "lon": -70.1509078,
    "radius_m": 300
   },
   "base_id": 1189,
@@ -14601,11 +14601,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Nr're Beach Family Capmground"
+   "text": "Shannoh Bennett, D.O."
   },
   "truth": {
-   "lat": 43.5150586,
-   "lon": -70.380575,
+   "lat": 43.6533244,
+   "lon": -70.2751542,
    "radius_m": 300
   },
   "base_id": 1098,
@@ -14617,11 +14617,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Eyea o R"
+   "text": "Birgess Construction & Prro"
   },
   "truth": {
-   "lat": 43.65815585,
-   "lon": -70.25362002,
+   "lat": 44.98407791233106,
+   "lon": -70.65873917161707,
    "radius_m": 300
   },
   "base_id": 1399,
@@ -14633,11 +14633,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Westen Unn"
+   "text": "Regional Mediacl Centerr A"
   },
   "truth": {
-   "lat": 46.137622,
-   "lon": -67.83868,
+   "lat": 44.7154591,
+   "lon": -67.4615236,
    "radius_m": 300
   },
   "base_id": 1391,
@@ -14649,11 +14649,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Eassy Steeet Aut"
+   "text": "Mry Snoww S"
   },
   "truth": {
-   "lat": 43.65699005074917,
-   "lon": -70.25035858154297,
+   "lat": 44.81737415,
+   "lon": -68.77298358,
    "radius_m": 300
   },
   "base_id": 1364,
@@ -14665,11 +14665,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Cpngregation Bey Ha'am"
+   "text": "Maine Moutain Timber Framse"
   },
   "truth": {
-   "lat": 43.62220563,
-   "lon": -70.30558284,
+   "lat": 44.8137137,
+   "lon": -70.34238607,
    "radius_m": 300
   },
   "base_id": 1137,
@@ -14681,11 +14681,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Hometoown Hir"
+   "text": "Genest Concreete: Landscape Masonrt Supply"
   },
   "truth": {
-   "lat": 46.68189757,
-   "lon": -68.15891846,
+   "lat": 43.439104431451085,
+   "lon": -70.76183438301088,
    "radius_m": 300
   },
   "base_id": 1363,
@@ -14697,11 +14697,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Daw's Maple Sugr Shack"
+   "text": "Joshuaa L. Cuamberlain Museum"
   },
   "truth": {
-   "lat": 44.04605331,
-   "lon": -70.63682773,
+   "lat": 43.910461626037744,
+   "lon": -69.96397378052482,
    "radius_m": 300
   },
   "base_id": 1072,
@@ -14713,11 +14713,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Fsld's "
+   "text": "Tonw off Har"
   },
   "truth": {
-   "lat": 43.80511981,
-   "lon": -69.98982388,
+   "lat": 43.8137763,
+   "lon": -69.94313945,
    "radius_m": 300
   },
   "base_id": 1375,
@@ -14729,11 +14729,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Maiine Hospitakity "
+   "text": "Rntt-A-C"
   },
   "truth": {
-   "lat": 44.31142439,
-   "lon": -69.79202049,
+   "lat": 45.02444519,
+   "lon": -69.29043394,
    "radius_m": 300
   },
   "base_id": 1341,
@@ -14745,11 +14745,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Coommunity Radii W"
+   "text": "Bennett's Gemx "
   },
   "truth": {
-   "lat": 44.56499352588156,
-   "lon": -68.66632348463081,
+   "lat": 44.4333355,
+   "lon": -68.99819472,
    "radius_m": 300
   },
   "base_id": 1358,
@@ -14761,11 +14761,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Eelments Books Clff"
+   "text": "Harodl Mac Qui"
   },
   "truth": {
-   "lat": 43.4940468,
-   "lon": -70.45802568,
+   "lat": 44.5236167,
+   "lon": -68.36158642,
    "radius_m": 300
   },
   "base_id": 1346,
@@ -14777,11 +14777,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Eye Cennter Norttheast"
+   "text": "Calvsry Cemetery, South Portoand"
   },
   "truth": {
-   "lat": 44.83149056,
-   "lon": -68.78627582,
+   "lat": 43.63021801,
+   "lon": -70.29388485,
    "radius_m": 300
   },
   "base_id": 1082,
@@ -14793,11 +14793,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Hilton Gaden Innn"
+   "text": "Natalis H. Rockweli, CNM"
   },
   "truth": {
-   "lat": 43.64948677,
-   "lon": -70.31540594,
+   "lat": 43.906285165142975,
+   "lon": -69.89137374668397,
    "radius_m": 300
   },
   "base_id": 1067,
@@ -14809,11 +14809,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Woodfoords Congregational Cyurch"
+   "text": "Dewey's Lumber ans Cewar Mill"
   },
   "truth": {
-   "lat": 43.67077464,
-   "lon": -70.28757478,
+   "lat": 44.37109,
+   "lon": -69.361436,
    "radius_m": 300
   },
   "base_id": 1099,
@@ -14825,11 +14825,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "INKrib"
+   "text": "Duguuay Eo"
   },
   "truth": {
-   "lat": 44.76603213,
-   "lon": -69.71752025,
+   "lat": 44.54735019,
+   "lon": -70.56040705,
    "radius_m": 300
   },
   "base_id": 1345,
@@ -14841,11 +14841,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Massare Thherapy"
+   "text": "North Whiteield Superettee"
   },
   "truth": {
-   "lat": 46.86944573,
-   "lon": -68.00509949,
+   "lat": 44.222029,
+   "lon": -69.587287,
    "radius_m": 300
   },
   "base_id": 1116,
@@ -14857,11 +14857,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Peaks Islandd Sterngth and Wellness"
+   "text": "Casco By Fyrniture"
   },
   "truth": {
-   "lat": 43.65785078,
-   "lon": -70.19825303,
+   "lat": 43.6569639,
+   "lon": -70.2567261,
    "radius_m": 300
   },
   "base_id": 1152,
@@ -14873,11 +14873,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Rduman Winchelp"
+   "text": "Mainely Gaallery and Sudio"
   },
   "truth": {
-   "lat": 44.54399086395939,
-   "lon": -68.42498856549535,
+   "lat": 44.42940642,
+   "lon": -68.97388277,
    "radius_m": 300
   },
   "base_id": 1136,
@@ -14889,11 +14889,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Botmx Frm"
+   "text": "Early Bird Restuarant, Oauland"
   },
   "truth": {
-   "lat": 44.03005554,
-   "lon": -70.0881532,
+   "lat": 44.55262505074715,
+   "lon": -69.74439292784336,
    "radius_m": 300
   },
   "base_id": 1138,
@@ -14905,11 +14905,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Mav Kat's Restauraht and Bar"
+   "text": "West Bowdoinn Baptist Churfh"
   },
   "truth": {
-   "lat": 44.79932669,
-   "lon": -68.75381463,
+   "lat": 44.0496503,
+   "lon": -70.0214776,
    "radius_m": 300
   },
   "base_id": 1117,
@@ -14921,11 +14921,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Cherisshed Poss"
+   "text": "Bsoal Fx"
   },
   "truth": {
-   "lat": 43.70233113,
-   "lon": -70.28961995,
+   "lat": 43.57113025,
+   "lon": -70.38819049,
    "radius_m": 300
   },
   "base_id": 1339,
@@ -14937,11 +14937,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Portlan Atr"
+   "text": "Mexxico Congregai"
   },
   "truth": {
-   "lat": 43.65802002,
-   "lon": -70.25383407,
+   "lat": 44.55549418,
+   "lon": -70.53990307,
    "radius_m": 300
   },
   "base_id": 1384,
@@ -14953,11 +14953,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Rsutic Ridge Photofraphy"
+   "text": "Capital Familt Practce, P.a."
   },
   "truth": {
-   "lat": 43.92756421204877,
-   "lon": -70.43733853221903,
+   "lat": 44.303478,
+   "lon": -69.765213,
    "radius_m": 300
   },
   "base_id": 1153,
@@ -14969,11 +14969,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Mcc Kennek's Anim"
+   "text": "Centegline Ahto"
   },
   "truth": {
-   "lat": 44.51305579,
-   "lon": -70.54797657,
+   "lat": 44.47862256,
+   "lon": -70.64327188,
    "radius_m": 300
   },
   "base_id": 1356,
@@ -14985,11 +14985,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Back Rod Baekry"
+   "text": "Colbu Woods Cattle"
   },
   "truth": {
-   "lat": 43.49047181,
-   "lon": -70.712269,
+   "lat": 44.56416415,
+   "lon": -70.14185603,
    "radius_m": 300
   },
   "base_id": 1054,
@@ -15001,11 +15001,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Twliite Motrl"
+   "text": "Blela Amica Saln"
   },
   "truth": {
-   "lat": 44.539745467831466,
-   "lon": -68.44215971352925,
+   "lat": 44.3143031,
+   "lon": -69.7744112,
    "radius_m": 300
   },
   "base_id": 1131,
@@ -15017,11 +15017,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Barreft's Prk"
+   "text": "Walgreenz, Lisobn Falls"
   },
   "truth": {
-   "lat": 43.848117,
-   "lon": -69.61794,
+   "lat": 44.004666,
+   "lon": -70.074845,
    "radius_m": 300
   },
   "base_id": 1139,
@@ -15033,11 +15033,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Gerdad's "
+   "text": "Ligthhoues"
   },
   "truth": {
-   "lat": 44.22971,
-   "lon": -69.772115,
+   "lat": 43.64040487,
+   "lon": -70.254654,
    "radius_m": 300
   },
   "base_id": 1383,
@@ -15049,11 +15049,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Andre Achenbach, Oc - Lewisyon"
+   "text": "Laash Has"
   },
   "truth": {
-   "lat": 44.1146822,
-   "lon": -70.2067618,
+   "lat": 43.51776753,
+   "lon": -70.4000003,
    "radius_m": 300
   },
   "base_id": 1092,
@@ -15065,11 +15065,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Mdar"
+   "text": "Lebell Doog "
   },
   "truth": {
-   "lat": 44.84224,
-   "lon": -68.73779,
+   "lat": 43.32038302,
+   "lon": -70.58153901,
    "radius_m": 300
   },
   "base_id": 1348,
@@ -15081,11 +15081,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Persoal Besst Hea"
+   "text": "Drmatology Asz"
   },
   "truth": {
-   "lat": 44.2273097,
-   "lon": -70.519013,
+   "lat": 43.65533739,
+   "lon": -70.29003533,
    "radius_m": 300
   },
   "base_id": 1342,
@@ -15097,11 +15097,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Blvx Grr"
+   "text": "Boothbya Harbl"
   },
   "truth": {
-   "lat": 46.91096441,
-   "lon": -67.82536957,
+   "lat": 43.85132553,
+   "lon": -69.62776007,
    "radius_m": 300
   },
   "base_id": 1407,
@@ -15113,11 +15113,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Riversjde Surevy, LLC"
+   "text": "Kimblal Cotyage"
   },
   "truth": {
-   "lat": 44.115526071170144,
-   "lon": -70.59547424316408,
+   "lat": 43.27582278,
+   "lon": -70.58221631,
    "radius_m": 300
   },
   "base_id": 1167,
@@ -15129,11 +15129,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Main Lne Fennce Co"
+   "text": "Setven's Pod"
   },
   "truth": {
-   "lat": 43.78163,
-   "lon": -70.199569,
+   "lat": 44.38198011,
+   "lon": -69.29741726,
    "radius_m": 300
   },
   "base_id": 1055,
@@ -15145,11 +15145,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Penske Trucu Retal"
+   "text": "Bonniie Harf, PT"
   },
   "truth": {
-   "lat": 44.82451876,
-   "lon": -68.75897217,
+   "lat": 43.86198242220213,
+   "lon": -70.10562240970796,
    "radius_m": 300
   },
   "base_id": 1134,
@@ -15161,11 +15161,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Patiot Insurnce "
+   "text": "Blackk Elekent T"
   },
   "truth": {
-   "lat": 43.80301554,
-   "lon": -70.18191736,
+   "lat": 43.91123841,
+   "lon": -69.97573844,
    "radius_m": 300
   },
   "base_id": 1378,
@@ -15177,11 +15177,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Jefff's Vacuum LLLC"
+   "text": "Hammond Street Congregatiional Church"
   },
   "truth": {
-   "lat": 44.1845764,
-   "lon": -69.11931406,
+   "lat": 44.80096019,
+   "lon": -68.77417537,
    "radius_m": 300
   },
   "base_id": 1130,
@@ -15193,11 +15193,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Central Mine Spoorts"
+   "text": "KIz"
   },
   "truth": {
-   "lat": 44.3210978,
-   "lon": -69.82368018,
+   "lat": 43.08600168954892,
+   "lon": -70.74299391602509,
    "radius_m": 300
   },
   "base_id": 1179,
@@ -15209,11 +15209,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Tme Corer "
+   "text": "Te 1909 H"
   },
   "truth": {
-   "lat": 45.45881808,
-   "lon": -69.59178355,
+   "lat": 44.77152708097523,
+   "lon": -69.7220336907615,
    "radius_m": 300
   },
   "base_id": 1340,
@@ -15225,11 +15225,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Kennebuk Fmaily "
+   "text": "If Yo Saa"
   },
   "truth": {
-   "lat": 43.38428154,
-   "lon": -70.54492681,
+   "lat": 43.94785006,
+   "lon": -70.19978593,
    "radius_m": 300
   },
   "base_id": 1374,
@@ -15241,11 +15241,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Grounx Foor"
+   "text": "Ffeeport Mind-Body Fitness/Gyrotonic Sudio in Freeport, Maine"
   },
   "truth": {
-   "lat": 43.8582426,
-   "lon": -70.10094733,
+   "lat": 43.85468718,
+   "lon": -70.10759444,
    "radius_m": 300
   },
   "base_id": 1070,
@@ -15257,11 +15257,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Reuinon Staation"
+   "text": "Spirit Halloeen, Crockett Corner"
   },
   "truth": {
-   "lat": 44.06077244,
-   "lon": -69.49642696,
+   "lat": 43.6345183773483,
+   "lon": -70.336337880139,
    "radius_m": 300
   },
   "base_id": 1154,
@@ -15273,11 +15273,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Brn on 26 Aj"
+   "text": "Pray C"
   },
   "truth": {
-   "lat": 43.93233153185235,
-   "lon": -70.35288339118601,
+   "lat": 44.347132,
+   "lon": -69.789185,
    "radius_m": 300
   },
   "base_id": 1352,
@@ -15289,11 +15289,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "Tokth Portectors Inc"
+   "text": "Still Waters Auto Saless and Servics"
   },
   "truth": {
-   "lat": 44.074457,
-   "lon": -70.1757984,
+   "lat": 43.73195802,
+   "lon": -70.58819736,
    "radius_m": 300
   },
   "base_id": 1180,
@@ -18805,11 +18805,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "liy ppn"
+   "text": "w groretown hil"
   },
   "truth": {
-   "lat": 43.6599629,
-   "lon": -70.6369016,
+   "lat": 43.8005337,
+   "lon": -69.7786372,
    "radius_m": 4000
   },
   "base_id": 958,
@@ -18821,11 +18821,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "lafbd ppnd"
+   "text": "pleasany mougtain houughton"
   },
   "truth": {
-   "lat": 47.146383,
-   "lon": -68.6264401,
+   "lat": 44.7344647,
+   "lon": -70.6908308,
    "radius_m": 4000
   },
   "base_id": 932,
@@ -18837,11 +18837,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hig ctut"
+   "text": "johhns ponnd davi town"
   },
   "truth": {
-   "lat": 45.0768356,
-   "lon": -69.1315286,
+   "lat": 45.0697749,
+   "lon": -70.7914576,
    "radius_m": 4000
   },
   "base_id": 904,
@@ -18853,11 +18853,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "whhitnry hilp"
+   "text": "froost hilll sodok"
   },
   "truth": {
-   "lat": 44.183851,
-   "lon": -70.4847795,
+   "lat": 44.180821,
+   "lon": -70.6031595,
    "radius_m": 4000
   },
   "base_id": 1009,
@@ -18869,11 +18869,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "gratt ponf"
+   "text": "serwall hilll"
   },
   "truth": {
-   "lat": 44.863057,
-   "lon": -68.0435815,
+   "lat": 43.132024,
+   "lon": -70.6622742,
    "radius_m": 4000
   },
   "base_id": 908,
@@ -18885,11 +18885,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "gerat mose lak"
+   "text": "setton pnd"
   },
   "truth": {
-   "lat": 44.9230285,
-   "lon": -69.5172258,
+   "lat": 44.8482106,
+   "lon": -70.4774848,
    "radius_m": 4000
   },
   "base_id": 975,
@@ -18901,11 +18901,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "haayy pon"
+   "text": "eaglees craag"
   },
   "truth": {
-   "lat": 46.167187,
-   "lon": -68.7515527,
+   "lat": 44.3258509,
+   "lon": -68.2197302,
    "radius_m": 4000
   },
   "base_id": 1003,
@@ -18917,11 +18917,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "uper tgoue ponnd"
+   "text": "tes moountwin"
   },
   "truth": {
-   "lat": 45.8237943,
-   "lon": -68.8956835,
+   "lat": 45.2281712,
+   "lon": -70.5389367,
    "radius_m": 4000
   },
   "base_id": 1024,
@@ -18933,11 +18933,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "skillly hill"
+   "text": "grat hikl loower village"
   },
   "truth": {
-   "lat": 43.5867398,
-   "lon": -70.4756071,
+   "lat": 43.3440346,
+   "lon": -70.5130859,
    "radius_m": 4000
   },
   "base_id": 993,
@@ -18949,11 +18949,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "sundzy rier whitecxp"
+   "text": "weymout hliil"
   },
   "truth": {
-   "lat": 44.5489609,
-   "lon": -70.8966993,
+   "lat": 44.228601,
+   "lon": -70.8085394,
    "radius_m": 4000
   },
   "base_id": 939,
@@ -18965,11 +18965,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "moum vetp"
+   "text": "unclle dicj hilk"
   },
   "truth": {
-   "lat": 45.940779,
-   "lon": -69.0920503,
+   "lat": 44.3516809,
+   "lon": -68.3859002,
    "radius_m": 4000
   },
   "base_id": 1048,
@@ -18981,11 +18981,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "irob minee hlil"
+   "text": "brownz pnx"
   },
   "truth": {
-   "lat": 44.2126853,
-   "lon": -69.7847859,
+   "lat": 43.9129819,
+   "lon": -70.7277363,
    "radius_m": 4000
   },
   "base_id": 936,
@@ -18997,11 +18997,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "graey hilll"
+   "text": "stafforc pondd"
   },
   "truth": {
-   "lat": 44.3859422,
-   "lon": -68.2318132,
+   "lat": 44.8911979,
+   "lon": -69.5037708,
    "radius_m": 4000
   },
   "base_id": 974,
@@ -19013,11 +19013,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "parkee poone"
+   "text": "cma pod"
   },
   "truth": {
-   "lat": 44.5085098,
-   "lon": -70.1418107,
+   "lat": 45.4291257,
+   "lon": -69.2687466,
    "radius_m": 4000
   },
   "base_id": 998,
@@ -19029,11 +19029,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "iasiah muntaib"
+   "text": "yonugz ponr"
   },
   "truth": {
-   "lat": 44.2819222,
-   "lon": -70.8754577,
+   "lat": 44.7165898,
+   "lon": -68.4476393,
    "radius_m": 4000
   },
   "base_id": 949,
@@ -19045,11 +19045,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "moody ppn"
+   "text": "pickerep pon altpn"
   },
   "truth": {
-   "lat": 43.5624821,
-   "lon": -70.7387476,
+   "lat": 45.0465982,
+   "lon": -68.7700584,
    "radius_m": 4000
   },
   "base_id": 1019,
@@ -19061,11 +19061,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "gilan ppndd"
+   "text": "lunksoo mounntaig"
   },
   "truth": {
-   "lat": 44.9580266,
-   "lon": -70.0543385,
+   "lat": 45.9583006,
+   "lon": -68.68061,
    "radius_m": 4000
   },
   "base_id": 980,
@@ -19077,11 +19077,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "bgi moosd pon"
+   "text": "shaww mountai kinel"
   },
   "truth": {
-   "lat": 45.4543916,
-   "lon": -69.6795308,
+   "lat": 45.7197907,
+   "lon": -69.7087324,
    "radius_m": 4000
   },
   "base_id": 1046,
@@ -19093,11 +19093,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "mudd pnodd"
+   "text": "faareow lakw"
   },
   "truth": {
-   "lat": 45.6679554,
-   "lon": -69.0109466,
+   "lat": 45.4253968,
+   "lon": -67.7660586,
    "radius_m": 4000
   },
   "base_id": 923,
@@ -19109,11 +19109,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "conart head"
+   "text": "pinne hill fayette coorner"
   },
   "truth": {
-   "lat": 44.2312309,
-   "lon": -68.5814801,
+   "lat": 44.4479809,
+   "lon": -70.0832396,
    "radius_m": 4000
   },
   "base_id": 967,
@@ -19125,11 +19125,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "bthcer lae"
+   "text": "sahaw hiill"
   },
   "truth": {
-   "lat": 45.4689223,
-   "lon": -67.6640598,
+   "lat": 44.1268088,
+   "lon": -70.3132539,
    "radius_m": 4000
   },
   "base_id": 959,
@@ -19141,11 +19141,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "brdabury moohntain"
+   "text": "froty acte hilll"
   },
   "truth": {
-   "lat": 43.9023677,
-   "lon": -70.1818227,
+   "lat": 43.1140412,
+   "lon": -70.6933695,
    "radius_m": 4000
   },
   "base_id": 1007,
@@ -19157,11 +19157,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "poller ppndw"
+   "text": "sulle ponv"
   },
   "truth": {
-   "lat": 45.2910508,
-   "lon": -69.9899155,
+   "lat": 46.2747876,
+   "lon": -68.8165277,
    "radius_m": 4000
   },
   "base_id": 976,
@@ -19173,11 +19173,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hlwd pdak"
+   "text": "seconnd musqiacook lae"
   },
   "truth": {
-   "lat": 46.0708706,
-   "lon": -68.9982999,
+   "lat": 46.6338666,
+   "lon": -69.1736999,
    "radius_m": 4000
   },
   "base_id": 995,
@@ -19189,11 +19189,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "meeaddow pod"
+   "text": "jerusaem mountaaln"
   },
   "truth": {
-   "lat": 45.3450306,
-   "lon": -69.4657716,
+   "lat": 44.0499809,
+   "lon": -68.6228901,
    "radius_m": 4000
   },
   "base_id": 992,
@@ -19205,11 +19205,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "redd rck mountaiin"
+   "text": "cunninguam montain hibbrets"
   },
   "truth": {
-   "lat": 44.309501,
-   "lon": -70.8983193,
+   "lat": 44.324648,
+   "lon": -69.4099165,
    "radius_m": 4000
   },
   "base_id": 931,
@@ -19221,11 +19221,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pickrrel pdn"
+   "text": "littel penobsscot poond"
   },
   "truth": {
-   "lat": 45.4670738,
-   "lon": -67.7598152,
+   "lat": 45.6799815,
+   "lon": -69.1782677,
    "radius_m": 4000
   },
   "base_id": 991,
@@ -19237,11 +19237,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hosland hilll"
+   "text": "shot podnn"
   },
   "truth": {
-   "lat": 44.5633107,
-   "lon": -69.7807472,
+   "lat": 43.4736536,
+   "lon": -70.3866543,
    "radius_m": 4000
   },
   "base_id": 1012,
@@ -19253,11 +19253,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "chandlg hill"
+   "text": "croe hiill buurdin corner"
   },
   "truth": {
-   "lat": 45.0004108,
-   "lon": -70.0166096,
+   "lat": 45.1093527,
+   "lon": -69.5061565,
    "radius_m": 4000
   },
   "base_id": 984,
@@ -19269,11 +19269,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "varen hilll"
+   "text": "turne hkll wymn"
   },
   "truth": {
-   "lat": 45.2490907,
-   "lon": -68.4819501,
+   "lat": 44.502847,
+   "lon": -67.8625007,
    "radius_m": 4000
   },
   "base_id": 934,
@@ -19285,11 +19285,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "rouhd pondf"
+   "text": "mf seelal"
   },
   "truth": {
-   "lat": 43.4017812,
-   "lon": -70.7584382,
+   "lat": 45.1161324,
+   "lon": -67.238463,
    "radius_m": 4000
   },
   "base_id": 1005,
@@ -19301,11 +19301,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "rbowrts hilll"
+   "text": "littls fishh pondss"
   },
   "truth": {
-   "lat": 44.5685109,
-   "lon": -69.0793099,
+   "lat": 45.9077405,
+   "lon": -70.2473704,
    "radius_m": 4000
   },
   "base_id": 937,
@@ -19317,11 +19317,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "selmods ponw"
+   "text": "msadow pnd islesbro"
   },
   "truth": {
-   "lat": 45.196334,
-   "lon": -68.0464594,
+   "lat": 44.3566458,
+   "lon": -68.8992566,
    "radius_m": 4000
   },
   "base_id": 906,
@@ -19333,11 +19333,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "baer mounatjn"
+   "text": "mdu pond skillngs cornsr"
   },
   "truth": {
-   "lat": 44.669924,
-   "lon": -69.7520049,
+   "lat": 44.2198675,
+   "lon": -70.2980186,
    "radius_m": 4000
   },
   "base_id": 997,
@@ -19349,11 +19349,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "horse hilk"
+   "text": "nroton ponw knightw landing"
   },
   "truth": {
-   "lat": 44.178761,
-   "lon": -70.5489895,
+   "lat": 45.3717264,
+   "lon": -68.9696469,
    "radius_m": 4000
   },
   "base_id": 920,
@@ -19365,11 +19365,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "roxvury moubttain"
+   "text": "pluummeg muontain"
   },
   "truth": {
-   "lat": 44.6413488,
-   "lon": -70.5307094,
+   "lat": 44.1162118,
+   "lon": -70.800689,
    "radius_m": 4000
   },
   "base_id": 1017,
@@ -19381,11 +19381,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "ltitle coffeeios pon"
+   "text": "dsan hiill"
   },
   "truth": {
-   "lat": 46.1606556,
-   "lon": -69.1085389,
+   "lat": 44.0842292,
+   "lon": -70.4800574,
    "radius_m": 4000
   },
   "base_id": 1043,
@@ -19397,11 +19397,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "burmtt pone"
+   "text": "sehoeis deadwter"
   },
   "truth": {
-   "lat": 44.7459627,
-   "lon": -68.5273792,
+   "lat": 46.2044909,
+   "lon": -68.5892065,
    "radius_m": 4000
   },
   "base_id": 951,
@@ -19413,11 +19413,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hlhbs hilll"
+   "text": "litlte mohntain sunet"
   },
   "truth": {
-   "lat": 44.1179412,
-   "lon": -70.6563851,
+   "lat": 44.2296609,
+   "lon": -68.7851301,
    "radius_m": 4000
   },
   "base_id": 947,
@@ -19429,11 +19429,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "wsst cardy pon"
+   "text": "callfin hili"
   },
   "truth": {
-   "lat": 45.1689736,
-   "lon": -70.1112333,
+   "lat": 44.6940909,
+   "lon": -70.2679895,
    "radius_m": 4000
   },
   "base_id": 912,
@@ -19445,11 +19445,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "litte bea pknd"
+   "text": "biv rcpks"
   },
   "truth": {
-   "lat": 44.3535201,
-   "lon": -70.2903553,
+   "lat": 44.2434048,
+   "lon": -68.3361283,
    "radius_m": 4000
   },
   "base_id": 938,
@@ -19461,11 +19461,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "grrreat ponr"
+   "text": "tayor broo pogd"
   },
   "truth": {
-   "lat": 44.6500788,
-   "lon": -67.2927648,
+   "lat": 44.7804178,
+   "lon": -67.8435757,
    "radius_m": 4000
   },
   "base_id": 907,
@@ -19477,11 +19477,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "deed br"
+   "text": "cobbke hull cartthage"
   },
   "truth": {
-   "lat": 45.2060301,
-   "lon": -69.9195189,
+   "lat": 44.6661627,
+   "lon": -70.4889541,
    "radius_m": 4000
   },
   "base_id": 983,
@@ -19493,11 +19493,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "lst pogdd"
+   "text": "thirdd lakr n washhington"
   },
   "truth": {
-   "lat": 45.3647244,
-   "lon": -70.4136993,
+   "lat": 45.0202141,
+   "lon": -67.7967975,
    "radius_m": 4000
   },
   "base_id": 994,
@@ -19509,11 +19509,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "c pons"
+   "text": "s twwin mpuntxin"
   },
   "truth": {
-   "lat": 44.7176418,
-   "lon": -70.8819261,
+   "lat": 44.6040651,
+   "lon": -70.6132753,
    "radius_m": 4000
   },
   "base_id": 909,
@@ -19525,11 +19525,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "crookrd broo lak"
+   "text": "smitth brookk pond round moumtain"
   },
   "truth": {
-   "lat": 45.5519987,
-   "lon": -67.7217126,
+   "lat": 46.4623066,
+   "lon": -68.9716513,
    "radius_m": 4000
   },
   "base_id": 1001,
@@ -19541,11 +19541,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "fesrh pomd"
+   "text": "fiftth msuquacook laks"
   },
   "truth": {
-   "lat": 44.345159,
-   "lon": -68.7915825,
+   "lat": 46.5465082,
+   "lon": -69.1099686,
    "radius_m": 4000
   },
   "base_id": 925,
@@ -19557,11 +19557,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "froosst mounhain"
+   "text": "fullerr mounaon"
   },
   "truth": {
-   "lat": 43.952791,
-   "lon": -70.9173394,
+   "lat": 43.8146738,
+   "lon": -69.8373328,
    "radius_m": 4000
   },
   "base_id": 972,
@@ -19573,11 +19573,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hamblun hilll"
+   "text": "witheee pd"
   },
   "truth": {
-   "lat": 44.1960853,
-   "lon": -70.8924621,
+   "lat": 45.0866752,
+   "lon": -69.7733146,
    "radius_m": 4000
   },
   "base_id": 901,
@@ -19589,11 +19589,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "breakhear hilol"
+   "text": "hasttinsg pind"
   },
   "truth": {
-   "lat": 43.729714,
-   "lon": -70.5652424,
+   "lat": 43.9119625,
+   "lon": -69.4923248,
    "radius_m": 4000
   },
   "base_id": 1041,
@@ -19605,11 +19605,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "fll cirrcle artian's"
+   "text": "totllyyy"
   },
   "truth": {
-   "lat": 43.8050699,
-   "lon": -70.80292426,
+   "lat": 43.4396432513328,
+   "lon": -70.77563140023753,
    "radius_m": 300
   },
   "base_id": 1372,
@@ -19621,11 +19621,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "th learniing plaec"
+   "text": "peadock consignkken"
   },
   "truth": {
-   "lat": 43.3416278,
-   "lon": -70.5677037,
+   "lat": 44.7784663,
+   "lon": -68.77671469,
    "radius_m": 300
   },
   "base_id": 1376,
@@ -19637,11 +19637,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "maiinne ml"
+   "text": "aerooo"
   },
   "truth": {
-   "lat": 44.205911,
-   "lon": -69.061675,
+   "lat": 43.63302001423414,
+   "lon": -70.33393944618143,
    "radius_m": 300
   },
   "base_id": 1354,
@@ -19653,11 +19653,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "buxtno unietd methodist chirch"
+   "text": "ms. sith’s piannists"
   },
   "truth": {
-   "lat": 43.7005503,
-   "lon": -70.55214356,
+   "lat": 44.64516418,
+   "lon": -67.59655936,
    "radius_m": 300
   },
   "base_id": 1057,
@@ -19669,11 +19669,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "northenr light acaddia hopital"
+   "text": "marcle's barbeer shoop"
   },
   "truth": {
-   "lat": 44.8206692,
-   "lon": -68.76334921,
+   "lat": 44.0875299,
+   "lon": -70.2233437,
    "radius_m": 300
   },
   "base_id": 1196,
@@ -19685,11 +19685,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "islandd wacth beed & breakfast"
+   "text": "upe authorized shipping provder farmintgon"
   },
   "truth": {
-   "lat": 44.2795800878689,
-   "lon": -68.33215729816078,
+   "lat": 44.6682668,
+   "lon": -70.1509078,
    "radius_m": 300
   },
   "base_id": 1189,
@@ -19701,11 +19701,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "ne'rr bach fqmily campground"
+   "text": "shnnon bfnnettt d.o."
   },
   "truth": {
-   "lat": 43.5150586,
-   "lon": -70.380575,
+   "lat": 43.6533244,
+   "lon": -70.2751542,
    "radius_m": 300
   },
   "base_id": 1098,
@@ -19717,11 +19717,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "eyss o r"
+   "text": "burges consttruction & prro"
   },
   "truth": {
-   "lat": 43.65815585,
-   "lon": -70.25362002,
+   "lat": 44.98407791233106,
+   "lon": -70.65873917161707,
    "radius_m": 300
   },
   "base_id": 1399,
@@ -19733,11 +19733,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "wetsrn uh"
+   "text": "regioal medicak cnter a"
   },
   "truth": {
-   "lat": 46.137622,
-   "lon": -67.83868,
+   "lat": 44.7154591,
+   "lon": -67.4615236,
    "radius_m": 300
   },
   "base_id": 1391,
@@ -19749,11 +19749,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "easj stret aug"
+   "text": "marg snoww sotuh"
   },
   "truth": {
-   "lat": 43.65699005074917,
-   "lon": -70.25035858154297,
+   "lat": 44.81737415,
+   "lon": -68.77298358,
    "radius_m": 300
   },
   "base_id": 1364,
@@ -19765,11 +19765,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "congrsgation bey ha'amm"
+   "text": "maine mounntain tmiber farmes"
   },
   "truth": {
-   "lat": 43.62220563,
-   "lon": -70.30558284,
+   "lat": 44.8137137,
+   "lon": -70.34238607,
    "radius_m": 300
   },
   "base_id": 1137,
@@ -19781,11 +19781,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "hmetonw hairr"
+   "text": "genest conncrete: ladscape masonry suplly"
   },
   "truth": {
-   "lat": 46.68189757,
-   "lon": -68.15891846,
+   "lat": 43.439104431451085,
+   "lon": -70.76183438301088,
    "radius_m": 300
   },
   "base_id": 1363,
@@ -19797,11 +19797,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "dad's malle suga sack"
+   "text": "joshuaa l. cnamberlain museu"
   },
   "truth": {
-   "lat": 44.04605331,
-   "lon": -70.63682773,
+   "lat": 43.910461626037744,
+   "lon": -69.96397378052482,
    "radius_m": 300
   },
   "base_id": 1072,
@@ -19813,11 +19813,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "fidof's"
+   "text": "tow o hxr"
   },
   "truth": {
-   "lat": 43.80511981,
-   "lon": -69.98982388,
+   "lat": 43.8137763,
+   "lon": -69.94313945,
    "radius_m": 300
   },
   "base_id": 1375,
@@ -19829,11 +19829,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "main hopitaliyt"
+   "text": "remr-a-c"
   },
   "truth": {
-   "lat": 44.31142439,
-   "lon": -69.79202049,
+   "lat": 45.02444519,
+   "lon": -69.29043394,
    "radius_m": 300
   },
   "base_id": 1341,
@@ -19845,11 +19845,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "commuunity radip wet"
+   "text": "bnenett's geh"
   },
   "truth": {
-   "lat": 44.56499352588156,
-   "lon": -68.66632348463081,
+   "lat": 44.4333355,
+   "lon": -68.99819472,
    "radius_m": 300
   },
   "base_id": 1358,
@@ -19861,11 +19861,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "eleements boosk cff"
+   "text": "harolld maac qui"
   },
   "truth": {
-   "lat": 43.4940468,
-   "lon": -70.45802568,
+   "lat": 44.5236167,
+   "lon": -68.36158642,
    "radius_m": 300
   },
   "base_id": 1346,
@@ -19877,11 +19877,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "ey centeg nirtheast"
+   "text": "calvray cemeery s portlznd"
   },
   "truth": {
-   "lat": 44.83149056,
-   "lon": -68.78627582,
+   "lat": 43.63021801,
+   "lon": -70.29388485,
    "radius_m": 300
   },
   "base_id": 1082,
@@ -19893,11 +19893,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "hilotn garrden inm"
+   "text": "naatlie h. rodkwell cnnm"
   },
   "truth": {
-   "lat": 43.64948677,
-   "lon": -70.31540594,
+   "lat": 43.906285165142975,
+   "lon": -69.89137374668397,
    "radius_m": 300
   },
   "base_id": 1067,
@@ -19909,11 +19909,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "woodofrds congregwtional churrch"
+   "text": "dwey's lumber and ceda mil"
   },
   "truth": {
-   "lat": 43.67077464,
-   "lon": -70.28757478,
+   "lat": 44.37109,
+   "lon": -69.361436,
    "radius_m": 300
   },
   "base_id": 1099,
@@ -19925,11 +19925,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "iknrrib"
+   "text": "dugguy ek"
   },
   "truth": {
-   "lat": 44.76603213,
-   "lon": -69.71752025,
+   "lat": 44.54735019,
+   "lon": -70.56040705,
    "radius_m": 300
   },
   "base_id": 1345,
@@ -19941,11 +19941,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "massage tehrrapy"
+   "text": "nrth whigefield superettte"
   },
   "truth": {
-   "lat": 46.86944573,
-   "lon": -68.00509949,
+   "lat": 44.222029,
+   "lon": -69.587287,
    "radius_m": 300
   },
   "base_id": 1116,
@@ -19957,11 +19957,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "peks islandd strength and wellnes"
+   "text": "cacso by furrniture"
   },
   "truth": {
-   "lat": 43.65785078,
-   "lon": -70.19825303,
+   "lat": 43.6569639,
+   "lon": -70.2567261,
    "radius_m": 300
   },
   "base_id": 1152,
@@ -19973,11 +19973,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "rjdmman winhell"
+   "text": "mainely gallry an sttudio"
   },
   "truth": {
-   "lat": 44.54399086395939,
-   "lon": -68.42498856549535,
+   "lat": 44.42940642,
+   "lon": -68.97388277,
    "radius_m": 300
   },
   "base_id": 1136,
@@ -19989,11 +19989,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "boyma faarn"
+   "text": "earlh bifd restaurant okaland"
   },
   "truth": {
-   "lat": 44.03005554,
-   "lon": -70.0881532,
+   "lat": 44.55262505074715,
+   "lon": -69.74439292784336,
    "radius_m": 300
   },
   "base_id": 1138,
@@ -20005,11 +20005,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "mad kta's retaurant andd bar"
+   "text": "w bowddoin bqptist chuech"
   },
   "truth": {
-   "lat": 44.79932669,
-   "lon": -68.75381463,
+   "lat": 44.0496503,
+   "lon": -70.0214776,
    "radius_m": 300
   },
   "base_id": 1117,
@@ -20021,11 +20021,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "cheriished pkss"
+   "text": "bsao fq"
   },
   "truth": {
-   "lat": 43.70233113,
-   "lon": -70.28961995,
+   "lat": 43.57113025,
+   "lon": -70.38819049,
    "radius_m": 300
   },
   "base_id": 1339,
@@ -20037,11 +20037,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "portllane at"
+   "text": "mexxico coogregati"
   },
   "truth": {
-   "lat": 43.65802002,
-   "lon": -70.25383407,
+   "lat": 44.55549418,
+   "lon": -70.53990307,
    "radius_m": 300
   },
   "base_id": 1384,
@@ -20053,11 +20053,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "rustid ridg photographu"
+   "text": "caapital familg ptactice p.a."
   },
   "truth": {
-   "lat": 43.92756421204877,
-   "lon": -70.43733853221903,
+   "lat": 44.303478,
+   "lon": -69.765213,
    "radius_m": 300
   },
   "base_id": 1153,
@@ -20069,11 +20069,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "mcc kennell's anij"
+   "text": "centerlinnne auti"
   },
   "truth": {
-   "lat": 44.51305579,
-   "lon": -70.54797657,
+   "lat": 44.47862256,
+   "lon": -70.64327188,
    "radius_m": 300
   },
   "base_id": 1356,
@@ -20085,11 +20085,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "bcak r bakeryy"
+   "text": "cloby wiods cartle"
   },
   "truth": {
-   "lat": 43.49047181,
-   "lon": -70.712269,
+   "lat": 44.56416415,
+   "lon": -70.14185603,
    "radius_m": 300
   },
   "base_id": 1054,
@@ -20101,11 +20101,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "twiilte mootel"
+   "text": "bflla aica sakon"
   },
   "truth": {
-   "lat": 44.539745467831466,
-   "lon": -68.44215971352925,
+   "lat": 44.3143031,
+   "lon": -69.7744112,
    "radius_m": 300
   },
   "base_id": 1131,
@@ -20117,11 +20117,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "baarrett's pato"
+   "text": "wagreens lissbon falps"
   },
   "truth": {
-   "lat": 43.848117,
-   "lon": -69.61794,
+   "lat": 44.004666,
+   "lon": -70.074845,
    "radius_m": 300
   },
   "base_id": 1139,
@@ -20133,11 +20133,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "gerrff's"
+   "text": "lighhtluuse"
   },
   "truth": {
-   "lat": 44.22971,
-   "lon": -69.772115,
+   "lat": 43.64040487,
+   "lon": -70.254654,
    "radius_m": 300
   },
   "base_id": 1383,
@@ -20149,11 +20149,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "andrw achhenbach od - lewisron"
+   "text": "lxsh hakss"
   },
   "truth": {
-   "lat": 44.1146822,
-   "lon": -70.2067618,
+   "lat": 43.51776753,
+   "lon": -70.4000003,
    "radius_m": 300
   },
   "base_id": 1092,
@@ -20165,11 +20165,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "madrd"
+   "text": "leel dlg"
   },
   "truth": {
-   "lat": 44.84224,
-   "lon": -68.73779,
+   "lat": 43.32038302,
+   "lon": -70.58153901,
    "radius_m": 300
   },
   "base_id": 1348,
@@ -20181,11 +20181,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "persnal bets hda"
+   "text": "dermatoioyg ass"
   },
   "truth": {
-   "lat": 44.2273097,
-   "lon": -70.519013,
+   "lat": 43.65533739,
+   "lon": -70.29003533,
    "radius_m": 300
   },
   "base_id": 1342,
@@ -20197,11 +20197,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "blv gfr"
+   "text": "boorhvay harvo"
   },
   "truth": {
-   "lat": 46.91096441,
-   "lon": -67.82536957,
+   "lat": 43.85132553,
+   "lon": -69.62776007,
    "radius_m": 300
   },
   "base_id": 1407,
@@ -20213,11 +20213,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "rivverside survfy lcl"
+   "text": "kimabll cotttae"
   },
   "truth": {
-   "lat": 44.115526071170144,
-   "lon": -70.59547424316408,
+   "lat": 43.27582278,
+   "lon": -70.58221631,
    "radius_m": 300
   },
   "base_id": 1167,
@@ -20229,11 +20229,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "maib lne fencw co"
+   "text": "strvne's pomd"
   },
   "truth": {
-   "lat": 43.78163,
-   "lon": -70.199569,
+   "lat": 44.38198011,
+   "lon": -69.29741726,
    "radius_m": 300
   },
   "base_id": 1055,
@@ -20245,11 +20245,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "pneske trucu rnetal"
+   "text": "bonne har p"
   },
   "truth": {
-   "lat": 44.82451876,
-   "lon": -68.75897217,
+   "lat": 43.86198242220213,
+   "lon": -70.10562240970796,
    "radius_m": 300
   },
   "base_id": 1134,
@@ -20261,11 +20261,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "pateilt insufance"
+   "text": "blscck eleent t"
   },
   "truth": {
-   "lat": 43.80301554,
-   "lon": -70.18191736,
+   "lat": 43.91123841,
+   "lon": -69.97573844,
    "radius_m": 300
   },
   "base_id": 1378,
@@ -20277,11 +20277,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "jefff's vaucum ll"
+   "text": "hammond stt congregationa churcm"
   },
   "truth": {
-   "lat": 44.1845764,
-   "lon": -69.11931406,
+   "lat": 44.80096019,
+   "lon": -68.77417537,
    "radius_m": 300
   },
   "base_id": 1130,
@@ -20293,11 +20293,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "cetnral maien sorts"
+   "text": "kiyx"
   },
   "truth": {
-   "lat": 44.3210978,
-   "lon": -69.82368018,
+   "lat": 43.08600168954892,
+   "lon": -70.74299391602509,
    "radius_m": 300
   },
   "base_id": 1179,
@@ -20309,11 +20309,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "the corne"
+   "text": "thw 1909 hoo"
   },
   "truth": {
-   "lat": 45.45881808,
-   "lon": -69.59178355,
+   "lat": 44.77152708097523,
+   "lon": -69.7220336907615,
    "radius_m": 300
   },
   "base_id": 1340,
@@ -20325,11 +20325,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "kennebjnk fajly"
+   "text": "ib ylu sq"
   },
   "truth": {
-   "lat": 43.38428154,
-   "lon": -70.54492681,
+   "lat": 43.94785006,
+   "lon": -70.19978593,
    "radius_m": 300
   },
   "base_id": 1374,
@@ -20341,11 +20341,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "gruonnd flooor"
+   "text": "freport mind-body fitness/gyrotonicc studio in freeoort maine"
   },
   "truth": {
-   "lat": 43.8582426,
-   "lon": -70.10094733,
+   "lat": 43.85468718,
+   "lon": -70.10759444,
    "radius_m": 300
   },
   "base_id": 1070,
@@ -20357,11 +20357,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "relnion staation"
+   "text": "spirit hallwoeen crockeetts cornr"
   },
   "truth": {
-   "lat": 44.06077244,
-   "lon": -69.49642696,
+   "lat": 43.6345183773483,
+   "lon": -70.336337880139,
    "radius_m": 300
   },
   "base_id": 1154,
@@ -20373,11 +20373,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "bagn o 26 ab"
+   "text": "py c"
   },
   "truth": {
-   "lat": 43.93233153185235,
-   "lon": -70.35288339118601,
+   "lat": 44.347132,
+   "lon": -69.789185,
    "radius_m": 300
   },
   "base_id": 1352,
@@ -20389,11 +20389,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "toth protectoes ind"
+   "text": "stilll waters auto sales an srvice"
   },
   "truth": {
-   "lat": 44.074457,
-   "lon": -70.1757984,
+   "lat": 43.73195802,
+   "lon": -70.58819736,
    "radius_m": 300
   },
   "base_id": 1180,
@@ -23905,11 +23905,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pndo liily"
+   "text": "georgetown hiill w"
   },
   "truth": {
-   "lat": 43.6599629,
-   "lon": -70.6369016,
+   "lat": 43.8005337,
+   "lon": -69.7786372,
    "radius_m": 4000
   },
   "base_id": 958,
@@ -23921,11 +23921,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pnod lbabbe"
+   "text": "plaesant mounntin"
   },
   "truth": {
-   "lat": 47.146383,
-   "lon": -68.6264401,
+   "lat": 44.7344647,
+   "lon": -70.6908308,
    "radius_m": 4000
   },
   "base_id": 932,
@@ -23937,11 +23937,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "cu hinj"
+   "text": "jobhs pon"
   },
   "truth": {
-   "lat": 45.0768356,
-   "lon": -69.1315286,
+   "lat": 45.0697749,
+   "lon": -70.7914576,
    "radius_m": 4000
   },
   "base_id": 904,
@@ -23953,11 +23953,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hlll whitny"
+   "text": "frrsot hikl"
   },
   "truth": {
-   "lat": 44.183851,
-   "lon": -70.4847795,
+   "lat": 44.180821,
+   "lon": -70.6031595,
    "radius_m": 4000
   },
   "base_id": 1009,
@@ -23969,11 +23969,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "podn gaary"
+   "text": "hiill seawll"
   },
   "truth": {
-   "lat": 44.863057,
-   "lon": -68.0435815,
+   "lat": 43.132024,
+   "lon": -70.6622742,
    "radius_m": 4000
   },
   "base_id": 908,
@@ -23985,11 +23985,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "mlose lale grea"
+   "text": "pod settsno"
   },
   "truth": {
-   "lat": 44.9230285,
-   "lon": -69.5172258,
+   "lat": 44.8482106,
+   "lon": -70.4774848,
    "radius_m": 4000
   },
   "base_id": 975,
@@ -24001,11 +24001,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pox hya"
+   "text": "craag eagllfs"
   },
   "truth": {
-   "lat": 46.167187,
-   "lon": -68.7515527,
+   "lat": 44.3258509,
+   "lon": -68.2197302,
    "radius_m": 4000
   },
   "base_id": 1003,
@@ -24017,11 +24017,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "tgue pnd uppre"
+   "text": "moutnain teq"
   },
   "truth": {
-   "lat": 45.8237943,
-   "lon": -68.8956835,
+   "lat": 45.2281712,
+   "lon": -70.5389367,
    "radius_m": 4000
   },
   "base_id": 1024,
@@ -24033,11 +24033,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hlios silly"
+   "text": "greeat hill"
   },
   "truth": {
-   "lat": 43.5867398,
-   "lon": -70.4756071,
+   "lat": 43.3440346,
+   "lon": -70.5130859,
    "radius_m": 4000
   },
   "base_id": 993,
@@ -24049,11 +24049,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "riverr whtiecap sundayy"
+   "text": "hil weykputh"
   },
   "truth": {
-   "lat": 44.5489609,
-   "lon": -70.8966993,
+   "lat": 44.228601,
+   "lon": -70.8085394,
    "radius_m": 4000
   },
   "base_id": 939,
@@ -24065,11 +24065,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "veego m"
+   "text": "dkck hilll unncle"
   },
   "truth": {
-   "lat": 45.940779,
-   "lon": -69.0920503,
+   "lat": 44.3516809,
+   "lon": -68.3859002,
    "radius_m": 4000
   },
   "base_id": 1048,
@@ -24081,11 +24081,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "min hill iroj"
+   "text": "pndd brrowns"
   },
   "truth": {
-   "lat": 44.2126853,
-   "lon": -69.7847859,
+   "lat": 43.9129819,
+   "lon": -70.7277363,
    "radius_m": 4000
   },
   "base_id": 936,
@@ -24097,11 +24097,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hillo gret"
+   "text": "pnod staatford"
   },
   "truth": {
-   "lat": 44.3859422,
-   "lon": -68.2318132,
+   "lat": 44.8911979,
+   "lon": -69.5037708,
    "radius_m": 4000
   },
   "base_id": 974,
@@ -24113,11 +24113,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pnod paarkre"
+   "text": "ponnnd cam"
   },
   "truth": {
-   "lat": 44.5085098,
-   "lon": -70.1418107,
+   "lat": 45.4291257,
+   "lon": -69.2687466,
    "radius_m": 4000
   },
   "base_id": 998,
@@ -24129,11 +24129,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "mounntaib isiaah"
+   "text": "pindd yokngs"
   },
   "truth": {
-   "lat": 44.2819222,
-   "lon": -70.8754577,
+   "lat": 44.7165898,
+   "lon": -68.4476393,
    "radius_m": 4000
   },
   "base_id": 949,
@@ -24145,11 +24145,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pnd mooeyy"
+   "text": "pickwerel pnod"
   },
   "truth": {
-   "lat": 43.5624821,
-   "lon": -70.7387476,
+   "lat": 45.0465982,
+   "lon": -68.7700584,
    "radius_m": 4000
   },
   "base_id": 1019,
@@ -24161,11 +24161,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "ponddd gilmman"
+   "text": "mounttain lugksos"
   },
   "truth": {
-   "lat": 44.9580266,
-   "lon": -70.0543385,
+   "lat": 45.9583006,
+   "lon": -68.68061,
    "radius_m": 4000
   },
   "base_id": 980,
@@ -24177,11 +24177,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "mose podn bib"
+   "text": "shawww mounntain"
   },
   "truth": {
-   "lat": 45.4543916,
-   "lon": -69.6795308,
+   "lat": 45.7197907,
+   "lon": -69.7087324,
    "radius_m": 4000
   },
   "base_id": 1046,
@@ -24193,11 +24193,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pood md"
+   "text": "leak farros"
   },
   "truth": {
-   "lat": 45.6679554,
-   "lon": -69.0109466,
+   "lat": 45.4253968,
+   "lon": -67.7660586,
    "radius_m": 4000
   },
   "base_id": 923,
@@ -24209,11 +24209,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hawd coanry"
+   "text": "piee hiol"
   },
   "truth": {
-   "lat": 44.2312309,
-   "lon": -68.5814801,
+   "lat": 44.4479809,
+   "lon": -70.0832396,
    "radius_m": 4000
   },
   "base_id": 967,
@@ -24225,11 +24225,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "lwke butucher"
+   "text": "hlul sha"
   },
   "truth": {
-   "lat": 45.4689223,
-   "lon": -67.6640598,
+   "lat": 44.1268088,
+   "lon": -70.3132539,
    "radius_m": 4000
   },
   "base_id": 959,
@@ -24241,11 +24241,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "monutaih bradbruy"
+   "text": "accre hilll foty"
   },
   "truth": {
-   "lat": 43.9023677,
-   "lon": -70.1818227,
+   "lat": 43.1140412,
+   "lon": -70.6933695,
    "radius_m": 4000
   },
   "base_id": 1007,
@@ -24257,11 +24257,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pnoods poooler"
+   "text": "podn siole"
   },
   "truth": {
-   "lat": 45.2910508,
-   "lon": -69.9899155,
+   "lat": 46.2747876,
+   "lon": -68.8165277,
    "radius_m": 4000
   },
   "base_id": 976,
@@ -24273,11 +24273,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pel hoew"
+   "text": "musquacoook lakke secons"
   },
   "truth": {
-   "lat": 46.0708706,
-   "lon": -68.9982999,
+   "lat": 46.6338666,
+   "lon": -69.1736999,
    "radius_m": 4000
   },
   "base_id": 995,
@@ -24289,11 +24289,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pln mewdow"
+   "text": "montaim jeruslem"
   },
   "truth": {
-   "lat": 45.3450306,
-   "lon": -69.4657716,
+   "lat": 44.0499809,
+   "lon": -68.6228901,
    "radius_m": 4000
   },
   "base_id": 992,
@@ -24305,11 +24305,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "rocm mountaln redd"
+   "text": "cunnlngam mounfain"
   },
   "truth": {
-   "lat": 44.309501,
-   "lon": -70.8983193,
+   "lat": 44.324648,
+   "lon": -69.4099165,
    "radius_m": 4000
   },
   "base_id": 931,
@@ -24321,11 +24321,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pof pickere"
+   "text": "penobscof poond litle"
   },
   "truth": {
-   "lat": 45.4670738,
-   "lon": -67.7598152,
+   "lat": 45.6799815,
+   "lon": -69.1782677,
    "radius_m": 4000
   },
   "base_id": 991,
@@ -24337,11 +24337,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hill howand"
+   "text": "podh shortt"
   },
   "truth": {
-   "lat": 44.5633107,
-   "lon": -69.7807472,
+   "lat": 43.4736536,
+   "lon": -70.3866543,
    "radius_m": 4000
   },
   "base_id": 1012,
@@ -24353,11 +24353,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hlil chaenler"
+   "text": "crrow hlill"
   },
   "truth": {
-   "lat": 45.0004108,
-   "lon": -70.0166096,
+   "lat": 45.1093527,
+   "lon": -69.5061565,
    "radius_m": 4000
   },
   "base_id": 984,
@@ -24369,11 +24369,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hikl vatny"
+   "text": "tuneer hlil"
   },
   "truth": {
-   "lat": 45.2490907,
-   "lon": -68.4819501,
+   "lat": 44.502847,
+   "lon": -67.8625007,
    "radius_m": 4000
   },
   "base_id": 934,
@@ -24385,11 +24385,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pon roudd"
+   "text": "seeall mr"
   },
   "truth": {
-   "lat": 43.4017812,
-   "lon": -70.7584382,
+   "lat": 45.1161324,
+   "lon": -67.238463,
    "radius_m": 4000
   },
   "base_id": 1005,
@@ -24401,11 +24401,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hull robtrs"
+   "text": "fisb pond littl"
   },
   "truth": {
-   "lat": 44.5685109,
-   "lon": -69.0793099,
+   "lat": 45.9077405,
+   "lon": -70.2473704,
    "radius_m": 4000
   },
   "base_id": 937,
@@ -24417,11 +24417,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pondd selojre"
+   "text": "meaddw pind"
   },
   "truth": {
-   "lat": 45.196334,
-   "lon": -68.0464594,
+   "lat": 44.3566458,
+   "lon": -68.8992566,
    "radius_m": 4000
   },
   "base_id": 906,
@@ -24433,11 +24433,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "mounatin beasr"
+   "text": "mdd pod"
   },
   "truth": {
-   "lat": 44.669924,
-   "lon": -69.7520049,
+   "lat": 44.2198675,
+   "lon": -70.2980186,
    "radius_m": 4000
   },
   "base_id": 997,
@@ -24449,11 +24449,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hil hosse"
+   "text": "nrron podn"
   },
   "truth": {
-   "lat": 44.178761,
-   "lon": -70.5489895,
+   "lat": 45.3717264,
+   "lon": -68.9696469,
    "radius_m": 4000
   },
   "base_id": 920,
@@ -24465,11 +24465,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "moutin roxburry"
+   "text": "mountanj plmumer"
   },
   "truth": {
-   "lat": 44.6413488,
-   "lon": -70.5307094,
+   "lat": 44.1162118,
+   "lon": -70.800689,
    "radius_m": 4000
   },
   "base_id": 1017,
@@ -24481,11 +24481,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "coffeeoos pnod litlte"
+   "text": "hipll dea"
   },
   "truth": {
-   "lat": 46.1606556,
-   "lon": -69.1085389,
+   "lat": 44.0842292,
+   "lon": -70.4800574,
    "radius_m": 4000
   },
   "base_id": 1043,
@@ -24497,11 +24497,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "ponmd burrnt"
+   "text": "dedwwater sbeoeis"
   },
   "truth": {
-   "lat": 44.7459627,
-   "lon": -68.5273792,
+   "lat": 46.2044909,
+   "lon": -68.5892065,
    "radius_m": 4000
   },
   "base_id": 951,
@@ -24513,11 +24513,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hill hobs"
+   "text": "littte mountian"
   },
   "truth": {
-   "lat": 44.1179412,
-   "lon": -70.6563851,
+   "lat": 44.2296609,
+   "lon": -68.7851301,
    "radius_m": 4000
   },
   "base_id": 947,
@@ -24529,11 +24529,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "caarry pobd wesst"
+   "text": "hlll caldim"
   },
   "truth": {
-   "lat": 45.1689736,
-   "lon": -70.1112333,
+   "lat": 44.6940909,
+   "lon": -70.2679895,
    "radius_m": 4000
   },
   "base_id": 912,
@@ -24545,11 +24545,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "bera ponnd litle"
+   "text": "rockkq biv"
   },
   "truth": {
-   "lat": 44.3535201,
-   "lon": -70.2903553,
+   "lat": 44.2434048,
+   "lon": -68.3361283,
    "radius_m": 4000
   },
   "base_id": 938,
@@ -24561,11 +24561,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pknd grret"
+   "text": "brok ponnd tayllor"
   },
   "truth": {
-   "lat": 44.6500788,
-   "lon": -67.2927648,
+   "lat": 44.7804178,
+   "lon": -67.8435757,
    "radius_m": 4000
   },
   "base_id": 907,
@@ -24577,11 +24577,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "bto der"
+   "text": "ckobble hil"
   },
   "truth": {
-   "lat": 45.2060301,
-   "lon": -69.9195189,
+   "lat": 44.6661627,
+   "lon": -70.4889541,
    "radius_m": 4000
   },
   "base_id": 983,
@@ -24593,11 +24593,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "poxn lsot"
+   "text": "thd lakee"
   },
   "truth": {
-   "lat": 45.3647244,
-   "lon": -70.4136993,
+   "lat": 45.0202141,
+   "lon": -67.7967975,
    "radius_m": 4000
   },
   "base_id": 994,
@@ -24609,11 +24609,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pnoood c"
+   "text": "tain mountaun suoth"
   },
   "truth": {
-   "lat": 44.7176418,
-   "lon": -70.8819261,
+   "lat": 44.6040651,
+   "lon": -70.6132753,
    "radius_m": 4000
   },
   "base_id": 909,
@@ -24625,11 +24625,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "briok lakke croooked"
+   "text": "smitth brookk pondd"
   },
   "truth": {
-   "lat": 45.5519987,
-   "lon": -67.7217126,
+   "lat": 46.4623066,
+   "lon": -68.9716513,
    "radius_m": 4000
   },
   "base_id": 1001,
@@ -24641,11 +24641,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pbd freshh"
+   "text": "musquacoik lakee fiifth"
   },
   "truth": {
-   "lat": 44.345159,
-   "lon": -68.7915825,
+   "lat": 46.5465082,
+   "lon": -69.1099686,
    "radius_m": 4000
   },
   "base_id": 925,
@@ -24657,11 +24657,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "mougtian forst"
+   "text": "munntain fupler"
   },
   "truth": {
-   "lat": 43.952791,
-   "lon": -70.9173394,
+   "lat": 43.8146738,
+   "lon": -69.8373328,
    "radius_m": 4000
   },
   "base_id": 972,
@@ -24673,11 +24673,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hipp hamblij"
+   "text": "ponod withew"
   },
   "truth": {
-   "lat": 44.1960853,
-   "lon": -70.8924621,
+   "lat": 45.0866752,
+   "lon": -69.7733146,
    "radius_m": 4000
   },
   "base_id": 901,
@@ -24689,11 +24689,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hiill brakheat"
+   "text": "pomd hatiings"
   },
   "truth": {
-   "lat": 43.729714,
-   "lon": -70.5652424,
+   "lat": 43.9119625,
+   "lon": -69.4923248,
    "radius_m": 4000
   },
   "base_id": 1041,
@@ -24705,11 +24705,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "circlf artiisan's fll"
+   "text": "totaoly"
   },
   "truth": {
-   "lat": 43.8050699,
-   "lon": -70.80292426,
+   "lat": 43.4396432513328,
+   "lon": -70.77563140023753,
    "radius_m": 300
   },
   "base_id": 1372,
@@ -24721,11 +24721,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "laerning plxce th"
+   "text": "consignmeen pacoock"
   },
   "truth": {
-   "lat": 43.3416278,
-   "lon": -70.5677037,
+   "lat": 44.7784663,
+   "lon": -68.77671469,
    "radius_m": 300
   },
   "base_id": 1376,
@@ -24737,11 +24737,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "mii mane"
+   "text": "agpoo"
   },
   "truth": {
-   "lat": 44.205911,
-   "lon": -69.061675,
+   "lat": 43.63302001423414,
+   "lon": -70.33393944618143,
    "radius_m": 300
   },
   "base_id": 1354,
@@ -24753,11 +24753,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "united methodits churfh buxxton"
+   "text": "smih’s pianistw mds."
   },
   "truth": {
-   "lat": 43.7005503,
-   "lon": -70.55214356,
+   "lat": 44.64516418,
+   "lon": -67.59655936,
    "radius_m": 300
   },
   "base_id": 1057,
@@ -24769,11 +24769,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "light acadiq hospittal nortbern"
+   "text": "baarber shoop marceo's"
   },
   "truth": {
-   "lat": 44.8206692,
-   "lon": -68.76334921,
+   "lat": 44.0875299,
+   "lon": -70.2233437,
    "radius_m": 300
   },
   "base_id": 1196,
@@ -24785,11 +24785,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "wathc bed & breakffast islwnd"
+   "text": "ups authoried shippinr provvider"
   },
   "truth": {
-   "lat": 44.2795800878689,
-   "lon": -68.33215729816078,
+   "lat": 44.6682668,
+   "lon": -70.1509078,
    "radius_m": 300
   },
   "base_id": 1189,
@@ -24801,11 +24801,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "beac famiyl campgroun ne're"
+   "text": "shannonn benhett"
   },
   "truth": {
-   "lat": 43.5150586,
-   "lon": -70.380575,
+   "lat": 43.6533244,
+   "lon": -70.2751542,
    "radius_m": 300
   },
   "base_id": 1098,
@@ -24817,11 +24817,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "oj r eyys"
+   "text": "consruction & prp burges"
   },
   "truth": {
-   "lat": 43.65815585,
-   "lon": -70.25362002,
+   "lat": 44.98407791233106,
+   "lon": -70.65873917161707,
    "radius_m": 300
   },
   "base_id": 1399,
@@ -24833,11 +24833,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "uj westtwrn"
+   "text": "meddical centet a regiional"
   },
   "truth": {
-   "lat": 46.137622,
-   "lon": -67.83868,
+   "lat": 44.7154591,
+   "lon": -67.4615236,
    "radius_m": 300
   },
   "base_id": 1391,
@@ -24849,11 +24849,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "stt at eaqy"
+   "text": "snoe southh mray"
   },
   "truth": {
-   "lat": 43.65699005074917,
-   "lon": -70.25035858154297,
+   "lat": 44.81737415,
+   "lon": -68.77298358,
    "radius_m": 300
   },
   "base_id": 1364,
@@ -24865,11 +24865,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "beet ha'amm cogregation"
+   "text": "mountain timbe fraames mains"
   },
   "truth": {
-   "lat": 43.62220563,
-   "lon": -70.30558284,
+   "lat": 44.8137137,
+   "lon": -70.34238607,
    "radius_m": 300
   },
   "base_id": 1137,
@@ -24881,11 +24881,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "hait hmerown"
+   "text": "concrrete: ladscape masonrt supply genest"
   },
   "truth": {
-   "lat": 46.68189757,
-   "lon": -68.15891846,
+   "lat": 43.439104431451085,
+   "lon": -70.76183438301088,
    "radius_m": 300
   },
   "base_id": 1363,
@@ -24897,11 +24897,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "maple sgar suack daf's"
+   "text": "l. chambberlain museu josuua"
   },
   "truth": {
-   "lat": 44.04605331,
-   "lon": -70.63682773,
+   "lat": 43.910461626037744,
+   "lon": -69.96397378052482,
    "radius_m": 300
   },
   "base_id": 1072,
@@ -24913,11 +24913,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "fie's"
+   "text": "o haar towj"
   },
   "truth": {
-   "lat": 43.80511981,
-   "lon": -69.98982388,
+   "lat": 43.8137763,
+   "lon": -69.94313945,
    "radius_m": 300
   },
   "base_id": 1375,
@@ -24929,11 +24929,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "hospitalutty miane"
+   "text": "rtenn-a-c"
   },
   "truth": {
-   "lat": 44.31142439,
-   "lon": -69.79202049,
+   "lat": 45.02444519,
+   "lon": -69.29043394,
    "radius_m": 300
   },
   "base_id": 1341,
@@ -24945,11 +24945,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "radik weest communitty"
+   "text": "gemd bsnneett's"
   },
   "truth": {
-   "lat": 44.56499352588156,
-   "lon": -68.66632348463081,
+   "lat": 44.4333355,
+   "lon": -68.99819472,
    "radius_m": 300
   },
   "base_id": 1358,
@@ -24961,11 +24961,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "book cofff elekents"
+   "text": "mc qkin harolf"
   },
   "truth": {
-   "lat": 43.4940468,
-   "lon": -70.45802568,
+   "lat": 44.5236167,
+   "lon": -68.36158642,
    "radius_m": 300
   },
   "base_id": 1346,
@@ -24977,11 +24977,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "cenyer notheast ee"
+   "text": "calfary cemetet"
   },
   "truth": {
-   "lat": 44.83149056,
-   "lon": -68.78627582,
+   "lat": 43.63021801,
+   "lon": -70.29388485,
    "radius_m": 300
   },
   "base_id": 1082,
@@ -24993,11 +24993,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "graden inm hiltob"
+   "text": "nztalie h. rockwwelll"
   },
   "truth": {
-   "lat": 43.64948677,
-   "lon": -70.31540594,
+   "lat": 43.906285165142975,
+   "lon": -69.89137374668397,
    "radius_m": 300
   },
   "base_id": 1067,
@@ -25009,11 +25009,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "cingregational churcch woodforrds"
+   "text": "luumber and cedag mill dwwey's"
   },
   "truth": {
-   "lat": 43.67077464,
-   "lon": -70.28757478,
+   "lat": 44.37109,
+   "lon": -69.361436,
    "radius_m": 300
   },
   "base_id": 1099,
@@ -25025,11 +25025,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "inkrwbdi"
+   "text": "e duguay"
   },
   "truth": {
-   "lat": 44.76603213,
-   "lon": -69.71752025,
+   "lat": 44.54735019,
+   "lon": -70.56040705,
    "radius_m": 300
   },
   "base_id": 1345,
@@ -25041,11 +25041,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "theraapy masssaage"
+   "text": "whhitefield superetr n"
   },
   "truth": {
-   "lat": 46.86944573,
-   "lon": -68.00509949,
+   "lat": 44.222029,
+   "lon": -69.587287,
    "radius_m": 300
   },
   "base_id": 1116,
@@ -25057,11 +25057,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "isand strength anf wllness peaks"
+   "text": "baay furnifure caso"
   },
   "truth": {
-   "lat": 43.65785078,
-   "lon": -70.19825303,
+   "lat": 43.6569639,
+   "lon": -70.2567261,
    "radius_m": 300
   },
   "base_id": 1152,
@@ -25073,11 +25073,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "wimchell rudaan"
+   "text": "galleyr and stduio mianely"
   },
   "truth": {
-   "lat": 44.54399086395939,
-   "lon": -68.42498856549535,
+   "lat": 44.42940642,
+   "lon": -68.97388277,
    "radius_m": 300
   },
   "base_id": 1136,
@@ -25089,11 +25089,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "fzr botmaa"
+   "text": "earky bidr resturant"
   },
   "truth": {
-   "lat": 44.03005554,
-   "lon": -70.0881532,
+   "lat": 44.55262505074715,
+   "lon": -69.74439292784336,
    "radius_m": 300
   },
   "base_id": 1138,
@@ -25105,11 +25105,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "katt's restauran annd bar mad"
+   "text": "bwdoin baptist chhurch wes"
   },
   "truth": {
-   "lat": 44.79932669,
-   "lon": -68.75381463,
+   "lat": 44.0496503,
+   "lon": -70.0214776,
    "radius_m": 300
   },
   "base_id": 1117,
@@ -25121,11 +25121,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "possse chershed"
+   "text": "fs bsa"
   },
   "truth": {
-   "lat": 43.70233113,
-   "lon": -70.28961995,
+   "lat": 43.57113025,
+   "lon": -70.38819049,
    "radius_m": 300
   },
   "base_id": 1339,
@@ -25137,11 +25137,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "at porttlnd"
+   "text": "cnogregat mrxico"
   },
   "truth": {
-   "lat": 43.65802002,
-   "lon": -70.25383407,
+   "lat": 44.55549418,
+   "lon": -70.53990307,
    "radius_m": 300
   },
   "base_id": 1384,
@@ -25153,11 +25153,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "rdige photgoraphy rutic"
+   "text": "cpital famiily pratcice"
   },
   "truth": {
-   "lat": 43.92756421204877,
-   "lon": -70.43733853221903,
+   "lat": 44.303478,
+   "lon": -69.765213,
    "radius_m": 300
   },
   "base_id": 1153,
@@ -25169,11 +25169,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "keennel's anum m"
+   "text": "auo cenferline"
   },
   "truth": {
-   "lat": 44.51305579,
-   "lon": -70.54797657,
+   "lat": 44.47862256,
+   "lon": -70.64327188,
    "radius_m": 300
   },
   "base_id": 1356,
@@ -25185,11 +25185,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "rv baoery bck"
+   "text": "wooods cattie colbg"
   },
   "truth": {
-   "lat": 43.49047181,
-   "lon": -70.712269,
+   "lat": 44.56416415,
+   "lon": -70.14185603,
    "radius_m": 300
   },
   "base_id": 1054,
@@ -25201,11 +25201,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "mootek twiltie"
+   "text": "amca sallon bela"
   },
   "truth": {
-   "lat": 44.539745467831466,
-   "lon": -68.44215971352925,
+   "lat": 44.3143031,
+   "lon": -69.7744112,
    "radius_m": 300
   },
   "base_id": 1131,
@@ -25217,11 +25217,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "park barrrett's"
+   "text": "wargenes"
   },
   "truth": {
-   "lat": 43.848117,
-   "lon": -69.61794,
+   "lat": 44.004666,
+   "lon": -70.074845,
    "radius_m": 300
   },
   "base_id": 1139,
@@ -25233,11 +25233,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "gera's"
+   "text": "lighttgouss"
   },
   "truth": {
-   "lat": 44.22971,
-   "lon": -69.772115,
+   "lat": 43.64040487,
+   "lon": -70.254654,
    "radius_m": 300
   },
   "base_id": 1383,
@@ -25249,11 +25249,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "achenbaach od - lwiston ande"
+   "text": "hasu lah"
   },
   "truth": {
-   "lat": 44.1146822,
-   "lon": -70.2067618,
+   "lat": 43.51776753,
+   "lon": -70.4000003,
    "radius_m": 300
   },
   "base_id": 1092,
@@ -25265,11 +25265,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "madr"
+   "text": "dor lebbel"
   },
   "truth": {
-   "lat": 44.84224,
-   "lon": -68.73779,
+   "lat": 43.32038302,
+   "lon": -70.58153901,
    "radius_m": 300
   },
   "base_id": 1348,
@@ -25281,11 +25281,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "bes hae pesonal"
+   "text": "ass dermaotloggy"
   },
   "truth": {
-   "lat": 44.2273097,
-   "lon": -70.519013,
+   "lat": 43.65533739,
+   "lon": -70.29003533,
    "radius_m": 300
   },
   "base_id": 1342,
@@ -25297,11 +25297,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "gd bvid"
+   "text": "harfo boothbbbay"
   },
   "truth": {
-   "lat": 46.91096441,
-   "lon": -67.82536957,
+   "lat": 43.85132553,
+   "lon": -69.62776007,
    "radius_m": 300
   },
   "base_id": 1407,
@@ -25313,11 +25313,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "survye llcc riversside"
+   "text": "cottaage kmball"
   },
   "truth": {
-   "lat": 44.115526071170144,
-   "lon": -70.59547424316408,
+   "lat": 43.27582278,
+   "lon": -70.58221631,
    "radius_m": 300
   },
   "base_id": 1167,
@@ -25329,11 +25329,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "lie fennce co mian"
+   "text": "pon seve's"
   },
   "truth": {
-   "lat": 43.78163,
-   "lon": -70.199569,
+   "lat": 44.38198011,
+   "lon": -69.29741726,
    "radius_m": 300
   },
   "base_id": 1055,
@@ -25345,11 +25345,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "truxk renta pnske"
+   "text": "bnoni hagt"
   },
   "truth": {
-   "lat": 44.82451876,
-   "lon": -68.75897217,
+   "lat": 43.86198242220213,
+   "lon": -70.10562240970796,
    "radius_m": 300
   },
   "base_id": 1134,
@@ -25361,11 +25361,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "isnurance patriiot"
+   "text": "elemrnt t bllacu"
   },
   "truth": {
-   "lat": 43.80301554,
-   "lon": -70.18191736,
+   "lat": 43.91123841,
+   "lon": -69.97573844,
    "radius_m": 300
   },
   "base_id": 1378,
@@ -25377,11 +25377,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "vacuuum lllc jeft's"
+   "text": "streeet conregational chuch hammond"
   },
   "truth": {
-   "lat": 44.1845764,
-   "lon": -69.11931406,
+   "lat": 44.80096019,
+   "lon": -68.77417537,
    "radius_m": 300
   },
   "base_id": 1130,
@@ -25393,11 +25393,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "maien sport cntral"
+   "text": "kyzi"
   },
   "truth": {
-   "lat": 44.3210978,
-   "lon": -69.82368018,
+   "lat": 43.08600168954892,
+   "lon": -70.74299391602509,
    "radius_m": 300
   },
   "base_id": 1179,
@@ -25409,11 +25409,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "clrnrr ths"
+   "text": "1909 h tyee"
   },
   "truth": {
-   "lat": 45.45881808,
-   "lon": -69.59178355,
+   "lat": 44.77152708097523,
+   "lon": -69.7220336907615,
    "radius_m": 300
   },
   "base_id": 1340,
@@ -25425,11 +25425,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "fmily kwnnebhnk"
+   "text": "yo saa ib"
   },
   "truth": {
-   "lat": 43.38428154,
-   "lon": -70.54492681,
+   "lat": 43.94785006,
+   "lon": -70.19978593,
    "radius_m": 300
   },
   "base_id": 1374,
@@ -25441,11 +25441,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "foor grunnd"
+   "text": "freport mind-bowy fitness/gyrotonic studio in freepotr"
   },
   "truth": {
-   "lat": 43.8582426,
-   "lon": -70.10094733,
+   "lat": 43.85468718,
+   "lon": -70.10759444,
    "radius_m": 300
   },
   "base_id": 1070,
@@ -25457,11 +25457,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "satino reubion"
+   "text": "spiritt hllowene"
   },
   "truth": {
-   "lat": 44.06077244,
-   "lon": -69.49642696,
+   "lat": 43.6345183773483,
+   "lon": -70.336337880139,
    "radius_m": 300
   },
   "base_id": 1154,
@@ -25473,11 +25473,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "og 26 a barm"
+   "text": "c paryy"
   },
   "truth": {
-   "lat": 43.93233153185235,
-   "lon": -70.35288339118601,
+   "lat": 44.347132,
+   "lon": -69.789185,
    "radius_m": 300
   },
   "base_id": 1352,
@@ -25489,11 +25489,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "proteectors inv tootj"
+   "text": "watere auto sales and serrvice stlil"
   },
   "truth": {
-   "lat": 44.074457,
-   "lon": -70.1757984,
+   "lat": 43.73195802,
+   "lon": -70.58819736,
    "radius_m": 300
   },
   "base_id": 1180,
@@ -29005,11 +29005,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pond lily"
+   "text": "georgetuwb hil wast"
   },
   "truth": {
-   "lat": 43.6599629,
-   "lon": -70.6369016,
+   "lat": 43.8005337,
+   "lon": -69.7786372,
    "radius_m": 4000
   },
   "base_id": 958,
@@ -29021,11 +29021,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pond labe"
+   "text": "pleusogt maugtaim"
   },
   "truth": {
-   "lat": 47.146383,
-   "lon": -68.6264401,
+   "lat": 44.7344647,
+   "lon": -70.6908308,
    "radius_m": 4000
   },
   "base_id": 932,
@@ -29037,11 +29037,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "cat hugh"
+   "text": "johns ponx, davos towj"
   },
   "truth": {
-   "lat": 45.0768356,
-   "lon": -69.1315286,
+   "lat": 45.0697749,
+   "lon": -70.7914576,
    "radius_m": 4000
   },
   "base_id": 904,
@@ -29053,11 +29053,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hil wbatget"
+   "text": "fdost hal, sodom"
   },
   "truth": {
-   "lat": 44.183851,
-   "lon": -70.4847795,
+   "lat": 44.180821,
+   "lon": -70.6031595,
    "radius_m": 4000
   },
   "base_id": 1009,
@@ -29069,11 +29069,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "graj pond"
+   "text": "siwal hil"
   },
   "truth": {
-   "lat": 44.863057,
-   "lon": -68.0435815,
+   "lat": 43.132024,
+   "lon": -70.6622742,
    "radius_m": 4000
   },
   "base_id": 908,
@@ -29085,11 +29085,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "greaf moso lake"
+   "text": "stegson pond"
   },
   "truth": {
-   "lat": 44.9230285,
-   "lon": -69.5172258,
+   "lat": 44.8482106,
+   "lon": -70.4774848,
    "radius_m": 4000
   },
   "base_id": 975,
@@ -29101,11 +29101,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "ponf hay"
+   "text": "eagles crab"
   },
   "truth": {
-   "lat": 46.167187,
-   "lon": -68.7515527,
+   "lat": 44.3258509,
+   "lon": -68.2197302,
    "radius_m": 4000
   },
   "base_id": 1003,
@@ -29117,11 +29117,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "tague pond uoer"
+   "text": "teu mounroin"
   },
   "truth": {
-   "lat": 45.8237943,
-   "lon": -68.8956835,
+   "lat": 45.2281712,
+   "lon": -70.5389367,
    "radius_m": 4000
   },
   "base_id": 1024,
@@ -29133,11 +29133,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hils skiky"
+   "text": "gteit hil, loqer viluhe"
   },
   "truth": {
-   "lat": 43.5867398,
-   "lon": -70.4756071,
+   "lat": 43.3440346,
+   "lon": -70.5130859,
    "radius_m": 4000
   },
   "base_id": 993,
@@ -29149,11 +29149,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "river whitekap subday"
+   "text": "weymowtb hil"
   },
   "truth": {
-   "lat": 44.5489609,
-   "lon": -70.8966993,
+   "lat": 44.228601,
+   "lon": -70.8085394,
    "radius_m": 4000
   },
   "base_id": 939,
@@ -29165,11 +29165,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "veto maint"
+   "text": "ugcle dock hii"
   },
   "truth": {
-   "lat": 45.940779,
-   "lon": -69.0920503,
+   "lat": 44.3516809,
+   "lon": -68.3859002,
    "radius_m": 4000
   },
   "base_id": 1048,
@@ -29181,11 +29181,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "itoh mine hii"
+   "text": "browns pond"
   },
   "truth": {
-   "lat": 44.2126853,
-   "lon": -69.7847859,
+   "lat": 43.9129819,
+   "lon": -70.7277363,
    "radius_m": 4000
   },
   "base_id": 936,
@@ -29197,11 +29197,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hil gruot"
+   "text": "stafird pond"
   },
   "truth": {
-   "lat": 44.3859422,
-   "lon": -68.2318132,
+   "lat": 44.8911979,
+   "lon": -69.5037708,
    "radius_m": 4000
   },
   "base_id": 974,
@@ -29213,11 +29213,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "porker pojd"
+   "text": "cakp pond"
   },
   "truth": {
-   "lat": 44.5085098,
-   "lon": -70.1418107,
+   "lat": 45.4291257,
+   "lon": -69.2687466,
    "radius_m": 4000
   },
   "base_id": 998,
@@ -29229,11 +29229,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "isaaah mointaan"
+   "text": "pond yowngs"
   },
   "truth": {
-   "lat": 44.2819222,
-   "lon": -70.8754577,
+   "lat": 44.7165898,
+   "lon": -68.4476393,
    "radius_m": 4000
   },
   "base_id": 949,
@@ -29245,11 +29245,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "mody pond"
+   "text": "pimerei pond"
   },
   "truth": {
-   "lat": 43.5624821,
-   "lon": -70.7387476,
+   "lat": 45.0465982,
+   "lon": -68.7700584,
    "radius_m": 4000
   },
   "base_id": 1019,
@@ -29261,11 +29261,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pond gipman"
+   "text": "lunicos mowhtaib"
   },
   "truth": {
-   "lat": 44.9580266,
-   "lon": -70.0543385,
+   "lat": 45.9583006,
+   "lon": -68.68061,
    "radius_m": 4000
   },
   "base_id": 980,
@@ -29277,11 +29277,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "big moso pond"
+   "text": "shae muqntian"
   },
   "truth": {
-   "lat": 45.4543916,
-   "lon": -69.6795308,
+   "lat": 45.7197907,
+   "lon": -69.7087324,
    "radius_m": 4000
   },
   "base_id": 1046,
@@ -29293,11 +29293,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "mid pand"
+   "text": "fariw lake"
   },
   "truth": {
-   "lat": 45.6679554,
-   "lon": -69.0109466,
+   "lat": 45.4253968,
+   "lon": -67.7660586,
    "radius_m": 4000
   },
   "base_id": 923,
@@ -29309,11 +29309,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "cogary heed"
+   "text": "pina hil, feyetu cadner"
   },
   "truth": {
-   "lat": 44.2312309,
-   "lon": -68.5814801,
+   "lat": 44.4479809,
+   "lon": -70.0832396,
    "radius_m": 4000
   },
   "base_id": 967,
@@ -29325,11 +29325,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "bufdhur lake"
+   "text": "hil shew"
   },
   "truth": {
-   "lat": 45.4689223,
-   "lon": -67.6640598,
+   "lat": 44.1268088,
+   "lon": -70.3132539,
    "radius_m": 4000
   },
   "base_id": 959,
@@ -29341,11 +29341,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "moungaon bravfurj"
+   "text": "forry adde hel"
   },
   "truth": {
-   "lat": 43.9023677,
-   "lon": -70.1818227,
+   "lat": 43.1140412,
+   "lon": -70.6933695,
    "radius_m": 4000
   },
   "base_id": 1007,
@@ -29357,11 +29357,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "paler pojds"
+   "text": "souke penr"
   },
   "truth": {
-   "lat": 45.2910508,
-   "lon": -69.9899155,
+   "lat": 46.2747876,
+   "lon": -68.8165277,
    "radius_m": 4000
   },
   "base_id": 976,
@@ -29373,11 +29373,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "howe peau"
+   "text": "sedond muskwecok lake"
   },
   "truth": {
-   "lat": 46.0708706,
-   "lon": -68.9982999,
+   "lat": 46.6338666,
+   "lon": -69.1736999,
    "radius_m": 4000
   },
   "base_id": 995,
@@ -29389,11 +29389,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pogd meacaa"
+   "text": "jerusaluk meungain"
   },
   "truth": {
-   "lat": 45.3450306,
-   "lon": -69.4657716,
+   "lat": 44.0499809,
+   "lon": -68.6228901,
    "radius_m": 4000
   },
   "base_id": 992,
@@ -29405,11 +29405,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "red rou mowntaan"
+   "text": "cuninbbam mauntuin"
   },
   "truth": {
-   "lat": 44.309501,
-   "lon": -70.8983193,
+   "lat": 44.324648,
+   "lon": -69.4099165,
    "radius_m": 4000
   },
   "base_id": 931,
@@ -29421,11 +29421,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "ponr pikerek"
+   "text": "penobsxot pond lutoe"
   },
   "truth": {
-   "lat": 45.4670738,
-   "lon": -67.7598152,
+   "lat": 45.6799815,
+   "lon": -69.1782677,
    "radius_m": 4000
   },
   "base_id": 991,
@@ -29437,11 +29437,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hewoabd hel"
+   "text": "pond short"
   },
   "truth": {
-   "lat": 44.5633107,
-   "lon": -69.7807472,
+   "lat": 43.4736536,
+   "lon": -70.3866543,
    "radius_m": 4000
   },
   "base_id": 1012,
@@ -29453,11 +29453,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "chandier hil"
+   "text": "crow hil, burdin cogjir"
   },
   "truth": {
-   "lat": 45.0004108,
-   "lon": -70.0166096,
+   "lat": 45.1093527,
+   "lon": -69.5061565,
    "radius_m": 4000
   },
   "base_id": 984,
@@ -29469,11 +29469,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hil varney"
+   "text": "tarnee hil"
   },
   "truth": {
-   "lat": 45.2490907,
-   "lon": -68.4819501,
+   "lat": 44.502847,
+   "lon": -67.8625007,
    "radius_m": 4000
   },
   "base_id": 934,
@@ -29485,11 +29485,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pujs roubd"
+   "text": "seal mownt"
   },
   "truth": {
-   "lat": 43.4017812,
-   "lon": -70.7584382,
+   "lat": 45.1161324,
+   "lon": -67.238463,
    "radius_m": 4000
   },
   "base_id": 1005,
@@ -29501,11 +29501,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hio robergz"
+   "text": "litoa fish pinds"
   },
   "truth": {
-   "lat": 44.5685109,
-   "lon": -69.0793099,
+   "lat": 45.9077405,
+   "lon": -70.2473704,
    "radius_m": 4000
   },
   "base_id": 937,
@@ -29517,11 +29517,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "seimoru ponf"
+   "text": "meadod pund"
   },
   "truth": {
-   "lat": 45.196334,
-   "lon": -68.0464594,
+   "lat": 44.3566458,
+   "lon": -68.8992566,
    "radius_m": 4000
   },
   "base_id": 906,
@@ -29533,11 +29533,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "moungain beaf"
+   "text": "mud penc"
   },
   "truth": {
-   "lat": 44.669924,
-   "lon": -69.7520049,
+   "lat": 44.2198675,
+   "lon": -70.2980186,
    "radius_m": 4000
   },
   "base_id": 997,
@@ -29549,11 +29549,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "herde hup"
+   "text": "nogtob pond, knuyhts landang"
   },
   "truth": {
-   "lat": 44.178761,
-   "lon": -70.5489895,
+   "lat": 45.3717264,
+   "lon": -68.9696469,
    "radius_m": 4000
   },
   "base_id": 920,
@@ -29565,11 +29565,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "raxbury mountaen"
+   "text": "mountaun plimer"
   },
   "truth": {
-   "lat": 44.6413488,
-   "lon": -70.5307094,
+   "lat": 44.1162118,
+   "lon": -70.800689,
    "radius_m": 4000
   },
   "base_id": 1017,
@@ -29581,11 +29581,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "litle cafeaios pond"
+   "text": "deon hil"
   },
   "truth": {
-   "lat": 46.1606556,
-   "lon": -69.1085389,
+   "lat": 44.0842292,
+   "lon": -70.4800574,
    "radius_m": 4000
   },
   "base_id": 1043,
@@ -29597,11 +29597,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pond burnt"
+   "text": "sebouua deadwatee"
   },
   "truth": {
-   "lat": 44.7459627,
-   "lon": -68.5273792,
+   "lat": 46.2044909,
+   "lon": -68.5892065,
    "radius_m": 4000
   },
   "base_id": 951,
@@ -29613,11 +29613,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hogq hil"
+   "text": "ligle mowntain, sunset"
   },
   "truth": {
-   "lat": 44.1179412,
-   "lon": -70.6563851,
+   "lat": 44.2296609,
+   "lon": -68.7851301,
    "radius_m": 4000
   },
   "base_id": 947,
@@ -29629,11 +29629,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "west karg pund"
+   "text": "kalwin hil"
   },
   "truth": {
-   "lat": 45.1689736,
-   "lon": -70.1112333,
+   "lat": 44.6940909,
+   "lon": -70.2679895,
    "radius_m": 4000
   },
   "base_id": 912,
@@ -29645,11 +29645,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "bear pomd lurle"
+   "text": "rooz bag"
   },
   "truth": {
-   "lat": 44.3535201,
-   "lon": -70.2903553,
+   "lat": 44.2434048,
+   "lon": -68.3361283,
    "radius_m": 4000
   },
   "base_id": 938,
@@ -29661,11 +29661,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "ggeag pond"
+   "text": "brol pond taylif"
   },
   "truth": {
-   "lat": 44.6500788,
-   "lon": -67.2927648,
+   "lat": 44.7804178,
+   "lon": -67.8435757,
    "radius_m": 4000
   },
   "base_id": 907,
@@ -29677,11 +29677,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "dear bob"
+   "text": "kable hil"
   },
   "truth": {
-   "lat": 45.2060301,
-   "lon": -69.9195189,
+   "lat": 44.6661627,
+   "lon": -70.4889541,
    "radius_m": 4000
   },
   "base_id": 983,
@@ -29693,11 +29693,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pand loqt"
+   "text": "third laka"
   },
   "truth": {
-   "lat": 45.3647244,
-   "lon": -70.4136993,
+   "lat": 45.0202141,
+   "lon": -67.7967975,
    "radius_m": 4000
   },
   "base_id": 994,
@@ -29709,11 +29709,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "pond k"
+   "text": "tdin mawntaab sougn"
   },
   "truth": {
-   "lat": 44.7176418,
-   "lon": -70.8819261,
+   "lat": 44.6040651,
+   "lon": -70.6132753,
    "radius_m": 4000
   },
   "base_id": 909,
@@ -29725,11 +29725,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "crukef brok lako"
+   "text": "shihh bruk pond"
   },
   "truth": {
-   "lat": 45.5519987,
-   "lon": -67.7217126,
+   "lat": 46.4623066,
+   "lon": -68.9716513,
    "radius_m": 4000
   },
   "base_id": 1001,
@@ -29741,11 +29741,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "fresh ponc"
+   "text": "fitth muskwakok leke"
   },
   "truth": {
-   "lat": 44.345159,
-   "lon": -68.7915825,
+   "lat": 46.5465082,
+   "lon": -69.1099686,
    "radius_m": 4000
   },
   "base_id": 925,
@@ -29757,11 +29757,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "moentain frowt"
+   "text": "mowggaan fuler"
   },
   "truth": {
-   "lat": 43.952791,
-   "lon": -70.9173394,
+   "lat": 43.8146738,
+   "lon": -69.8373328,
    "radius_m": 4000
   },
   "base_id": 972,
@@ -29773,11 +29773,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "hik hamblin"
+   "text": "pond wothe"
   },
   "truth": {
-   "lat": 44.1960853,
-   "lon": -70.8924621,
+   "lat": 45.0866752,
+   "lon": -69.7733146,
    "radius_m": 4000
   },
   "base_id": 901,
@@ -29789,11 +29789,11 @@
   "qtype": "fuzz",
   "kind": "lake_summit",
   "params": {
-   "text": "breakhearh hil"
+   "text": "hastangx pond"
   },
   "truth": {
-   "lat": 43.729714,
-   "lon": -70.5652424,
+   "lat": 43.9119625,
+   "lon": -69.4923248,
    "radius_m": 4000
   },
   "base_id": 1041,
@@ -29805,11 +29805,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "ful kaffpa artisen's "
+   "text": "totapy "
   },
   "truth": {
-   "lat": 43.8050699,
-   "lon": -70.80292426,
+   "lat": 43.4396432513328,
+   "lon": -70.77563140023753,
    "radius_m": 300
   },
   "base_id": 1372,
@@ -29821,11 +29821,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "leofgihg plake the"
+   "text": "kunsohnmen peucol"
   },
   "truth": {
-   "lat": 43.3416278,
-   "lon": -70.5677037,
+   "lat": 44.7784663,
+   "lon": -68.77671469,
    "radius_m": 300
   },
   "base_id": 1376,
@@ -29837,11 +29837,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "mi maige"
+   "text": "aetoli"
   },
   "truth": {
-   "lat": 44.205911,
-   "lon": -69.061675,
+   "lat": 43.63302001423414,
+   "lon": -70.33393944618143,
    "radius_m": 300
   },
   "base_id": 1354,
@@ -29853,11 +29853,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "unatud murnoduxy kjofxh buxton"
+   "text": "smitg’s pianiats mrs."
   },
   "truth": {
-   "lat": 43.7005503,
-   "lon": -70.55214356,
+   "lat": 44.64516418,
+   "lon": -67.59655936,
    "radius_m": 300
   },
   "base_id": 1057,
@@ -29869,11 +29869,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "leght akadia hosoitol nortmegj"
+   "text": "barber sboo murcel's"
   },
   "truth": {
-   "lat": 44.8206692,
-   "lon": -68.76334921,
+   "lat": 44.0875299,
+   "lon": -70.2233437,
    "radius_m": 300
   },
   "base_id": 1196,
@@ -29885,11 +29885,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "watoh bed & bdeakfast iwlabd"
+   "text": "ups autjoruzod shuping progidur"
   },
   "truth": {
-   "lat": 44.2795800878689,
-   "lon": -68.33215729816078,
+   "lat": 44.6682668,
+   "lon": -70.1509078,
    "radius_m": 300
   },
   "base_id": 1189,
@@ -29901,11 +29901,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "ne're beocy fajily caklgrounc"
+   "text": "shanon benet, d.o."
   },
   "truth": {
-   "lat": 43.5150586,
-   "lon": -70.380575,
+   "lat": 43.6533244,
+   "lon": -70.2751542,
    "radius_m": 300
   },
   "base_id": 1098,
@@ -29917,11 +29917,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "eyac oh r"
+   "text": "bufgos kebstrudtion & pfi"
   },
   "truth": {
-   "lat": 43.65815585,
-   "lon": -70.25362002,
+   "lat": 44.98407791233106,
+   "lon": -70.65873917161707,
    "radius_m": 300
   },
   "base_id": 1399,
@@ -29933,11 +29933,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "wodtern uh"
+   "text": "medical cejter a rigional"
   },
   "truth": {
-   "lat": 46.137622,
-   "lon": -67.83868,
+   "lat": 44.7154591,
+   "lon": -67.4615236,
    "radius_m": 300
   },
   "base_id": 1391,
@@ -29949,11 +29949,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "easu streah aot"
+   "text": "snow s mary"
   },
   "truth": {
-   "lat": 43.65699005074917,
-   "lon": -70.25035858154297,
+   "lat": 44.81737415,
+   "lon": -68.77298358,
    "radius_m": 300
   },
   "base_id": 1364,
@@ -29965,11 +29965,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "ber hu'am congregasjun"
+   "text": "mownfiom timber fgamec maana"
   },
   "truth": {
-   "lat": 43.62220563,
-   "lon": -70.30558284,
+   "lat": 44.8137137,
+   "lon": -70.34238607,
    "radius_m": 300
   },
   "base_id": 1137,
@@ -29981,11 +29981,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "haif honetown"
+   "text": "genest koncrete: linxqcapa masenrh suplt"
   },
   "truth": {
-   "lat": 46.68189757,
-   "lon": -68.15891846,
+   "lat": 43.439104431451085,
+   "lon": -70.76183438301088,
    "radius_m": 300
   },
   "base_id": 1363,
@@ -29997,11 +29997,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "dad's melle sugar shak"
+   "text": "l. chembeglain museum joshua"
   },
   "truth": {
-   "lat": 44.04605331,
-   "lon": -70.63682773,
+   "lat": 43.910461626037744,
+   "lon": -69.96397378052482,
    "radius_m": 300
   },
   "base_id": 1072,
@@ -30013,11 +30013,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "field's "
+   "text": "town of her"
   },
   "truth": {
-   "lat": 43.80511981,
-   "lon": -69.98982388,
+   "lat": 43.8137763,
+   "lon": -69.94313945,
    "radius_m": 300
   },
   "base_id": 1375,
@@ -30029,11 +30029,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "husliyulity miine"
+   "text": "rent-a-c"
   },
   "truth": {
-   "lat": 44.31142439,
-   "lon": -69.79202049,
+   "lat": 45.02444519,
+   "lon": -69.29043394,
    "radius_m": 300
   },
   "base_id": 1341,
@@ -30045,11 +30045,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "komunity radio w"
+   "text": "benet's guns "
   },
   "truth": {
-   "lat": 44.56499352588156,
-   "lon": -68.66632348463081,
+   "lat": 44.4333355,
+   "lon": -68.99819472,
    "radius_m": 300
   },
   "base_id": 1358,
@@ -30061,11 +30061,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "boks kof elemenfs"
+   "text": "herold mau quin"
   },
   "truth": {
-   "lat": 43.4940468,
-   "lon": -70.45802568,
+   "lat": 44.5236167,
+   "lon": -68.36158642,
    "radius_m": 300
   },
   "base_id": 1346,
@@ -30077,11 +30077,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "kentud nodyjuost eye"
+   "text": "kelvafy cehetery, south perrland"
   },
   "truth": {
-   "lat": 44.83149056,
-   "lon": -68.78627582,
+   "lat": 43.63021801,
+   "lon": -70.29388485,
    "radius_m": 300
   },
   "base_id": 1082,
@@ -30093,11 +30093,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "hiltun gereen in"
+   "text": "nataloe h. rokwep, cnm"
   },
   "truth": {
-   "lat": 43.64948677,
-   "lon": -70.31540594,
+   "lat": 43.906285165142975,
+   "lon": -69.89137374668397,
    "radius_m": 300
   },
   "base_id": 1067,
@@ -30109,11 +30109,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "wodfords cohgdagataonil chorch"
+   "text": "deway's lumber ajx kedut mil"
   },
   "truth": {
-   "lat": 43.67077464,
-   "lon": -70.28757478,
+   "lat": 44.37109,
+   "lon": -69.361436,
    "radius_m": 300
   },
   "base_id": 1099,
@@ -30125,11 +30125,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "inltadib"
+   "text": "el duhuiy"
   },
   "truth": {
-   "lat": 44.76603213,
-   "lon": -69.71752025,
+   "lat": 44.54735019,
+   "lon": -70.56040705,
    "radius_m": 300
   },
   "base_id": 1345,
@@ -30141,11 +30141,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "therapy masage"
+   "text": "whetebiald superete norgh"
   },
   "truth": {
-   "lat": 46.86944573,
-   "lon": -68.00509949,
+   "lat": 44.222029,
+   "lon": -69.587287,
    "radius_m": 300
   },
   "base_id": 1116,
@@ -30157,11 +30157,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "island stremgrh and welnes peals"
+   "text": "bih furnihuru casci"
   },
   "truth": {
-   "lat": 43.65785078,
-   "lon": -70.19825303,
+   "lat": 43.6569639,
+   "lon": -70.2567261,
    "radius_m": 300
   },
   "base_id": 1152,
@@ -30173,11 +30173,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "wincyal rudmen"
+   "text": "mainely galory anv sturio"
   },
   "truth": {
-   "lat": 44.54399086395939,
-   "lon": -68.42498856549535,
+   "lat": 44.42940642,
+   "lon": -68.97388277,
    "radius_m": 300
   },
   "base_id": 1136,
@@ -30189,11 +30189,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "botme farm"
+   "text": "eadly bied restairajt, oakpand"
   },
   "truth": {
-   "lat": 44.03005554,
-   "lon": -70.0881532,
+   "lat": 44.55262505074715,
+   "lon": -69.74439292784336,
    "radius_m": 300
   },
   "base_id": 1138,
@@ -30205,11 +30205,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "mud kar's restaurant ahd ber"
+   "text": "west bowdoin baptast churcb"
   },
   "truth": {
-   "lat": 44.79932669,
-   "lon": -68.75381463,
+   "lat": 44.0496503,
+   "lon": -70.0214776,
    "radius_m": 300
   },
   "base_id": 1117,
@@ -30221,11 +30221,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "cherished pise"
+   "text": "fa bisap"
   },
   "truth": {
-   "lat": 43.70233113,
-   "lon": -70.28961995,
+   "lat": 43.57113025,
+   "lon": -70.38819049,
    "radius_m": 300
   },
   "base_id": 1339,
@@ -30237,11 +30237,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "porflanx arr"
+   "text": "mesico cohgregeyi"
   },
   "truth": {
-   "lat": 43.65802002,
-   "lon": -70.25383407,
+   "lat": 44.55549418,
+   "lon": -70.53990307,
    "radius_m": 300
   },
   "base_id": 1384,
@@ -30253,11 +30253,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "ridgo pbotufralhy rushac"
+   "text": "capotal fimioy practufe, p.a."
   },
   "truth": {
-   "lat": 43.92756421204877,
-   "lon": -70.43733853221903,
+   "lat": 44.303478,
+   "lon": -69.765213,
    "radius_m": 300
   },
   "base_id": 1153,
@@ -30269,11 +30269,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "kenek's anam mk"
+   "text": "aoto kentetlinu"
   },
   "truth": {
-   "lat": 44.51305579,
-   "lon": -70.54797657,
+   "lat": 44.47862256,
+   "lon": -70.64327188,
    "radius_m": 300
   },
   "base_id": 1356,
@@ -30285,11 +30285,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "bak road bakury"
+   "text": "wocw citle celny"
   },
   "truth": {
-   "lat": 43.49047181,
-   "lon": -70.712269,
+   "lat": 44.56416415,
+   "lon": -70.14185603,
    "radius_m": 300
   },
   "base_id": 1054,
@@ -30301,11 +30301,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "teulite mitel"
+   "text": "ameka salon bela"
   },
   "truth": {
-   "lat": 44.539745467831466,
-   "lon": -68.44215971352925,
+   "lat": 44.3143031,
+   "lon": -69.7744112,
    "radius_m": 300
   },
   "base_id": 1131,
@@ -30317,11 +30317,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "park baret's"
+   "text": "wulbregd"
   },
   "truth": {
-   "lat": 43.848117,
-   "lon": -69.61794,
+   "lat": 44.004666,
+   "lon": -70.074845,
    "radius_m": 300
   },
   "base_id": 1139,
@@ -30333,11 +30333,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "gororf's "
+   "text": "ligthhouse"
   },
   "truth": {
-   "lat": 44.22971,
-   "lon": -69.772115,
+   "lat": 43.64040487,
+   "lon": -70.254654,
    "radius_m": 300
   },
   "base_id": 1383,
@@ -30349,11 +30349,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "acmengach od - lowisron andro"
+   "text": "haus lash"
   },
   "truth": {
-   "lat": 44.1146822,
-   "lon": -70.2067618,
+   "lat": 43.51776753,
+   "lon": -70.4000003,
    "radius_m": 300
   },
   "base_id": 1092,
@@ -30365,11 +30365,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "madd"
+   "text": "lefol dog "
   },
   "truth": {
-   "lat": 44.84224,
-   "lon": -68.73779,
+   "lat": 43.32038302,
+   "lon": -70.58153901,
    "radius_m": 300
   },
   "base_id": 1348,
@@ -30381,11 +30381,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "pedsonal best hea"
+   "text": "dermotaoagy as"
   },
   "truth": {
-   "lat": 44.2273097,
-   "lon": -70.519013,
+   "lat": 43.65533739,
+   "lon": -70.29003533,
    "radius_m": 300
   },
   "base_id": 1342,
@@ -30397,11 +30397,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "blvd gr"
+   "text": "horbo bothbay"
   },
   "truth": {
-   "lat": 46.91096441,
-   "lon": -67.82536957,
+   "lat": 43.85132553,
+   "lon": -69.62776007,
    "radius_m": 300
   },
   "base_id": 1407,
@@ -30413,11 +30413,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "raversido sigvey, lk"
+   "text": "kotagu kambai"
   },
   "truth": {
-   "lat": 44.115526071170144,
-   "lon": -70.59547424316408,
+   "lat": 43.27582278,
+   "lon": -70.58221631,
    "radius_m": 300
   },
   "base_id": 1167,
@@ -30429,11 +30429,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "maen line fince co"
+   "text": "pojd sgeven's"
   },
   "truth": {
-   "lat": 43.78163,
-   "lon": -70.199569,
+   "lat": 44.38198011,
+   "lon": -69.29741726,
    "radius_m": 300
   },
   "base_id": 1055,
@@ -30445,11 +30445,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "ttuck renfal pehski"
+   "text": "bonie hirt"
   },
   "truth": {
-   "lat": 44.82451876,
-   "lon": -68.75897217,
+   "lat": 43.86198242220213,
+   "lon": -70.10562240970796,
    "radius_m": 300
   },
   "base_id": 1134,
@@ -30461,11 +30461,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "insugance pitriot"
+   "text": "blal element t"
   },
   "truth": {
-   "lat": 43.80301554,
-   "lon": -70.18191736,
+   "lat": 43.91123841,
+   "lon": -69.97573844,
    "radius_m": 300
   },
   "base_id": 1378,
@@ -30477,11 +30477,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "vicum lx jef's"
+   "text": "hahand streat kingrigatiohal chirvh"
   },
   "truth": {
-   "lat": 44.1845764,
-   "lon": -69.11931406,
+   "lat": 44.80096019,
+   "lon": -68.77417537,
    "radius_m": 300
   },
   "base_id": 1130,
@@ -30493,11 +30493,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "kegyral miime sporys"
+   "text": "kiha"
   },
   "truth": {
-   "lat": 44.3210978,
-   "lon": -69.82368018,
+   "lat": 43.08600168954892,
+   "lon": -70.74299391602509,
    "radius_m": 300
   },
   "base_id": 1179,
@@ -30509,11 +30509,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "the corner "
+   "text": "1909 ho the"
   },
   "truth": {
-   "lat": 45.45881808,
-   "lon": -69.59178355,
+   "lat": 44.77152708097523,
+   "lon": -69.7220336907615,
    "radius_m": 300
   },
   "base_id": 1340,
@@ -30525,11 +30525,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "kunubugl family "
+   "text": "yoa su if"
   },
   "truth": {
-   "lat": 43.38428154,
-   "lon": -70.54492681,
+   "lat": 43.94785006,
+   "lon": -70.19978593,
    "radius_m": 300
   },
   "base_id": 1374,
@@ -30541,11 +30541,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "flor grownd"
+   "text": "froapart mind-body figgas/gufotanik studio in frepart"
   },
   "truth": {
-   "lat": 43.8582426,
-   "lon": -70.10094733,
+   "lat": 43.85468718,
+   "lon": -70.10759444,
    "radius_m": 300
   },
   "base_id": 1070,
@@ -30557,11 +30557,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "station rainion"
+   "text": "slieit hiluaeab, kruckers corner"
   },
   "truth": {
-   "lat": 44.06077244,
-   "lon": -69.49642696,
+   "lat": 43.6345183773483,
+   "lon": -70.336337880139,
    "radius_m": 300
   },
   "base_id": 1154,
@@ -30573,11 +30573,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "on 26 an borg"
+   "text": "k party"
   },
   "truth": {
-   "lat": 43.93233153185235,
-   "lon": -70.35288339118601,
+   "lat": 44.347132,
+   "lon": -69.789185,
    "radius_m": 300
   },
   "base_id": 1352,
@@ -30589,11 +30589,11 @@
   "qtype": "fuzz",
   "kind": "venue",
   "params": {
-   "text": "peotekhors inc toth"
+   "text": "wagars auyo sales and sarvike stip"
   },
   "truth": {
-   "lat": 44.074457,
-   "lon": -70.1757984,
+   "lat": 43.73195802,
+   "lon": -70.58819736,
    "radius_m": 300
   },
   "base_id": 1180,

@@ -14755,11 +14755,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Hamblin Hill"
+   "text": "Withee Pond"
   },
   "truth": {
-   "lat": 44.1960853,
-   "lon": -70.8924621,
+   "lat": 45.0866752,
+   "lon": -69.7733146,
    "radius_m": 4000
   }
  },
@@ -14769,11 +14769,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Hanson Pondd"
+   "text": "Black Nubble, Carrabassett Valleg"
   },
   "truth": {
-   "lat": 44.6872952,
-   "lon": -68.6491971,
+   "lat": 44.9998039,
+   "lon": -70.2568351,
    "radius_m": 4000
   }
  },
@@ -14783,11 +14783,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Tilden Pond"
+   "text": "Hall Hill, North Berwick"
   },
   "truth": {
-   "lat": 44.3676674,
-   "lon": -69.1124231,
+   "lat": 43.2777442,
+   "lon": -70.7680788,
    "radius_m": 4000
   }
  },
@@ -14797,11 +14797,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "High Cut"
+   "text": "Johns Pond, Davis Town"
   },
   "truth": {
-   "lat": 45.0768356,
-   "lon": -69.1315286,
+   "lat": 45.0697749,
+   "lon": -70.7914576,
    "radius_m": 4000
   }
  },
@@ -14811,11 +14811,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "bossy mountain"
+   "text": "davis pond, northwest somerset"
   },
   "truth": {
-   "lat": 47.2186304,
-   "lon": -68.6890099,
+   "lat": 45.3929318,
+   "lon": -70.3986944,
    "radius_m": 4000
   }
  },
@@ -14825,11 +14825,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Selmore Pond"
+   "text": "Meadow Pond, Islesboro"
   },
   "truth": {
-   "lat": 45.196334,
-   "lon": -68.0464594,
+   "lat": 44.3566458,
+   "lon": -68.8992566,
    "radius_m": 4000
   }
  },
@@ -14839,11 +14839,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Great Pond"
+   "text": "Taylor Brook Pond"
   },
   "truth": {
-   "lat": 44.6500788,
-   "lon": -67.2927648,
+   "lat": 44.7804178,
+   "lon": -67.8435757,
    "radius_m": 4000
   }
  },
@@ -14853,11 +14853,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Gray Pond"
+   "text": "Sewall Hill"
   },
   "truth": {
-   "lat": 44.863057,
-   "lon": -68.0435815,
+   "lat": 43.132024,
+   "lon": -70.6622742,
    "radius_m": 4000
   }
  },
@@ -14867,11 +14867,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "C Pond"
+   "text": "South Twin Mountain"
   },
   "truth": {
-   "lat": 44.7176418,
-   "lon": -70.8819261,
+   "lat": 44.6040651,
+   "lon": -70.6132753,
    "radius_m": 4000
   }
  },
@@ -14881,11 +14881,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Pym Pond"
+   "text": "Chase Stream Pond, West Forks Plantation"
   },
   "truth": {
-   "lat": 45.8394333,
-   "lon": -69.1372476,
+   "lat": 45.4648056,
+   "lon": -69.9008404,
    "radius_m": 4000
   }
  },
@@ -14895,11 +14895,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "witham mountain"
+   "text": "larrabee mountain"
   },
   "truth": {
-   "lat": 45.0792008,
-   "lon": -70.0884596,
+   "lat": 43.921891,
+   "lon": -70.6492895,
    "radius_m": 4000
   }
  },
@@ -14909,11 +14909,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "West Carry Pond"
+   "text": "Caldin Hill"
   },
   "truth": {
-   "lat": 45.1689736,
-   "lon": -70.1112333,
+   "lat": 44.6940909,
+   "lon": -70.2679895,
    "radius_m": 4000
   }
  },
@@ -14923,11 +14923,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "McLean Mountain"
+   "text": "Horseshoe Pond, Earley Landing"
   },
   "truth": {
-   "lat": 47.1178732,
-   "lon": -68.8516938,
+   "lat": 45.2869171,
+   "lon": -69.3765729,
    "radius_m": 4000
   }
  },
@@ -14937,11 +14937,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Deeeer Pond"
+   "text": "Doowns Hilll, North Buckfield"
   },
   "truth": {
-   "lat": 45.3163336,
-   "lon": -70.9349132,
+   "lat": 44.3177942,
+   "lon": -70.401182,
    "radius_m": 4000
   }
  },
@@ -14951,11 +14951,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Joson Mountain"
+   "text": "Haorn Pond"
   },
   "truth": {
-   "lat": 44.6073861,
-   "lon": -67.4528757,
+   "lat": 46.0071508,
+   "lon": -68.7669365,
    "radius_m": 4000
   }
  },
@@ -14965,11 +14965,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Hills Pond"
+   "text": "Ladd Pond"
   },
   "truth": {
-   "lat": 44.6686652,
-   "lon": -70.3513214,
+   "lat": 44.6228955,
+   "lon": -69.9006302,
    "radius_m": 4000
   }
  },
@@ -14979,11 +14979,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "Ackley Pond"
+   "text": "Bishop Hill"
   },
   "truth": {
-   "lat": 46.0882461,
-   "lon": -68.5321165,
+   "lat": 44.2942209,
+   "lon": -70.0829496,
    "radius_m": 4000
   }
  },
@@ -14993,11 +14993,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "Mill Privilege Lake"
+   "text": "Middle Branch Pond, Waterboro"
   },
   "truth": {
-   "lat": 45.342873,
-   "lon": -68.0180254,
+   "lat": 43.5561479,
+   "lon": -70.7756264,
    "radius_m": 4000
   }
  },
@@ -15007,11 +15007,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Black Ca Pond"
+   "text": "Turner Pond, Livrore Falls"
   },
   "truth": {
-   "lat": 46.314775,
-   "lon": -68.4597877,
+   "lat": 44.4339533,
+   "lon": -70.1223092,
    "radius_m": 4000
   }
  },
@@ -15021,11 +15021,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Horse Hill"
+   "text": "Norton Pond, Knights Landing"
   },
   "truth": {
-   "lat": 44.178761,
-   "lon": -70.5489895,
+   "lat": 45.3717264,
+   "lon": -68.9696469,
    "radius_m": 4000
   }
  },
@@ -15035,11 +15035,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Yeaton Hill"
+   "text": "Little Sabattus Pond"
   },
   "truth": {
-   "lat": 43.4946367,
-   "lon": -70.7375684,
+   "lat": 44.2110369,
+   "lon": -70.1355663,
    "radius_m": 4000
   }
  },
@@ -15049,11 +15049,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "Pond Little Mountain Catcher"
+   "text": "Pond Little Falls"
   },
   "truth": {
-   "lat": 46.2114134,
-   "lon": -68.7663323,
+   "lat": 47.1816687,
+   "lon": -69.1063249,
    "radius_m": 4000
   }
  },
@@ -15063,11 +15063,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Mud Pond"
+   "text": "Farrow Lake"
   },
   "truth": {
-   "lat": 45.6679554,
-   "lon": -69.0109466,
+   "lat": 45.4253968,
+   "lon": -67.7660586,
    "radius_m": 4000
   }
  },
@@ -15077,11 +15077,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "Pond Downing"
+   "text": "jay hill"
   },
   "truth": {
-   "lat": 44.6140113,
-   "lon": -67.9980128,
+   "lat": 44.5146344,
+   "lon": -70.2259143,
    "radius_m": 4000
   }
  },
@@ -15091,11 +15091,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Fresh Pond"
+   "text": "Fifth Musquacook Lake"
   },
   "truth": {
-   "lat": 44.345159,
-   "lon": -68.7915825,
+   "lat": 46.5465082,
+   "lon": -69.1099686,
    "radius_m": 4000
   }
  },
@@ -15105,11 +15105,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "First Crier Pond"
+   "text": "Upperr Blufer Pond"
   },
   "truth": {
-   "lat": 46.418477,
-   "lon": -69.09892,
+   "lat": 46.3596243,
+   "lon": -69.1247674,
    "radius_m": 4000
   }
  },
@@ -15119,11 +15119,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "mann pond"
+   "text": "Cranberry Pond, Oxbow"
   },
   "truth": {
-   "lat": 43.6087199,
-   "lon": -70.870007,
+   "lat": 46.3271229,
+   "lon": -68.4457072,
    "radius_m": 4000
   }
  },
@@ -15133,11 +15133,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Powres Mountain"
+   "text": "Yrork Ridge"
   },
   "truth": {
-   "lat": 43.989541,
-   "lon": -69.9374899,
+   "lat": 46.6544325,
+   "lon": -68.3313674,
    "radius_m": 4000
   }
  },
@@ -15147,11 +15147,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Isxiahh Hill"
+   "text": "Canotn Mountain"
   },
   "truth": {
-   "lat": 44.2058633,
-   "lon": -70.6049987,
+   "lat": 44.5078326,
+   "lon": -70.3031161,
    "radius_m": 4000
   }
  },
@@ -15161,11 +15161,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Beeech Hill"
+   "text": "Muf Pon, Wheelock Mill"
   },
   "truth": {
-   "lat": 45.5923557,
-   "lon": -68.3114126,
+   "lat": 46.9471499,
+   "lon": -68.9376555,
    "radius_m": 4000
   }
  },
@@ -15175,11 +15175,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Red Rock Mountain"
+   "text": "Cunningham Mountain, Hibberts"
   },
   "truth": {
-   "lat": 44.309501,
-   "lon": -70.8983193,
+   "lat": 44.324648,
+   "lon": -69.4099165,
    "radius_m": 4000
   }
  },
@@ -15189,11 +15189,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Labbe Pond"
+   "text": "Pleasant Mountain, Houghton"
   },
   "truth": {
-   "lat": 47.146383,
-   "lon": -68.6264401,
+   "lat": 44.7344647,
+   "lon": -70.6908308,
    "radius_m": 4000
   }
  },
@@ -15203,11 +15203,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "Pond Sandy"
+   "text": "pond white"
   },
   "truth": {
-   "lat": 44.9089211,
-   "lon": -69.919258,
+   "lat": 46.8092365,
+   "lon": -69.6194883,
    "radius_m": 4000
   }
  },
@@ -15217,11 +15217,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Varney Hill"
+   "text": "Turner Hill, Wyman"
   },
   "truth": {
-   "lat": 45.2490907,
-   "lon": -68.4819501,
+   "lat": 44.502847,
+   "lon": -67.8625007,
    "radius_m": 4000
   }
  },
@@ -15231,11 +15231,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "Lake Second Musquacook"
+   "text": "Brush Mountain"
   },
   "truth": {
-   "lat": 46.6338666,
-   "lon": -69.1736999,
+   "lat": 44.7039534,
+   "lon": -70.5743919,
    "radius_m": 4000
   }
  },
@@ -15245,11 +15245,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Iron Mine Hill"
+   "text": "Browns Pond"
   },
   "truth": {
-   "lat": 44.2126853,
-   "lon": -69.7847859,
+   "lat": 43.9129819,
+   "lon": -70.7277363,
    "radius_m": 4000
   }
  },
@@ -15259,11 +15259,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Roberts Hill"
+   "text": "Little Fish Ponds"
   },
   "truth": {
-   "lat": 44.5685109,
-   "lon": -69.0793099,
+   "lat": 45.9077405,
+   "lon": -70.2473704,
    "radius_m": 4000
   }
  },
@@ -15273,11 +15273,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Little Bear Pond"
+   "text": "Big Rocks"
   },
   "truth": {
-   "lat": 44.3535201,
-   "lon": -70.2903553,
+   "lat": 44.2434048,
+   "lon": -68.3361283,
    "radius_m": 4000
   }
  },
@@ -15287,11 +15287,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Sunday River Whitecap"
+   "text": "Weymouth Hill"
   },
   "truth": {
-   "lat": 44.5489609,
-   "lon": -70.8966993,
+   "lat": 44.228601,
+   "lon": -70.8085394,
    "radius_m": 4000
   }
  },
@@ -15301,11 +15301,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Spencer Pond"
+   "text": "Oak Hill, Fryeburg"
   },
   "truth": {
-   "lat": 45.1669651,
-   "lon": -68.1640027,
+   "lat": 44.00053,
+   "lon": -70.9566,
    "radius_m": 4000
   }
  },
@@ -15315,11 +15315,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Scraggly Lake"
+   "text": "Beech Hill, Mercer"
   },
   "truth": {
-   "lat": 45.3254541,
-   "lon": -67.9556275,
+   "lat": 44.6485993,
+   "lon": -69.9034536,
    "radius_m": 4000
   }
  },
@@ -15329,11 +15329,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "pond dyer"
+   "text": "long pond, new city"
   },
   "truth": {
-   "lat": 43.8954626,
-   "lon": -70.8963756,
+   "lat": 46.0000758,
+   "lon": -68.9242379,
    "radius_m": 4000
   }
  },
@@ -15343,11 +15343,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Caterpillar Mountain"
+   "text": "Big Robar Pond"
   },
   "truth": {
-   "lat": 44.3302709,
-   "lon": -68.6685401,
+   "lat": 45.9904093,
+   "lon": -68.7476178,
    "radius_m": 4000
   }
  },
@@ -15357,11 +15357,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Morrill Hill"
+   "text": "Spruce Mountain, Beddington"
   },
   "truth": {
-   "lat": 44.5959392,
-   "lon": -69.9085824,
+   "lat": 44.8360968,
+   "lon": -68.0322945,
    "radius_m": 4000
   }
  },
@@ -15371,11 +15371,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Saj Hill Lake"
+   "text": "Upper Carnberry Lake"
   },
   "truth": {
-   "lat": 44.9108095,
-   "lon": -67.7502073,
+   "lat": 44.9280702,
+   "lon": -67.9551864,
    "radius_m": 4000
   }
  },
@@ -15385,11 +15385,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Poland Pond"
+   "text": "Sabino Hill"
   },
   "truth": {
-   "lat": 46.2516287,
-   "lon": -69.582251,
+   "lat": 43.7444906,
+   "lon": -69.7920756,
    "radius_m": 4000
   }
  },
@@ -15399,11 +15399,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Hobbs Hill"
+   "text": "Little Mountain, Sunset"
   },
   "truth": {
-   "lat": 44.1179412,
-   "lon": -70.6563851,
+   "lat": 44.2296609,
+   "lon": -68.7851301,
    "radius_m": 4000
   }
  },
@@ -15413,11 +15413,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Hoorbneam Hill"
+   "text": "Newtowg Hill"
   },
   "truth": {
-   "lat": 44.041781,
-   "lon": -69.9556497,
+   "lat": 43.835411,
+   "lon": -69.7879297,
    "radius_m": 4000
   }
  },
@@ -15427,11 +15427,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Isaiah Mountain"
+   "text": "Youngs Pond"
   },
   "truth": {
-   "lat": 44.2819222,
-   "lon": -70.8754577,
+   "lat": 44.7165898,
+   "lon": -68.4476393,
    "radius_m": 4000
   }
  },
@@ -15441,11 +15441,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Bottle Monuain"
+   "text": "Debullie Pond"
   },
   "truth": {
-   "lat": 45.1832616,
-   "lon": -70.8957401,
+   "lat": 46.9649201,
+   "lon": -68.8577754,
    "radius_m": 4000
   }
  },
@@ -15455,11 +15455,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Burnt Pond"
+   "text": "Seboeis Deadwater"
   },
   "truth": {
-   "lat": 44.7459627,
-   "lon": -68.5273792,
+   "lat": 46.2044909,
+   "lon": -68.5892065,
    "radius_m": 4000
   }
  },
@@ -15469,11 +15469,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Jackson Hill"
+   "text": "Common Hill"
   },
   "truth": {
-   "lat": 44.3169709,
-   "lon": -68.97951,
+   "lat": 44.6344867,
+   "lon": -69.1854028,
    "radius_m": 4000
   }
  },
@@ -15483,11 +15483,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "Pond Lane"
+   "text": "pond rideout"
   },
   "truth": {
-   "lat": 45.9458704,
-   "lon": -70.0779955,
+   "lat": 47.2967712,
+   "lon": -69.2907773,
    "radius_m": 4000
   }
  },
@@ -15497,11 +15497,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Mount Zircon"
+   "text": "Mile Pond"
   },
   "truth": {
-   "lat": 44.4742634,
-   "lon": -70.5589007,
+   "lat": 46.357253,
+   "lon": -69.5811375,
    "radius_m": 4000
   }
  },
@@ -15511,11 +15511,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Pemauqid Pond"
+   "text": "Gould Ponw, New Limericck"
   },
   "truth": {
-   "lat": 44.0190588,
-   "lon": -69.4536018,
+   "lat": 46.1133175,
+   "lon": -68.0174244,
    "radius_m": 4000
   }
  },
@@ -15525,11 +15525,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Big Heth"
+   "text": "Prkic Pond"
   },
   "truth": {
-   "lat": 44.7205456,
-   "lon": -67.6544691,
+   "lat": 45.4448493,
+   "lon": -70.516466,
    "radius_m": 4000
   }
  },
@@ -15539,11 +15539,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Webb Roowe Mountai"
+   "text": "Bond Mountin"
   },
   "truth": {
-   "lat": 43.864858,
-   "lon": -70.6984738,
+   "lat": 43.6246811,
+   "lon": -70.9016379,
    "radius_m": 4000
   }
  },
@@ -15553,11 +15553,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Lily Pond"
+   "text": "West Georgetown Hill"
   },
   "truth": {
-   "lat": 43.6599629,
-   "lon": -70.6369016,
+   "lat": 43.8005337,
+   "lon": -69.7786372,
    "radius_m": 4000
   }
  },
@@ -15567,11 +15567,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Butcher Lake"
+   "text": "Shaw Hill"
   },
   "truth": {
-   "lat": 45.4689223,
-   "lon": -67.6640598,
+   "lat": 44.1268088,
+   "lon": -70.3132539,
    "radius_m": 4000
   }
  },
@@ -15581,11 +15581,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Haysttack Mountain"
+   "text": "Feloows Pond"
   },
   "truth": {
-   "lat": 44.3977409,
-   "lon": -69.3085899,
+   "lat": 44.5264156,
+   "lon": -70.0833493,
    "radius_m": 4000
   }
  },
@@ -15595,11 +15595,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Balddwin Hill"
+   "text": "Lily Pond, South Broksville"
   },
   "truth": {
-   "lat": 44.4325571,
-   "lon": -70.0756107,
+   "lat": 44.3297569,
+   "lon": -68.7111745,
    "radius_m": 4000
   }
  },
@@ -15609,11 +15609,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "Pond Round"
+   "text": "partridge pond, amherst"
   },
   "truth": {
-   "lat": 45.3567044,
-   "lon": -70.7052519,
+   "lat": 44.8604397,
+   "lon": -68.4037283,
    "radius_m": 4000
   }
  },
@@ -15623,11 +15623,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "Mud Pond"
+   "text": "Chesuncook Lake"
   },
   "truth": {
-   "lat": 45.4351016,
-   "lon": -69.5134089,
+   "lat": 45.987437,
+   "lon": -69.3348043,
    "radius_m": 4000
   }
  },
@@ -15637,11 +15637,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Cockle Hill"
+   "text": "Little Northwest Pond"
   },
   "truth": {
-   "lat": 43.2348745,
-   "lon": -70.6357375,
+   "lat": 45.3011297,
+   "lon": -70.7954666,
    "radius_m": 4000
   }
  },
@@ -15651,11 +15651,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Jones Hill"
+   "text": "Holland Pond"
   },
   "truth": {
-   "lat": 43.7669491,
-   "lon": -70.3732802,
+   "lat": 45.0451754,
+   "lon": -68.7505769,
    "radius_m": 4000
   }
  },
@@ -15665,11 +15665,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "Johns Pond"
+   "text": "Lake Goulding"
   },
   "truth": {
-   "lat": 45.3844981,
-   "lon": -70.1510778,
+   "lat": 45.073329,
+   "lon": -67.1857119,
    "radius_m": 4000
   }
  },
@@ -15679,11 +15679,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Conary Head"
+   "text": "Pine Hill, Fayette Corner"
   },
   "truth": {
-   "lat": 44.2312309,
-   "lon": -68.5814801,
+   "lat": 44.4479809,
+   "lon": -70.0832396,
    "radius_m": 4000
   }
  },
@@ -15693,11 +15693,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Weir Pond"
+   "text": "Brown Hill, Raymond"
   },
   "truth": {
-   "lat": 45.3383733,
-   "lon": -68.229827,
+   "lat": 43.916461,
+   "lon": -70.4846195,
    "radius_m": 4000
   }
  },
@@ -15707,11 +15707,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Southeast Pond"
+   "text": "Lower Partridge Pond"
   },
   "truth": {
-   "lat": 43.8835754,
-   "lon": -70.744644,
+   "lat": 46.3700757,
+   "lon": -69.167598,
    "radius_m": 4000
   }
  },
@@ -15721,11 +15721,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "dike peak"
+   "text": "Sargent Mountain, Mount Desert"
   },
   "truth": {
-   "lat": 44.3363309,
-   "lon": -68.2262102,
+   "lat": 44.3429351,
+   "lon": -68.2732203,
    "radius_m": 4000
   }
  },
@@ -15735,11 +15735,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Louise Muntain"
+   "text": "Zion Hilll"
   },
   "truth": {
-   "lat": 45.4308153,
-   "lon": -70.7814633,
+   "lat": 44.5778313,
+   "lon": -70.1017252,
    "radius_m": 4000
   }
  },
@@ -15749,11 +15749,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Frost Mountain"
+   "text": "Fuller Mountain"
   },
   "truth": {
-   "lat": 43.952791,
-   "lon": -70.9173394,
+   "lat": 43.8146738,
+   "lon": -69.8373328,
    "radius_m": 4000
   }
  },
@@ -15763,11 +15763,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Big Beaver Pond"
+   "text": "Plunkett Pond"
   },
   "truth": {
-   "lat": 46.2633285,
-   "lon": -68.8615675,
+   "lat": 45.785145,
+   "lon": -68.367811,
    "radius_m": 4000
   }
  },
@@ -15777,11 +15777,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Great Hill"
+   "text": "Stafford Pond"
   },
   "truth": {
-   "lat": 44.3859422,
-   "lon": -68.2318132,
+   "lat": 44.8911979,
+   "lon": -69.5037708,
    "radius_m": 4000
   }
  },
@@ -15791,11 +15791,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Great Moose Lake"
+   "text": "Stetson Pond"
   },
   "truth": {
-   "lat": 44.9230285,
-   "lon": -69.5172258,
+   "lat": 44.8482106,
+   "lon": -70.4774848,
    "radius_m": 4000
   }
  },
@@ -15805,11 +15805,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Pooler Ponds"
+   "text": "Soule Pond"
   },
   "truth": {
-   "lat": 45.2910508,
-   "lon": -69.9899155,
+   "lat": 46.2747876,
+   "lon": -68.8165277,
    "radius_m": 4000
   }
  },
@@ -15819,11 +15819,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Moose Pond"
+   "text": "Sandy Bay Mountain"
   },
   "truth": {
-   "lat": 45.7346411,
-   "lon": -68.9179247,
+   "lat": 45.7542299,
+   "lon": -70.3936425,
    "radius_m": 4000
   }
  },
@@ -15833,11 +15833,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "lake tenmile"
+   "text": "boyd pond, bristol"
   },
   "truth": {
-   "lat": 45.938406,
-   "lon": -67.96925,
+   "lat": 43.9323565,
+   "lon": -69.4994856,
    "radius_m": 4000
   }
  },
@@ -15847,11 +15847,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Upper Portage Pnd"
+   "text": "Snow Mountain, Whtes Corner"
   },
   "truth": {
-   "lat": 46.4489269,
-   "lon": -69.1447769,
+   "lat": 44.6579208,
+   "lon": -68.94722,
    "radius_m": 4000
   }
  },
@@ -15861,11 +15861,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Gilman Pond"
+   "text": "Lunksoos Mountain"
   },
   "truth": {
-   "lat": 44.9580266,
-   "lon": -70.0543385,
+   "lat": 45.9583006,
+   "lon": -68.68061,
    "radius_m": 4000
   }
  },
@@ -15875,11 +15875,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Joes Hoel"
+   "text": "Garddiner Pond"
   },
   "truth": {
-   "lat": 45.2508862,
-   "lon": -69.8253359,
+   "lat": 44.064792,
+   "lon": -69.7000324,
    "radius_m": 4000
   }
  },
@@ -15889,11 +15889,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Longfellow Lakw"
+   "text": "Sawyer Moumtain, Suoth Arm"
   },
   "truth": {
-   "lat": 45.7660274,
-   "lon": -67.8514153,
+   "lat": 44.7119709,
+   "lon": -70.7857394,
    "radius_m": 4000
   }
  },
@@ -15903,11 +15903,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Deer Bog"
+   "text": "Cobble Hill, Carthage"
   },
   "truth": {
-   "lat": 45.2060301,
-   "lon": -69.9195189,
+   "lat": 44.6661627,
+   "lon": -70.4889541,
    "radius_m": 4000
   }
  },
@@ -15917,11 +15917,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Chandler Hill"
+   "text": "Crow Hill, Burdin Corner"
   },
   "truth": {
-   "lat": 45.0004108,
-   "lon": -70.0166096,
+   "lat": 45.1093527,
+   "lon": -69.5061565,
    "radius_m": 4000
   }
  },
@@ -15931,11 +15931,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Clark Mountain"
+   "text": "Haskell Pond"
   },
   "truth": {
-   "lat": 43.7292815,
-   "lon": -70.7856594,
+   "lat": 43.6766454,
+   "lon": -70.3540697,
    "radius_m": 4000
   }
  },
@@ -15945,11 +15945,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Whiehtead Lake"
+   "text": "Fihs Pond, Northwest Somesret"
   },
   "truth": {
-   "lat": 46.4554891,
-   "lon": -67.8632663,
+   "lat": 45.4429791,
+   "lon": -70.2971858,
    "radius_m": 4000
   }
  },
@@ -15959,11 +15959,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Mudd Pond"
+   "text": "Enchanted Pod"
   },
   "truth": {
-   "lat": 45.5482014,
-   "lon": -68.1211548,
+   "lat": 45.4339418,
+   "lon": -70.1849474,
    "radius_m": 4000
   }
  },
@@ -15973,11 +15973,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "Pond Little"
+   "text": "macdougall pond"
   },
   "truth": {
-   "lat": 45.9615697,
-   "lon": -69.4410479,
+   "lat": 45.1723818,
+   "lon": -69.9843287,
    "radius_m": 4000
   }
  },
@@ -15987,11 +15987,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "snow mountain"
+   "text": "jim hill"
   },
   "truth": {
-   "lat": 45.2914208,
-   "lon": -70.7092693,
+   "lat": 44.216741,
+   "lon": -70.6172194,
    "radius_m": 4000
   }
  },
@@ -16001,11 +16001,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Otter Ponc"
+   "text": "Towen Pond"
   },
   "truth": {
-   "lat": 45.8564557,
-   "lon": -69.3557988,
+   "lat": 45.3022863,
+   "lon": -69.5242834,
    "radius_m": 4000
   }
  },
@@ -16015,11 +16015,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Pickerel Pond"
+   "text": "Little Penobscot Pond"
   },
   "truth": {
-   "lat": 45.4670738,
-   "lon": -67.7598152,
+   "lat": 45.6799815,
+   "lon": -69.1782677,
    "radius_m": 4000
   }
  },
@@ -16029,11 +16029,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Meadow Pond"
+   "text": "Jerusalem Mountain"
   },
   "truth": {
-   "lat": 45.3450306,
-   "lon": -69.4657716,
+   "lat": 44.0499809,
+   "lon": -68.6228901,
    "radius_m": 4000
   }
  },
@@ -16043,11 +16043,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Skilly Hills"
+   "text": "Great Hill, Lower Village"
   },
   "truth": {
-   "lat": 43.5867398,
-   "lon": -70.4756071,
+   "lat": 43.3440346,
+   "lon": -70.5130859,
    "radius_m": 4000
   }
  },
@@ -16057,11 +16057,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Lost Pond"
+   "text": "Third Lake, North Washington"
   },
   "truth": {
-   "lat": 45.3647244,
-   "lon": -70.4136993,
+   "lat": 45.0202141,
+   "lon": -67.7967975,
    "radius_m": 4000
   }
  },
@@ -16071,11 +16071,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Howe Peak"
+   "text": "Second Musquacook Lake"
   },
   "truth": {
-   "lat": 46.0708706,
-   "lon": -68.9982999,
+   "lat": 46.6338666,
+   "lon": -69.1736999,
    "radius_m": 4000
   }
  },
@@ -16085,11 +16085,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "Lake Little Black Brook"
+   "text": "burnt meadow mountains"
   },
   "truth": {
-   "lat": 47.0131209,
-   "lon": -67.8923468,
+   "lat": 43.9103799,
+   "lon": -70.9088852,
    "radius_m": 4000
   }
  },
@@ -16099,11 +16099,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Bear Mountain"
+   "text": "Mud Pond, Skillings Corner"
   },
   "truth": {
-   "lat": 44.669924,
-   "lon": -69.7520049,
+   "lat": 44.2198675,
+   "lon": -70.2980186,
    "radius_m": 4000
   }
  },
@@ -16113,11 +16113,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Parker Pond"
+   "text": "Camp Pond"
   },
   "truth": {
-   "lat": 44.5085098,
-   "lon": -70.1418107,
+   "lat": 45.4291257,
+   "lon": -69.2687466,
    "radius_m": 4000
   }
  },
@@ -16127,11 +16127,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Fort Hill"
+   "text": "Center Hill, Temple"
   },
   "truth": {
-   "lat": 43.6481294,
-   "lon": -70.2286585,
+   "lat": 44.6858109,
+   "lon": -70.2918495,
    "radius_m": 4000
   }
  },
@@ -16141,11 +16141,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "Long Logan"
+   "text": "Philbrick Mountain"
   },
   "truth": {
-   "lat": 45.0214432,
-   "lon": -70.6653459,
+   "lat": 44.2732311,
+   "lon": -69.1979714,
    "radius_m": 4000
   }
  },
@@ -16155,11 +16155,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Crooked Brook Lake"
+   "text": "Smith Brook Pond, Round Mountain"
   },
   "truth": {
-   "lat": 45.5519987,
-   "lon": -67.7217126,
+   "lat": 46.4623066,
+   "lon": -68.9716513,
    "radius_m": 4000
   }
  },
@@ -16169,11 +16169,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "McDaniels Hill"
+   "text": "Brayley Pond"
   },
   "truth": {
-   "lat": 44.203231,
-   "lon": -70.8589402,
+   "lat": 46.2268829,
+   "lon": -69.0304188,
    "radius_m": 4000
   }
  },
@@ -16183,11 +16183,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Hay Pond"
+   "text": "Eagles Crag"
   },
   "truth": {
-   "lat": 46.167187,
-   "lon": -68.7515527,
+   "lat": 44.3258509,
+   "lon": -68.2197302,
    "radius_m": 4000
   }
  },
@@ -16197,11 +16197,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "little madagascal pond"
+   "text": "Pond Kelly"
   },
   "truth": {
-   "lat": 45.3090174,
-   "lon": -68.3337248,
+   "lat": 45.805174,
+   "lon": -69.2289184,
    "radius_m": 4000
   }
  },
@@ -16211,11 +16211,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Round Pond"
+   "text": "Mount Seeall"
   },
   "truth": {
-   "lat": 43.4017812,
-   "lon": -70.7584382,
+   "lat": 45.1161324,
+   "lon": -67.238463,
    "radius_m": 4000
   }
  },
@@ -16225,11 +16225,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Paark Hill"
+   "text": "Brimstoge Hill"
   },
   "truth": {
-   "lat": 44.4145109,
-   "lon": -69.0825399,
+   "lat": 43.8772933,
+   "lon": -70.0478277,
    "radius_m": 4000
   }
  },
@@ -16239,11 +16239,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Bradbury Mountain"
+   "text": "Forty Acre Hill"
   },
   "truth": {
-   "lat": 43.9023677,
-   "lon": -70.1818227,
+   "lat": 43.1140412,
+   "lon": -70.6933695,
    "radius_m": 4000
   }
  },
@@ -16253,11 +16253,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Berry Pond"
+   "text": "Pierce Hill, Polands Corner"
   },
   "truth": {
-   "lat": 44.333498,
-   "lon": -70.0231386,
+   "lat": 44.4620809,
+   "lon": -69.2312799,
    "radius_m": 4000
   }
  },
@@ -16267,11 +16267,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Whitney Hill"
+   "text": "Frost Hill, Sodom"
   },
   "truth": {
-   "lat": 44.183851,
-   "lon": -70.4847795,
+   "lat": 44.180821,
+   "lon": -70.6031595,
    "radius_m": 4000
   }
  },
@@ -16281,11 +16281,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "Holt Hill"
+   "text": "Midday Pond"
   },
   "truth": {
-   "lat": 44.2369178,
-   "lon": -70.6304288,
+   "lat": 45.3781942,
+   "lon": -69.4163261,
    "radius_m": 4000
   }
  },
@@ -16295,11 +16295,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "pond smith"
+   "text": "Howard Pond, Hanover"
   },
   "truth": {
-   "lat": 45.5672277,
-   "lon": -70.0259955,
+   "lat": 44.5062505,
+   "lon": -70.7223535,
    "radius_m": 4000
   }
  },
@@ -16309,11 +16309,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Howland Hill"
+   "text": "Short Pond"
   },
   "truth": {
-   "lat": 44.5633107,
-   "lon": -69.7807472,
+   "lat": 43.4736536,
+   "lon": -70.3866543,
    "radius_m": 4000
   }
  },
@@ -16323,11 +16323,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Sheell Pond"
+   "text": "Daerborn Hill"
   },
   "truth": {
-   "lat": 44.2447596,
-   "lon": -70.9711498,
+   "lat": 44.0018664,
+   "lon": -70.7087753,
    "radius_m": 4000
   }
  },
@@ -16337,11 +16337,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Torrey Hill"
+   "text": "Libby Pinnacle"
   },
   "truth": {
-   "lat": 43.8536047,
-   "lon": -70.0976546,
+   "lat": 46.344442,
+   "lon": -68.8405426,
    "radius_m": 4000
   }
  },
@@ -16351,11 +16351,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Hampshire Mountain"
+   "text": "Black Cap Mountain, Lobster"
   },
   "truth": {
-   "lat": 45.2604107,
-   "lon": -69.3647598,
+   "lat": 45.8342906,
+   "lon": -69.4219597,
    "radius_m": 4000
   }
  },
@@ -16365,11 +16365,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "Libby Hill"
+   "text": "Treat Hill"
   },
   "truth": {
-   "lat": 43.8007175,
-   "lon": -70.3640031,
+   "lat": 44.4837609,
+   "lon": -70.1964596,
    "radius_m": 4000
   }
  },
@@ -16379,11 +16379,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Roxbury Mountain"
+   "text": "Plummer Mountain"
   },
   "truth": {
-   "lat": 44.6413488,
-   "lon": -70.5307094,
+   "lat": 44.1162118,
+   "lon": -70.800689,
    "radius_m": 4000
   }
  },
@@ -16393,11 +16393,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Mount Tiee'm"
+   "text": "Hills Pind"
   },
   "truth": {
-   "lat": 44.1771556,
-   "lon": -70.7236928,
+   "lat": 44.6686652,
+   "lon": -70.3513214,
    "radius_m": 4000
   }
  },
@@ -16407,11 +16407,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Moody Pond"
+   "text": "Pickerel Pond, Alton"
   },
   "truth": {
-   "lat": 43.5624821,
-   "lon": -70.7387476,
+   "lat": 45.0465982,
+   "lon": -68.7700584,
    "radius_m": 4000
   }
  },
@@ -16421,11 +16421,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "McIntire Pond"
+   "text": "Horseshoe Pond, Shirley"
   },
   "truth": {
-   "lat": 44.5823161,
-   "lon": -69.9595273,
+   "lat": 45.364169,
+   "lon": -69.7714963,
    "radius_m": 4000
   }
  },
@@ -16435,11 +16435,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Robretts Pond"
+   "text": "Little Jphnson Pond"
   },
   "truth": {
-   "lat": 43.5362614,
-   "lon": -70.6420209,
+   "lat": 46.3255632,
+   "lon": -69.5929887,
    "radius_m": 4000
   }
  },
@@ -16449,11 +16449,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Morrison Knoll"
+   "text": "Spruce Mountain, Temple"
   },
   "truth": {
-   "lat": 44.7116153,
-   "lon": -68.3917919,
+   "lat": 44.7350409,
+   "lon": -70.3137095,
    "radius_m": 4000
   }
  },
@@ -16463,11 +16463,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Wity Hilk"
+   "text": "Ledge Hill, Saker Village"
   },
   "truth": {
-   "lat": 44.2889484,
-   "lon": -70.5981176,
+   "lat": 43.9704148,
+   "lon": -70.4102129,
    "radius_m": 4000
   }
  },
@@ -16477,11 +16477,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Upper Togue Pond"
+   "text": "Tea Mountain"
   },
   "truth": {
-   "lat": 45.8237943,
-   "lon": -68.8956835,
+   "lat": 45.2281712,
+   "lon": -70.5389367,
    "radius_m": 4000
   }
  },
@@ -16491,11 +16491,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "Lake Cross"
+   "text": "South Pond, Sandy River"
   },
   "truth": {
-   "lat": 47.270199,
-   "lon": -69.0510124,
+   "lat": 44.8677572,
+   "lon": -70.5574327,
    "radius_m": 4000
   }
  },
@@ -16505,11 +16505,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "Penknife Lakes"
+   "text": "Green Hill, Hildreths Mill"
   },
   "truth": {
-   "lat": 45.036094,
-   "lon": -67.2073448,
+   "lat": 44.6619604,
+   "lon": -70.4020749,
    "radius_m": 4000
   }
  },
@@ -16519,11 +16519,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Ber De Hill"
+   "text": "Mopang First Lak"
   },
   "truth": {
-   "lat": 44.9452168,
-   "lon": -68.4481049,
+   "lat": 44.8932857,
+   "lon": -67.9476733,
    "radius_m": 4000
   }
  },
@@ -16533,11 +16533,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Lake Onswa"
+   "text": "Sanborrn Hill"
   },
   "truth": {
-   "lat": 45.3748231,
-   "lon": -69.3793168,
+   "lat": 44.5139409,
+   "lon": -70.0617196,
    "radius_m": 4000
   }
  },
@@ -16547,11 +16547,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Mud Pond"
+   "text": "Celia Pond"
   },
   "truth": {
-   "lat": 45.3797007,
-   "lon": -70.7742891,
+   "lat": 45.8920281,
+   "lon": -69.0681775,
    "radius_m": 4000
   }
  },
@@ -16561,11 +16561,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Moose Pond"
+   "text": "Second Lake, North Washington"
   },
   "truth": {
-   "lat": 46.0742076,
-   "lon": -69.3439425,
+   "lat": 45.0117397,
+   "lon": -67.7913899,
    "radius_m": 4000
   }
  },
@@ -16575,11 +16575,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "pond north otter"
+   "text": "Little Dutton Pond"
   },
   "truth": {
-   "lat": 45.2752228,
-   "lon": -70.0363035,
+   "lat": 44.9040395,
+   "lon": -68.350958,
    "radius_m": 4000
   }
  },
@@ -16589,11 +16589,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Rayomnd Pondd"
+   "text": "Meadow Muontain, Pembroke"
   },
   "truth": {
-   "lat": 43.9705791,
-   "lon": -70.42842,
+   "lat": 44.9561018,
+   "lon": -67.1924431,
    "radius_m": 4000
   }
  },
@@ -16603,11 +16603,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Viles Ponr"
+   "text": "Upper Islav Pond"
   },
   "truth": {
-   "lat": 45.2821641,
-   "lon": -70.5577284,
+   "lat": 46.502188,
+   "lon": -69.0654469,
    "radius_m": 4000
   }
  },
@@ -16617,11 +16617,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Austin Ponx"
+   "text": "Flod Pond"
   },
   "truth": {
-   "lat": 45.2091039,
-   "lon": -69.7461941,
+   "lat": 44.7390022,
+   "lon": -68.4961173,
    "radius_m": 4000
   }
  },
@@ -16631,11 +16631,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "Lake Boyd"
+   "text": "Lake Falls Brook"
   },
   "truth": {
-   "lat": 45.1775923,
-   "lon": -68.9211978,
+   "lat": 47.1556551,
+   "lon": -69.0763564,
    "radius_m": 4000
   }
  },
@@ -16645,11 +16645,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "Dam Pond"
+   "text": "Ames Pond"
   },
   "truth": {
-   "lat": 45.4219929,
-   "lon": -69.2814374,
+   "lat": 44.159596,
+   "lon": -68.6482785,
    "radius_m": 4000
   }
  },
@@ -16659,11 +16659,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Spaulding Lake"
+   "text": "Millay Hill"
   },
   "truth": {
-   "lat": 46.1067084,
-   "lon": -68.103177,
+   "lat": 44.9340108,
+   "lon": -70.0921396,
    "radius_m": 4000
   }
  },
@@ -16673,11 +16673,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "Rollins Mountain"
+   "text": "meadowbrook pond"
   },
   "truth": {
-   "lat": 45.3872647,
-   "lon": -68.3637762,
+   "lat": 46.3462064,
+   "lon": -67.9330769,
    "radius_m": 4000
   }
  },
@@ -16687,11 +16687,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Orange Lake"
+   "text": "Shattuck Lake"
   },
   "truth": {
-   "lat": 44.7701073,
-   "lon": -67.2499532,
+   "lat": 45.1046857,
+   "lon": -67.1684786,
    "radius_m": 4000
   }
  },
@@ -16701,11 +16701,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Mountain View Pond"
+   "text": "White Horse Lake"
   },
   "truth": {
-   "lat": 45.6091065,
-   "lon": -69.1750778,
+   "lat": 46.2284609,
+   "lon": -68.5974865,
    "radius_m": 4000
   }
  },
@@ -16715,11 +16715,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Breakheart Hill"
+   "text": "Hastings Pond"
   },
   "truth": {
-   "lat": 43.729714,
-   "lon": -70.5652424,
+   "lat": 43.9119625,
+   "lon": -69.4923248,
    "radius_m": 4000
   }
  },
@@ -16729,11 +16729,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "caldin hill"
+   "text": "Sugar Hill, Eastbrook"
   },
   "truth": {
-   "lat": 44.6940909,
-   "lon": -70.2679895,
+   "lat": 44.6910677,
+   "lon": -68.1714012,
    "radius_m": 4000
   }
  },
@@ -16743,11 +16743,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Little Coffeelos Pond"
+   "text": "Dean Hill"
   },
   "truth": {
-   "lat": 46.1606556,
-   "lon": -69.1085389,
+   "lat": 44.0842292,
+   "lon": -70.4800574,
    "radius_m": 4000
   }
  },
@@ -16757,11 +16757,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Wiley Ponx"
+   "text": "Horrse Hill, Carroll"
   },
   "truth": {
-   "lat": 46.0012344,
-   "lon": -68.5396924,
+   "lat": 45.4000807,
+   "lon": -67.9269703,
    "radius_m": 4000
   }
  },
@@ -16771,11 +16771,11 @@
   "qtype": "typo",
   "kind": "lake_summit",
   "params": {
-   "text": "Cooldige Hill"
+   "text": "Lookout Mountain, North Penboscot"
   },
   "truth": {
-   "lat": 44.166758,
-   "lon": -70.6980302,
+   "lat": 45.9156106,
+   "lon": -68.60025,
    "radius_m": 4000
   }
  },
@@ -16785,11 +16785,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Big Moose Pond"
+   "text": "Shaw Mountain, Kineo"
   },
   "truth": {
-   "lat": 45.4543916,
-   "lon": -69.6795308,
+   "lat": 45.7197907,
+   "lon": -69.7087324,
    "radius_m": 4000
   }
  },
@@ -16799,11 +16799,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Brackett Hill"
+   "text": "Flying Hill"
   },
   "truth": {
-   "lat": 44.9528008,
-   "lon": -70.0903896,
+   "lat": 46.3262005,
+   "lon": -68.64997,
    "radius_m": 4000
   }
  },
@@ -16813,11 +16813,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Mount Veto"
+   "text": "Uncle Dick Hill"
   },
   "truth": {
-   "lat": 45.940779,
-   "lon": -69.0920503,
+   "lat": 44.3516809,
+   "lon": -68.3859002,
    "radius_m": 4000
   }
  },
@@ -16827,11 +16827,11 @@
   "qtype": "exact",
   "kind": "lake_summit",
   "params": {
-   "text": "Hunt Mountain"
+   "text": "Starks Mountain"
   },
   "truth": {
-   "lat": 45.8820811,
-   "lon": -68.6554183,
+   "lat": 44.0016174,
+   "lon": -70.9851796,
    "radius_m": 4000
   }
  },
@@ -16841,11 +16841,11 @@
   "qtype": "variant",
   "kind": "lake_summit",
   "params": {
-   "text": "Pond Pockwockamus"
+   "text": "red hill, west peru"
   },
   "truth": {
-   "lat": 45.7992662,
-   "lon": -68.8814121,
+   "lat": 44.5242774,
+   "lon": -70.4769538,
    "radius_m": 4000
   }
  },
@@ -16855,11 +16855,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Pupies Pause Traiging"
+   "text": "Suites by the Sda"
   },
   "truth": {
-   "lat": 44.3491868,
-   "lon": -69.7616422,
+   "lat": 44.28265987,
+   "lon": -69.00870737,
    "radius_m": 300
   }
  },
@@ -16869,11 +16869,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "AT&T"
+   "text": "Boyd Street Community Garden"
   },
   "truth": {
-   "lat": 43.6647340230556,
-   "lon": -70.26014867531654,
+   "lat": 43.66259988,
+   "lon": -70.25572513,
    "radius_m": 300
   }
  },
@@ -16883,11 +16883,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Eastern River Self Storage"
+   "text": "Alexander Kappelman"
   },
   "truth": {
-   "lat": 44.08380497862099,
-   "lon": -69.74253593404504,
+   "lat": 43.65936443,
+   "lon": -70.25139213,
    "radius_m": 300
   }
  },
@@ -16897,16 +16897,142 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Back Road Bakery"
+   "text": "Colby Woods Cattle"
   },
   "truth": {
-   "lat": 43.49047181,
-   "lon": -70.712269,
+   "lat": 44.56416415,
+   "lon": -70.14185603,
    "radius_m": 300
   }
  },
  {
   "id": 1055,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Steven's Pond"
+  },
+  "truth": {
+   "lat": 44.38198011,
+   "lon": -69.29741726,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 1056,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Augusta School Superintendent"
+  },
+  "truth": {
+   "lat": 44.31405831,
+   "lon": -69.74936059,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 1057,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Mrs. Smith’s Pianists"
+  },
+  "truth": {
+   "lat": 44.64516418,
+   "lon": -67.59655936,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 1058,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Edward Jones - Financial Advisor: Susan Heckaman, AAMS®"
+  },
+  "truth": {
+   "lat": 43.1500332928402,
+   "lon": -70.6660795211792,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 1059,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "Cafe This Wya, Bar Harbor"
+  },
+  "truth": {
+   "lat": 44.38684594,
+   "lon": -68.20528459,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 1060,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Circle K, Bethel"
+  },
+  "truth": {
+   "lat": 44.425044,
+   "lon": -70.796999,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 1061,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "Lksa Hammer"
+  },
+  "truth": {
+   "lat": 44.054394,
+   "lon": -69.500528,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 1062,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "Sandy Rivre Heath Systems"
+  },
+  "truth": {
+   "lat": 44.7815757,
+   "lon": -69.7058721,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 1063,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "Bethel Advfnture Tours"
+  },
+  "truth": {
+   "lat": 44.40448305,
+   "lon": -70.78714999,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 1064,
   "endpoint": "search",
   "qtype": "exact",
   "kind": "venue",
@@ -16920,142 +17046,16 @@
   }
  },
  {
-  "id": 1056,
-  "endpoint": "search",
-  "qtype": "exact",
-  "kind": "venue",
-  "params": {
-   "text": "Eastport Port Authority"
-  },
-  "truth": {
-   "lat": 44.907642624186046,
-   "lon": -66.98404384141627,
-   "radius_m": 300
-  }
- },
- {
-  "id": 1057,
-  "endpoint": "search",
-  "qtype": "exact",
-  "kind": "venue",
-  "params": {
-   "text": "Buxton United Methodist Church"
-  },
-  "truth": {
-   "lat": 43.7005503,
-   "lon": -70.55214356,
-   "radius_m": 300
-  }
- },
- {
-  "id": 1058,
-  "endpoint": "search",
-  "qtype": "exact",
-  "kind": "venue",
-  "params": {
-   "text": "Barking Dawg Market"
-  },
-  "truth": {
-   "lat": 44.47114607367254,
-   "lon": -70.84321258641373,
-   "radius_m": 300
-  }
- },
- {
-  "id": 1059,
-  "endpoint": "search",
-  "qtype": "typo",
-  "kind": "venue",
-  "params": {
-   "text": "Niche, Ic."
-  },
-  "truth": {
-   "lat": 44.2298355,
-   "lon": -69.7737288,
-   "radius_m": 300
-  }
- },
- {
-  "id": 1060,
-  "endpoint": "search",
-  "qtype": "exact",
-  "kind": "venue",
-  "params": {
-   "text": "All About Kids"
-  },
-  "truth": {
-   "lat": 43.846440046398484,
-   "lon": -70.44703427479148,
-   "radius_m": 300
-  }
- },
- {
-  "id": 1061,
-  "endpoint": "search",
-  "qtype": "typo",
-  "kind": "venue",
-  "params": {
-   "text": "Trrellis Health"
-  },
-  "truth": {
-   "lat": 43.6535291,
-   "lon": -70.3184755,
-   "radius_m": 300
-  }
- },
- {
-  "id": 1062,
-  "endpoint": "search",
-  "qtype": "typo",
-  "kind": "venue",
-  "params": {
-   "text": "Rebdx"
-  },
-  "truth": {
-   "lat": 44.2120289,
-   "lon": -70.5296447,
-   "radius_m": 300
-  }
- },
- {
-  "id": 1063,
-  "endpoint": "search",
-  "qtype": "typo",
-  "kind": "venue",
-  "params": {
-   "text": "Childreb's Center Early Intervention & Family Support"
-  },
-  "truth": {
-   "lat": 44.310823,
-   "lon": -69.80132,
-   "radius_m": 300
-  }
- },
- {
-  "id": 1064,
-  "endpoint": "search",
-  "qtype": "exact",
-  "kind": "venue",
-  "params": {
-   "text": "SS Guns and Ammo"
-  },
-  "truth": {
-   "lat": 46.120409,
-   "lon": -67.827992,
-   "radius_m": 300
-  }
- },
- {
   "id": 1065,
   "endpoint": "search",
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Clark's Cove Fqrm & Inn"
+   "text": "Sane's of Maige"
   },
   "truth": {
-   "lat": 43.9327496,
-   "lon": -69.55556534,
+   "lat": 43.41466,
+   "lon": -70.76881,
    "radius_m": 300
   }
  },
@@ -17065,11 +17065,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Paris Autobarn Auto Sales & Service"
+   "text": "John Burrell, Financial Services Professional - New York Life"
   },
   "truth": {
-   "lat": 44.22064788,
-   "lon": -70.50046785,
+   "lat": 44.2314574,
+   "lon": -69.7891327,
    "radius_m": 300
   }
  },
@@ -17079,11 +17079,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Hilton Garden Inn"
+   "text": "Natalie H. Rockwell, CNM"
   },
   "truth": {
-   "lat": 43.64948677,
-   "lon": -70.31540594,
+   "lat": 43.906285165142975,
+   "lon": -69.89137374668397,
    "radius_m": 300
   }
  },
@@ -17093,11 +17093,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "High-Powered Nutrtion"
+   "text": "Calvary Bible Church, Stratton"
   },
   "truth": {
-   "lat": 44.7871974,
-   "lon": -69.7310893,
+   "lat": 45.14222982490948,
+   "lon": -70.4325299904927,
    "radius_m": 300
   }
  },
@@ -17107,11 +17107,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Whispering Sands Gift Shop"
+   "text": "Greenbriar Apartments"
   },
   "truth": {
-   "lat": 43.17564056,
-   "lon": -70.6102891,
+   "lat": 46.67441138,
+   "lon": -67.98917787,
    "radius_m": 300
   }
  },
@@ -17121,11 +17121,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Ground Floor"
+   "text": "Freeport Mind-Body Fitness/Gyrotonic Studio in Freeport, Maine"
   },
   "truth": {
-   "lat": 43.8582426,
-   "lon": -70.10094733,
+   "lat": 43.85468718,
+   "lon": -70.10759444,
    "radius_m": 300
   }
  },
@@ -17135,11 +17135,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Genfsis HealthaCre"
+   "text": "The Talbot Hose Inn"
   },
   "truth": {
-   "lat": 43.56766039822035,
-   "lon": -70.37897378604384,
+   "lat": 44.7383732,
+   "lon": -67.3906385,
    "radius_m": 300
   }
  },
@@ -17149,11 +17149,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Dad's Maple Sugar Shack"
+   "text": "Joshua L. Chamberlain Museum"
   },
   "truth": {
-   "lat": 44.04605331,
-   "lon": -70.63682773,
+   "lat": 43.910461626037744,
+   "lon": -69.96397378052482,
    "radius_m": 300
   }
  },
@@ -17163,11 +17163,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "First Parish Congregational Church"
+   "text": "Sewall Memorial Congregational Church"
   },
   "truth": {
-   "lat": 43.41417867,
-   "lon": -70.91772056,
+   "lat": 45.08429811,
+   "lon": -67.11157956,
    "radius_m": 300
   }
  },
@@ -17177,11 +17177,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Isabella's Cfae & Bakedy"
+   "text": "Skowhegan Imaging Associatez P.a"
   },
   "truth": {
-   "lat": 43.85841836,
-   "lon": -70.10189965,
+   "lat": 44.0873966,
+   "lon": -70.2015478,
    "radius_m": 300
   }
  },
@@ -17191,11 +17191,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Ron Brown Plumbing"
+   "text": "Hanscom's Motel and Cottages"
   },
   "truth": {
-   "lat": 43.78260313,
-   "lon": -70.19868321,
+   "lat": 44.430447150223195,
+   "lon": -68.25776160374015,
    "radius_m": 300
   }
  },
@@ -17205,11 +17205,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Searsmont Oral Wellness Center"
+   "text": "Cyber Copy"
   },
   "truth": {
-   "lat": 44.36602716,
-   "lon": -69.17773204,
+   "lat": 43.68197,
+   "lon": -70.290134,
    "radius_m": 300
   }
  },
@@ -17219,11 +17219,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "ASK ... for Home Care"
+   "text": "Soul Sisters II"
   },
   "truth": {
-   "lat": 44.04371624,
-   "lon": -69.18099934,
+   "lat": 44.84208664,
+   "lon": -68.70489077,
    "radius_m": 300
   }
  },
@@ -17233,11 +17233,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Dollar General"
+   "text": "Quality Beverages Inc"
   },
   "truth": {
-   "lat": 43.51455515,
-   "lon": -70.37998332,
+   "lat": 44.800509,
+   "lon": -68.7715922,
    "radius_m": 300
   }
  },
@@ -17247,11 +17247,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Downesst Crdeit Union"
+   "text": "North Enr Landscapin & Stone Supply, Inc."
   },
   "truth": {
-   "lat": 45.18209312,
-   "lon": -67.28434341,
+   "lat": 46.79993776,
+   "lon": -67.99147072,
    "radius_m": 300
   }
  },
@@ -17261,11 +17261,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Apex Youth Connection"
+   "text": "Youngtown Inn"
   },
   "truth": {
-   "lat": 43.4845611,
-   "lon": -70.4549973,
+   "lat": 44.26915149,
+   "lon": -69.09775143,
    "radius_m": 300
   }
  },
@@ -17275,11 +17275,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "RSU 67 Adult Ed"
+   "text": "Cmmc Urgent Care"
   },
   "truth": {
-   "lat": 45.378499,
-   "lon": -68.49663,
+   "lat": 44.123301069349424,
+   "lon": -70.22458331030202,
    "radius_m": 300
   }
  },
@@ -17289,11 +17289,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Eye Center Northeast"
+   "text": "Calvary Cemetery, South Portland"
   },
   "truth": {
-   "lat": 44.83149056,
-   "lon": -68.78627582,
+   "lat": 43.63021801,
+   "lon": -70.29388485,
    "radius_m": 300
   }
  },
@@ -17303,11 +17303,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Artistry in Bloom"
+   "text": "Wakita Electric"
   },
   "truth": {
-   "lat": 43.49726568014921,
-   "lon": -70.4461306158746,
+   "lat": 43.61391606,
+   "lon": -70.82682184,
    "radius_m": 300
   }
  },
@@ -17317,11 +17317,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Central Buillding Supplies"
+   "text": "Fkamkng Physical Therapy, Woolwich"
   },
   "truth": {
-   "lat": 47.35302505,
-   "lon": -68.30154972,
+   "lat": 43.909557700363294,
+   "lon": -69.82381692849513,
    "radius_m": 300
   }
  },
@@ -17331,11 +17331,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Call of The Wild RV Center"
+   "text": "Richard Batstone Md Pa"
   },
   "truth": {
-   "lat": 44.15302115,
-   "lon": -70.48759869,
+   "lat": 44.6704281,
+   "lon": -70.1460536,
    "radius_m": 300
   }
  },
@@ -17345,11 +17345,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "TownePlace Suites by Marriott Portland Airport ME"
+   "text": "Runaround Pond Recreation Area"
   },
   "truth": {
-   "lat": 43.6426533,
-   "lon": -70.33175371,
+   "lat": 43.951868578342285,
+   "lon": -70.16867997986905,
    "radius_m": 300
   }
  },
@@ -17359,11 +17359,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Daniel Hanley Center For Health Leadership"
+   "text": "United States Postal Service, Dixfield"
   },
   "truth": {
-   "lat": 43.655479,
-   "lon": -70.254005,
+   "lat": 44.53118238343802,
+   "lon": -70.45542218167611,
    "radius_m": 300
   }
  },
@@ -17373,11 +17373,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Mountain House on Sunday River"
+   "text": "G.O. Tubing / Go Zipping"
   },
   "truth": {
-   "lat": 44.495215768516296,
-   "lon": -70.84548175970565,
+   "lat": 44.4131341375414,
+   "lon": -69.52247668458604,
    "radius_m": 300
   }
  },
@@ -17387,11 +17387,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Spiritualist Church Of Eternal Life"
+   "text": "O'Reilly Auto Parts, Waterville"
   },
   "truth": {
-   "lat": 44.076005,
-   "lon": -70.1150546,
+   "lat": 44.56694075,
+   "lon": -69.63732498,
    "radius_m": 300
   }
  },
@@ -17401,11 +17401,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Charles B Davis Co"
+   "text": "Gifford's Famous Ice Cream and Mini Golf"
   },
   "truth": {
-   "lat": 44.54872982,
-   "lon": -69.64161666,
+   "lat": 44.78265184,
+   "lon": -69.72721232,
    "radius_m": 300
   }
  },
@@ -17415,11 +17415,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "C D Auto"
+   "text": "The Mateja Group"
   },
   "truth": {
-   "lat": 44.58696475,
-   "lon": -69.58139188,
+   "lat": 43.58540377,
+   "lon": -70.3583711,
    "radius_m": 300
   }
  },
@@ -17429,11 +17429,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Andre Achenbach, OD - Lewiston"
+   "text": "Lash Haus"
   },
   "truth": {
-   "lat": 44.1146822,
-   "lon": -70.2067618,
+   "lat": 43.51776753,
+   "lon": -70.4000003,
    "radius_m": 300
   }
  },
@@ -17443,11 +17443,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Connections Telehealth Consort"
+   "text": "Fat Toad's Pub"
   },
   "truth": {
-   "lat": 44.79608825670719,
-   "lon": -68.77200814117637,
+   "lat": 44.2632354,
+   "lon": -69.78207872,
    "radius_m": 300
   }
  },
@@ -17457,11 +17457,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "I.T. Link Maine"
+   "text": "Belden John R Md"
   },
   "truth": {
-   "lat": 43.70419441,
-   "lon": -70.32503389,
+   "lat": 43.624882,
+   "lon": -70.345668,
    "radius_m": 300
   }
  },
@@ -17471,11 +17471,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Kennebec Riverside Cabins"
+   "text": "Calais Free Library"
   },
   "truth": {
-   "lat": 45.33072906,
-   "lon": -69.96830766,
+   "lat": 45.18941908,
+   "lon": -67.27666658,
    "radius_m": 300
   }
  },
@@ -17485,11 +17485,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "WTB Law"
+   "text": "Wags & Wool"
   },
   "truth": {
-   "lat": 43.49236,
-   "lon": -70.45749,
+   "lat": 44.86018481961739,
+   "lon": -66.98326171549728,
    "radius_m": 300
   }
  },
@@ -17499,11 +17499,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Flanagan's Driving School"
+   "text": "Apartment Mart"
   },
   "truth": {
-   "lat": 43.43877496,
-   "lon": -70.775221,
+   "lat": 43.65332182,
+   "lon": -70.26580472,
    "radius_m": 300
   }
  },
@@ -17513,11 +17513,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Ne're Beach Family Campground"
+   "text": "Shannon Bennett, D.O."
   },
   "truth": {
-   "lat": 43.5150586,
-   "lon": -70.380575,
+   "lat": 43.6533244,
+   "lon": -70.2751542,
    "radius_m": 300
   }
  },
@@ -17527,11 +17527,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Woodfords Congregational Church"
+   "text": "Dewey's Lumber and Cedar Mill"
   },
   "truth": {
-   "lat": 43.67077464,
-   "lon": -70.28757478,
+   "lat": 44.37109,
+   "lon": -69.361436,
    "radius_m": 300
   }
  },
@@ -17541,11 +17541,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Pip Prro Automotlve"
+   "text": "Starbird Cocrete"
   },
   "truth": {
-   "lat": 43.8253358,
-   "lon": -70.43461,
+   "lat": 44.144929821511575,
+   "lon": -69.19890885434526,
    "radius_m": 300
   }
  },
@@ -17555,11 +17555,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Empeople Credit Union"
+   "text": "Martins Point Health Care"
   },
   "truth": {
-   "lat": 43.6817145,
-   "lon": -70.3315468,
+   "lat": 43.69049178553877,
+   "lon": -70.40257022155546,
    "radius_m": 300
   }
  },
@@ -17569,11 +17569,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Lordrock Farm"
+   "text": "Maine Art Collective"
   },
   "truth": {
-   "lat": 43.636934,
-   "lon": -70.712348,
+   "lat": 43.65812287,
+   "lon": -70.25414869,
    "radius_m": 300
   }
  },
@@ -17583,11 +17583,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Fisherman's Grill"
+   "text": "My Thai Table"
   },
   "truth": {
-   "lat": 43.677015160968686,
-   "lon": -70.28732418854898,
+   "lat": 43.91801264936158,
+   "lon": -69.8268914101617,
    "radius_m": 300
   }
  },
@@ -17597,11 +17597,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Richard Mellon, MD"
+   "text": "Green Lake, Ellsworth Maine"
   },
   "truth": {
-   "lat": 44.1439987,
-   "lon": -69.0853401,
+   "lat": 44.62130054522318,
+   "lon": -68.44977004998897,
    "radius_m": 300
   }
  },
@@ -17611,11 +17611,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Crosby's Gun Shop"
+   "text": "Witham Paving"
   },
   "truth": {
-   "lat": 44.82130218,
-   "lon": -68.69606924,
+   "lat": 44.7769567,
+   "lon": -69.0158313,
    "radius_m": 300
   }
  },
@@ -17625,11 +17625,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Dr. Michael R. Curtis, Md"
+   "text": "Millinocket Insurance Agency"
   },
   "truth": {
-   "lat": 43.9099088,
-   "lon": -69.8921488,
+   "lat": 45.65661237,
+   "lon": -68.70920804,
    "radius_m": 300
   }
  },
@@ -17639,11 +17639,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Caribou Recreation Department"
+   "text": "The Mercury"
   },
   "truth": {
-   "lat": 46.86451241,
-   "lon": -68.00415615,
+   "lat": 43.65630261,
+   "lon": -70.26802863,
    "radius_m": 300
   }
  },
@@ -17653,11 +17653,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Electrical Consultants, Inc."
+   "text": "Yiannis House of Pizza"
   },
   "truth": {
-   "lat": 44.3176433,
-   "lon": -69.8176272,
+   "lat": 44.499857166830154,
+   "lon": -70.2084548995304,
    "radius_m": 300
   }
  },
@@ -17667,11 +17667,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Rebel for Good"
+   "text": "Melda's Fabric & Desogns"
   },
   "truth": {
-   "lat": 44.24503719,
-   "lon": -69.77051927,
+   "lat": 44.638857176871106,
+   "lon": -70.01523578336928,
    "radius_m": 300
   }
  },
@@ -17681,11 +17681,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Talj of the Town"
+   "text": "Bohemian Roes"
   },
   "truth": {
-   "lat": 46.91219819,
-   "lon": -67.8254647,
+   "lat": 43.91359877,
+   "lon": -69.81422994,
    "radius_m": 300
   }
  },
@@ -17695,11 +17695,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Mandy & Matt's Café"
+   "text": "The Nail Room, Waterville"
   },
   "truth": {
-   "lat": 43.68684805,
-   "lon": -70.29298784,
+   "lat": 44.55170565156927,
+   "lon": -69.63038205448541,
    "radius_m": 300
   }
  },
@@ -17709,11 +17709,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Alna Hopyard and Farm"
+   "text": "Walpole Woodworkers"
   },
   "truth": {
-   "lat": 44.11043562,
-   "lon": -69.60411601,
+   "lat": 44.80256798769464,
+   "lon": -69.30618491667846,
    "radius_m": 300
   }
  },
@@ -17723,11 +17723,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Animal Hospital of Wateerville"
+   "text": "Another Man's Treasurrf, Farmingdale"
   },
   "truth": {
-   "lat": 44.54744315604177,
-   "lon": -69.67660186619192,
+   "lat": 44.24038222,
+   "lon": -69.77141388,
    "radius_m": 300
   }
  },
@@ -17737,11 +17737,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Sabattus Community Baptist"
+   "text": "Bee Pride"
   },
   "truth": {
-   "lat": 44.11975873,
-   "lon": -70.10787576,
+   "lat": 43.434245,
+   "lon": -70.840535,
    "radius_m": 300
   }
  },
@@ -17751,11 +17751,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Blue Rhin Propane Exchange"
+   "text": "Nortern Light Behavioral Health Home, Glen Cove"
   },
   "truth": {
-   "lat": 44.07816,
-   "lon": -70.415581,
+   "lat": 44.1169847,
+   "lon": -69.1036459,
    "radius_m": 300
   }
  },
@@ -17765,11 +17765,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Massage Therapy"
+   "text": "North Whitefield Superette"
   },
   "truth": {
-   "lat": 46.86944573,
-   "lon": -68.00509949,
+   "lat": 44.222029,
+   "lon": -69.587287,
    "radius_m": 300
   }
  },
@@ -17779,11 +17779,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Mad Kat's Restaurant and Bar"
+   "text": "West Bowdoin Baptist Church"
   },
   "truth": {
-   "lat": 44.79932669,
-   "lon": -68.75381463,
+   "lat": 44.0496503,
+   "lon": -70.0214776,
    "radius_m": 300
   }
  },
@@ -17793,11 +17793,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Barbara Prey Projects"
+   "text": "Subway, Cumberland Mills"
   },
   "truth": {
-   "lat": 43.92773261,
-   "lon": -69.25746708,
+   "lat": 43.67919085,
+   "lon": -70.35598129,
    "radius_m": 300
   }
  },
@@ -17807,11 +17807,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "UMA Rumford Center"
+   "text": "Back Cove BBQ & Pizzeria"
   },
   "truth": {
-   "lat": 44.54686653,
-   "lon": -70.54509892,
+   "lat": 43.6747121,
+   "lon": -70.2828421,
    "radius_m": 300
   }
  },
@@ -17821,11 +17821,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Hillside Cusstom Woodworuing"
+   "text": "LUX Residentiaal"
   },
   "truth": {
-   "lat": 44.7670808134451,
-   "lon": -69.59656634762956,
+   "lat": 43.67594281,
+   "lon": -70.3660188,
    "radius_m": 300
   }
  },
@@ -17835,11 +17835,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Levesque Poois"
+   "text": "Mast Cliinic Inc"
   },
   "truth": {
-   "lat": 44.5878295898438,
-   "lon": -69.577751159668,
+   "lat": 43.681235,
+   "lon": -70.290141,
    "radius_m": 300
   }
  },
@@ -17849,11 +17849,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Refomation Angliican Church"
+   "text": "Baysidee Village, Maaine"
   },
   "truth": {
-   "lat": 43.88570775956355,
-   "lon": -70.32999041273509,
+   "lat": 44.37997557927483,
+   "lon": -68.96841874292573,
    "radius_m": 300
   }
  },
@@ -17863,11 +17863,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Big Apple Store"
+   "text": "MECA&D Cafe"
   },
   "truth": {
-   "lat": 43.65749987,
-   "lon": -70.26643114,
+   "lat": 43.655683272700706,
+   "lon": -70.2607914507823,
    "radius_m": 300
   }
  },
@@ -17877,11 +17877,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Golden Cleaning Services"
+   "text": "Eyecare Medical Group, Saco Community Based Outpatient Clinic"
   },
   "truth": {
-   "lat": 43.65879762,
-   "lon": -70.25757805,
+   "lat": 43.515580287487026,
+   "lon": -70.42851983072318,
    "radius_m": 300
   }
  },
@@ -17891,11 +17891,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "The Tellint Room"
+   "text": "Mucrotel Inn and Suites by Wyndham"
   },
   "truth": {
-   "lat": 43.65531,
-   "lon": -70.254216,
+   "lat": 43.85698839,
+   "lon": -70.45230372,
    "radius_m": 300
   }
  },
@@ -17905,11 +17905,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Savzge Autk Body"
+   "text": "Boothbay Refion Historical"
   },
   "truth": {
-   "lat": 44.40937074,
-   "lon": -70.80573742,
+   "lat": 43.85628543194122,
+   "lon": -69.62598858412383,
    "radius_m": 300
   }
  },
@@ -17919,11 +17919,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Studio 1209"
+   "text": "Blue Rhino Propane Exchange, Lebanon"
   },
   "truth": {
-   "lat": 43.42127583160003,
-   "lon": -70.7584818190815,
+   "lat": 43.415974,
+   "lon": -70.8645577,
    "radius_m": 300
   }
  },
@@ -17933,11 +17933,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Milbury Cycles"
+   "text": "Lee Baptist Church"
   },
   "truth": {
-   "lat": 43.27837375,
-   "lon": -70.85942745,
+   "lat": 45.36071936,
+   "lon": -68.27566202,
    "radius_m": 300
   }
  },
@@ -17947,11 +17947,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Sign Store and Flag Center"
+   "text": "The Blue Ox Saloon - East, Llc"
   },
   "truth": {
-   "lat": 44.11377,
-   "lon": -70.22375,
+   "lat": 45.6541155,
+   "lon": -68.7089133,
    "radius_m": 300
   }
  },
@@ -17961,11 +17961,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Jeff's Vacuum LLC"
+   "text": "Hammond Street Congregational Church"
   },
   "truth": {
-   "lat": 44.1845764,
-   "lon": -69.11931406,
+   "lat": 44.80096019,
+   "lon": -68.77417537,
    "radius_m": 300
   }
  },
@@ -17975,11 +17975,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Twilite Motel"
+   "text": "Bella Amica Salon"
   },
   "truth": {
-   "lat": 44.539745467831466,
-   "lon": -68.44215971352925,
+   "lat": 44.3143031,
+   "lon": -69.7744112,
    "radius_m": 300
   }
  },
@@ -17989,11 +17989,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Josh LaFerriere Electric"
+   "text": "Industrial Craftsmen"
   },
   "truth": {
-   "lat": 43.72638559,
-   "lon": -70.34241845,
+   "lat": 43.97418178554081,
+   "lon": -70.05884586361636,
    "radius_m": 300
   }
  },
@@ -18003,11 +18003,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Academy For Active Learner's"
+   "text": "Champagne True Value Lumber & Hardware"
   },
   "truth": {
-   "lat": 43.676624788049374,
-   "lon": -70.3374894830632,
+   "lat": 45.62745013,
+   "lon": -70.25749848,
    "radius_m": 300
   }
  },
@@ -18017,11 +18017,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Penske Truck Rental"
+   "text": "Bonnie Hart, PT"
   },
   "truth": {
-   "lat": 44.82451876,
-   "lon": -68.75897217,
+   "lat": 43.86198242220213,
+   "lon": -70.10562240970796,
    "radius_m": 300
   }
  },
@@ -18031,11 +18031,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Cumberland/No.Yarmouth Community Recreation Dept."
+   "text": "U-Haul Neighborhood Dealer, Sagamore Village"
   },
   "truth": {
-   "lat": 43.789392,
-   "lon": -70.24536,
+   "lat": 43.6864182,
+   "lon": -70.3253349,
    "radius_m": 300
   }
  },
@@ -18045,11 +18045,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Rudman Winchell"
+   "text": "Mainely Gallery and Studio"
   },
   "truth": {
-   "lat": 44.54399086395939,
-   "lon": -68.42498856549535,
+   "lat": 44.42940642,
+   "lon": -68.97388277,
    "radius_m": 300
   }
  },
@@ -18059,11 +18059,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Congregation Bet Ha'am"
+   "text": "Maine Mountain Timber Frames"
   },
   "truth": {
-   "lat": 43.62220563,
-   "lon": -70.30558284,
+   "lat": 44.8137137,
+   "lon": -70.34238607,
    "radius_m": 300
   }
  },
@@ -18073,11 +18073,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Botma Farm"
+   "text": "Early Bird Restaurant, Oakland"
   },
   "truth": {
-   "lat": 44.03005554,
-   "lon": -70.0881532,
+   "lat": 44.55262505074715,
+   "lon": -69.74439292784336,
    "radius_m": 300
   }
  },
@@ -18087,11 +18087,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Barrett's Park"
+   "text": "Walgreens, Lisbon Falls"
   },
   "truth": {
-   "lat": 43.848117,
-   "lon": -69.61794,
+   "lat": 44.004666,
+   "lon": -70.074845,
    "radius_m": 300
   }
  },
@@ -18101,11 +18101,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Gold Pine Tree Llc"
+   "text": "Moriah Market Llc"
   },
   "truth": {
-   "lat": 43.415526,
-   "lon": -70.74527,
+   "lat": 43.6574368,
+   "lon": -70.2621467,
    "radius_m": 300
   }
  },
@@ -18115,11 +18115,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "The Barn ay Lambs Mill"
+   "text": "First Baptist Church, South Berwickk"
   },
   "truth": {
-   "lat": 43.96248,
-   "lon": -70.64237,
+   "lat": 43.23114212,
+   "lon": -70.80867225,
    "radius_m": 300
   }
  },
@@ -18129,11 +18129,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "First United Methodist Church of Bangor"
+   "text": "McSeagull's Restaurant"
   },
   "truth": {
-   "lat": 44.82485308,
-   "lon": -68.76936663,
+   "lat": 43.85101555,
+   "lon": -69.62712562,
    "radius_m": 300
   }
  },
@@ -18143,11 +18143,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Winnxnet"
+   "text": "Ewmistin Heating"
   },
   "truth": {
-   "lat": 43.6613253356788,
-   "lon": -70.26575468068154,
+   "lat": 43.89421630312569,
+   "lon": -70.2869146705691,
    "radius_m": 300
   }
  },
@@ -18157,11 +18157,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Eight 2 Eight Landscape"
+   "text": "One River CPAs Bath"
   },
   "truth": {
-   "lat": 44.811179,
-   "lon": -69.0841957,
+   "lat": 43.917321,
+   "lon": -69.813947,
    "radius_m": 300
   }
  },
@@ -18171,11 +18171,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Ken's Food Truck"
+   "text": "Walgreens, Gorham"
   },
   "truth": {
-   "lat": 44.537938211251394,
-   "lon": -69.6293520755747,
+   "lat": 43.681306,
+   "lon": -70.43867,
    "radius_m": 300
   }
  },
@@ -18185,11 +18185,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "A+ Parry Rental"
+   "text": "Art on the Hilll Kitteyr"
   },
   "truth": {
-   "lat": 43.5767209,
-   "lon": -70.3571286,
+   "lat": 43.08708832,
+   "lon": -70.75066962,
    "radius_m": 300
   }
  },
@@ -18199,11 +18199,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Crawford Electric"
+   "text": "The Hess Law Firm"
   },
   "truth": {
-   "lat": 44.27642461,
-   "lon": -70.02731902,
+   "lat": 44.0995079,
+   "lon": -70.216543,
    "radius_m": 300
   }
  },
@@ -18213,11 +18213,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "ServiceMaster"
+   "text": "The Rock and Art Shop, Bar Harbor"
   },
   "truth": {
-   "lat": 43.8735709,
-   "lon": -69.9636944,
+   "lat": 44.38973606,
+   "lon": -68.20557178,
    "radius_m": 300
   }
  },
@@ -18227,11 +18227,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Nature Conservancy"
+   "text": "Best Massage in Portland"
   },
   "truth": {
-   "lat": 43.919161,
-   "lon": -69.967645,
+   "lat": 43.687676,
+   "lon": -70.272127,
    "radius_m": 300
   }
  },
@@ -18241,11 +18241,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Walker's Used Cars"
+   "text": "Tractor Supply Co., Belfast"
   },
   "truth": {
-   "lat": 43.781424083477056,
-   "lon": -70.56298818354801,
+   "lat": 44.42370993,
+   "lon": -69.03020708,
    "radius_m": 300
   }
  },
@@ -18255,11 +18255,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Portland Center for Assised Living"
+   "text": "The Movemdnt Market"
   },
   "truth": {
-   "lat": 43.6662649,
-   "lon": -70.2848625,
+   "lat": 43.0993239,
+   "lon": -70.7449374,
    "radius_m": 300
   }
  },
@@ -18269,11 +18269,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Peaks Island Strength and Wellness"
+   "text": "Casco Bay Furniture"
   },
   "truth": {
-   "lat": 43.65785078,
-   "lon": -70.19825303,
+   "lat": 43.6569639,
+   "lon": -70.2567261,
    "radius_m": 300
   }
  },
@@ -18283,11 +18283,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Rustic Ridge Photography"
+   "text": "Capital Family Practice, P.a."
   },
   "truth": {
-   "lat": 43.92756421204877,
-   "lon": -70.43733853221903,
+   "lat": 44.303478,
+   "lon": -69.765213,
    "radius_m": 300
   }
  },
@@ -18297,11 +18297,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Reunion Station"
+   "text": "Spirit Halloween, Crocketts Corner"
   },
   "truth": {
-   "lat": 44.06077244,
-   "lon": -69.49642696,
+   "lat": 43.6345183773483,
+   "lon": -70.336337880139,
    "radius_m": 300
   }
  },
@@ -18311,11 +18311,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "All About Traevl"
+   "text": "Maineline Sewer and Drian"
   },
   "truth": {
-   "lat": 44.78603881,
-   "lon": -68.75624756,
+   "lat": 43.76269267,
+   "lon": -70.3723917,
    "radius_m": 300
   }
  },
@@ -18325,11 +18325,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Windswept Gardens Nurserh & Greehouse"
+   "text": "Boojs Etc. Mainee"
   },
   "truth": {
-   "lat": 44.8530053,
-   "lon": -68.8066715,
+   "lat": 43.722693,
+   "lon": -70.233214,
    "radius_m": 300
   }
  },
@@ -18339,11 +18339,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Mike's Market II"
+   "text": "Halifax Heights Mobile Home Park"
   },
   "truth": {
-   "lat": 44.40386127,
-   "lon": -68.6033772,
+   "lat": 44.54237326,
+   "lon": -69.61693673,
    "radius_m": 300
   }
  },
@@ -18353,11 +18353,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Irvnjg Woodlands"
+   "text": "East Coast Travleing Spa"
   },
   "truth": {
-   "lat": 47.22191546174059,
-   "lon": -68.75554211584623,
+   "lat": 43.49371342,
+   "lon": -70.45195085,
    "radius_m": 300
   }
  },
@@ -18367,11 +18367,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Pentagoet Inn"
+   "text": "Patrick's Hallmark Shop"
   },
   "truth": {
-   "lat": 44.38816391,
-   "lon": -68.79776219,
+   "lat": 44.8242265,
+   "lon": -68.77694333,
    "radius_m": 300
   }
  },
@@ -18381,11 +18381,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Natioanl Attachments Incc."
+   "text": "Asset Managementt Inc"
   },
   "truth": {
-   "lat": 43.70104566,
-   "lon": -70.40253389,
+   "lat": 44.5416198,
+   "lon": -68.4230278,
    "radius_m": 300
   }
  },
@@ -18395,11 +18395,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Bull Moose"
+   "text": "Three Little Birds Preschool"
   },
   "truth": {
-   "lat": 44.08656593,
-   "lon": -70.20283573,
+   "lat": 43.640121,
+   "lon": -70.39930567,
    "radius_m": 300
   }
  },
@@ -18409,11 +18409,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Oxfodr Federal Credit Union"
+   "text": "Eric Broen, MD"
   },
   "truth": {
-   "lat": 44.21117228,
-   "lon": -70.52986418,
+   "lat": 43.6533244,
+   "lon": -70.2751542,
    "radius_m": 300
   }
  },
@@ -18423,11 +18423,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Crossroads to Calvary"
+   "text": "Kennebunk Sewer District"
   },
   "truth": {
-   "lat": 44.409514,
-   "lon": -69.174342,
+   "lat": 43.38193478,
+   "lon": -70.53934905,
    "radius_m": 300
   }
  },
@@ -18437,11 +18437,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Green's Tree Service - Tree Surgeon"
+   "text": "Slow Bell Cafe"
   },
   "truth": {
-   "lat": 44.3109623,
-   "lon": -69.0897504,
+   "lat": 43.74431,
+   "lon": -70.105796,
    "radius_m": 300
   }
  },
@@ -18451,11 +18451,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Permanent Exprssions Tattoo Studio"
+   "text": "Prattt Abbott, North Windham"
   },
   "truth": {
-   "lat": 44.42615458,
-   "lon": -69.00692197,
+   "lat": 43.84225452,
+   "lon": -70.44476912,
    "radius_m": 300
   }
  },
@@ -18465,11 +18465,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Toppins"
+   "text": "UPS Authrized Shippint Outlet, Camden"
   },
   "truth": {
-   "lat": 43.38396229208744,
-   "lon": -70.54390654218402,
+   "lat": 44.204505,
+   "lon": -69.072219,
    "radius_m": 300
   }
  },
@@ -18479,11 +18479,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Riverside Survey, LLC"
+   "text": "Kimball Cottage"
   },
   "truth": {
-   "lat": 44.115526071170144,
-   "lon": -70.59547424316408,
+   "lat": 43.27582278,
+   "lon": -70.58221631,
    "radius_m": 300
   }
  },
@@ -18493,11 +18493,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Lucky Catch Cruiess"
+   "text": "McKeney Foundations"
   },
   "truth": {
-   "lat": 43.65578346,
-   "lon": -70.25240506,
+   "lat": 43.53576854,
+   "lon": -70.45202065,
    "radius_m": 300
   }
  },
@@ -18507,11 +18507,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Maine Hydroponic Supply"
+   "text": "United States Postal Service, Wilton"
   },
   "truth": {
-   "lat": 44.25338,
-   "lon": -69.497203,
+   "lat": 44.5891159,
+   "lon": -70.2304681,
    "radius_m": 300
   }
  },
@@ -18521,11 +18521,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "JL Custom Fab, Inc"
+   "text": "Patti Foden and Associates"
   },
   "truth": {
-   "lat": 44.061224,
-   "lon": -69.926916,
+   "lat": 43.65531423,
+   "lon": -70.28985166,
    "radius_m": 300
   }
  },
@@ -18535,11 +18535,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Bayside Nutrition"
+   "text": "Vanessa Grant Hair Studio"
   },
   "truth": {
-   "lat": 43.80399276,
-   "lon": -70.18171716,
+   "lat": 43.49359211,
+   "lon": -70.45261627,
    "radius_m": 300
   }
  },
@@ -18549,11 +18549,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Nourq"
+   "text": "Americas Best Value Inn & Cotages Wells Ogunquit"
   },
   "truth": {
-   "lat": 43.72538095,
-   "lon": -70.23231874,
+   "lat": 43.28515,
+   "lon": -70.5956,
    "radius_m": 300
   }
  },
@@ -18563,11 +18563,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Wildwood Medicine"
+   "text": "Tire Warehouse, Hampden"
   },
   "truth": {
-   "lat": 43.661355,
-   "lon": -70.250983,
+   "lat": 44.7872821,
+   "lon": -68.8170451,
    "radius_m": 300
   }
  },
@@ -18577,11 +18577,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Rent-A-Center"
+   "text": "Berlin City Lexus of Portland Parts Center"
   },
   "truth": {
-   "lat": 43.90912653,
-   "lon": -69.82844197,
+   "lat": 43.68328844,
+   "lon": -70.32602338,
    "radius_m": 300
   }
  },
@@ -18591,11 +18591,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Royal T barebrshop"
+   "text": "Jellystone Park ™ Madison, ME at Yonderr hill"
   },
   "truth": {
-   "lat": 43.56914415,
-   "lon": -70.68604354,
+   "lat": 44.79856333567127,
+   "lon": -69.74972426891328,
    "radius_m": 300
   }
  },
@@ -18605,11 +18605,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Wendyy's"
+   "text": "Acive Chiropractic Llc Pa"
   },
   "truth": {
-   "lat": 43.5929033457713,
-   "lon": -70.3304171562194,
+   "lat": 43.5184069,
+   "lon": -70.4547482,
    "radius_m": 300
   }
  },
@@ -18619,11 +18619,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Western Union"
+   "text": "Sanford Institution for Savings, Sanford"
   },
   "truth": {
-   "lat": 43.696464,
-   "lon": -70.788764,
+   "lat": 43.439698647558885,
+   "lon": -70.77558362099512,
    "radius_m": 300
   }
  },
@@ -18633,11 +18633,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Broadway TV & Appliance"
+   "text": "Carrabassett Coffee Company"
   },
   "truth": {
-   "lat": 44.8391073,
-   "lon": -68.7943555,
+   "lat": 44.94941099,
+   "lon": -70.14947675,
    "radius_m": 300
   }
  },
@@ -18647,11 +18647,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Central Maine Sports"
+   "text": "KIYA"
   },
   "truth": {
-   "lat": 44.3210978,
-   "lon": -69.82368018,
+   "lat": 43.08600168954892,
+   "lon": -70.74299391602509,
    "radius_m": 300
   }
  },
@@ -18661,11 +18661,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Tooth Protectors Inc"
+   "text": "Still Waters Auto Sales and Service"
   },
   "truth": {
-   "lat": 44.074457,
-   "lon": -70.1757984,
+   "lat": 43.73195802,
+   "lon": -70.58819736,
    "radius_m": 300
   }
  },
@@ -18675,11 +18675,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Acadia Seashore Camping & Cabins"
+   "text": "Steven Hess, MD"
   },
   "truth": {
-   "lat": 44.50069796,
-   "lon": -68.14926647,
+   "lat": 43.6533244,
+   "lon": -70.2751542,
    "radius_m": 300
   }
  },
@@ -18689,11 +18689,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "U-Haul Neighborhood Dealer"
+   "text": "Aurora Heart Massage"
   },
   "truth": {
-   "lat": 43.323216,
-   "lon": -70.610289,
+   "lat": 44.7958866,
+   "lon": -68.76357742,
    "radius_m": 300
   }
  },
@@ -18703,11 +18703,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Johnson Excavation"
+   "text": "Seaside Skin Care & Spa"
   },
   "truth": {
-   "lat": 43.9412621,
-   "lon": -70.8754315,
+   "lat": 44.204799478677856,
+   "lon": -69.07111013533564,
    "radius_m": 300
   }
  },
@@ -18717,11 +18717,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Saulrer Dental Hygienne Center Madison location"
+   "text": "Glacaail Multimedia Inc, Rosemont"
   },
   "truth": {
-   "lat": 44.79748119,
-   "lon": -69.87995056,
+   "lat": 43.66988497,
+   "lon": -70.30374576,
    "radius_m": 300
   }
  },
@@ -18731,11 +18731,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Palt's Closet"
+   "text": "Stne Coast Musc"
   },
   "truth": {
-   "lat": 43.63161905,
-   "lon": -70.3255338,
+   "lat": 43.74328563,
+   "lon": -70.21826634,
    "radius_m": 300
   }
  },
@@ -18745,11 +18745,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Guru Saoln Spa"
+   "text": "Central Maine Infectious Disesaes"
   },
   "truth": {
-   "lat": 43.66410514,
-   "lon": -70.28636538,
+   "lat": 44.102331,
+   "lon": -70.215657,
    "radius_m": 300
   }
  },
@@ -18759,11 +18759,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Captain Joe's Cruises"
+   "text": "Dexter Police Department"
   },
   "truth": {
-   "lat": 43.480184675712785,
-   "lon": -70.41294828091623,
+   "lat": 45.02438898,
+   "lon": -69.29000048,
    "radius_m": 300
   }
  },
@@ -18773,11 +18773,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Ernie's Cycle Shop"
+   "text": "Krainin Real Estate, Naples"
   },
   "truth": {
-   "lat": 43.680427216121224,
-   "lon": -70.37463605403902,
+   "lat": 43.9703,
+   "lon": -70.6075,
    "radius_m": 300
   }
  },
@@ -18787,11 +18787,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Island Watch Bed & Breakfast"
+   "text": "UPS Authorized Shipping Provider, Farmington"
   },
   "truth": {
-   "lat": 44.2795800878689,
-   "lon": -68.33215729816078,
+   "lat": 44.6682668,
+   "lon": -70.1509078,
    "radius_m": 300
   }
  },
@@ -18801,11 +18801,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Cumberland Farms"
+   "text": "Blue Rhino Propane Exchange, Readfield"
   },
   "truth": {
-   "lat": 43.63531935,
-   "lon": -70.23415597,
+   "lat": 44.387762,
+   "lon": -69.966383,
    "radius_m": 300
   }
  },
@@ -18815,11 +18815,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "The Shop Inc."
+   "text": "Grand Harbor Inn, Camden"
   },
   "truth": {
-   "lat": 44.80235544,
-   "lon": -68.89590561,
+   "lat": 44.20930901,
+   "lon": -69.06369655,
    "radius_m": 300
   }
  },
@@ -18829,11 +18829,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Intoxalock Ighition Interlock"
+   "text": "Parker's Boahluse"
   },
   "truth": {
-   "lat": 44.799592,
-   "lon": -68.791155,
+   "lat": 43.49855774,
+   "lon": -70.8538254,
    "radius_m": 300
   }
  },
@@ -18843,11 +18843,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Ocrutts Variety"
+   "text": "Baxrer Brewing Co."
   },
   "truth": {
-   "lat": 44.68885317,
-   "lon": -69.11911178,
+   "lat": 44.09529465584088,
+   "lon": -70.21918596350945,
    "radius_m": 300
   }
  },
@@ -18857,11 +18857,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "United States Postla Service"
+   "text": "Healthy Community Coaalition"
   },
   "truth": {
-   "lat": 45.24225338,
-   "lon": -68.65689753,
+   "lat": 44.6229062,
+   "lon": -70.1633101,
    "radius_m": 300
   }
  },
@@ -18871,11 +18871,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Countty Physicak Therapy - Bangor"
+   "text": "Meetign House Far"
   },
   "truth": {
-   "lat": 44.82811733,
-   "lon": -68.74388348,
+   "lat": 43.605553,
+   "lon": -70.329657,
    "radius_m": 300
   }
  },
@@ -18885,11 +18885,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Northern Light Acadia Hospital"
+   "text": "Marcel's Barber Shop"
   },
   "truth": {
-   "lat": 44.8206692,
-   "lon": -68.76334921,
+   "lat": 44.0875299,
+   "lon": -70.2233437,
    "radius_m": 300
   }
  },
@@ -18899,11 +18899,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Inspirations of Eden"
+   "text": "Fiddlehead School of Arts and Sciences"
   },
   "truth": {
-   "lat": 44.38971879,
-   "lon": -68.20640981,
+   "lat": 43.88804084,
+   "lon": -70.33331568,
    "radius_m": 300
   }
  },
@@ -18913,11 +18913,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Merchant X"
+   "text": "Central High School"
   },
   "truth": {
-   "lat": 43.65612483,
-   "lon": -70.25847837,
+   "lat": 44.99765069,
+   "lon": -69.01919056,
    "radius_m": 300
   }
  },
@@ -18927,11 +18927,11 @@
   "qtype": "typo",
   "kind": "venue",
   "params": {
-   "text": "Cherie Gustaasfon"
+   "text": "Dee Isle Artisans Market"
   },
   "truth": {
-   "lat": 43.63786141,
-   "lon": -70.25168033,
+   "lat": 44.220803347273765,
+   "lon": -68.67577850818635,
    "radius_m": 300
   }
  },
@@ -18941,11 +18941,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Sweet Seniors"
+   "text": "Big Apple Stores"
   },
   "truth": {
-   "lat": 45.62979593,
-   "lon": -68.57134758,
+   "lat": 44.652750932000004,
+   "lon": -70.14935202449999,
    "radius_m": 300
   }
  },
@@ -20845,11 +20845,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Rockwood Conve"
+   "text": "Little Brown Dogs Grooming a"
   },
   "truth": {
-   "lat": 45.670587,
-   "lon": -69.744787,
+   "lat": 43.94463304,
+   "lon": -70.91049942,
    "radius_m": 300
   }
  },
@@ -20859,11 +20859,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Bennett's "
+   "text": "Cit"
   },
   "truth": {
-   "lat": 44.76804753,
-   "lon": -69.20597669,
+   "lat": 43.523471,
+   "lon": -70.42834452,
    "radius_m": 300
   }
  },
@@ -20873,11 +20873,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Pierce Poin"
+   "text": "PEPPER'S Mexica"
   },
   "truth": {
-   "lat": 44.21008956,
-   "lon": -70.53031752,
+   "lat": 43.47517017,
+   "lon": -70.51251064,
    "radius_m": 300
   }
  },
@@ -20887,11 +20887,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Cherished Posse"
+   "text": "Bosal Fa"
   },
   "truth": {
-   "lat": 43.70233113,
-   "lon": -70.28961995,
+   "lat": 43.57113025,
+   "lon": -70.38819049,
    "radius_m": 300
   }
  },
@@ -20901,11 +20901,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "The Corner "
+   "text": "The 1909 Ho"
   },
   "truth": {
-   "lat": 45.45881808,
-   "lon": -69.59178355,
+   "lat": 44.77152708097523,
+   "lon": -69.7220336907615,
    "radius_m": 300
   }
  },
@@ -20915,11 +20915,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Maine Hospitality "
+   "text": "Rent-A-C"
   },
   "truth": {
-   "lat": 44.31142439,
-   "lon": -69.79202049,
+   "lat": 45.02444519,
+   "lon": -69.29043394,
    "radius_m": 300
   }
  },
@@ -20929,11 +20929,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Personal Best Hea"
+   "text": "Dermatology Ass"
   },
   "truth": {
-   "lat": 44.2273097,
-   "lon": -70.519013,
+   "lat": 43.65533739,
+   "lon": -70.29003533,
    "radius_m": 300
   }
  },
@@ -20943,11 +20943,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Sears Appliance"
+   "text": "Otisfield "
   },
   "truth": {
-   "lat": 44.56831602,
-   "lon": -69.6410803,
+   "lat": 44.06061402,
+   "lon": -70.53531505,
    "radius_m": 300
   }
  },
@@ -20957,11 +20957,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Local Image Marketi"
+   "text": "Locally S"
   },
   "truth": {
-   "lat": 43.632593,
-   "lon": -70.2631073,
+   "lat": 43.80457323,
+   "lon": -70.18437359,
    "radius_m": 300
   }
  },
@@ -20971,11 +20971,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "INKredib"
+   "text": "Duguay El"
   },
   "truth": {
-   "lat": 44.76603213,
-   "lon": -69.71752025,
+   "lat": 44.54735019,
+   "lon": -70.56040705,
    "radius_m": 300
   }
  },
@@ -20985,11 +20985,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Elements Books Coff"
+   "text": "Harold Mac Quin"
   },
   "truth": {
-   "lat": 43.4940468,
-   "lon": -70.45802568,
+   "lat": 44.5236167,
+   "lon": -68.36158642,
    "radius_m": 300
   }
  },
@@ -20999,11 +20999,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Camden Nation"
+   "text": "Down East Community Reh"
   },
   "truth": {
-   "lat": 44.07865013,
-   "lon": -69.18346354,
+   "lat": 44.7053272,
+   "lon": -67.4618447,
    "radius_m": 300
   }
  },
@@ -21013,11 +21013,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Mard"
+   "text": "Lebel Dog "
   },
   "truth": {
-   "lat": 44.84224,
-   "lon": -68.73779,
+   "lat": 43.32038302,
+   "lon": -70.58153901,
    "radius_m": 300
   }
  },
@@ -21027,11 +21027,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Marcia Buker "
+   "text": "Joseph's Sportin"
   },
   "truth": {
-   "lat": 44.08486688,
-   "lon": -69.80687372,
+   "lat": 44.542009,
+   "lon": -69.658166,
    "radius_m": 300
   }
  },
@@ -21041,11 +21041,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Maine Tick & "
+   "text": "M T Bottle Re"
   },
   "truth": {
-   "lat": 44.47007389739727,
-   "lon": -69.48604857397322,
+   "lat": 44.106771,
+   "lon": -70.127318,
    "radius_m": 300
   }
  },
@@ -21055,11 +21055,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Sunday River Covered"
+   "text": "AE Robinson Convenien"
   },
   "truth": {
-   "lat": 44.492277,
-   "lon": -70.843424,
+   "lat": 45.1672578,
+   "lon": -69.3859635,
    "radius_m": 300
   }
  },
@@ -21069,11 +21069,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Barn on 26 An"
+   "text": "Party C"
   },
   "truth": {
-   "lat": 43.93233153185235,
-   "lon": -70.35288339118601,
+   "lat": 44.347132,
+   "lon": -69.789185,
    "radius_m": 300
   }
  },
@@ -21083,11 +21083,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Flaherty Equestrian "
+   "text": "Oyster River Wineg"
   },
   "truth": {
-   "lat": 43.586333562755556,
-   "lon": -70.37816058423827,
+   "lat": 44.10176109,
+   "lon": -69.22185242,
    "radius_m": 300
   }
  },
@@ -21097,11 +21097,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Maine Mi"
+   "text": "Aeropo"
   },
   "truth": {
-   "lat": 44.205911,
-   "lon": -69.061675,
+   "lat": 43.63302001423414,
+   "lon": -70.33393944618143,
    "radius_m": 300
   }
  },
@@ -21111,11 +21111,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Bavarian Chocola"
+   "text": "Mountain Machin"
   },
   "truth": {
-   "lat": 44.05423876,
-   "lon": -70.71055793,
+   "lat": 44.04695455,
+   "lon": -70.27745621,
    "radius_m": 300
   }
  },
@@ -21125,11 +21125,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Mc Kennel's Anim"
+   "text": "Centerline Auto"
   },
   "truth": {
-   "lat": 44.51305579,
-   "lon": -70.54797657,
+   "lat": 44.47862256,
+   "lon": -70.64327188,
    "radius_m": 300
   }
  },
@@ -21139,11 +21139,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "99 Restaur"
+   "text": "United States Postal"
   },
   "truth": {
-   "lat": 43.93790666,
-   "lon": -69.9777096,
+   "lat": 47.15527124127743,
+   "lon": -68.57278972864151,
    "radius_m": 300
   }
  },
@@ -21153,11 +21153,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Community Radio W"
+   "text": "Bennett's Gems "
   },
   "truth": {
-   "lat": 44.56499352588156,
-   "lon": -68.66632348463081,
+   "lat": 44.4333355,
+   "lon": -68.99819472,
    "radius_m": 300
   }
  },
@@ -21167,11 +21167,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Stonecr"
+   "text": "Aging Kingdom H"
   },
   "truth": {
-   "lat": 44.45315567,
-   "lon": -69.09209089,
+   "lat": 43.65865556,
+   "lon": -70.25763022,
    "radius_m": 300
   }
  },
@@ -21181,11 +21181,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Blue Rhino Propane"
+   "text": "Ingram fin"
   },
   "truth": {
-   "lat": 43.51466,
-   "lon": -70.378611,
+   "lat": 44.00264618,
+   "lon": -69.66481265,
    "radius_m": 300
   }
  },
@@ -21195,11 +21195,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Scarborough Fire Dep"
+   "text": "Abac"
   },
   "truth": {
-   "lat": 43.59056136,
-   "lon": -70.29591421,
+   "lat": 43.85577734,
+   "lon": -70.10527475,
    "radius_m": 300
   }
  },
@@ -21209,11 +21209,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "South Portland Fir"
+   "text": "Nor"
   },
   "truth": {
-   "lat": 43.6285602,
-   "lon": -70.29377244,
+   "lat": 44.001841,
+   "lon": -69.66442,
    "radius_m": 300
   }
  },
@@ -21223,11 +21223,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Hometown Hair"
+   "text": "Genest Concrete: Landscape Masonry Supply"
   },
   "truth": {
-   "lat": 46.68189757,
-   "lon": -68.15891846,
+   "lat": 43.439104431451085,
+   "lon": -70.76183438301088,
    "radius_m": 300
   }
  },
@@ -21237,11 +21237,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Easy Street Aut"
+   "text": "Mary Snow S"
   },
   "truth": {
-   "lat": 43.65699005074917,
-   "lon": -70.25035858154297,
+   "lat": 44.81737415,
+   "lon": -68.77298358,
    "radius_m": 300
   }
  },
@@ -21251,11 +21251,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "KUMA Fit Saco: Kickboxing & Fi"
+   "text": "DownEast Christia"
   },
   "truth": {
-   "lat": 43.55682137964168,
-   "lon": -70.40176928495947,
+   "lat": 44.61633987,
+   "lon": -67.78504944,
    "radius_m": 300
   }
  },
@@ -21265,11 +21265,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Dingley Buil"
+   "text": "Star City Sanitati"
   },
   "truth": {
-   "lat": 44.0984831,
-   "lon": -70.2158933,
+   "lat": 46.7006876,
+   "lon": -68.0202282,
    "radius_m": 300
   }
  },
@@ -21279,11 +21279,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Greene Christian Com"
+   "text": "Absolute Hypn"
   },
   "truth": {
-   "lat": 44.18232503,
-   "lon": -70.16469024,
+   "lat": 44.795711517334,
+   "lon": -68.7564697265625,
    "radius_m": 300
   }
  },
@@ -21293,11 +21293,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Home2 Suites by Hilton Portlan"
+   "text": "North Bubble Ridge Trail"
   },
   "truth": {
-   "lat": 43.642927,
-   "lon": -70.330655,
+   "lat": 44.3534635,
+   "lon": -68.3461864,
    "radius_m": 300
   }
  },
@@ -21307,11 +21307,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "MaineHealth Behavioral Health - La"
+   "text": "Tim Ho"
   },
   "truth": {
-   "lat": 43.661154,
-   "lon": -70.26142,
+   "lat": 46.86835188831183,
+   "lon": -68.00407833901822,
    "radius_m": 300
   }
  },
@@ -21321,11 +21321,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "West Street"
+   "text": "East Ridge Unio"
   },
   "truth": {
-   "lat": 44.3907372,
-   "lon": -68.20685732,
+   "lat": 46.55341661,
+   "lon": -67.8386535,
    "radius_m": 300
   }
  },
@@ -21335,11 +21335,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Monmouth A"
+   "text": "Iron Worker"
   },
   "truth": {
-   "lat": 44.25064551,
-   "lon": -70.03760929,
+   "lat": 44.64131915,
+   "lon": -69.53591403,
    "radius_m": 300
   }
  },
@@ -21349,11 +21349,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Full Circle Artisan's "
+   "text": "Totally "
   },
   "truth": {
-   "lat": 43.8050699,
-   "lon": -70.80292426,
+   "lat": 43.4396432513328,
+   "lon": -70.77563140023753,
    "radius_m": 300
   }
  },
@@ -21363,11 +21363,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Tang's Chines"
+   "text": "Harpswell Sc"
   },
   "truth": {
-   "lat": 46.13130882,
-   "lon": -67.84076073,
+   "lat": 43.8235316351625,
+   "lon": -69.96405110050758,
    "radius_m": 300
   }
  },
@@ -21377,11 +21377,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Kennebunk Family "
+   "text": "If You Sa"
   },
   "truth": {
-   "lat": 43.38428154,
-   "lon": -70.54492681,
+   "lat": 43.94785006,
+   "lon": -70.19978593,
    "radius_m": 300
   }
  },
@@ -21391,11 +21391,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Field's "
+   "text": "Town of Har"
   },
   "truth": {
-   "lat": 43.80511981,
-   "lon": -69.98982388,
+   "lat": 43.8137763,
+   "lon": -69.94313945,
    "radius_m": 300
   }
  },
@@ -21405,11 +21405,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "The Learning Place "
+   "text": "Peacock Consignmen"
   },
   "truth": {
-   "lat": 43.3416278,
-   "lon": -70.5677037,
+   "lat": 44.7784663,
+   "lon": -68.77671469,
    "radius_m": 300
   }
  },
@@ -21419,11 +21419,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "M & C Beauty S"
+   "text": "Goold Health Syste"
   },
   "truth": {
-   "lat": 44.195387,
-   "lon": -70.525924,
+   "lat": 44.366471,
+   "lon": -69.80134,
    "radius_m": 300
   }
  },
@@ -21433,11 +21433,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Patriot Insurance "
+   "text": "Black Element T"
   },
   "truth": {
-   "lat": 43.80301554,
-   "lon": -70.18191736,
+   "lat": 43.91123841,
+   "lon": -69.97573844,
    "radius_m": 300
   }
  },
@@ -21447,11 +21447,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Beverly and T"
+   "text": "Allison Caldw"
   },
   "truth": {
-   "lat": 43.64962714,
-   "lon": -70.26213237,
+   "lat": 43.6533244,
+   "lon": -70.2751542,
    "radius_m": 300
   }
  },
@@ -21461,11 +21461,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Gogan Landsc"
+   "text": "Camp Aga"
   },
   "truth": {
-   "lat": 43.27813499,
-   "lon": -70.61444746,
+   "lat": 43.833596,
+   "lon": -70.438499,
    "radius_m": 300
   }
  },
@@ -21475,11 +21475,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Hummingbird Haven Mass"
+   "text": "Big Apple"
   },
   "truth": {
-   "lat": 43.7357813,
-   "lon": -70.5507658,
+   "lat": 43.40667563,
+   "lon": -70.52361685,
    "radius_m": 300
   }
  },
@@ -21489,11 +21489,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Lisa H"
+   "text": "Norumbega "
   },
   "truth": {
-   "lat": 44.054394,
-   "lon": -69.500528,
+   "lat": 44.80281487,
+   "lon": -68.77171972,
    "radius_m": 300
   }
  },
@@ -21503,11 +21503,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Gerard's "
+   "text": "Lighthouse"
   },
   "truth": {
-   "lat": 44.22971,
-   "lon": -69.772115,
+   "lat": 43.64040487,
+   "lon": -70.254654,
    "radius_m": 300
   }
  },
@@ -21517,11 +21517,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Portland Art"
+   "text": "Mexico Congregati"
   },
   "truth": {
-   "lat": 43.65802002,
-   "lon": -70.25383407,
+   "lat": 44.55549418,
+   "lon": -70.53990307,
    "radius_m": 300
   }
  },
@@ -21531,11 +21531,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Casco Farmers "
+   "text": "Flowlive St"
   },
   "truth": {
-   "lat": 44.004408434667084,
-   "lon": -70.52275192947577,
+   "lat": 43.6534572,
+   "lon": -70.2575087,
    "radius_m": 300
   }
  },
@@ -21545,11 +21545,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Freeport Police D"
+   "text": "Axis Natura"
   },
   "truth": {
-   "lat": 43.8543044,
-   "lon": -70.10724407,
+   "lat": 44.1054151,
+   "lon": -70.22617316,
    "radius_m": 300
   }
  },
@@ -21559,11 +21559,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Wilson Lake Inn & S"
+   "text": "AE Robinson Convenience Store "
   },
   "truth": {
-   "lat": 44.59003144,
-   "lon": -70.24831839,
+   "lat": 45.283757,
+   "lon": -69.499735,
    "radius_m": 300
   }
  },
@@ -21573,11 +21573,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Bird's Eye Wel"
+   "text": "American Academic Ad"
   },
   "truth": {
-   "lat": 43.4919624,
-   "lon": -70.4559634,
+   "lat": 44.59553853,
+   "lon": -69.76775761,
    "radius_m": 300
   }
  },
@@ -21587,11 +21587,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Cit"
+   "text": "United Way of Kenneb"
   },
   "truth": {
-   "lat": 43.80663153,
-   "lon": -70.17133324,
+   "lat": 44.3160151,
+   "lon": -69.77400641,
    "radius_m": 300
   }
  },
@@ -21601,11 +21601,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Boulder Nordic Spor"
+   "text": "Mocean Skatebo"
   },
   "truth": {
-   "lat": 43.669521,
-   "lon": -70.255836,
+   "lat": 43.6568061,
+   "lon": -70.2534675,
    "radius_m": 300
   }
  },
@@ -21615,11 +21615,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Western Un"
+   "text": "Regional Medical Center A"
   },
   "truth": {
-   "lat": 46.137622,
-   "lon": -67.83868,
+   "lat": 44.7154591,
+   "lon": -67.4615236,
    "radius_m": 300
   }
  },
@@ -21629,11 +21629,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Greg's Used Cars a"
+   "text": "Loco Cocos"
   },
   "truth": {
-   "lat": 44.04134352,
-   "lon": -69.6754052,
+   "lat": 43.08729333,
+   "lon": -70.74788402,
    "radius_m": 300
   }
  },
@@ -21643,11 +21643,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Northern Light Behavioral "
+   "text": "The Vywamus Fou"
   },
   "truth": {
-   "lat": 44.1169847,
-   "lon": -69.1036459,
+   "lat": 43.848765903045084,
+   "lon": -70.44913897593327,
    "radius_m": 300
   }
  },
@@ -21657,11 +21657,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "ASAP Sewer And Drain Cl"
+   "text": "Milbury Cyc"
   },
   "truth": {
-   "lat": 45.354924,
-   "lon": -68.5056716,
+   "lat": 43.27837375,
+   "lon": -70.85942745,
    "radius_m": 300
   }
  },
@@ -21671,11 +21671,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Morgan's Au"
+   "text": "Quaddy Point,"
   },
   "truth": {
-   "lat": 44.22037221,
-   "lon": -70.09168256,
+   "lat": 44.91943,
+   "lon": -67.00284,
    "radius_m": 300
   }
  },
@@ -21685,11 +21685,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "VIP Tires & Se"
+   "text": "Firefly, "
   },
   "truth": {
-   "lat": 44.54001882,
-   "lon": -70.51680711,
+   "lat": 44.03962152186087,
+   "lon": -69.51130002593604,
    "radius_m": 300
   }
  },
@@ -21699,11 +21699,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Lyle E. Littlefield Ornamentals Tr"
+   "text": "RN Coh"
   },
   "truth": {
-   "lat": 44.856290166667,
-   "lon": -68.72264105,
+   "lat": 43.65382897,
+   "lon": -70.26372847,
    "radius_m": 300
   }
  },
@@ -21713,11 +21713,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Bram Gell"
+   "text": "Brighton Ey"
   },
   "truth": {
-   "lat": 43.602531,
-   "lon": -70.317904,
+   "lat": 43.73529,
+   "lon": -70.30077663,
    "radius_m": 300
   }
  },
@@ -21727,11 +21727,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Eyes on R"
+   "text": "Burgess Construction & Pro"
   },
   "truth": {
-   "lat": 43.65815585,
-   "lon": -70.25362002,
+   "lat": 44.98407791233106,
+   "lon": -70.65873917161707,
    "radius_m": 300
   }
  },
@@ -21741,11 +21741,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Tim Hor"
+   "text": "Mainely Frames "
   },
   "truth": {
-   "lat": 44.82132191605628,
-   "lon": -68.777815076123,
+   "lat": 43.6558234,
+   "lon": -70.26139516,
    "radius_m": 300
   }
  },
@@ -21755,11 +21755,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Blonde and Co H"
+   "text": "K Erik Koste"
   },
   "truth": {
-   "lat": 43.68162466,
-   "lon": -70.34836338,
+   "lat": 43.6554243,
+   "lon": -70.2898592,
    "radius_m": 300
   }
  },
@@ -21769,11 +21769,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Dante's Pizza Co"
+   "text": "Chapman-Hall H"
   },
   "truth": {
-   "lat": 43.13281061597182,
-   "lon": -70.70254678889779,
+   "lat": 44.0325,
+   "lon": -69.52972222,
    "radius_m": 300
   }
  },
@@ -21783,11 +21783,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Carquest Auto Parts - H.C. ROL"
+   "text": "Maine Fabric "
   },
   "truth": {
-   "lat": 44.547664744230204,
-   "lon": -67.89835631847383,
+   "lat": 43.622184753418,
+   "lon": -70.2930221557617,
    "radius_m": 300
   }
  },
@@ -21797,11 +21797,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Lebanese C"
+   "text": "The High"
   },
   "truth": {
-   "lat": 44.55052292640391,
-   "lon": -69.62957415458914,
+   "lat": 43.92878769,
+   "lon": -69.95847649,
    "radius_m": 300
   }
  },
@@ -21811,11 +21811,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Premium Specialty H"
+   "text": "Personal Services Of A"
   },
   "truth": {
-   "lat": 44.5093053,
-   "lon": -70.5839123,
+   "lat": 46.6952415,
+   "lon": -68.0021207,
    "radius_m": 300
   }
  },
@@ -21825,11 +21825,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Chebegue Island Hall"
+   "text": "Green Leaf Holistic Ma"
   },
   "truth": {
-   "lat": 43.74002561,
-   "lon": -70.10762946,
+   "lat": 43.14392401,
+   "lon": -70.65029747,
    "radius_m": 300
   }
  },
@@ -21839,11 +21839,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Blvd Gr"
+   "text": "Boothbay Harbo"
   },
   "truth": {
-   "lat": 46.91096441,
-   "lon": -67.82536957,
+   "lat": 43.85132553,
+   "lon": -69.62776007,
    "radius_m": 300
   }
  },
@@ -21853,11 +21853,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Shaw's Ridge Farm Ice Cream, BBQ "
+   "text": "Peoples Ins"
   },
   "truth": {
-   "lat": 43.4611282348633,
-   "lon": -70.7665252685547,
+   "lat": 43.26796441,
+   "lon": -70.59724318,
    "radius_m": 300
   }
  },
@@ -21867,11 +21867,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "PDQ D"
+   "text": "A Place to "
   },
   "truth": {
-   "lat": 44.1715109,
-   "lon": -69.0843229,
+   "lat": 43.40809134,
+   "lon": -70.56391896,
    "radius_m": 300
   }
  },
@@ -21881,11 +21881,11 @@
   "qtype": "exact",
   "kind": "venue",
   "params": {
-   "text": "Aroma "
+   "text": "Thank Goddess Sou"
   },
   "truth": {
-   "lat": 44.18764783,
-   "lon": -70.23725046,
+   "lat": 43.6378452,
+   "lon": -70.2515544,
    "radius_m": 300
   }
  },
