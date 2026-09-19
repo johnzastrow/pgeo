@@ -28,7 +28,9 @@ def load(run_dirs: list[Path]) -> list[dict]:
     found = {}
     for d in run_dirs:
         for p in d.glob("*.json"):
-            found[p.stem] = json.loads(p.read_text()) | {"run": d.name}
+            doc = json.loads(p.read_text())
+            if "runs" in doc:  # skip non-result files (e.g. per-dataset API configs)
+                found[p.stem] = doc | {"run": d.name}
     return [found[k] for k in ORDER if k in found] + [
         v for k, v in sorted(found.items()) if k not in ORDER
     ]
@@ -48,6 +50,8 @@ def cfg_label(r: dict) -> str:
     c = r["config"]
     cpus = "all" if c["cpus"] is None else str(c["cpus"])
     mem = "unlimited" if r["budget_gb"] is None else f"{r['budget_gb']} GB"
+    if "heap" not in c:  # pgeo configuration (tests/load/run_matrix_pgeo.py)
+        return f"{cpus} CPU / {mem} / shared_buffers {c['sb']} / {c['conns']} connections"
     return f"{cpus} CPU / {mem} / heap {c['heap']} / {c['workers']} API worker(s)"
 
 

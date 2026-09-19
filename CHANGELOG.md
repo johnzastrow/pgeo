@@ -23,6 +23,18 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+## [0.10.1] - 2026-09-19
+
+### Added
+- Load-test results for both engines (`docs/LOAD_TEST_RESULTS.md`,
+  `docs/LOAD_TEST_RESULTS_PGEO.md`, plots in `docs/loadtest*/`) and the head-to-head
+  answer to the capacity questions (`docs/ENGINE_COMPARISON.md`): Pelias serves 4-24x more
+  users per CPU; pgeo meets the 3-user target in 1.6 GB and is more accurate.
+- Pelias data-volume results (C3 x D1-D5): 384 -> 192 users as OSM and Overture are added.
+
+### Fixed
+- `tests/load/report.py`: skips non-result JSON in run folders and labels pgeo configs.
+
 ## [0.10.0] - 2026-09-19
 
 ### Added
@@ -127,7 +139,8 @@ commits where each milestone was complete.
   (`docs/DATA_PIPELINE.md`).
 - Project plan, environment facts and decision log.
 
-[Unreleased]: https://git.example.org/jcz/pelias_maine/compare/v0.10.0...HEAD
+[Unreleased]: https://git.example.org/jcz/pelias_maine/compare/v0.10.1...HEAD
+[0.10.1]: https://git.example.org/jcz/pelias_maine/compare/v0.10.0...v0.10.1
 [0.10.0]: https://git.example.org/jcz/pelias_maine/compare/v0.9.0...v0.10.0
 [0.9.0]: https://git.example.org/jcz/pelias_maine/compare/v0.8.0...v0.9.0
 [0.8.0]: https://git.example.org/jcz/pelias_maine/compare/v0.7.0...v0.8.0

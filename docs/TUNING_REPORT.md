@@ -208,8 +208,12 @@ Next experiments (plan in PGEO_TUNING.md):
 | Memory "standard" profile | placeholder 0.5 GB -> 0.8 GB | OOM-killed at 128 users in C3, C4, C4a |
 | Elasticsearch heap | 768 MB to 2 GB by configuration; 4 GB unconstrained | Sized per budget in the load matrix |
 
-The Pelias runs with the raised limits are in progress; the final recommended Pelias
-limits for the VM will be added here and to the deployment when they finish.
+Result of the reruns with placeholder at 0.8 GB (run `20260918-2051`): no service was
+OOM-killed or restarted in any configuration; limits 96 users (1 vCPU), 192 (2 vCPU),
+384 (4 vCPU with 4 API workers). Recommended Pelias memory for a VM: the "standard"
+profile with placeholder 0.8 GB (libpostal 2.2, interpolation 2.3, pip 0.9, Elasticsearch
+2-3 GB with a 1-2 GB heap) plus ~0.8 GB for the OS: about 9.5-10.8 GB. Head-to-head with
+pgeo: [ENGINE_COMPARISON.md](ENGINE_COMPARISON.md).
 
 ## 7. Applying the tuning to later builds
 
