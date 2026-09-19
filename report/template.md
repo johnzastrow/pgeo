@@ -942,8 +942,10 @@ seen. The capacity and memory findings carry no such caveat.
 
 ## 6. Next steps
 
-- **Reverse and autocomplete speed**: profile the remaining per-request cost in PL/pgSQL (prepared
-  statements, fewer candidate queries, a GiST trigram index for ordered similarity).
+- **Autocomplete speed**: with reverse geocoding fixed, autocomplete is the endpoint that decides
+  pgeo's capacity ({{ref:figure:endpoint_ramp}}), and it has the tightest target. Profile the
+  per-request cost in PL/pgSQL: prepared statements, fewer candidate queries, and a GiST trigram
+  index for ordered similarity. This is where another factor of two in capacity would come from.
 - **Scale out for more users**: read replicas behind PostgREST, or caching of frequent queries at
   the edge; measure against the Pelias curve.
 - **New Hampshire**: build both engines for two states; measure the data-volume effect on pgeo
@@ -952,7 +954,8 @@ seen. The capacity and memory findings carry no such caveat.
 - **Test set**: remove the eight false misses; add real user queries once the service is in use.
 - **Shadow comparison on real traffic**: keep Pelias beside pgeo on the query host for a few weeks,
   score both on real searches (neither engine tuned on them), then decide whether to retire Pelias
-  (saving ~8.5 GB of memory on the host).
+  (freeing its {{value:floor_pelias_gb}} on the host). This is also the only way to settle the
+  tuning caveat in Section 4.
 - **libpostal model update** (Senzing libpostal-data): re-test the libpostal arm for accuracy and
   memory.
 - **Authorization** (Phase 11): single sign-on plus hashed API keys at the edge before LANCER uses
