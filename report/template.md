@@ -88,7 +88,8 @@ product**. That principle motivated building pgeo alongside Pelias and measuring
 | Target host | VM 120 (`geocoder.example.org`), 4 vCPU and 10 GB RAM, NVMe storage, LAN only |
 | Build and test host | Workstation: {{value:host_cpu}}, {{value:host_threads}} threads, {{value:host_mem}} RAM |
 | Reference recipe | The Pelias `docker` project for Texas, adapted for Maine |
-| Data | Open data only; no OpenAddresses API token (the statewide Maine file was used) |
+| Data | Open data only. No OpenAddresses API token is needed: the statewide Maine file is downloaded without one |
+| Where things run | Builds and all controlled tests run on the workstation; the service runs on VM 120 on the Proxmox host (192.0.2.10) and is reached through the wharf Caddy |
 | Goals | G1 accurate Maine geocoding; G2 LAN-only, HTTPS; G3 reproducible build; G4 demo page; G5 minimum resources for 3 users; G6 fewest components |
 
 ### 1.3 Questions
@@ -128,6 +129,22 @@ function can serve it. Two front ends were built and measured:
 - **FastAPI** (application): the same SQL functions behind a Python service, kept as the
   baseline to show what an application layer adds or costs.
 
+PostgreSQL core and its contrib extensions contain no HTTP server, so "Postgres as the endpoint"
+always needs either third-party code inside the database or a small gateway beside it. The options
+were weighed as follows (docs/HTTP_OPTIONS.md has the full research and sources):
+
+```table http_options
+| Option | For | Against | Decision |
+|---|---|---|---|
+| PostgREST (external gateway) | no business logic outside SQL; mature; database roles as the security model; crash-isolated from the database; pooling built in | one more process; `/rpc/` paths and dotted parameters need an edge mapping | chosen |
+| Omnigres `omni_httpd` (in the database) | literally "Postgres is the API"; no extra hop; full URL control | third-party C code in the database process; early maturity; upgrades tied to PostgreSQL releases; HTTP workers compete with queries | rejected |
+| OpenResty + pgmoon (nginx + Lua) | nginx already present; full control of paths and parameters | a custom nginx build and Lua code to own | fallback |
+| pg_featureserv, pREST, GraphQL gateways | publish functions quickly | OGC or GraphQL shapes, not the Pelias API | not suitable |
+| FastAPI (application) | flexible; any parser | application code to maintain | kept as baseline |
+```
+
+{{table:http_options|HTTP options for serving the SQL API.}}
+
 {{figure:query_pipeline|The pgeo forward-search pipeline. Each step is SQL; the tuning work in
 Section 2.7 changed steps 1, 3, 4, 5 and 6.}}
 
@@ -149,6 +166,16 @@ build-time deduplication in pgeo; venues differ because pgeo also deduplicates O
 places that share a name and position.}}
 
 {{table:layers|Records by layer.}}
+
+**Overture Maps.** Every Overture theme was evaluated for Maine (2026-08-19 release). *Places* add
+value and were loaded (76,582 after quality and boundary rules). *Addresses* add nothing for Maine:
+all 772,684 come from the national address database, which is built from the same Maine E911 address
+points as OpenAddresses; every apparently unique record has an OpenAddresses twin within 5 m that
+differs only in spelling ("78 East Grand Avenue" vs "78 E Grand Ave"), and 90% of pairs have
+identical coordinates. They remain a token-free fallback and a source of spelled-out street aliases,
+and should be re-checked for New Hampshire. *Divisions* parallel Who's On First (1,145 localities, 916
+polygons) and cannot feed Pelias's point-in-polygon service; they were not used. *Water, land and
+roads* are derived from OpenStreetMap, which is already loaded.
 
 Data problems found and fixed during preparation (all in `prep/`): GNIS points outside Maine,
 a pipe-delimited ZCTA gazetteer, an Overture extract that leaked into Portsmouth, New
@@ -233,8 +260,16 @@ warms them up, runs a 3-user validation (3 minutes), then ramps through 1, 2, 3,
 24, 32, 48, 64, 96, 128, 192, 256, 384 and 512 users (15 s warm-up plus 60 s measured at each
 step). A step **passes** when every endpoint's p95 is within target and errors stay below 1%;
 the run stops when errors exceed 5%, any p95 exceeds five times its target, or a service dies.
-Caches warm up by design and warm-up traffic is excluded, so the numbers describe a service in
-steady use, not a cold start.
+**Caching.** No response caching is configured anywhere (nginx, Caddy, the Pelias API and pgeo
+all answer every request afresh). The caches that do exist are warmed on purpose and are the same for
+both engines: containers are recreated for every configuration (clearing the Elasticsearch query
+cache and PostgreSQL's shared buffers), a fixed warm-up runs before measuring, and warm-up requests
+are excluded from the results. The operating system's page cache survives container recreation.
+All numbers therefore describe a server in continuous use, not a cold start. The query corpus is
+large (Table {{ref:table:corpus}}) and drawn at random, so exact repeats are rare.
+
+**Scope.** Every test in this section was run on both engines with the same session, corpus, targets
+and ramp; pgeo additionally with both of its front ends.
 
 ```table configs
 | Engine | Config | vCPU | Memory budget | Notes |
@@ -267,6 +302,16 @@ pgeo was tuned in rounds. Each round started from the failing test cases (what c
 was expected, which query step lost the right answer), changed one thing, and re-ran the full
 accuracy set, the fuzz set and a per-category comparison that listed every flipped case. A
 change was kept only if overall accuracy did not drop and no category lost more than noise.
+**Parallelism.** PostgreSQL uses several cores in two ways. Between queries, every connection is
+its own backend process, so concurrent users spread across all available cores; pgeo's connection
+pools are sized to about two per core, and capacity grew in proportion to the cores given
+(Section 3.4), which shows the cores are used. Within a single query, PostgreSQL can split large
+scans across parallel workers; this is switched off (`max_parallel_workers_per_gather = 0`) for
+serving, because pgeo's queries take 5-100 ms and read small, indexed row sets, where starting
+workers costs more than it saves and would take cores away from other users. It was not measured
+(experiment T2 in docs/PGEO_TUNING.md). The build, which scans whole tables, does use four parallel
+workers.
+
 The final state is protected by:
 
 - **tuning profiles** (`pgeo-tune`): measured PostgreSQL and front-end settings per machine size,
@@ -508,6 +553,25 @@ and the pure-SQL path rejects parameters it does not know where Pelias ignores t
 
 {{table:features|Features of each platform as deployed here.}}
 
+#### Structured addresses for LANCER
+
+pgeo's `/v1/address` returns a US address in USPS Publication 28 form (number, directionals,
+street name, standard suffix, unit, city, state, ZIP; the delivery and last lines) with the
+municipality, county and FIPS codes, for a selected search result, a typed address or a map
+position. When the selected result is not an address (a business or landmark, for example "Just in
+Time, Lewiston Maine"), it returns the nearest address point with its distance, as the project's
+requirement asked. The street parser gives a standard suffix for 97.1% of Maine's 41,868 street
+names; the rest have none in Publication 28 terms (Broadway, Rue Principale). Units come only from
+the caller, because search merges a building's per-unit records. Queries carry client addresses, so
+PostgreSQL never logs query parameters.
+
+**ZIP+4.** The USPS ZIP+4 file would add ZIP+4 codes, USPS street spellings and the USPS preferred
+city per ZIP (for example SOUTH PARIS for 04281, where the open data says PARIS). It costs $120 a
+year for one state ($1,750 for all), and its licence allows "internal corporate or personal use on
+one computer at one location", with no network distribution without a paid amendment (unlimited:
+$24,000) and no use of data older than 105 days. The project decided against it; the address API
+stays on open data and is not a deliverability check (docs/ADDRESS_API.md).
+
 The demo page exposes these features: autocomplete with map-centre bias, structured search,
 reverse geocoding by map click, a CSV batch tool, and, where both engines are deployed, an engine
 switch, an Address tab (type-ahead with a best-match suggestion, the USPS block with a copy
@@ -649,6 +713,43 @@ Inputs: `report/inputs.toml`. Figures are published as PNG (used in this report)
 (editable) in `docs/report_figures/`. Load tests: `tests/load/run_matrix.py` (Pelias) and
 `tests/load/run_matrix_pgeo.py` (pgeo); accuracy: `tests/accuracy/`; compatibility:
 `tests/compat/`.
+
+## Appendix C. Questions asked during the project
+
+Every question the project owner asked during the work, with a short answer and where the report
+answers it in full.
+
+```table questions
+| Question | Short answer | Section |
+|---|---|---|
+| Can the search capabilities be reproduced with a web API straight from PostgreSQL/PostGIS and extensions? | Yes: pgeo, SQL functions behind PostgREST, more accurate than Pelias on Maine data | 2.1, 3 |
+| Is Overture address data worth using, compared with OpenAddresses? | Not for Maine: the same E911 points packaged twice; places were loaded | 2.2 |
+| Did the VM go on the Proxmox host or locally? | The service runs on VM 120 on the Proxmox host; builds and controlled tests run on the workstation | 1.2 |
+| Is an OpenAddresses API key needed? | No: the statewide Maine file downloads without one | 1.2 |
+| Can caching affect later results? | Caches are warmed the same way for both engines and warm-up is excluded; results are warm steady state | 2.5 |
+| Is all the testing only with Pelias? | No: every test ran on both engines (pgeo with both front ends) | 2.5 |
+| How long do the tests take? | Accuracy 3-5 min per engine; a capacity matrix 2-7 hours; the minimum-server search 2-3 hours | Appendix A |
+| What are the latency targets? | p95: autocomplete 250 ms, search and structured 750 ms, reverse 400 ms; errors below 1% | 2.5 |
+| How many users does the ramp go to? | 1 up to 512, stopping when a configuration breaks | 2.5 |
+| Does pgeo use PostgreSQL's parallelism across cores? | Yes between queries (one backend per connection; capacity scales with cores); intra-query parallelism is off for short queries and not measured | 2.7, 3.4 |
+| Can pgeo replace Pelias for existing clients, with extensions? | Yes for the documented API (27 of 27 contract cases), plus `/v1/address` | 3.8, 3.10 |
+| Is testing on the Proxmox VM needed for accurate results? | Both: the workstation isolates the engines for a fair comparison; the VM measures the real service | 2.5, 3.11 |
+| Which machine does the builds? | The workstation (Ryzen 5 3600, 31 GB); builds are shipped to the VM as a snapshot and a dump | 1.2, 2.3 |
+| Do the platforms now have feature and accuracy parity? | Feature parity for the documented API; pgeo is more accurate; Pelias has about four times the throughput per CPU | 3.10 |
+| Is there still a reason to use Pelias? | For many users per server, multi-state or international coverage, or a maintained upstream | 4 |
+| Can USPS ZIP+4 data improve the addresses? | Yes technically, but it is licensed for internal use on one computer; declined | 3.9 |
+| Does the newer libpostal model (Senzing libpostal-data) help in the US? | Not evaluated in this study; pgeo's rule parser already beats the current libpostal (95.8% vs 94.0%), so it would matter mainly for Pelias | 6 |
+| Can a non-address search result return the nearest street address? | Yes: `/v1/address` returns the nearest address point and its distance | 3.9 |
+| Which engine performs better, and is pgeo good enough on the same or fewer resources? | Pelias is faster; pgeo meets the 3-user goal in a quarter of the memory and is more accurate | Summary, 3.4, 3.10 |
+| How do more data layers affect performance? | Pelias: addresses barely; OSM and Overture places cost one ramp step each | 3.6 |
+| What are the arguments for and against the external HTTP options? | PostgREST chosen; Omnigres rejected (code in the database); OpenResty as fallback | 2.1 |
+| What does each platform need to build and to run, and what loads and data can it support? | Sizing guide by load; operating and build requirements | 3.5 |
+| What features does each platform provide? | Feature matrix and parity table | 3.9, 3.10 |
+| How small can a server be for 3 concurrent users, and how many users does it then scale to? | See Section 3.12 | 3.12 |
+```
+
+{{table:questions|Questions asked during the project, with short answers and the sections that
+answer them in full.}}
 
 ## Appendix B. pgeo storage
 
