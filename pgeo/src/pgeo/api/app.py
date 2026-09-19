@@ -255,7 +255,7 @@ async def run_search(request: Request, text: str | None, p: Parsed, c: dict) -> 
         return await con.fetch(
             SEARCH_SQL,
             text,
-            p.name_query() if text else p.name,
+            p.name,  # the SQL also searches the full text unless an address was parsed
             p.housenumber,
             p.street,
             p.locality,

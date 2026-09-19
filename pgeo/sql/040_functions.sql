@@ -52,10 +52,15 @@ RETURNS SETOF geocode.hit
 LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
 DECLARE
-  qn    text := nullif(geocode.norm(coalesce(nullif(p_name, ''), p_text, '')), '');
+  qf    text := nullif(geocode.norm(coalesce(p_text, '')), '');      -- full query
+  qn    text := nullif(geocode.norm(p_name), '');                     -- parser's name part
   st    text := nullif(geocode.norm(p_street), '');
   loc   text := nullif(geocode.norm(p_locality), '');
   hn    text := nullif(lower(trim(p_hn)), '');
+  -- A parsed house number + street means address intent: the full text is then not searched
+  -- as a place name (it would match the town and outrank the address).
+  addr_intent boolean := hn IS NOT NULL AND st IS NOT NULL;
+  targets text[];
   hni   integer := geocode.hn_int(p_hn);
   pc    text := substring(p_postcode from '\d{5}');
   focus geometry := CASE WHEN p_focus_lon IS NOT NULL AND p_focus_lat IS NOT NULL
@@ -66,6 +71,14 @@ DECLARE
 BEGIN
   PERFORM set_config('pg_trgm.similarity_threshold', '0.3', true);
   PERFORM set_config('pg_trgm.word_similarity_threshold', '0.5', true);
+  -- Name strings to try: the parser's name part; the full text unless an address was parsed;
+  -- a bare town ("Portland, Maine"). Parsers misread odd input ("T4 R9 WELS"), so the full
+  -- text is the safety net.
+  targets := ARRAY(SELECT DISTINCT t FROM unnest(ARRAY[
+               qn,
+               CASE WHEN NOT addr_intent THEN qf END,
+               CASE WHEN NOT addr_intent AND st IS NULL AND hn IS NULL THEN loc END]) t
+             WHERE t IS NOT NULL AND t <> '');
 
   RETURN QUERY
   WITH
@@ -93,7 +106,8 @@ BEGIN
     SELECT s.street_norm, s.locality_norm, s.st_sim, s.loc_sim, lo.geom AS g_lo, hi.geom AS g_hi,
            lo.hn_int AS n_lo, hi.hn_int AS n_hi, lo.id AS lo_id
     FROM (SELECT * FROM streets x
-          WHERE NOT EXISTS (SELECT 1 FROM addr_exact e JOIN pgeo.feature f ON f.id = e.id
+          WHERE x.st_sim >= 0.6
+            AND NOT EXISTS (SELECT 1 FROM addr_exact e JOIN pgeo.feature f ON f.id = e.id
                             WHERE f.street_norm = x.street_norm AND f.locality_norm = x.locality_norm)
           ORDER BY x.st_sim + coalesce(x.loc_sim, 0) DESC LIMIT 3) s
     CROSS JOIN LATERAL (
@@ -113,20 +127,25 @@ BEGIN
     FROM streets s
     JOIN pgeo.feature f ON f.layer = 'street' AND f.street_norm = s.street_norm
                         AND f.locality_norm = s.locality_norm
+    WHERE s.st_sim >= 0.6
     ORDER BY f.street_norm, f.locality_norm, f.id
   ),
   -- Place / venue / admin names (addresses excluded from this index).
   names AS (
-    SELECT f.id,
-           greatest(similarity(f.name_norm, qn), 0.95 * word_similarity(f.name_norm, qn)) AS nsim
-    FROM pgeo.feature f
-    WHERE qn IS NOT NULL AND f.layer <> 'address' AND f.name_norm % qn
-    ORDER BY similarity(f.name_norm, qn) DESC
-    LIMIT 80
+    SELECT n.id, max(n.nsim) AS nsim
+    FROM unnest(targets) AS q(txt)
+    CROSS JOIN LATERAL (
+      SELECT f.id,
+             greatest(similarity(f.name_norm, q.txt), 0.9 * word_similarity(f.name_norm, q.txt))::double precision AS nsim
+      FROM pgeo.feature f
+      WHERE f.layer <> 'address' AND f.name_norm % q.txt
+      ORDER BY similarity(f.name_norm, q.txt) DESC
+      LIMIT 60) n
+    GROUP BY n.id
   ),
   names_exact AS (
     SELECT f.id, 1.0::double precision AS nsim FROM pgeo.feature f
-    WHERE qn IS NOT NULL AND f.layer <> 'address' AND f.name_norm = qn
+    WHERE cardinality(targets) > 0 AND f.layer <> 'address' AND f.name_norm = ANY (targets)
     LIMIT 40
   ),
   town AS (  -- the town itself, for fallbacks when nothing finer matches
@@ -164,6 +183,7 @@ BEGIN
     SELECT DISTINCT ON (c.id, c.ihn) c.*, f,
            -- agreement with the query's town / ZIP
            CASE WHEN loc IS NULL AND pc IS NULL THEN 1.0
+                WHEN loc IS NOT NULL AND c.loc_sim IS NULL AND position(loc in coalesce(f.name_norm, '')) > 0 THEN 1.0
                 ELSE greatest(
                   coalesce(c.loc_sim, CASE WHEN loc IS NULL THEN 0 ELSE similarity(coalesce(f.locality_norm, ''), loc) END),
                   CASE WHEN pc IS NOT NULL AND f.postcode = pc THEN 1.0 ELSE 0 END,
@@ -179,14 +199,19 @@ BEGIN
                                     WHEN s.agree >= 0.5 THEN 0.8 ELSE 0.45 END)::real AS conf
     FROM scored s
   )
-  SELECT (z.h).*
+  SELECT (d.h).* FROM (
+  SELECT z.h, row_number() OVER (
+           PARTITION BY (z.h).label,
+                        CASE (z.h).layer WHEN 'localadmin' THEN 'locality' ELSE (z.h).layer END
+           ORDER BY (z.h).score DESC, CASE (z.h).layer WHEN 'locality' THEN 0 ELSE 1 END,
+                    CASE (z.h).source WHEN 'whosonfirst' THEN 0 WHEN 'openaddresses' THEN 1 ELSE 2 END) AS dup
   FROM final fi
   CROSS JOIN LATERAL (
     SELECT CASE WHEN fi.ihn IS NULL THEN
       geocode.to_hit(fi.f, fi.conf, fi.mt, fi.acc,
                      CASE WHEN focus IS NULL THEN NULL
                           ELSE ST_Distance((fi.f).geom::geography, focus::geography) / 1000 END,
-                     (fi.conf + 0.1 * (fi.f).importance + 0.1 * geocode.focus_boost((fi.f).geom, focus))::real)
+                     (fi.conf + 0.05 * (fi.f).importance + 0.1 * geocode.focus_boost((fi.f).geom, focus))::real)
     ELSE
       -- interpolated address: synthesize the row at the interpolated position
       ROW(NULL, 'interpolation:address:' || (fi.f).street_norm || ':' || fi.ihn || ':' || coalesce((fi.f).locality_norm, ''),
@@ -196,11 +221,13 @@ BEGIN
           fi.ihn || ' ' || (fi.f).street || coalesce(', ' || coalesce((fi.f).locality, (fi.f).localadmin), '') || ', ME, USA',
           NULL, NULL, ST_X(fi.igeom), ST_Y(fi.igeom), NULL, fi.conf, 'interpolated', 'point',
           CASE WHEN focus IS NULL THEN NULL ELSE ST_Distance(fi.igeom::geography, focus::geography) / 1000 END,
-          (fi.conf + 0.1 * (fi.f).importance + 0.1 * geocode.focus_boost(fi.igeom, focus))::real)::geocode.hit
+          (fi.conf + 0.05 * (fi.f).importance + 0.1 * geocode.focus_boost(fi.igeom, focus))::real)::geocode.hit
     END AS h
   ) z
   WHERE fi.conf >= 0.3                         -- drop weak matches: misses return nothing
-  ORDER BY (z.h).score DESC
+  ) d
+  WHERE d.dup = 1                               -- one result per label (locality/localadmin, ZIP sources)
+  ORDER BY (d.h).score DESC
   LIMIT lim;
 END
 $$;
@@ -263,8 +290,10 @@ BEGIN
   ELSE
     RETURN QUERY
     SELECT (z.h).*
-    FROM (SELECT * FROM pgeo.feature x WHERE x.tokens @@ tsq AND x.layer <> 'address'
-          ORDER BY x.importance DESC LIMIT 400) f
+    FROM (SELECT DISTINCT ON (y.label) y.* FROM
+            (SELECT * FROM pgeo.feature x WHERE x.tokens @@ tsq AND x.layer <> 'address'
+             ORDER BY x.importance DESC LIMIT 400) y
+          ORDER BY y.label, y.importance DESC) f
     CROSS JOIN LATERAL (SELECT geocode.to_hit(f, NULL, NULL, 'centroid',
              CASE WHEN focus IS NULL THEN NULL ELSE ST_Distance(f.geom::geography, focus::geography) / 1000 END,
              (f.importance
@@ -318,11 +347,12 @@ DECLARE
 BEGIN
   RETURN QUERY
   WITH nearest AS (
-    SELECT f, ST_Distance(f.geom::geography, pt::geography) AS d
-    FROM (SELECT * FROM pgeo.feature x
-          WHERE x.layer = ANY (point_layers)
-            AND (p_sources IS NULL OR cardinality(p_sources) = 0 OR x.source = ANY (p_sources))
-          ORDER BY x.geom <-> pt LIMIT lim * 3) f
+    SELECT x AS f, ST_Distance(x.geom::geography, pt::geography) AS d
+    FROM pgeo.feature x
+    WHERE x.layer = ANY (point_layers)
+      AND (p_sources IS NULL OR cardinality(p_sources) = 0 OR x.source = ANY (p_sources))
+    ORDER BY x.geom <-> pt
+    LIMIT lim * 3
   ),
   containing AS (
     SELECT f, 0::double precision AS d,
