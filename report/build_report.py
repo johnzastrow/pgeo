@@ -78,8 +78,11 @@ def main() -> int:
     r = Renderer(vals, tabs, figs, fig_dir_rel=FIG_PUBLISH.name, target="md")
     md = r.render(template)
     if r.missing:
-        print("report: unresolved references:\n  " + "\n  ".join(sorted(set(r.missing))), file=sys.stderr)
-        return 1
+        # a draft may reference results that a running experiment has not produced yet
+        where = "warning (draft)" if a.draft else "unresolved references"
+        print(f"report: {where}:\n  " + "\n  ".join(sorted(set(r.missing))), file=sys.stderr)
+        if not a.draft:
+            return 1
     publish_figures(FIG_BUILD, FIG_PUBLISH)
     OUT_MD.write_text(md)
     print(f"report: wrote {OUT_MD.relative_to(ROOT)} ({r.counts['figure']} figures, {r.counts['table']} tables)")

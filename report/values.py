@@ -378,6 +378,8 @@ def floor_values(v: dict, t: dict) -> None:
         if r:
             v[f"floor_{engine}_vcpu"] = f"{r['vcpu']:g}"
             v[f"floor_{engine}_gb"] = f"{r['memory_gb']:.2f} GB"
+            containers = sum(val for k, val in r["config"].items() if k != "cpus")
+            v[f"floor_{engine}_ct_gb"] = f"{containers:.2f} GB"
         for i, p in enumerate(d["path"]):
             c = p["config"]
             size = ", ".join(f"{k} {val:g}" for k, val in c.items())

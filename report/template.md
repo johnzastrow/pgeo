@@ -34,7 +34,12 @@ of this project in a {{value:budget_rest_Pmin}} memory budget on one vCPU, and h
 {{value:lim_rest_Pmin}} users there, where Pelias needs about {{value:budget_C1}} to run at all. A
 single missing index had made pgeo's reverse geocoding 20 to 45 times slower; fixing it raised pgeo's
 one-vCPU capacity from {{value:before_lim_rest_P1}} to {{value:lim_rest_P1}} users.
-<!-- PENDING: minimum server for 3 users per platform (floor search and temporary-VM confirmation) -->
+**The smallest server.** Shrinking one resource at a time until the three-user load stopped
+meeting its targets (Section 3.12) put pgeo's floor at **{{value:floor_pgeo_vcpu}} vCPU and
+{{value:floor_pgeo_gb}}** of memory and Pelias's at **{{value:floor_pelias_vcpu}} vCPU and
+{{value:floor_pelias_gb}}**. Both idle below a quarter of a core, so at this scale the bill is set
+by memory: pgeo fits the cheapest shared-CPU plans providers sell, Pelias needs a mid-range server.
+<!-- PENDING: temporary-VM confirmation of both floors -->
 
 **Compatibility and extensions.** pgeo passes all {{value:compat_cases}} cases of a Pelias API
 compatibility contract on both front ends, so existing Pelias clients work unchanged, and adds
@@ -622,7 +627,13 @@ Sources: [Linode/Akamai](https://techdocs.akamai.com/cloud-computing/docs/shared
 [Hetzner](https://www.hetzner.com/cloud/), [AWS Lightsail](https://aws.amazon.com/lightsail/pricing/),
 [Oracle free tier](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm).}}
 
-<!-- PENDING: one sentence mapping the measured floors to these plans, after the VM confirmation -->
+Measured against these plans: pgeo's {{value:floor_pgeo_gb}} floor is {{value:floor_pgeo_ct_gb}}
+of containers plus the 0.8 GB this study reserves for the operating system, so a 1 GB plan works
+only with a minimal OS and nothing else resident, while a 2 GB plan leaves real headroom; Pelias's
+{{value:floor_pelias_gb}} floor needs the 8 GB tier, roughly ten times the monthly price for the
+same three users. The 1 GB case is the one worth confirming on a real machine rather than a
+container limit, which Section 3.12 does.
+<!-- PENDING: replace the 1 GB expectation above with the temporary-VM result -->
 
 **Data volume.** For Pelias, capacity fell from {{value:ds_D1}} users with admin areas only to
 {{value:ds_D5}} with every source (Section 3.6); the index grew to 435 MB. pgeo's database grows with
@@ -762,6 +773,44 @@ and planet scale, none of which this deployment uses.
 ### 3.11 Production validation on VM 120
 
 <!-- PENDING: validation run on the resized VM 120 through the HTTPS path (both engines, one at a time) -->
+
+### 3.12 The smallest server that works
+
+The headline question of this project is not which engine is fastest but how small a machine the
+three-user service can run on. A search program answered it directly
+(`tests/load/find_floor.py`): start from a configuration known to pass, shrink one resource at a
+time -- first the CPU quota, then each service's memory -- and keep a step only when a five-minute
+three-user run stays within every latency target with no errors, no container restarts and no
+out-of-memory kill. A step that fails ends the search for that resource, because smaller values of
+it will fail too. {{ref:table:floor_path}} is the whole path, pass and fail.
+
+{{table:floor_path|Minimum-server search: every trial, in order, for both engines. Memory totals
+include 0.8 GB for the operating system.}}
+
+**pgeo** ran the three-user load inside **{{value:floor_pgeo_vcpu}} vCPU and
+{{value:floor_pgeo_gb}}** of memory in total: a quarter of one core, 0.45 GB for PostgreSQL,
+0.15 GB for PostgREST and 0.8 GB left for the operating system. Every failed step failed on
+latency, not on memory: the database kept answering at 0.35 GB and at 0.1 GB for the front end,
+just too slowly (7 to 13 percent over target). That is the practical signature of a database whose
+working set is smaller than the machine: it degrades gently instead of being killed.
+
+**Pelias** floors at **{{value:floor_pelias_vcpu}} vCPU and {{value:floor_pelias_gb}}**. Its limit
+is the opposite kind: the memory is not a tuning choice but the sum of what five services load
+before the first request (the libpostal model, the interpolation database, placeholder's in-memory
+tables and the Elasticsearch heap), so the floor barely moves however little traffic it serves.
+
+{{callout:key|The three-user service fits in {{value:floor_pgeo_gb}} on pgeo and
+{{value:floor_pelias_gb}} on Pelias. Both engines idle comfortably below a quarter of a core, so at
+this scale the machine is chosen by memory, not by CPU -- which is why the two platforms land in
+different price classes ({{ref:table:vps}}).}}
+
+**Confirmation on real machines.** A container limit is not a server: it shares the host's page
+cache, its disk and its kernel. Each floor was therefore re-tested on a temporary Proxmox VM of
+that size, created for the run and destroyed after it (`tests/load/floor_vm.sh`), with the same
+three-user validation followed by a ramp to find how far that VM stretches.
+
+{{table:floor_vm|The measured floors confirmed on temporary VMs: the three-user validation and the
+ramp to the first configuration outside a latency target.}}
 
 ## 4. Discussion
 
