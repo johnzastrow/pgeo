@@ -107,8 +107,11 @@ def accuracy_values(v: dict, t: dict) -> None:
             a_ = F.rate([r for r in acc["pelias"]["results"] if r["kind"] == kind])
             b_ = F.rate([r for r in acc["pgeo-sql"]["results"] if r["kind"] == kind])
             gap = b_ - a_
+            # a gap that rounds to zero point is a tie, whichever side it falls on
             lead = "pgeo" if gap >= 0.5 else ("Pelias" if gap <= -0.5 else "tie")
-            rows.append([F.KIND_LABEL[kind], pct(a_, 0), pct(b_, 0), f"{gap:+.0f}", lead])
+            # one decimal: rounding to whole points showed "100% vs 100%" with a -0 gap
+            d = 0 if abs(gap) >= 1 else 1
+            rows.append([F.KIND_LABEL[kind], pct(a_, d), pct(b_, d), f"{gap:+.{d}f}", lead])
         a_ = F.rate(acc["pelias"]["results"])
         b_ = F.rate(acc["pgeo-sql"]["results"])
         rows.append(["All cases", pct(a_), pct(b_), f"{b_ - a_:+.1f}", "pgeo" if b_ > a_ else "Pelias"])
@@ -283,15 +286,20 @@ def load_values(v: dict, t: dict) -> None:
         v["ratio_max"] = f"{max(ratios):.0f}"
     # parity: users within targets per CPU size, Pelias vs pgeo (both front ends)
     rows = []
-    for size, p_id, g in ((1, "C1", "P1"), (2, "C2", "P2"), (4, "C4", "P4")):
+    # at one vCPU the smaller Pmin budget reaches the same user count as P1, so quote that one
+    per_size = {1: ["Pmin", "P1"], 2: ["P2"], 4: ["P4"]}
+    for size, p_id, _g in ((1, "C1", "P1"), (2, "C2", "P2"), (4, "C4", "P4")):
         if p_id not in pel:
             continue
         pl = pel[p_id]["limit_users"]
         cells = [f"{size} vCPU", f"{pl} ({pel[p_id]['budget_gb']} GB)"]
+        chosen = {}
         for fe in ("rest", "api"):
-            r = pg.get(f"{fe}-{g}")
+            cands = [pg[f"{fe}-{c}"] for c in per_size[size] if f"{fe}-{c}" in pg]
+            r = min(cands, key=lambda x: (-x["limit_users"], x["budget_gb"])) if cands else None
+            chosen[fe] = r
             cells.append("-" if r is None else f"{r['limit_users']} ({r['budget_gb']} GB)")
-        best = max((pg[f"{fe}-{g}"]["limit_users"] for fe in ("rest", "api") if f"{fe}-{g}" in pg), default=0)
+        best = max((r["limit_users"] for r in chosen.values() if r), default=0)
         cells.append(f"{pl / best:.1f}x" if best else "-")
         rows.append(cells)
     t["parity_capacity"] = md_table(["CPU", "Pelias users (budget)", "pgeo pure SQL", "pgeo FastAPI",

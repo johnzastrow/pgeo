@@ -64,7 +64,7 @@ endpoint stayed within its latency target (log scale). pgeo configurations sit a
 |---|---|---|
 | Which engine is more accurate? | pgeo, by about 20 points overall and 50+ points on typos | Section 3.1 |
 | Which is faster under load? | Pelias, four times as many users per CPU | Section 3.4, Table 30 |
-| Smallest configuration for 3 users? | pgeo: 1 vCPU, 1.6 GB. Pelias: 1 vCPU, ~8.3 GB | Section 3.5 |
+| Smallest server for 3 users? | pgeo: 0.25 vCPU, 1.4 GB total. Pelias: see Section 3.12 | Section 3.12 |
 | Can PostgreSQL alone be the API? | Yes: PostgREST in front of SQL functions, identical accuracy | Sections 2.1, 3.8 |
 | Does more data slow Pelias? | Addresses barely; OSM and Overture places cost one ramp step each | Section 3.6 |
 | Drop-in replacement for Pelias clients? | Yes for the documented API (27 of 27 contract cases) | Section 3.8 |
@@ -195,7 +195,8 @@ visible later in memory and disk (Section 3.5): pgeo searches a smaller store.
 
 {{table:layers|Records by layer.}}
 
-**Overture Maps.** Every Overture theme was evaluated for Maine (2026-08-19 release). *Places* add
+**Overture Maps.** Every Overture theme was evaluated for Maine (2026-08-19 release), 203 MB of
+Parquet extracts in total, of which only the 16 MB *places* file was loaded. *Places* add
 value and were loaded (76,582 after quality and boundary rules). *Addresses* add nothing for Maine:
 all 772,684 come from the national address database, which is built from the same Maine E911 address
 points as OpenAddresses; every apparently unique record has an OpenAddresses twin within 5 m that
@@ -848,11 +849,13 @@ an upper bound until both engines have been scored on real queries neither has s
 - The accuracy set comes from the same sources both engines load; it measures finding what is in
   the data, not whether the data is correct. Eight miss cases are test-set errors.
 - Load tests ran on one workstation with CPU pinning and memory limits standing in for VM sizes;
-  absolute numbers on other hardware differ (Section 3.10 validates on the production VM).
+  absolute numbers on other hardware differ (Section 3.11 validates on the production VM).
 - At 1-4 users the per-endpoint p95 rests on few requests; the ramp's decisions at higher user
   counts rest on thousands.
-- One pgeo run was interrupted by a host event (the Docker daemon was stopped at 04:32 on
-  2026-09-19, unrelated to the test); it is marked where it appears.
+- One pgeo run (api-svc-P4) was interrupted by a host event: the Docker daemon was stopped at
+  04:32 on 2026-09-19, unrelated to the test, which ended the ramp at 32 users. That
+  configuration was re-run from the start, and the results here are the complete re-run; no
+  truncated run contributes a number to this report.
 - The first Pelias data-volume run failed because Elasticsearch was not ready after the previous
   run's restart; it was repeated with a readiness wait.
 
@@ -932,7 +935,7 @@ answers it in full.
 | Is an OpenAddresses API key needed? | No: the statewide Maine file downloads without one | 1.2 |
 | Can caching affect later results? | Caches are warmed the same way for both engines and warm-up is excluded; results are warm steady state | 2.5 |
 | Is all the testing only with Pelias? | No: every test ran on both engines (pgeo with both front ends) | 2.5 |
-| How long do the tests take? | Accuracy 3-5 min per engine; a capacity matrix 2-7 hours; the minimum-server search 2-3 hours | Appendix A |
+| How long do the tests take? | Accuracy 3-5 min per engine; a capacity matrix 2-7 hours; the minimum-server search 2-3 hours | Appendix A, `docs/REBUILD.md` section 4 |
 | What are the latency targets? | p95: autocomplete 250 ms, search and structured 750 ms, reverse 400 ms; errors below 1% | 2.5 |
 | How many users does the ramp go to? | 1 up to 512, stopping when a configuration breaks | 2.5 |
 | Does pgeo use PostgreSQL's parallelism across cores? | Yes between queries (one backend per connection; capacity scales with cores); intra-query parallelism is off for short queries and not measured | 2.7, 3.4 |
@@ -950,6 +953,7 @@ answers it in full.
 | What does each platform need to build and to run, and what loads and data can it support? | Sizing guide by load; operating and build requirements | 3.5 |
 | What features does each platform provide? | Feature matrix and parity table | 3.9, 3.10 |
 | How small can a server be for 3 concurrent users, and how many users does it then scale to? | See Section 3.12 | 3.12 |
+| What do the measured floors mean in shared-CPU VPS plans (Linode, DigitalOcean, Vultr, Hetzner and others)? | pgeo fits the cheapest 1-2 GB plans; Pelias needs an 8 GB plan, roughly ten times the price | 3.5 (Table 24), 3.12 |
 ```
 
 {{table:questions|Questions asked during the project, with short answers and the sections that

@@ -14,7 +14,7 @@ and observations made during the work (marked "session").
 - [ ] Pelias index: 1,649,644 documents, 435 MB; sources OA 780,260, OSM 768,992, Overture
       76,582, GNIS 20,104, WOF 3,280, ZCTA 426. (session)
 - [ ] pgeo: 906,101 features; database 674 MB after dropping build-only tables (971 MB before). (session)
-- [ ] Raw inputs: OSM PBF 87 MB, OA 223 MB, Overture places 203 MB, GNIS 3.6 MB, ZCTA 0.9 MB,
+- [ ] Raw inputs: OSM PBF 87 MB, OA 222 MB, Overture extracts 203 MB across all evaluated themes (places 16 MB), GNIS 3.6 MB, ZCTA 0.9 MB,
       WOF SQLite (US, 5.2 GB on disk, Maine subset used), interpolation DB 333 MB. (session)
 - [ ] Data problems fixed in prep: GNIS out-of-state points; ZCTA pipe delimiter; Overture
       Portsmouth (NH) leak; interpolation needed OA as legacy CSV. (summary)
@@ -42,7 +42,7 @@ and observations made during the work (marked "session").
 - [ ] libpostal buys nothing measurable: rule parser 95.8% vs libpostal service 94.0% (F26).
 - [ ] Pure SQL and FastAPI identical accuracy (F27).
 - [ ] Fuzz: pgeo F0-F5 98/87/75/46/45/49 vs Pelias 82/34/10/4/3/10.
-- [ ] Remaining failures (66): categories and reasons (TUNING_REPORT section 8).
+- [ ] Remaining failures (65 of 1,560): categories and reasons (TUNING_REPORT section 8).
 - [ ] Gate reproduces lost tuning: five regressions against pre-town-aware results.
 
 ## Load and capacity

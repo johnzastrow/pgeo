@@ -14,7 +14,7 @@ finished report before each release. Status: answered / pending (awaiting a meas
 | 5 | Do you still need an API key from me? (OpenAddresses token) | 1.2 | answered |
 | 6 | Is there any caching that may affect later results? | 2.5 (caching) | answered |
 | 7 | Is all this testing just with Pelias? | 2.5, 3.4 | answered |
-| 8 | How long until all the tests finish? | Appendix A (durations; REBUILD.md section 4) | answered |
+| 8 | How long until all the tests finish? | Appendix B row (durations); REBUILD.md section 4 | answered |
 | 9 | What are the latency targets? | 2.5, Table "Latency targets" | answered |
 | 10 | How many users will you scale up to? | 2.5 (ramp to 512) | answered |
 | 11 | Are you tuning to use the full level of parallelism Postgres allows across the cores given to it? | 2.7 (parallelism) | answered |
