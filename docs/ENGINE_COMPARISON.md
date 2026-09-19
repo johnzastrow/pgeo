@@ -13,29 +13,32 @@ errors < 1%. "Limit" = most concurrent users with every endpoint within target.
 ## Answers
 
 - **(a) Speed and throughput: Pelias is clearly faster.** At the same CPU count it serves
-  about four times more users within the targets, and its p95 at 3 users is 20-50 ms on every
-  endpoint versus 35-390 ms for pgeo.
+  about four times more users within the targets, and its p95 at 3 users is 20-40 ms on every
+  endpoint versus 5-105 ms for pgeo.
 - **(b) Good enough at lower resources: yes, for the stated need.** pgeo meets every target
   at 3 users on the smallest configuration tested (1 vCPU, 1.6 GB budget), where Pelias
   needs an ~8.3 GB budget (it was OOM-killed below that). pgeo also answers far more
   queries correctly: 95.8% vs 75.5%.
-- **Where the gap comes from**: pgeo's reverse geocoding is the first endpoint over its
-  target in every configuration (225-390 ms at 3 users). Search and autocomplete have
-  large headroom. Reverse is the next tuning target (TUNING_REPORT.md, T11).
+- **Where the gap comes from**: pgeo runs several candidate queries and a scoring step in
+  PL/pgSQL per request, where Pelias does compiled index lookups in Elasticsearch. Since the
+  reverse-geocoding index fix (TUNING_REPORT.md, T11), **autocomplete** is the first endpoint
+  over target in every pgeo configuration, because it has the tightest target (250 ms) and
+  fires several times per typed word. Reverse, previously the bottleneck at 225-390 ms, now
+  answers in 5-18 ms.
 
 ## Head to head
 
 | CPUs | Pelias config: memory budget | Pelias limit | pgeo config: memory budget | pgeo limit (pure SQL / FastAPI) |
 |------|-------------------------------|--------------|----------------------------|---------------------------------|
-| 1 | C1: 8.3 GB | 96 | Pmin: 1.6 GB; P1: 2.0 GB | 4 / 8; 4 / 6 |
-| 2 | C2: 8.4 GB; C3: 9.5 GB | 192; 192 | P2: 2.5 / 2.7 GB | 24 / 32 |
-| 4 | C4: 10.8 GB | 384 | P4: 3.0 / 3.3 GB | 64 / 96 |
+| 1 | C1: 8.3 GB | 96 | Pmin: 1.6 GB; P1: 2.0 GB | 24 / 24; 24 / 24 |
+| 2 | C2: 8.4 GB; C3: 9.5 GB | 192; 192 | P2: 2.5 / 2.7 GB | 48 / 48 |
+| 4 | C4: 10.8 GB | 384 | P4: 3.0 / 3.3 GB | 96 / 96 |
 | all (12 threads) | M0: unlimited | 192 (1 API worker) | PM: unlimited | 128 / 192 |
 
 | At 3 users | Pelias (C3) | pgeo pure SQL (P2) | pgeo FastAPI (P2) |
 |------------|-------------|--------------------|-------------------|
-| p95 autocomplete / search / structured / reverse (ms) | 19 / 27 / 20 / 39 | 35 / 100 / 100 / 226 | 39 / 127 / 81 / 291 |
-| Memory in use (all containers) | 6.4 GB | 0.52 GB | 0.61 GB |
+| p95 autocomplete / search / structured / reverse (ms) | 19 / 27 / 20 / 39 | 44 / 97 / 105 / 5 | 54 / 95 / 106 / 14 |
+| Memory in use (all containers) | 6.3 GB | 0.55 GB | 0.66 GB |
 | Accuracy (1,560 cases) | 75.5% | 95.8% | 95.8% |
 | Containers | 6 (Elasticsearch, API, libpostal, placeholder, pip, interpolation) | 3 (PostgreSQL, PostgREST, nginx edge) | 2 (PostgreSQL, FastAPI) |
 
@@ -63,5 +66,7 @@ widen every text match) cost one ramp step each. The pgeo equivalent (subset bui
 | Fewest components, data in PostgreSQL (G6) | pgeo pure SQL | Database + stateless gateway |
 | Structured USPS addresses (LANCER) | pgeo | `/v1/address` exists only in pgeo |
 
-Caveats: pgeo's speed has had one round of tuning (none yet on reverse); Pelias ran its
-published configuration. The comparison will be repeated after the reverse-geocoding work.
+Caveats: pgeo's ranking was tuned against the accuracy set that scores it here; Pelias ran its
+published configuration. The reverse-geocoding work is done and these numbers are from after it;
+the remaining per-request cost in PL/pgSQL (autocomplete, now the binding endpoint) has not been
+tuned. Minimum-server results for both engines are in the study report, Section 3.12.
