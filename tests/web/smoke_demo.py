@@ -98,6 +98,22 @@ def run(base: str, shots: Path) -> list[str]:
                     page.wait_for_timeout(1500)
                     page.screenshot(path=str(shots / f"{tag}-05-batch.png"))
 
+                    # Engine switch: present only on the dev server; every engine must answer
+                    if page.is_visible("#engine-pick"):
+                        page.click("#tab-search")
+                        for value in page.locator("#engine option").evaluate_all("os => os.map(o => o.value)"):
+                            page.select_option("#engine", value)
+                            page.fill(".ps-input", "")
+                            page.type(".ps-input", "389 congress st portland", delay=25)
+                            page.wait_for_selector(".ps-option", timeout=8000)
+                            page.keyboard.press("ArrowDown")
+                            page.keyboard.press("Enter")
+                            page.wait_for_selector("#result:not([hidden]) h2", timeout=8000)
+                            label = page.inner_text("#result h2")
+                            if "389 Congress" not in label:
+                                failures.append(f"{tag}: engine {value or 'pelias'!r}: unexpected {label!r}")
+                        page.screenshot(path=str(shots / f"{tag}-06-engine.png"))
+
                 bad = [
                     e
                     for e in errors

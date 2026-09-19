@@ -24,6 +24,47 @@ const el = (tag, cls, text) => {
 };
 
 const client = new PeliasClient();
+
+// ---- Engine switch (local development only) -----------------------------------------------
+// The dev server injects <meta name="demo-engines" content="/engines.json">, a list of
+// same-origin API prefixes (Pelias, pgeo SQL, pgeo FastAPI). Production serves the page
+// without it, so the page makes no request and the switch stays hidden.
+const ENGINE_KEY = 'pelias-demo-engine';
+async function setupEngines() {
+  if (document.querySelector('meta[name="demo-engines"]')?.content !== '/engines.json') return;
+  let list;
+  try {
+    const res = await fetch('/engines.json', { headers: { Accept: 'application/json' } });
+    if (!res.ok) return;
+    list = (await res.json()).engines;
+  } catch {
+    return;
+  }
+  // Accept only same-origin path prefixes ('' or '/name'), never other origins.
+  list = Array.isArray(list)
+    ? list.filter((e) => e && typeof e.label === 'string' && typeof e.base === 'string'
+        && /^(\/[a-z0-9-]{1,32})?$/.test(e.base)).slice(0, 8)
+    : [];
+  if (list.length < 2) return;
+  const sel = $('#engine');
+  for (const e of list) {
+    const o = document.createElement('option');
+    o.value = e.base;
+    o.textContent = e.label.slice(0, 40);
+    sel.append(o);
+  }
+  let saved = null;
+  try { saved = localStorage.getItem(ENGINE_KEY); } catch { /* storage unavailable */ }
+  if (saved !== null && list.some((e) => e.base === saved)) sel.value = saved;
+  client.baseUrl = sel.value;
+  sel.addEventListener('change', () => {
+    client.baseUrl = sel.value;
+    try { localStorage.setItem(ENGINE_KEY, sel.value); } catch { /* storage unavailable */ }
+    for (const id of ['#search-results', '#structured-results', '#reverse-results']) $(id).replaceChildren();
+    showDots([]);
+  });
+  $('#engine-pick').hidden = false;
+}
 const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 const map = createMap('map', { dark });
 const marker = makeMarker('primary');
@@ -368,3 +409,5 @@ const compass = document.querySelector('.compass');
 map.on('rotate', () => { compass.style.transform = `rotate(${-map.getBearing()}deg)`; });
 
 search.focus();
+
+setupEngines();

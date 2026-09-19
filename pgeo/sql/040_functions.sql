@@ -326,6 +326,12 @@ DECLARE
   q     text := geocode.norm(coalesce(p_text, ''));
   toks  text[] := CASE WHEN q = '' THEN ARRAY[]::text[] ELSE string_to_array(q, ' ') END;
   n     integer := cardinality(toks);
+  -- raw tokens (same word boundaries as norm, which maps each word to one word)
+  rtoks text[] := string_to_array(trim(regexp_replace(regexp_replace(lower(geocode.unaccent_i(coalesce(p_text, ''))),
+                                  '[''’]', '', 'g'), '[^a-z0-9]+', ' ', 'g')), ' ');
+  parts text[] := ARRAY[]::text[];
+  i     integer;
+  aligned boolean;
   tsq   tsquery;
   focus geometry := CASE WHEN p_focus_lon IS NOT NULL AND p_focus_lat IS NOT NULL
                          THEN ST_SetSRID(ST_MakePoint(p_focus_lon, p_focus_lat), 4326) END;
@@ -337,10 +343,20 @@ BEGIN
   IF n = 0 THEN
     RETURN;
   END IF;
-  -- all tokens must match; the last one as a prefix (the user is still typing it)
-  tsq := to_tsquery('simple',
-           array_to_string(toks[1:n - 1], ' & ')
-           || CASE WHEN n > 1 THEN ' & ' ELSE '' END || toks[n] || ':*');
+  -- All tokens must match; the last one as a prefix (the user is still typing it). norm()
+  -- reads "st" before another word as "saint" ("St George"), but while typing
+  -- "389 congress st portland" it is "street", so such a token matches either. The last
+  -- token also matches its raw form, so "congress s" is not locked to "south". Tokens are
+  -- [a-z0-9] only (norm), so the tsquery text cannot inject operators.
+  aligned := cardinality(rtoks) = n;
+  FOR i IN 1..n LOOP
+    parts := parts || CASE
+      WHEN i < n AND aligned AND toks[i] = 'saint' AND rtoks[i] = 'st' THEN '(saint | street)'
+      WHEN i < n THEN toks[i]
+      WHEN aligned AND rtoks[i] <> toks[i] THEN '(' || toks[i] || ':* | ' || rtoks[i] || ':*)'
+      ELSE toks[i] || ':*' END;
+  END LOOP;
+  tsq := to_tsquery('simple', array_to_string(parts, ' & '));
 
   IF n >= 2 AND toks[1] ~ '^\d+[a-z]?$' THEN
     -- Address mode: "389 cong..." -> exact house number, street prefix.

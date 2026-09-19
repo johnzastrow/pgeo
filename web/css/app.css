@@ -283,6 +283,7 @@ h1 {
 .switch input:focus-visible, .chip input:focus-visible + span { outline: 2px solid var(--magenta); outline-offset: 2px; }
 
 .select { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+.engine { margin-top: 8px; font-size: 13px; }
 select, .grid-form input, textarea {
   font: 400 14px/1.3 var(--ui);
   color: var(--ink);
