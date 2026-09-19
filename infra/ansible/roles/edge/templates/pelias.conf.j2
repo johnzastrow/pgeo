@@ -21,6 +21,28 @@ upstream pelias_api {
     server 127.0.0.1:4000;
     keepalive 16;
 }
+{% if pgeo_enabled | default(false) | bool %}
+
+# pgeo pure-SQL API (PostgREST on 127.0.0.1:4600), served under /pgeo/v1/*. PostgREST keeps only
+# the last segment of dotted parameters, so boundary.circle.lat/lon would collide with
+# focus.point.lat/lon: rename them on search, structured and autocomplete (docs/PELIAS_COMPATIBILITY.md).
+upstream pgeo_rest {
+    server 127.0.0.1:4600;
+    keepalive 16;
+}
+map $args $pgeo_args_1 {
+    "~^(?<c1a>.*?)boundary\.circle\.lat=(?<c1b>.*)$" "${c1a}circle_lat=${c1b}";
+    default $args;
+}
+map $pgeo_args_1 $pgeo_args_2 {
+    "~^(?<c2a>.*?)boundary\.circle\.lon=(?<c2b>.*)$" "${c2a}circle_lon=${c2b}";
+    default $pgeo_args_1;
+}
+map $pgeo_args_2 $pgeo_circle_args {
+    "~^(?<c3a>.*?)boundary\.circle\.radius=(?<c3b>.*)$" "${c3a}circle_radius=${c3b}";
+    default $pgeo_args_2;
+}
+{% endif %}
 
 server {
     listen {{ ansible_facts['default_ipv4']['address'] }}:{{ edge_listen_port }};
@@ -71,6 +93,53 @@ server {
         proxy_pass http://pelias_api;
     }
 
+{% if pgeo_enabled | default(false) | bool %}
+    # ---- pgeo (same rate limits as Pelias). A parameter the SQL API does not declare makes
+    # PostgREST answer 404; turn it into a Pelias-shaped 400.
+    location = /pgeo/v1/autocomplete {
+        limit_except GET { deny all; }
+        limit_req zone=pelias_autocomplete burst=50 nodelay;
+        proxy_intercept_errors on;
+        error_page 404 = @pgeo_unsupported;
+        proxy_pass http://pgeo_rest/rpc/v1_autocomplete?$pgeo_circle_args;
+    }
+    location = /pgeo/v1/search {
+        limit_except GET { deny all; }
+        limit_req zone=pelias_search burst=20 nodelay;
+        proxy_intercept_errors on;
+        error_page 404 = @pgeo_unsupported;
+        proxy_pass http://pgeo_rest/rpc/v1_search?$pgeo_circle_args;
+    }
+    location = /pgeo/v1/search/structured {
+        limit_except GET { deny all; }
+        limit_req zone=pelias_search burst=20 nodelay;
+        proxy_intercept_errors on;
+        error_page 404 = @pgeo_unsupported;
+        proxy_pass http://pgeo_rest/rpc/v1_search_structured?$pgeo_circle_args;
+    }
+    location ~ ^/pgeo/v1/(?<pgeo_fn>reverse|place|address)$ {
+        limit_except GET { deny all; }
+        limit_req zone=pelias_search burst=20 nodelay;
+        proxy_intercept_errors on;
+        error_page 404 = @pgeo_unsupported;
+        proxy_pass http://pgeo_rest/rpc/v1_$pgeo_fn$is_args$args;
+    }
+    location /pgeo/ {
+        return 404;
+    }
+    location @pgeo_unsupported {
+        default_type application/json;
+        return 400 '{"geocoding":{"version":"0.2","errors":["unsupported parameter or endpoint: pgeo accepts the documented Pelias parameters"]},"type":"FeatureCollection","features":[]}';
+    }
+
+    # Engines for the demo page's switch (announced by the meta tag injected below).
+    location = /engines.json {
+        default_type application/json;
+        expires 5m;
+        return 200 '{"engines":[{"label":"Pelias","base":"","kind":"pelias"},{"label":"pgeo (PostgreSQL)","base":"/pgeo","kind":"pgeo"}]}';
+    }
+{% endif %}
+
     # Anything else under /v1 (e.g. /v1/nearby, attribution) is not exposed.
     location /v1/ {
         return 404;
@@ -100,6 +169,11 @@ server {
     location / {
         limit_except GET { deny all; }
         expires 5m;
+{% if pgeo_enabled | default(false) | bool %}
+        # Announce the engine switch to the page (served unmodified when pgeo is disabled).
+        sub_filter '</head>' '<meta name="demo-engines" content="/engines.json"></head>';
+        sub_filter_once on;
+{% endif %}
         try_files $uri $uri/ =404;
     }
 }

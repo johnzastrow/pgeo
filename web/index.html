@@ -22,14 +22,17 @@
       <p class="kicker">United States &middot; State of Maine</p>
       <h1><span class="t-main">Pelias</span> <span class="t-sub">Geocoder</span></h1>
       <p class="edition">Self-hosted &middot; 1,649,644 features &middot; OSM &middot; OA &middot; WOF &middot; GNIS &middot; Overture</p>
-      <!-- Shown only when the server publishes /engines.json (local development). -->
-      <label class="select engine" id="engine-pick" hidden>Engine <select id="engine"></select></label>
+      <!-- Shown when the server announces more than one engine (<meta name="demo-engines">). -->
+      <label class="select engine" id="engine-pick" hidden>Engine <select id="engine"></select>
+        <span class="engine-note" id="engine-note"></span></label>
     </header>
 
     <nav class="tabs" role="tablist" aria-label="Mode">
       <button type="button" role="tab" id="tab-search" aria-controls="panel-search" aria-selected="true">Search</button>
+      <button type="button" role="tab" id="tab-address" aria-controls="panel-address" aria-selected="false" tabindex="-1">Address</button>
       <button type="button" role="tab" id="tab-structured" aria-controls="panel-structured" aria-selected="false" tabindex="-1">Structured</button>
       <button type="button" role="tab" id="tab-reverse" aria-controls="panel-reverse" aria-selected="false" tabindex="-1">Reverse</button>
+      <button type="button" role="tab" id="tab-compare" aria-controls="panel-compare" aria-selected="false" tabindex="-1">Compare</button>
       <button type="button" role="tab" id="tab-batch" aria-controls="panel-batch" aria-selected="false" tabindex="-1">Batch</button>
     </nav>
 
@@ -39,9 +42,41 @@
         <label class="switch"><input type="checkbox" id="opt-focus" checked><span>Bias to map center</span></label>
         <label class="switch"><input type="checkbox" id="opt-bounds"><span>Only within view</span></label>
       </div>
+      <details class="more" id="more-filters">
+        <summary>More filters</summary>
+        <div class="opts">
+          <label class="switch"><input type="checkbox" id="opt-circle"><span>Within</span></label>
+          <label class="select"><select id="opt-radius" aria-label="Circle radius">
+            <option value="2">2 km</option><option value="5">5 km</option>
+            <option value="15" selected>15 km</option><option value="50">50 km</option>
+          </select> of map center</label>
+        </div>
+        <div class="area-pick">
+          <label for="area-input">Only in town or county</label>
+          <div class="area-row">
+            <input id="area-input" type="search" maxlength="60" placeholder="e.g. Portland, Cumberland County" autocomplete="off">
+            <button type="button" class="btn" id="area-clear" hidden>Clear</button>
+          </div>
+          <ul class="area-list" id="area-list" hidden></ul>
+          <p class="area-chosen" id="area-chosen" hidden></p>
+        </div>
+        <label class="field">Categories <input id="opt-categories" maxlength="120" placeholder="e.g. restaurant, lake"></label>
+      </details>
       <fieldset class="chips" id="layer-chips"><legend>Layers</legend></fieldset>
       <fieldset class="chips" id="source-chips"><legend>Sources</legend></fieldset>
       <ol class="results" id="search-results" aria-label="Search results"></ol>
+    </section>
+
+    <section class="panel" id="panel-address" role="tabpanel" aria-labelledby="tab-address" hidden>
+      <p class="hint">Start typing a place or address, pick the best match, and get a mailing address in
+        USPS format. Venues give the nearest street address. Clicking the map finds the address there.</p>
+      <pelias-search id="addr-search" placeholder="Address, business, landmark..." min-chars="3" debounce="150"></pelias-search>
+      <div class="row addr-row">
+        <label class="field unit">Unit <input id="addr-unit" maxlength="20" placeholder="Apt 2"></label>
+        <button type="button" class="btn btn-ink" id="addr-find">Find best match</button>
+      </div>
+      <p class="status" id="addr-status" role="status"></p>
+      <article class="usps" id="addr-result" aria-live="polite" hidden></article>
     </section>
 
     <section class="panel" id="panel-structured" role="tabpanel" aria-labelledby="tab-structured" hidden>
@@ -81,6 +116,17 @@
         </label>
       </div>
       <ol class="results" id="reverse-results" aria-label="Reverse geocoding results"></ol>
+    </section>
+
+    <section class="panel" id="panel-compare" role="tabpanel" aria-labelledby="tab-compare" hidden>
+      <p class="hint">The same search on Pelias and on pgeo, side by side, with response times and
+        whether the first results agree.</p>
+      <form id="compare-form" class="row" autocomplete="off">
+        <input id="compare-text" maxlength="200" placeholder="e.g. Portlnd, ME" aria-label="Query to compare">
+        <button type="submit" class="btn btn-ink">Compare</button>
+      </form>
+      <p class="status" id="compare-summary" role="status"></p>
+      <div class="compare" id="compare-cols"></div>
     </section>
 
     <section class="panel" id="panel-batch" role="tabpanel" aria-labelledby="tab-batch" hidden>

@@ -1,0 +1,5 @@
+- name: Restart pgeo
+  ansible.builtin.systemd_service:
+    name: pgeo
+    state: restarted
+    daemon_reload: true

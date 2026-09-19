@@ -12,6 +12,7 @@ geocoding works from a map click, and the batch sample completes. Exit code 1 on
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from pathlib import Path
 
@@ -113,6 +114,44 @@ def run(base: str, shots: Path) -> list[str]:
                             if "389 Congress" not in label:
                                 failures.append(f"{tag}: engine {value or 'pelias'!r}: unexpected {label!r}")
                         page.screenshot(path=str(shots / f"{tag}-06-engine.png"))
+
+                    # Address tab (needs a pgeo engine): suggestion -> USPS block
+                    if page.is_visible("#tab-address"):
+                        page.click("#tab-address")
+                        page.fill("#addr-search .ps-input", "")
+                        page.type("#addr-search .ps-input", "just in time lewiston", delay=25)
+                        page.wait_for_selector("#addr-search .ps-option", timeout=8000)
+                        page.keyboard.press("ArrowDown")
+                        page.keyboard.press("Enter")
+                        page.wait_for_selector("#addr-result:not([hidden]) .usps-block", timeout=8000)
+                        block = page.inner_text("#addr-result .usps-block")
+                        if "LEWISTON ME" not in block:
+                            failures.append(f"{tag}: address block {block!r}")
+                        page.wait_for_timeout(1200)
+                        page.screenshot(path=str(shots / f"{tag}-07-address.png"))
+                        # free text with a unit -> best match
+                        page.fill("#addr-search .ps-input", "389 Congress St, Portland ME")
+                        page.fill("#addr-unit", "Apt 2")
+                        page.click("#addr-find")
+                        page.wait_for_function(
+                            "() => /APT 2/.test(document.querySelector('#addr-result .usps-block')?.textContent || '')",
+                            timeout=8000,
+                        )
+
+                    # Compare tab (needs Pelias and pgeo)
+                    if page.is_visible("#tab-compare"):
+                        page.click("#tab-compare")
+                        page.fill("#compare-text", "Portlnd, ME")
+                        page.click("#compare-form button")
+                        page.wait_for_function(
+                            "() => document.querySelectorAll('#compare-cols .cmp-col').length === 2",
+                            timeout=10000,
+                        )
+                        summary = page.inner_text("#compare-summary")
+                        if not re.search(r"agree|differ|Only one|Neither", summary):
+                            failures.append(f"{tag}: compare summary {summary!r}")
+                        page.wait_for_timeout(1200)
+                        page.screenshot(path=str(shots / f"{tag}-08-compare.png"))
 
                 bad = [
                     e

@@ -277,7 +277,10 @@ BEGIN
     'delivery_line', nullif(line, ''),
     'last_line', nullif(concat_ws(' ', nullif(city, ''), coalesce(upper(f.region_a), 'ME'), zip), ''),
     'source', f.source,
-    'gid', f.gid
+    'gid', f.gid,
+    -- the address point itself (for a 'nearest' match it differs from the selected place)
+    'lat', round(ST_Y(f.geom)::numeric, 6),
+    'lon', round(ST_X(f.geom)::numeric, 6)
   ));
 END
 $$;

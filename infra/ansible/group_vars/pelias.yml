@@ -33,3 +33,24 @@ local_basemap_file: "{{ local_repo_root }}/data/raw/basemap/maine.pmtiles"
 # Requests per second per client IP (real IP from X-Forwarded-For set by wharf Caddy).
 edge_rate_search: 10
 edge_rate_autocomplete: 25
+
+# --- pgeo runtime (PostgreSQL/PostGIS geocoder; pure SQL via PostgREST) --------
+# Decision 2026-09-19: deploy next to Pelias; VM 120 resized for it (docs/DEPLOY_PGEO.md).
+pgeo_enabled: true
+pgeo_user: pgeo
+pgeo_home: /opt/pgeo
+pgeo_data_dir: /srv/pgeo
+# Same digests as the workstation build (pgeo/docker/db/Dockerfile, pgeo/compose.yml); the
+# official image is enough: the rule parser needs only core + contrib extensions.
+pgeo_db_image: "postgis/postgis:18-3.6@sha256:60f6ad1d21ea86a67d47780b9a0d1e1d200500f62b19293fa834d0dea80b8677"
+pgeo_rest_image: "postgrest/postgrest:v16.3@sha256:ec0e25a4e24b0a3bc5e4f011369bfc736bd1b19f513bd01079b86329a7636962"
+# Server profile "large" (pgeo/tuning/profiles/large.toml): 4 vCPU, shared with Pelias.
+pgeo_profile_name: large
+pgeo_pg: { shared_buffers: 512MB, effective_cache_size: 1536MB, work_mem: 16MB }
+pgeo_rest_pool: 10
+pgeo_mem_limit_db: 2560m
+pgeo_mem_limit_rest: 256m
+# Dump to restore (created by scripts/pgeo_dump.sh). Required on first deploy.
+pgeo_dump_name: ""
+pgeo_force_restore: false
+local_pgeo_dump_dir: "{{ local_repo_root }}/data/pgeo/dumps"

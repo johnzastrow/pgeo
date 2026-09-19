@@ -23,6 +23,20 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+### Added
+- Demo page: engine switch announced by the server (Pelias / pgeo), Address tab (type-ahead
+  with a best-match suggestion, USPS block with copy, nearest-address link on the map, map
+  click), Compare tab (the same search on both engines, timings, agreement), Search tab
+  filters (circle around the map center, town or county via boundary.gid, categories).
+  Browser tests pending.
+- pgeo on the query host: Ansible role `pgeo_runtime` (official PostGIS + PostgREST, dump
+  restore, secrets generated on the VM), edge routes `/pgeo/v1/*`, `scripts/pgeo_dump.sh`,
+  runbook `docs/DEPLOY_PGEO.md`. Not yet deployed.
+
+### Fixed
+- pgeo load runner mounts a per-run tuning directory (mounting a file inside the read-only
+  base directory failed when the file did not exist).
+
 ## [0.11.0] - 2026-09-19
 
 ### Added

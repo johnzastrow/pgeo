@@ -25,46 +25,62 @@ const el = (tag, cls, text) => {
 
 const client = new PeliasClient();
 
-// ---- Engine switch (local development only) -----------------------------------------------
-// The dev server injects <meta name="demo-engines" content="/engines.json">, a list of
-// same-origin API prefixes (Pelias, pgeo SQL, pgeo FastAPI). Production serves the page
-// without it, so the page makes no request and the switch stays hidden.
+// ---- Engines ------------------------------------------------------------------------------
+// The server announces its engines with <meta name="demo-engines" content="/engines.json">:
+// a list of same-origin API prefixes ({label, base, kind}), e.g. Pelias at "" and pgeo at
+// "/pgeo". Without the tag the page talks to Pelias only and hides the switch. The Address and
+// Compare tabs need a pgeo engine (/v1/address exists only there).
 const ENGINE_KEY = 'pelias-demo-engine';
+let engines = [{ label: 'Pelias', base: '', kind: 'pelias' }];
+let pgeoClient = null;
+const engineOf = (base) => engines.find((e) => e.base === base) || engines[0];
+
 async function setupEngines() {
-  if (document.querySelector('meta[name="demo-engines"]')?.content !== '/engines.json') return;
-  let list;
-  try {
-    const res = await fetch('/engines.json', { headers: { Accept: 'application/json' } });
-    if (!res.ok) return;
-    list = (await res.json()).engines;
-  } catch {
-    return;
+  if (document.querySelector('meta[name="demo-engines"]')?.content === '/engines.json') {
+    try {
+      const res = await fetch('/engines.json', { headers: { Accept: 'application/json' } });
+      if (res.ok) {
+        const list = (await res.json()).engines;
+        // Accept only same-origin path prefixes ('' or '/name'), never other origins.
+        const clean = Array.isArray(list)
+          ? list.filter((e) => e && typeof e.label === 'string' && typeof e.base === 'string'
+              && /^(\/[a-z0-9-]{1,32})?$/.test(e.base)).slice(0, 8)
+            .map((e) => ({ label: e.label.slice(0, 40), base: e.base,
+              kind: e.kind === 'pgeo' || (e.kind == null && e.base !== '') ? 'pgeo' : 'pelias' }))
+          : [];
+        if (clean.length) engines = clean;
+      }
+    } catch { /* keep the Pelias-only default */ }
   }
-  // Accept only same-origin path prefixes ('' or '/name'), never other origins.
-  list = Array.isArray(list)
-    ? list.filter((e) => e && typeof e.label === 'string' && typeof e.base === 'string'
-        && /^(\/[a-z0-9-]{1,32})?$/.test(e.base)).slice(0, 8)
-    : [];
-  if (list.length < 2) return;
+  const pg = engines.find((e) => e.kind === 'pgeo');
+  pgeoClient = pg ? new PeliasClient({ baseUrl: pg.base }) : null;
+  setupExtras();
+  if (engines.length < 2) return;
   const sel = $('#engine');
-  for (const e of list) {
+  for (const e of engines) {
     const o = document.createElement('option');
     o.value = e.base;
-    o.textContent = e.label.slice(0, 40);
+    o.textContent = e.label;
     sel.append(o);
   }
   let saved = null;
   try { saved = localStorage.getItem(ENGINE_KEY); } catch { /* storage unavailable */ }
-  if (saved !== null && list.some((e) => e.base === saved)) sel.value = saved;
-  client.baseUrl = sel.value;
-  sel.addEventListener('change', () => {
+  if (saved !== null && engines.some((e) => e.base === saved)) sel.value = saved;
+  const apply = () => {
     client.baseUrl = sel.value;
+    $('#engine-note').textContent = engineOf(sel.value).kind === 'pgeo' ? 'PostgreSQL / PostGIS' : 'Elasticsearch';
+  };
+  apply();
+  sel.addEventListener('change', () => {
+    apply();
     try { localStorage.setItem(ENGINE_KEY, sel.value); } catch { /* storage unavailable */ }
     for (const id of ['#search-results', '#structured-results', '#reverse-results']) $(id).replaceChildren();
     showDots([]);
+    clearSelection();
   });
   $('#engine-pick').hidden = false;
 }
+
 const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 const map = createMap('map', { dark });
 const marker = makeMarker('primary');
@@ -74,6 +90,19 @@ const probe = makeMarker('probe');
 
 const EMPTY = { type: 'FeatureCollection', features: [] };
 map.on('load', () => {
+  map.addSource('filter-circle', { type: 'geojson', data: EMPTY });
+  map.addLayer({ id: 'filter-circle-fill', type: 'fill', source: 'filter-circle',
+    paint: { 'fill-color': dark ? '#e0579a' : '#b3246b', 'fill-opacity': 0.06 } });
+  map.addLayer({ id: 'filter-circle-line', type: 'line', source: 'filter-circle',
+    paint: { 'line-color': dark ? '#e0579a' : '#b3246b', 'line-width': 1.2, 'line-dasharray': [3, 2] } });
+  map.addSource('addr-link', { type: 'geojson', data: EMPTY });
+  map.addLayer({ id: 'addr-link', type: 'line', source: 'addr-link',
+    paint: { 'line-color': dark ? '#f2c14e' : '#8a5a00', 'line-width': 2, 'line-dasharray': [2, 2] } });
+  map.addSource('compare', { type: 'geojson', data: EMPTY });
+  map.addLayer({ id: 'compare-dot', type: 'circle', source: 'compare',
+    paint: { 'circle-radius': ['case', ['==', ['get', 'rank'], 1], 7, 4.5],
+      'circle-color': ['match', ['get', 'engine'], 'pelias', '#1f5f8b', '#c0392b'],
+      'circle-stroke-color': dark ? '#111a29' : '#ffffff', 'circle-stroke-width': 1.5, 'circle-opacity': 0.9 } });
   map.addSource('results', { type: 'geojson', data: EMPTY });
   map.addLayer({
     id: 'results-halo',
@@ -117,15 +146,20 @@ function activate(tab) {
     t.tabIndex = on ? 0 : -1;
     document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
   }
-  map.getCanvas().style.cursor = tab.id === 'tab-reverse' ? 'crosshair' : '';
+  map.getCanvas().style.cursor = ['tab-reverse', 'tab-address'].includes(tab.id) ? 'crosshair' : '';
   clearSelection();
+  drawCircle();
+  if (tab.id !== 'tab-compare') map.getSource('compare')?.setData(EMPTY);
+  if (tab.id !== 'tab-address') clearAddress();
 }
 tabs.forEach((t, i) => {
   t.addEventListener('click', () => activate(t));
   t.addEventListener('keydown', (e) => {
     const d = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
     if (!d) return;
-    const next = tabs[(i + d + tabs.length) % tabs.length];
+    const shown = tabs.filter((x) => !x.hidden);
+    const k = shown.indexOf(t);
+    const next = shown[(k + d + shown.length) % shown.length];
     activate(next);
     next.focus();
   });
@@ -149,6 +183,8 @@ buildChips($('#layer-chips'), LAYERS.map((l) => [l, l]), 'layer');
 buildChips($('#source-chips'), SOURCES, 'source');
 const checked = (name) => [...document.querySelectorAll(`input[name="${name}"]:checked`)].map((i) => i.value);
 
+let areaGid = null; // boundary.gid chosen in "Only in town or county"
+
 function searchContext() {
   const ctx = { layers: checked('layer'), sources: checked('source') };
   const c = map.getCenter();
@@ -157,8 +193,71 @@ function searchContext() {
     const b = map.getBounds();
     ctx.boundary = { minLon: b.getWest(), minLat: b.getSouth(), maxLon: b.getEast(), maxLat: b.getNorth() };
   }
+  if ($('#opt-circle').checked) ctx.circle = { lat: c.lat, lon: c.lng, radiusKm: Number($('#opt-radius').value) };
+  if (areaGid) ctx.gid = areaGid;
+  const cats = $('#opt-categories').value.split(',').map((x) => x.trim().toLowerCase()).filter(Boolean);
+  if (cats.length) ctx.categories = cats.slice(0, 10);
   return ctx;
 }
+
+// Circle filter drawn on the map (64-sided polygon; follows the map center).
+function circlePolygon(lat, lon, km) {
+  const pts = [];
+  for (let i = 0; i <= 64; i += 1) {
+    const a = (i / 64) * 2 * Math.PI;
+    const dLat = (km / 111.32) * Math.cos(a);
+    const dLon = (km / (111.32 * Math.cos((lat * Math.PI) / 180))) * Math.sin(a);
+    pts.push([lon + dLon, lat + dLat]);
+  }
+  return { type: 'Feature', geometry: { type: 'Polygon', coordinates: [pts] }, properties: {} };
+}
+function drawCircle() {
+  const src = map.getSource('filter-circle');
+  if (!src) return;
+  const on = $('#opt-circle').checked && current() === 'tab-search';
+  const c = map.getCenter();
+  src.setData(on ? circlePolygon(c.lat, c.lng, Number($('#opt-radius').value)) : EMPTY);
+}
+$('#opt-circle').addEventListener('change', drawCircle);
+$('#opt-radius').addEventListener('change', drawCircle);
+map.on('move', () => { if ($('#opt-circle').checked) drawCircle(); });
+
+// "Only in town or county": suggestions from the current engine, restricted to admin layers.
+let areaTimer = null;
+let areaCtl = null;
+function chooseArea(f) {
+  areaGid = f ? f.properties.gid : null;
+  $('#area-chosen').hidden = !f;
+  $('#area-chosen').textContent = f ? `Only in ${f.properties.label}` : '';
+  $('#area-clear').hidden = !f;
+  $('#area-list').hidden = true;
+  $('#area-input').value = '';
+}
+$('#area-clear').addEventListener('click', () => chooseArea(null));
+$('#area-input').addEventListener('input', () => {
+  clearTimeout(areaTimer);
+  const text = $('#area-input').value.trim();
+  if (text.length < 2) { $('#area-list').hidden = true; return; }
+  areaTimer = setTimeout(async () => {
+    areaCtl?.abort();
+    areaCtl = new AbortController();
+    try {
+      const fc = await client.autocomplete(text, { size: 6, layers: ['locality', 'localadmin', 'county'] }, areaCtl.signal);
+      const ul = $('#area-list');
+      ul.replaceChildren();
+      for (const f of fc.features) {
+        const li = el('li', null, `${f.properties.label} (${f.properties.layer})`);
+        li.tabIndex = 0;
+        li.addEventListener('click', () => chooseArea(f));
+        li.addEventListener('keydown', (e) => { if (e.key === 'Enter') chooseArea(f); });
+        ul.append(li);
+      }
+      ul.hidden = fc.features.length === 0;
+    } catch (err) {
+      if (err.name !== 'AbortError') $('#area-list').hidden = true;
+    }
+  }, 200);
+});
 
 // ---- Selected result card -------------------------------------------------------------------
 
@@ -210,6 +309,9 @@ function renderCard(feature, { reverse = false } = {}) {
   row(dl, 'Hierarchy', [p.neighbourhood, p.locality || p.localadmin, p.county, p.region_a, p.postalcode]
     .filter(Boolean).join(' · '));
   row(dl, 'GID', p.gid);
+  if (engines.length > 1) {
+    row(dl, 'Engine', `${engineOf(client.baseUrl).label}${client.lastMs != null ? ` · ${client.lastMs} ms` : ''}`);
+  }
   card.append(dl);
 
   if (p.addendum) {
@@ -338,6 +440,238 @@ map.on('click', (e) => {
 map.on('contextmenu', (e) => {
   activate($('#tab-reverse'));
   reverseAt(e.lngLat);
+});
+
+// ---- Address tab (pgeo /v1/address: USPS Publication 28) -----------------------------------
+
+const addrSearch = $('#addr-search');
+const addrCard = $('#addr-result');
+const addrStatus = $('#addr-status');
+const addrPoint = makeMarker('probe');
+let addrCtl = null;
+let bestCtl = null;
+let bestTimer = null;
+
+function setupExtras() {
+  const hasPgeo = !!pgeoClient;
+  const hasBoth = hasPgeo && engines.some((e) => e.kind === 'pelias');
+  $('#tab-address').hidden = !hasPgeo;
+  $('#tab-compare').hidden = !hasBoth;
+  if (hasPgeo) {
+    addrSearch.client = pgeoClient; // suggestions and addresses from the same engine (gids match)
+    addrSearch.context = () => { const c = map.getCenter(); return { focus: { lat: c.lat, lon: c.lng } }; };
+  }
+}
+
+function clearAddress() {
+  addrCard.hidden = true;
+  addrPoint.remove();
+  map.getSource('addr-link')?.setData(EMPTY);
+}
+
+function copyButton(text) {
+  const b = el('button', 'btn copy', 'Copy');
+  b.type = 'button';
+  b.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      b.textContent = 'Copied';
+    } catch {
+      b.textContent = 'Copy failed';
+    }
+    setTimeout(() => { b.textContent = 'Copy'; }, 1500);
+  });
+  return b;
+}
+
+function renderAddress(feature) {
+  const p = feature.properties || {};
+  const u = p.usps;
+  const pl = p.place || {};
+  addrCard.replaceChildren();
+  const head = el('div', 'usps-head');
+  const badge = !u ? el('span', 'badge place', 'place only')
+    : u.match === 'nearest' ? el('span', 'badge nearest', `nearest address · ${Math.round(u.distance_m ?? 0)} m`)
+      : el('span', 'badge exact', u.match === 'fallback' ? 'best match' : 'exact');
+  head.append(badge, el('h2', null, p.label || pl.name || ''));
+  addrCard.append(head);
+  if (u?.delivery_line) {
+    const block = `${u.delivery_line}\n${u.last_line || ''}`;
+    const pre = el('pre', 'usps-block', block);
+    const wrap = el('div', 'usps-wrap');
+    wrap.append(pre, copyButton(block));
+    addrCard.append(wrap);
+    const dl = el('dl', 'usps-parts');
+    row(dl, 'Number', u.primary_number);
+    row(dl, 'Pre-dir.', u.predirectional);
+    row(dl, 'Street', u.street_name);
+    row(dl, 'Suffix', u.suffix);
+    row(dl, 'Modifier', u.post_modifier);
+    row(dl, 'Post-dir.', u.postdirectional);
+    row(dl, 'Unit', [u.secondary_designator, u.secondary_number].filter(Boolean).join(' '));
+    row(dl, 'City', u.city);
+    row(dl, 'State', u.state);
+    row(dl, 'ZIP', u.zip5);
+    addrCard.append(dl);
+  } else {
+    addrCard.append(el('p', 'hint', 'No street address: a town, county or ZIP has no single mailing address. Place details below.'));
+  }
+  const dl2 = el('dl');
+  row(dl2, 'Municipality', pl.municipality);
+  row(dl2, 'County', pl.county && `${pl.county}${pl.county_fips ? ` (FIPS ${pl.county_fips})` : ''}`);
+  row(dl2, 'State', pl.state && `${pl.state} (FIPS ${pl.state_fips})`);
+  row(dl2, 'Location', `${fixed(pl.lat)}, ${fixed(pl.lon)}`);
+  if (p.confidence != null) {
+    const conf = el('span');
+    conf.append(meter(p.confidence), document.createTextNode(Number(p.confidence).toFixed(2)));
+    row(dl2, 'Confidence', conf);
+  }
+  row(dl2, 'Source', u ? `${u.source} · ${u.gid}` : p.gid);
+  if (pgeoClient?.lastMs != null) row(dl2, 'Response', `${pgeoClient.lastMs} ms (pgeo)`);
+  addrCard.append(dl2);
+  const raw = el('details');
+  raw.append(el('summary', null, 'Raw response'), el('pre', null, JSON.stringify(feature, null, 2)));
+  addrCard.append(raw);
+  addrCard.hidden = false;
+
+  // map: the place, and for a nearest match the address point with a dashed link
+  const [lon, lat] = feature.geometry.coordinates;
+  marker.setLngLat([lon, lat]).addTo(map);
+  if (u && u.match === 'nearest' && u.lat != null) {
+    addrPoint.setLngLat([u.lon, u.lat]).addTo(map);
+    map.getSource('addr-link')?.setData({ type: 'Feature', properties: {},
+      geometry: { type: 'LineString', coordinates: [[lon, lat], [u.lon, u.lat]] } });
+  } else {
+    addrPoint.remove();
+    map.getSource('addr-link')?.setData(EMPTY);
+  }
+  map.flyTo({ center: [lon, lat], zoom: u ? 17 : 12, padding: panelPadding(), duration: 1000 });
+}
+
+async function lookupAddress(q) {
+  if (!pgeoClient) return;
+  addrCtl?.abort();
+  addrCtl = new AbortController();
+  const unit = $('#addr-unit').value.trim();
+  addrStatus.textContent = 'Looking up...';
+  try {
+    const fc = await pgeoClient.address({ ...q, unit: unit || undefined }, addrCtl.signal);
+    const f = fc.features?.[0];
+    if (!f) { addrStatus.textContent = 'No match.'; clearAddress(); return; }
+    addrStatus.textContent = '';
+    renderAddress(f);
+  } catch (err) {
+    if (err.name !== 'AbortError') addrStatus.textContent = err.message;
+  }
+}
+
+// A suggestion: by gid; interpolated addresses have no stored record, so use their label.
+addrSearch.addEventListener('pelias-select', (e) => {
+  const p = e.detail.feature.properties || {};
+  if (p.source === 'interpolation' || !/^[a-z0-9_]+:[a-z_]+:[A-Za-z0-9_\/.:-]{1,160}$/.test(p.gid || '')) {
+    lookupAddress({ text: p.label });
+  } else {
+    lookupAddress({ ids: p.gid });
+  }
+});
+// While typing: the best full-search match with its confidence, offered as a one-click pick.
+addrSearch.addEventListener('pelias-results', (e) => {
+  clearTimeout(bestTimer);
+  const text = (e.detail.text || '').trim();
+  if (e.detail.kind !== 'autocomplete' || text.length < 3 || !pgeoClient) return;
+  bestTimer = setTimeout(async () => {
+    bestCtl?.abort();
+    bestCtl = new AbortController();
+    try {
+      const c = map.getCenter();
+      const fc = await pgeoClient.search(text, { size: 1, focus: { lat: c.lat, lon: c.lng } }, bestCtl.signal);
+      const f = fc.features?.[0];
+      addrStatus.replaceChildren();
+      if (!f) return;
+      const chip = el('button', 'best', '');
+      chip.type = 'button';
+      chip.append(el('span', 'best-k', 'Best match'), el('span', 'best-l', f.properties.label),
+        el('span', 'best-c', `conf ${Number(f.properties.confidence ?? 0).toFixed(2)}`));
+      chip.addEventListener('click', () => addrSearch.dispatchEvent(new CustomEvent('pelias-select', { detail: { feature: f } })));
+      addrStatus.append(chip);
+    } catch { /* superseded or offline: no preview */ }
+  }, 400);
+});
+$('#addr-find').addEventListener('click', () => {
+  const text = (addrSearch.value || '').trim();
+  if (text) lookupAddress({ text });
+});
+map.on('click', (e) => {
+  if (current() !== 'tab-address' || !pgeoClient) return;
+  lookupAddress({ lat: e.lngLat.lat, lon: e.lngLat.lng, radiusKm: 0.3 });
+});
+
+// ---- Compare tab (the same search on Pelias and on pgeo) ------------------------------------
+
+function haversineM(a, b) {
+  const r = (d) => (d * Math.PI) / 180;
+  const dLat = r(b[1] - a[1]);
+  const dLon = r(b[0] - a[0]);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(r(a[1])) * Math.cos(r(b[1])) * Math.sin(dLon / 2) ** 2;
+  return 2 * 6371008.8 * Math.asin(Math.sqrt(h));
+}
+
+$('#compare-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const text = $('#compare-text').value.trim();
+  if (!text || !pgeoClient) return;
+  const pel = engines.find((x) => x.kind === 'pelias');
+  const pg = engines.find((x) => x.kind === 'pgeo');
+  const sides = [{ eng: pel, key: 'pelias', c: new PeliasClient({ baseUrl: pel.base }) },
+    { eng: pg, key: 'pgeo', c: new PeliasClient({ baseUrl: pg.base }) }];
+  const cols = $('#compare-cols');
+  cols.replaceChildren();
+  $('#compare-summary').textContent = 'Asking both engines...';
+  const c = map.getCenter();
+  const out = await Promise.all(sides.map(async (sd) => {
+    try {
+      const fc = await sd.c.search(text, { size: 5, focus: { lat: c.lat, lon: c.lng } });
+      return { ...sd, features: fc.features || [], ms: sd.c.lastMs };
+    } catch (err) {
+      return { ...sd, features: [], ms: sd.c.lastMs, error: err.message };
+    }
+  }));
+  const dots = [];
+  for (const sd of out) {
+    const col = el('div', `cmp-col cmp-${sd.key}`);
+    col.append(el('h3', null, sd.eng.label), el('p', 'r-meta', sd.error ? sd.error : `${sd.features.length} results · ${sd.ms} ms`));
+    const ol = el('ol', 'results');
+    sd.features.forEach((f, i) => {
+      const p = f.properties || {};
+      const li = el('li');
+      li.tabIndex = 0;
+      li.append(el('span', 'r-label', p.label || p.name), el('span', `tag tag-${p.layer}`, p.layer),
+        el('span', 'r-meta', `conf ${p.confidence != null ? Number(p.confidence).toFixed(2) : '-'} · ${p.source}`));
+      li.addEventListener('click', () => select(f));
+      ol.append(li);
+      dots.push({ ...f, properties: { ...p, engine: sd.key, rank: i + 1 } });
+    });
+    col.append(ol);
+    cols.append(col);
+  }
+  map.getSource('compare')?.setData({ type: 'FeatureCollection', features: dots });
+  const [a, b] = out.map((sd) => sd.features[0]);
+  let msg;
+  if (a && b) {
+    const d = haversineM(a.geometry.coordinates, b.geometry.coordinates);
+    msg = d < 250 ? `First results agree (${Math.round(d)} m apart).`
+      : `First results differ: ${d < 1000 ? `${Math.round(d)} m` : `${(d / 1000).toFixed(1)} km`} apart.`;
+  } else {
+    msg = a || b ? 'Only one engine found something.' : 'Neither engine found anything.';
+  }
+  $('#compare-summary').textContent = msg;
+  if (dots.length) {
+    const bb = dots.reduce((acc, f) => {
+      const [x, y] = f.geometry.coordinates;
+      return [Math.min(acc[0], x), Math.min(acc[1], y), Math.max(acc[2], x), Math.max(acc[3], y)];
+    }, [180, 90, -180, -90]);
+    map.fitBounds([[bb[0], bb[1]], [bb[2], bb[3]]], { padding: panelPadding(), maxZoom: 14, duration: 1000 });
+  }
 });
 
 // ---- Batch tab ----------------------------------------------------------------------------

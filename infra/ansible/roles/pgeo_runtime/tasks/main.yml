@@ -1,0 +1,159 @@
+# Query-only pgeo: the database is built on the workstation and restored here from a
+# pg_dump (scripts/pgeo_dump.sh), the same pattern as the Pelias snapshot restore.
+
+- name: Service account (no login shell)
+  ansible.builtin.user:
+    name: "{{ pgeo_user }}"
+    system: true
+    home: "{{ pgeo_home }}"
+    shell: /usr/sbin/nologin
+    groups: [docker]
+    append: true
+
+- name: Project and data directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ pgeo_user }}"
+    group: "{{ pgeo_user }}"
+    mode: "0750"
+  loop:
+    - "{{ pgeo_home }}"
+    - "{{ pgeo_data_dir }}"
+    - "{{ pgeo_data_dir }}/dumps"
+
+# The container's postgres user (uid 999) owns the cluster; create the directory for it.
+- name: Database directory
+  ansible.builtin.file:
+    path: "{{ pgeo_data_dir }}/pgdata"
+    state: directory
+    owner: "999"
+    group: "999"
+    mode: "0700"
+
+- name: Generate database secrets once (they never leave the VM)
+  ansible.builtin.shell: |
+    set -eu
+    umask 077
+    printf 'PGEO_DB_PASSWORD=%s\nPGEO_API_PASSWORD=%s\n' "$(openssl rand -hex 32)" "$(openssl rand -hex 32)" \
+      > {{ pgeo_home }}/pgeo.secrets
+  args:
+    creates: "{{ pgeo_home }}/pgeo.secrets"
+  no_log: true
+
+- name: Secrets file permissions
+  ansible.builtin.file:
+    path: "{{ pgeo_home }}/pgeo.secrets"
+    owner: "{{ pgeo_user }}"
+    group: "{{ pgeo_user }}"
+    mode: "0600"
+
+- name: Compose file and PostgreSQL configuration
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ pgeo_home }}/{{ item.dest }}"
+    owner: "{{ pgeo_user }}"
+    group: "{{ pgeo_user }}"
+    mode: "0640"
+  loop:
+    - { src: compose.yml.j2, dest: compose.yml }
+    - { src: postgresql.conf.j2, dest: postgresql.conf }
+  notify: Restart pgeo
+
+- name: Systemd unit
+  ansible.builtin.template:
+    src: pgeo.service.j2
+    dest: /etc/systemd/system/pgeo.service
+    mode: "0644"
+  notify: Restart pgeo
+
+- name: Ship the database dump from the workstation
+  when: pgeo_dump_name | length > 0
+  ansible.posix.synchronize:
+    src: "{{ local_pgeo_dump_dir }}/{{ pgeo_dump_name }}.dump"
+    dest: "{{ pgeo_data_dir }}/dumps/{{ pgeo_dump_name }}.dump"
+    rsync_opts: ["--chown={{ pgeo_user }}:{{ pgeo_user }}", "--chmod=F0644"]
+
+- name: Start the database alone for restore
+  ansible.builtin.command:
+    cmd: docker compose --env-file pgeo.secrets up -d db
+    chdir: "{{ pgeo_home }}"
+  changed_when: false
+
+- name: Wait for the database
+  ansible.builtin.command: docker exec pgeo_db pg_isready -U pgeo -d pgeo
+  register: pgeo_runtime_ready
+  retries: 30
+  delay: 3
+  until: pgeo_runtime_ready.rc == 0
+  changed_when: false
+
+- name: Is the pgeo schema present?
+  ansible.builtin.command: docker exec pgeo_db psql -U pgeo -d pgeo -Atc "SELECT count(*) FROM pg_namespace WHERE nspname = 'pgeo'"
+  register: pgeo_runtime_schema
+  changed_when: false
+
+- name: Restore the database from the dump
+  when: pgeo_runtime_schema.stdout | trim == '0' or pgeo_force_restore | bool
+  block:
+    - name: Require a dump name
+      ansible.builtin.assert:
+        that: pgeo_dump_name | length > 0
+        fail_msg: set pgeo_dump_name (see scripts/pgeo_dump.sh output)
+
+    - name: Read the API role password
+      ansible.builtin.slurp:
+        src: "{{ pgeo_home }}/pgeo.secrets"
+      register: pgeo_runtime_secrets
+      no_log: true
+
+    # Extensions (core + contrib only) and the read-only API role must exist before the
+    # restore: the dump grants EXECUTE/SELECT to pgeo_api. SQL goes in on stdin, so the
+    # password never appears on a command line.
+    - name: Extensions, schemas cleared, read-only API role
+      ansible.builtin.command:
+        cmd: docker exec -i pgeo_db psql -v ON_ERROR_STOP=1 -U pgeo -d pgeo
+        stdin: |
+          CREATE EXTENSION IF NOT EXISTS postgis;
+          CREATE EXTENSION IF NOT EXISTS pg_trgm;
+          CREATE EXTENSION IF NOT EXISTS unaccent;
+          CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;
+          DROP SCHEMA IF EXISTS geocode_api CASCADE;
+          DROP SCHEMA IF EXISTS geocode CASCADE;
+          DROP SCHEMA IF EXISTS pgeo CASCADE;
+          DO $$ BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'pgeo_api') THEN
+              CREATE ROLE pgeo_api LOGIN;
+            END IF;
+          END $$;
+          ALTER ROLE pgeo_api WITH LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE
+            PASSWORD '{{ (pgeo_runtime_secrets.content | b64decode | regex_search('PGEO_API_PASSWORD=([A-Za-z0-9]+)', '\1'))[0] }}';
+          GRANT CONNECT ON DATABASE pgeo TO pgeo_api;
+      no_log: true
+
+    - name: pg_restore (blocks until done)
+      ansible.builtin.command:
+        cmd: >-
+          docker exec pgeo_db pg_restore -U pgeo -d pgeo --no-owner --exit-on-error
+          /dumps/{{ pgeo_dump_name }}.dump
+      timeout: 1800
+
+    - name: VACUUM ANALYZE (fresh tables have no visibility map or statistics)
+      ansible.builtin.command: docker exec pgeo_db psql -U pgeo -d pgeo -c "VACUUM (ANALYZE)"
+      timeout: 1800
+
+- name: Stack enabled and running
+  ansible.builtin.systemd_service:
+    name: pgeo
+    enabled: true
+    state: started
+    daemon_reload: true
+
+- name: Smoke test the pure-SQL API locally
+  ansible.builtin.uri:
+    url: http://127.0.0.1:4600/rpc/v1_search?text=portland%20maine&size=1
+    return_content: true
+  register: pgeo_runtime_smoke
+  retries: 20
+  delay: 3
+  until: pgeo_runtime_smoke.status == 200 and (pgeo_runtime_smoke.json.features | length) > 0

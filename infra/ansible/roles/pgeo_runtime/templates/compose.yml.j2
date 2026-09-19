@@ -1,0 +1,44 @@
+# Managed by Ansible (role: pgeo_runtime). pgeo on the query host: PostgreSQL/PostGIS with the
+# pure-SQL API served by PostgREST. The database is restored from a dump built on the
+# workstation (scripts/pgeo_dump.sh); no data is built here. Secrets: {{ pgeo_home }}/pgeo.secrets.
+name: pgeo
+services:
+  db:
+    image: {{ pgeo_db_image }}
+    container_name: pgeo_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pgeo
+      POSTGRES_USER: pgeo
+      POSTGRES_PASSWORD: ${PGEO_DB_PASSWORD:?set in pgeo.secrets}
+    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
+    shm_size: 512m
+    mem_limit: {{ pgeo_mem_limit_db }}
+    memswap_limit: {{ pgeo_mem_limit_db }}
+    volumes:
+      - "{{ pgeo_data_dir }}/pgdata:/var/lib/postgresql/18/docker"
+      - "{{ pgeo_home }}/postgresql.conf:/etc/postgresql/postgresql.conf:ro"
+      - "{{ pgeo_data_dir }}/dumps:/dumps:ro"
+    # no published port: only PostgREST (same compose network) talks to the database
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pgeo -d pgeo"]
+      interval: 5s
+      retries: 30
+
+  rest:
+    image: {{ pgeo_rest_image }}
+    container_name: pgeo_rest
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      PGRST_DB_URI: "postgres://pgeo_api:${PGEO_API_PASSWORD:?set in pgeo.secrets}@db:5432/pgeo"
+      PGRST_DB_SCHEMAS: "geocode_api"
+      PGRST_DB_ANON_ROLE: "pgeo_api"
+      PGRST_DB_POOL: "{{ pgeo_rest_pool }}"
+      PGRST_SERVER_PORT: "3000"
+      PGRST_OPENAPI_MODE: "disabled"
+      PGRST_DB_MAX_ROWS: "40"
+    mem_limit: {{ pgeo_mem_limit_rest }}
+    memswap_limit: {{ pgeo_mem_limit_rest }}
+    ports: ["127.0.0.1:4600:3000"]

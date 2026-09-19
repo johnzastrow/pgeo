@@ -1,0 +1,19 @@
+# Managed by Ansible (role: pgeo_runtime)
+[Unit]
+Description=pgeo (PostgreSQL/PostGIS geocoder, PostgREST) via docker compose
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+User={{ pgeo_user }}
+Group={{ pgeo_user }}
+WorkingDirectory={{ pgeo_home }}
+ExecStart=/usr/bin/docker compose --env-file pgeo.secrets up -d --remove-orphans db rest
+ExecStop=/usr/bin/docker compose --env-file pgeo.secrets stop
+TimeoutStartSec=300
+
+[Install]
+WantedBy=multi-user.target

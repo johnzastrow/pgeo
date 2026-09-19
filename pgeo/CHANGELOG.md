@@ -10,6 +10,9 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+### Added
+- `/v1/address`: the address point's `lat`/`lon` in the `usps` block (differs from the place for `nearest` matches).
+
 ## [0.7.0] - 2026-09-19
 
 ### Added
