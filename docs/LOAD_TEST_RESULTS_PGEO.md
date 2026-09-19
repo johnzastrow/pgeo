@@ -1,5 +1,18 @@
 # Load Test Results: pgeo
 
+> **Superseded.** These runs predate the reverse-geocoding index fix (`feature_admin_idx`,
+> pgeo 0.7.0), which cut reverse p95 from 225-393 ms to 5-18 ms and raised one-vCPU capacity
+> from 4 users to 24. They are kept as the before side of that comparison; the current results
+> are in the study report ([REPORT.md](REPORT.md), Sections 3.3-3.4) and
+> [TUNING_REPORT.md](TUNING_REPORT.md) section 5. Regenerate this file for the post-fix runs
+> with:
+>
+> ```bash
+> uv run --with matplotlib python tests/load/report.py \
+>     data/loadtest/20260919-1135-pgeo data/loadtest/20260919-1543-pgeo \
+>     --engine pgeo --out docs/LOAD_TEST_RESULTS_PGEO.md --png-dir docs/loadtest_pgeo
+> ```
+
 Runs `20260918-2343-pgeo`, `20260919-0350-pgeo`; method and SLOs in [LOAD_TEST_PLAN.md](LOAD_TEST_PLAN.md). Latencies in ms (steady state, warm caches). Direct to the API, no edge rate limits.
 
 ## Summary
