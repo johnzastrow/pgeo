@@ -145,6 +145,7 @@ Inputs are listed in `report/inputs.toml`; point it at new load-test run ids aft
 | `python3 tests/load/run_matrix.py [--configs C1,..] [--datasets D1,..]` | Pelias capacity matrix; data-volume subsets | 2-4 h | `data/loadtest/<run>/` |
 | `python3 tests/load/run_matrix_pgeo.py --engines rest,api --configs Pmin,P1,P2,P4,PM` | pgeo capacity matrix | 5-7 h | `data/loadtest/<run>-pgeo/` |
 | `python3 tests/load/find_floor.py --engines pgeo,pelias` | smallest configuration that serves 3 users | 1-2 h | `data/loadtest/<run>-floor/` |
+| `python3 tests/load/find_floor.py --resume data/loadtest/<run>-floor --only cpus` | continue an earlier floor search after adding smaller steps | 30-60 min | `data/loadtest/<run>-floor/` |
 | `tests/load/floor_vm.sh <engine> <vmid 190-199> <cores> <cpulimit> <mb> ...` | the found minimum on a temporary Proxmox VM (created, tested, destroyed) | 30-60 min | `data/loadtest/<run>-vm/` |
 | `python3 tests/load/run_vm.py` | both engines on VM 120 through HTTPS (raise the edge rate limits for the window) | 1-2 h | `data/loadtest/<run>-vm/` |
 | `python3 tests/build/measure_build.py --engine <e> -- <build command>` | build time, CPU, memory, disk | 15-30 min | `data/buildstats/` |
