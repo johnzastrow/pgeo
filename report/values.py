@@ -323,6 +323,45 @@ def compat_values(v: dict, t: dict) -> None:
     v["compat_failures"] = str(d["failures"])
 
 
+def resource_values(v: dict, t: dict) -> None:
+    """Sizing guide (smallest tested configuration per load) and build requirements."""
+    pel, pg = F.pelias_runs(), F.pgeo_runs()
+    fams = {
+        "Pelias": {k: r for k, r in pel.items() if r["budget_gb"]},
+        "pgeo pure SQL": {k: r for k, r in pg.items() if k.startswith("rest-") and r["budget_gb"]},
+        "pgeo FastAPI": {k: r for k, r in pg.items() if k.startswith("api-") and not k.startswith("api-svc")
+                         and r["budget_gb"]},
+    }  # fmt: skip
+    rows = []
+    for users in (3, 10, 25, 50, 100, 200, 400):
+        row = [str(users)]
+        for runs in fams.values():
+            ok = [r for r in runs.values() if (r["limit_users"] or 0) >= users]
+            if ok:
+                best = min(ok, key=lambda r: (r["budget_gb"], r["config"].get("cpus") or 99))
+                row.append(f"{best['config'].get('cpus')} vCPU, {best['budget_gb']} GB ({best['id']})")
+            else:
+                row.append("not reached in tests")
+        rows.append(row)
+    t["sizing"] = md_table(["Concurrent users", *fams], rows, "llll")
+    # build requirements from tests/build/measure_build.py output (latest per engine)
+    rows = []
+    for engine in ("pelias", "pgeo"):
+        files = sorted((ROOT / "data" / "buildstats").glob(f"{engine}-*.json"))
+        files = [f for f in files if json.loads(f.read_text()).get("exit_code") == 0]
+        if not files:
+            rows.append([engine, "pending measurement", "", "", "", ""])
+            continue
+        d = json.loads(files[-1].read_text())
+        s = d["summary"]
+        disk = sum(b for b in d["disk_after_bytes"].values() if b)
+        rows.append(["Pelias" if engine == "pelias" else "pgeo", f"{s['wall_s'] / 60:.0f} min",
+                     f"{s['peak_mem_mb'] / 1024:.1f} GB", f"{s['avg_cpu_cores']:.1f} / {s['peak_cpu_cores']:.1f}",
+                     gb(disk, 1), d["started"][:10]])  # fmt: skip
+    t["build_resources"] = md_table(["Engine", "Wall time", "Peak memory", "CPU cores (avg / peak)",
+                                     "Disk after build", "Measured"], rows, "lrrrrl")  # fmt: skip
+
+
 def build_all(snap: dict) -> tuple[dict, dict]:
     v: dict = {}
     t: dict = {}
@@ -331,6 +370,7 @@ def build_all(snap: dict) -> tuple[dict, dict]:
     data_values(v, t, snap)
     load_values(v, t)
     compat_values(v, t)
+    resource_values(v, t)
     host = snap["host"]
     v["host_cpu"] = host["cpu"]
     v["host_threads"] = str(host["logical_cpus"])

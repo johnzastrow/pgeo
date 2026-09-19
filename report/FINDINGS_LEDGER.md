@@ -101,7 +101,7 @@ and observations made during the work (marked "session").
       interpretation tied to architecture and resources; the requests used for testing);
       conclusions (which tool for which scenario); next steps.
 - [ ] Every figure and table numbered, with a caption; matplotlib, publication quality; sans-serif font.
-- [ ] Resource requirements: build (CPU, peak memory, disk, time) and operations (vCPU, memory,
+- [~] (report 3.5, build numbers pending) Resource requirements: build (CPU, peak memory, disk, time) and operations (vCPU, memory,
       disk per load level) for each platform; which loads and which data volumes each supports.
 - [ ] Features of each platform: endpoints, parameters, parsing, data layers, interpolation,
       autocomplete, reverse, confidence, extensions (/v1/address), compatibility, security,

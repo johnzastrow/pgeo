@@ -376,7 +376,47 @@ is mostly the PostgreSQL page cache for a 674 MB database.}}
 
 {{figure:cpu|Average CPU by service as users are added on 4 vCPU.}}
 
-<!-- PENDING: resource requirements section (build and operations per platform, sizing by load and data volume) -->
+#### Resource requirements
+
+**Operation.** Table {{ref:table:sizing}} turns the capacity results into a sizing guide: for a
+target number of concurrent users, the smallest tested configuration of each engine that kept every
+endpoint within its latency target. Budgets include 0.8 GB for the operating system. One "user" is a
+person actively using the search page (a request every 3 to 8 seconds); a service with many
+occasional users needs far fewer concurrent slots than it has users.
+
+{{table:sizing|Sizing guide: smallest tested configuration that meets all latency targets for a
+given number of concurrent users. Only configurations with a memory budget are considered; "not
+reached in tests" means not reached within the tested budgets (the unconstrained reference runs
+M0 and PM appear in the capacity tables).}}
+
+```table ops_requirements
+| Resource | Pelias | pgeo |
+|---|---|---|
+| Containers | 6 (Elasticsearch, API, libpostal, placeholder, pip, interpolation) | 2 (PostgreSQL, PostgREST) or 2 (PostgreSQL, FastAPI) |
+| Memory floor (runs at all) | ~8.3 GB: libpostal model ~2 GB, interpolation ~2 GB, Elasticsearch heap 0.8-2 GB | ~1.6 GB (database 0.6 GB) |
+| Memory that grows with load | placeholder (OOM-killed at 0.4-0.5 GB under load; 0.8 GB needed) | PostgreSQL backends (a few MB each), page cache |
+| Disk (Maine) | ~1.4 GB Elasticsearch data plus ~0.9 GB helper databases; 435 MB snapshot to ship | 674 MB database; data directory ~2.6 GB with write-ahead log; dump to ship |
+| CPU scaling | add API workers with CPUs (1 worker on 4 vCPU halves capacity) | add connections with CPUs; front end workers for FastAPI |
+| Scaling out | Elasticsearch replicas and more API instances | read replicas behind PostgREST |
+| Updating data | rebuild index on a workstation, ship snapshot, restore | rebuild database on a workstation, ship dump, restore |
+```
+
+{{table:ops_requirements|Operating requirements of each platform (Maine data).}}
+
+**Build.** Both engines are built on a workstation and shipped to the query host, so the query host
+never needs the raw data or the build tools. Table {{ref:table:build_resources}} gives the measured
+cost of a full build of each engine.
+
+{{table:build_resources|Build resources: a full build of each engine, measured with
+`tests/build/measure_build.py` (wall time, peak memory of all build containers and processes,
+average and peak CPU, disk used by the result).}}
+
+**Data volume.** For Pelias, capacity fell from {{value:ds_D1}} users with admin areas only to
+{{value:ds_D5}} with every source (Section 3.6); the index grew to 435 MB. pgeo's database grows with
+the same sources to 674 MB; capacity against data volume was not measured for pgeo (Next steps).
+Doubling the data (for example adding New Hampshire) roughly doubles both stores; for Pelias the
+extra venues and names cost capacity per query, and for pgeo the trigram candidate sets grow in the
+same way, so both need more CPU per user as coverage grows.
 
 ### 3.6 Data volume
 
