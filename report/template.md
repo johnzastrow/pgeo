@@ -51,7 +51,7 @@ hundreds of concurrent users per vCPU. Section "Conclusions" maps scenarios to t
 
 {{callout:key|On the same open data and the same hardware, pgeo answers {{value:acc_pgeo_sql}} of
 {{value:n_cases}} test queries correctly against {{value:acc_pelias}} for Pelias, and it does so in
-about a quarter of the memory. Pelias remains about {{value:ratio_max}} times faster per CPU. For a
+a fifth of the memory at each engine's measured floor. Pelias remains about {{value:ratio_max}} times faster per CPU. For a
 small, self-hosted Maine geocoder, accuracy and memory decide, and both favour pgeo.}}
 
 {{figure:frontier|Capacity against memory budget for every tested configuration of both engines.
@@ -866,7 +866,7 @@ work needs more headroom. Read each floor as the pair of numbers it is: at more 
 would fit in less memory, and at less memory they would need more CPU to stay inside the targets.
 
 {{callout:key|The three-user service fits in {{value:floor_pgeo_gb}} on pgeo and
-{{value:floor_pelias_gb}} on Pelias. Both engines idle comfortably below a quarter of a core, so at
+{{value:floor_pelias_gb}} on Pelias -- a factor of five. Both engines idle comfortably below a quarter of a core, so at
 this scale the machine is chosen by memory, not by CPU -- which is why the two platforms land in
 different price classes ({{ref:table:vps}}).}}
 
