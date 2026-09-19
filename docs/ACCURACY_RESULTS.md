@@ -8,9 +8,9 @@ Test set: `tests/accuracy/cases.json` (seeded; ground truth from the source data
 |---|---|---|---|---|---|---|---|---|
 | pelias/default | 76% | 77% | 84% | 0.0 | 5% | 0.983 | 0.87 | 13.3 |
 | pgeo/parse-extension | 90% | 89% | 96% | 0.0 | 4% | 0.937 | 0.907 | 79.1 |
-| pgeo/parse-none | 93% | 91% | 97% | 0.0 | 5% | 0.935 | 0.901 | 87.0 |
-| pgeo/parse-service | 92% | 91% | 96% | 0.0 | 4% | 0.923 | 0.767 | 82.8 |
-| pgeo-sql/postgrest-rule | 93% | 91% | 97% | 0.0 | 5% | 0.935 | 0.901 | 89.2 |
+| pgeo/parse-none | 93% | 91% | 97% | 0.0 | 5% | 0.91 | 0.702 | 87.8 |
+| pgeo/parse-service | 93% | 91% | 96% | 0.0 | 4% | 0.898 | 0.581 | 88.5 |
+| pgeo-sql/postgrest-rule | 93% | 91% | 97% | 0.0 | 5% | 0.91 | 0.702 | 92.7 |
 
 ## By query quality
 
@@ -18,9 +18,9 @@ Test set: `tests/accuracy/cases.json` (seeded; ground truth from the source data
 |---|---|---|---|---|
 | pelias/default | 88% | 30% | 85% | 41% |
 | pgeo/parse-extension | 94% | 73% | 89% | 89% |
-| pgeo/parse-none | 95% | 83% | 91% | 93% |
-| pgeo/parse-service | 94% | 84% | 93% | 88% |
-| pgeo-sql/postgrest-rule | 95% | 83% | 91% | 93% |
+| pgeo/parse-none | 95% | 83% | 91% | 95% |
+| pgeo/parse-service | 94% | 84% | 93% | 90% |
+| pgeo-sql/postgrest-rule | 95% | 83% | 91% | 95% |
 
 ## By endpoint
 
@@ -38,9 +38,9 @@ Test set: `tests/accuracy/cases.json` (seeded; ground truth from the source data
 |---|---|---|---|---|---|---|---|
 | pelias/default | 88% | 81% | 37% | 60% | 100% | 100% | 41% |
 | pgeo/parse-extension | 98% | 94% | 59% | 82% | 98% | 100% | 89% |
-| pgeo/parse-none | 98% | 96% | 77% | 80% | 98% | 100% | 93% |
-| pgeo/parse-service | 98% | 96% | 76% | 82% | 98% | 100% | 88% |
-| pgeo-sql/postgrest-rule | 98% | 96% | 77% | 80% | 98% | 100% | 93% |
+| pgeo/parse-none | 98% | 96% | 77% | 80% | 98% | 100% | 95% |
+| pgeo/parse-service | 98% | 96% | 76% | 82% | 98% | 100% | 90% |
+| pgeo-sql/postgrest-rule | 98% | 96% | 77% | 80% | 98% | 100% | 95% |
 
 ## Search detail (endpoint / query type)
 
@@ -63,21 +63,21 @@ Test set: `tests/accuracy/cases.json` (seeded; ground truth from the source data
 | pgeo/parse-none | autocomplete/exact | 150 | 95% | 81% | 95% | 0.0 | 0% |
 | pgeo/parse-none | reverse/exact | 200 | 100% | 100% | 100% | 0.0 | 0% |
 | pgeo/parse-none | search/exact | 563 | 91% | 91% | 96% | 0.0 | 0% |
-| pgeo/parse-none | search/miss | 150 | 93% | - | - | None | 49% |
+| pgeo/parse-none | search/miss | 150 | 95% | - | - | None | 49% |
 | pgeo/parse-none | search/typo | 198 | 83% | 83% | 92% | 0.0 | 2% |
 | pgeo/parse-none | search/variant | 149 | 91% | 91% | 97% | 0.0 | 0% |
 | pgeo/parse-none | structured/exact | 150 | 100% | 100% | 100% | 0.0 | 0% |
 | pgeo/parse-service | autocomplete/exact | 150 | 95% | 81% | 95% | 0.0 | 0% |
 | pgeo/parse-service | reverse/exact | 200 | 100% | 100% | 100% | 0.0 | 0% |
 | pgeo/parse-service | search/exact | 563 | 91% | 91% | 96% | 0.0 | 0% |
-| pgeo/parse-service | search/miss | 150 | 88% | - | - | None | 34% |
+| pgeo/parse-service | search/miss | 150 | 90% | - | - | None | 34% |
 | pgeo/parse-service | search/typo | 198 | 84% | 84% | 92% | 0.0 | 2% |
 | pgeo/parse-service | search/variant | 149 | 93% | 93% | 94% | 0.0 | 3% |
 | pgeo/parse-service | structured/exact | 150 | 100% | 100% | 100% | 0.0 | 0% |
 | pgeo-sql/postgrest-rule | autocomplete/exact | 150 | 95% | 81% | 95% | 0.0 | 0% |
 | pgeo-sql/postgrest-rule | reverse/exact | 200 | 100% | 100% | 100% | 0.0 | 0% |
 | pgeo-sql/postgrest-rule | search/exact | 563 | 91% | 91% | 96% | 0.0 | 0% |
-| pgeo-sql/postgrest-rule | search/miss | 150 | 93% | - | - | None | 49% |
+| pgeo-sql/postgrest-rule | search/miss | 150 | 95% | - | - | None | 49% |
 | pgeo-sql/postgrest-rule | search/typo | 198 | 83% | 83% | 92% | 0.0 | 2% |
 | pgeo-sql/postgrest-rule | search/variant | 149 | 91% | 91% | 97% | 0.0 | 0% |
 | pgeo-sql/postgrest-rule | structured/exact | 150 | 100% | 100% | 100% | 0.0 | 0% |
@@ -111,7 +111,7 @@ xychart-beta
     title "Correct % on miss queries"
     x-axis ["pelias/default", "pgeo/parse-extension", "pgeo/parse-none", "pgeo/parse-service", "pgeo-sql/postgrest-rule"]
     y-axis "%" 0 --> 100
-    bar [41, 89, 93, 88, 93]
+    bar [41, 89, 95, 90, 95]
 ```
 
 ## Accuracy vs fuzziness (rounds F0-F5)

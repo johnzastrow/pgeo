@@ -29,6 +29,14 @@ AS $$ SELECT (layers IS NULL OR cardinality(layers) = 0 OR f.layer = ANY (layers
          AND (sources IS NULL OR cardinality(sources) = 0 OR f.source = ANY (sources))
          AND (rect IS NULL OR ST_Intersects(f.geom, rect)) $$;
 
+-- Copy of a hit with a different confidence.
+CREATE OR REPLACE FUNCTION geocode.set_conf(h geocode.hit, c real) RETURNS geocode.hit
+LANGUAGE sql IMMUTABLE PARALLEL SAFE
+AS $$ SELECT ROW(h.id, h.gid, h.source, h.layer, h.source_id, h.name, h.housenumber, h.street, h.postcode,
+              h.neighbourhood, h.locality, h.localadmin, h.county, h.region, h.region_a, h.label,
+              h.category, h.addendum, h.lon, h.lat, h.bbox, c, h.match_type, h.accuracy,
+              h.distance_km, h.score)::geocode.hit $$;
+
 CREATE OR REPLACE FUNCTION geocode.to_hit(f pgeo.feature, conf real, mt text, acc text,
                                           dist_km double precision, score real)
 RETURNS geocode.hit LANGUAGE sql IMMUTABLE PARALLEL SAFE
@@ -203,8 +211,9 @@ BEGIN
     SELECT s.*,
            least(1.0, s.base * (0.4 + 0.6 * least(1.0, s.agree)))::real AS conf
     FROM scored s
-  )
-  SELECT (d.h).* FROM (
+  ),
+  hits AS (
+  SELECT d.h FROM (
   SELECT z.h, row_number() OVER (
            PARTITION BY (z.h).label,
                         CASE (z.h).layer WHEN 'localadmin' THEN 'locality' ELSE (z.h).layer END
@@ -233,7 +242,24 @@ BEGIN
   WHERE fi.conf >= 0.3                         -- drop weak matches: misses return nothing
   ) d
   WHERE d.dup = 1                               -- one result per label (locality/localadmin, ZIP sources)
-  ORDER BY (d.h).score DESC
+  ),
+  -- Ambiguity: when several distinct places (~1 km grid) tie with the top confidence, the
+  -- query cannot say which one is meant ("Mud Pond"). Their confidence is scaled down so it
+  -- separates right answers from lucky guesses (calibration finding F28).
+  top AS (SELECT max((h).confidence) AS c FROM hits),
+  amb AS (
+    SELECT count(DISTINCT (round((h).lon::numeric, 2), round((h).lat::numeric, 2))) AS n
+    FROM hits, top WHERE (h).confidence >= top.c - 0.02
+  )
+  SELECT (y.h2).*
+  FROM hits CROSS JOIN top CROSS JOIN amb
+  CROSS JOIN LATERAL (
+    SELECT geocode.set_conf(hits.h,
+             CASE WHEN (hits.h).confidence >= top.c - 0.02 AND amb.n > 1
+                  THEN ((hits.h).confidence / (1 + 0.35 * (least(amb.n, 6) - 1)))::real
+                  ELSE (hits.h).confidence END) AS h2
+  ) y
+  ORDER BY (y.h2).score DESC
   LIMIT lim;
 END
 $$;

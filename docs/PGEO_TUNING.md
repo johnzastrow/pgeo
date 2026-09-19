@@ -42,6 +42,6 @@ Open tuning items noted during testing:
 
 Open items from this round:
 
-- **Confidence calibration**: pgeo's mean confidence is 0.94 when right vs 0.90 when wrong
-  (Pelias 0.98 vs 0.87); confidence should separate right from wrong much better.
+- ~~Confidence calibration~~: done (next row).
 - Venues 80% and lakes/summits 77%: next failure analysis.
+| 2026-09-18 | Ambiguity-aware confidence: when several distinct places (~1 km grid) tie with the top confidence, their confidence is divided by 1 + 0.35 x (places - 1) | Wrong answers were mostly ties (70 of 85 wrong exact matches had 2+ equal candidates; 746 of 887 right ones were unique) | rule parser 92.7% -> 92.9%, misses 93% -> 95%; confidence right/wrong 0.94/0.90 -> **0.91/0.70** (Pelias 0.98/0.87) | none |

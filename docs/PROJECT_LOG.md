@@ -190,7 +190,7 @@ confidence scores; easy loading and updates.
 | F25 | Accuracy on 1,560 engine-independent cases: pgeo 92.7% vs Pelias 75.5% (typos 83% vs 30%, misses handled 93% vs 41%, lakes/summits 77% vs 37%); fuzz rounds F1/F2: pgeo 84%/73% vs Pelias 34%/10% | docs/ACCURACY_RESULTS.md |
 | F26 | pgeo's rule parser (no libpostal) scores 92.7% vs 92.4% with libpostal: the ~2 GB libpostal model buys nothing measurable on this test set | Supports G6 (fewer components) |
 | F27 | The pure-SQL API behind PostgREST returns results identical to pgeo+FastAPI with the rule parser (92.7%, same per category) | Phase 13 viable; the application layer adds nothing to accuracy |
-| F28 | pgeo confidence is poorly calibrated (0.94 right vs 0.90 wrong); Pelias separates better (0.98 vs 0.87) | Tuning item |
+| F28 | pgeo confidence was poorly calibrated (0.94 right vs 0.90 wrong; Pelias 0.98 vs 0.87). Fixed with an ambiguity penalty: now 0.91 vs 0.70, a 2x wider gap than Pelias | See PGEO_TUNING.md |
 | F11 | The whole Maine build is small: ~15 min, 1,649,644 documents, 435 MB snapshot | A VPS deploy is cheap to ship |
 
 ---
