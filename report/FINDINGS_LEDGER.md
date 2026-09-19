@@ -78,7 +78,7 @@ and observations made during the work (marked "session").
 
 - [ ] pgeo data directory 2.6 GB on disk vs 674 MB database: write-ahead log (max_wal_size 4GB)
       and space from replaced tables; size VM disk for ~3-4x the database. (session)
-- [ ] Parity answer (user question 2026-09-19): feature parity for the documented API (27/27);
+- [x] (report 3.10) Parity answer (user question 2026-09-19): feature parity for the documented API (27/27);
       pgeo adds /v1/address and better calibration; Pelias keeps /v1/nearby, multilingual names,
       international parsing, its category taxonomy, planet scale; gid and unknown-parameter
       differences. Accuracy: pgeo ahead everywhere except ZIP codes (100% vs 98%, one case).

@@ -440,7 +440,37 @@ switch, an Address tab (type-ahead with a best-match suggestion, the USPS block 
 button, and the nearest street address drawn on the map for venues) and a Compare tab that runs
 one query on both engines side by side.
 
-### 3.10 Production validation on VM 120
+### 3.10 Parity between the platforms
+
+Do the two platforms now offer the same product? Feature for feature through the documented API,
+yes; in accuracy, pgeo is ahead rather than level; in throughput, Pelias is ahead.
+
+```table parity_features
+| Area | Both | Only pgeo | Only Pelias |
+|---|---|---|---|
+| Endpoints | search, structured, autocomplete, reverse, place | `/v1/address` (USPS Publication 28, nearest street address) | `/v1/nearby` (beta) |
+| Parameters | text, size, layers, sources, focus, boundary.rect, boundary.circle, boundary.country, boundary.gid, categories, lang and api_key accepted | | multilingual names (`lang` changes the output) |
+| Response | GeoJSON envelope, Pelias properties, hierarchy identifiers (`*_gid`, `county_a`), errors as HTTP 400 with `geocoding.errors` | confidence lowered for ties between distinct places (better calibrated) | |
+| Parsing | US addresses | rule parser tuned for Maine input | libpostal: international address parsing |
+| Categories | the `categories` filter | | the Pelias category taxonomy (`food`, `health`, ...) |
+| Scale | Maine (tested) | | planet-scale data |
+| Differences to handle | | pure-SQL front end rejects unknown parameters (400) | OpenAddresses records have different identifiers than in pgeo |
+```
+
+{{table:parity_features|Feature parity through the documented Pelias API.}}
+
+{{table:parity_accuracy|Accuracy parity by category: Pelias against pgeo (pure SQL), all query
+qualities. Pelias leads only where both are near perfect.}}
+
+{{table:parity_capacity|Throughput parity: most concurrent users within all latency targets at each
+CPU size, with each configuration's memory budget.}}
+
+In short: an existing Pelias client can switch to pgeo without code changes (the contract in
+Section 3.8) and gets more correct answers, especially for misspelled and vague queries, at a
+fraction of the memory; it gives up throughput per CPU, multilingual names, international parsing
+and planet scale, none of which this deployment uses.
+
+### 3.11 Production validation on VM 120
 
 <!-- PENDING: validation run on the resized VM 120 through the HTTPS path (both engines, one at a time) -->
 
