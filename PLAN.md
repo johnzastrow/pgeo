@@ -434,3 +434,34 @@ Steps:
 Security notes: only `geocode_api` functions are reachable over HTTP; the HTTP role has no
 table privileges beyond what those SECURITY INVOKER functions read via the read-only role;
 request size and statement timeouts enforced in Postgres; rate limiting stays at the edge.
+
+## 14. Final comparison scorecard (guiding principle G6)
+
+Goal: the stack with the **fewest additional components and the least data moved out of
+PostgreSQL**, unless that produces an abysmal, inferior or overly complex product. Each
+candidate stack is scored on the same sheet:
+
+| Criterion | How measured |
+|-----------|--------------|
+| Components beyond PostgreSQL + PostGIS | count of processes/services to deploy and patch (e.g. Pelias: Elasticsearch, API, libpostal, placeholder, pip, interpolation = 6) |
+| Data outside PostgreSQL | copies of the data held elsewhere (Elasticsearch index, SQLite DBs, model files) |
+| Third-party code inside the database | extensions beyond core/contrib/PostGIS (pgsql-postal, pg_search, omni_httpd) |
+| Accuracy | tests/accuracy: overall, by query type, fuzz rounds F0-F5 |
+| Speed and capacity | p95 per endpoint at 3 users; ramp limit at each resource size |
+| Memory floor | smallest VM that passes the 3-user validation |
+| Operational complexity | build time, refresh procedure, number of moving parts to debug |
+
+Candidate stacks:
+
+| Stack | Components beyond PG+PostGIS | Data outside PG |
+|-------|------------------------------|-----------------|
+| Pelias (reference) | 6 (ES, API, libpostal, placeholder, pip, interpolation) | all of it |
+| pgeo + FastAPI + libpostal service | 2 (API, libpostal) | libpostal model |
+| pgeo + FastAPI + libpostal extension | 1 (API) | model loaded into PG (third-party ext) |
+| pgeo + FastAPI + rule parser | 1 (API) | none |
+| pgeo pure SQL + PostgREST + rule parser | 1 (PostgREST, logic-free) | none |
+| pgeo pure SQL + PostgREST + libpostal extension | 1 (PostgREST) | model loaded into PG (third-party ext) |
+
+The recommendation picks the simplest stack whose accuracy and speed are not materially
+worse than the best candidate; "materially" will be judged from the measured gaps and stated
+explicitly.

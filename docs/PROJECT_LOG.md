@@ -15,6 +15,7 @@ entries are appended to each section; dates are absolute. For the plan itself se
 | G2 | Load every applicable Pelias data source for Maine | Done: OSM, OpenAddresses, Who's On First, polylines, TIGER interpolation, GNIS, Census ZCTA, Overture Places. GeoNames and transit deliberately skipped (D6) |
 | G3 | Demo web page with a MapLibre map showing the capabilities | Live at https://geocoder.example.org/ |
 | G4 | Longer term: reproduce the Pelias capabilities and API entirely in PostgreSQL/PostGIS + extensions, with Pelias as the reference and test oracle | Planned (Phase 10) |
+| G6 | Guiding principle (2026-09-18): arrive at the stack with the **fewest additional components and the least data moved out of PostgreSQL**, but not at the cost of an abysmal, inferior or overly complex product | Applied as a scorecard in the final comparison (PLAN.md section 14) |
 | G5 | Be able to move the service to our remote VPS | Designed in (build once, ship the snapshot; inventory-driven exposure) |
 
 Requirements carried over from the background notes (`Geocoding Server.md`): single-field
@@ -119,6 +120,7 @@ confidence scores; easy loading and updates.
 | 2026-09-18 | Add a phase where Postgres itself is the API endpoint? | Yes: Phase 13 (Omnigres omni_httpd in-database HTTP vs PostgREST gateway) |
 | 2026-09-18 | Is Postgres parallelism tuned? | Between-query parallelism (processes per connection, pool/API workers vs cores) is the main lever; within-query parallel workers off by default for short queries, to be measured (tuning T1/T2) |
 | 2026-09-18 | Stay within Postgres core + contrib? | For the HTTP part only (clarified): PostgREST instead of Omnigres (D28); keep everything already built |
+| 2026-09-18 | What is the overall goal for the final stack? | Fewest extra components, least data outside Postgres, unless that makes the product clearly worse or overly complex (G6) |
 | 2026-09-18 | SSH key for the VM? | `~/.ssh/id_ed25519.pub` (pasted, since `~/.ssh` reads are blocked by permission rules) |
 
 ---
