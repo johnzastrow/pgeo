@@ -113,7 +113,8 @@ async def build(settings: Settings, selected: list[str]) -> None:
             "built_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         }
         await con.execute("INSERT INTO build_info (key, value) VALUES ('build', $1::jsonb)", json.dumps(info))
-        await con.execute("DROP TABLE stage_admin, stage_point")
+        # Staging and raw tables are not needed at query time (~300 MB).
+        await con.execute("DROP TABLE stage_admin, stage_point, feature_raw")
 
         # Atomic swap + function rebuild (functions depend on the pgeo table types).
         await ensure_api_role(con)
