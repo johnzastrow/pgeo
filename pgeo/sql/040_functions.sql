@@ -79,16 +79,27 @@ DECLARE
   rect  geometry := CASE WHEN cardinality(p_rect) = 4
                          THEN ST_MakeEnvelope(p_rect[1], p_rect[2], p_rect[3], p_rect[4], 4326) END;
   lim   integer := least(greatest(coalesce(p_size, 10), 1), 40);
+  townpt geometry;   -- the queried town's location(s), when the town name is known
+  anchor geometry;   -- tie-break point for same-named candidates: focus, else the town
 BEGIN
   PERFORM set_config('pg_trgm.similarity_threshold', '0.3', true);
+  IF loc IS NOT NULL THEN
+    SELECT ST_Collect(t.geom) INTO townpt FROM (
+      SELECT f.geom FROM pgeo.feature f
+      WHERE f.layer IN ('locality', 'localadmin', 'neighbourhood') AND f.name_norm = loc
+      ORDER BY f.importance DESC LIMIT 5) t;
+  END IF;
+  anchor := coalesce(focus, townpt);
   PERFORM set_config('pg_trgm.word_similarity_threshold', '0.5', true);
   -- Name strings to try: the parser's name part; the full text unless an address was parsed;
-  -- a bare town ("Portland, Maine"). Parsers misread odd input ("T4 R9 WELS"), so the full
-  -- text is the safety net.
+  -- a bare town ("Portland, Maine") only when no name part was parsed: in "Subway, Cumberland
+  -- Mills" the town is context, and as a target it matched exactly and beat the venue (the
+  -- town CTE still offers it as a low-confidence fallback). Parsers misread odd input
+  -- ("T4 R9 WELS"), so the full text is the safety net.
   targets := ARRAY(SELECT DISTINCT t FROM unnest(ARRAY[
                qn,
                CASE WHEN NOT addr_intent THEN qf END,
-               CASE WHEN NOT addr_intent AND st IS NULL AND hn IS NULL THEN loc END]) t
+               CASE WHEN NOT addr_intent AND st IS NULL AND hn IS NULL AND qn IS NULL THEN loc END]) t
              WHERE t IS NOT NULL AND t <> '');
 
   RETURN QUERY
@@ -159,14 +170,14 @@ BEGIN
       -- ties (hundreds of "Main Street"s) are broken by distance to the focus point, so the
       -- nearby ones survive the candidate limit
       ORDER BY similarity(f.name_norm, q.txt) DESC,
-               CASE WHEN focus IS NULL THEN 0 ELSE f.geom <-> focus END
+               CASE WHEN anchor IS NULL THEN 0 ELSE f.geom <-> anchor END
       LIMIT 60) n
     GROUP BY n.id
   ),
   names_exact AS (
     SELECT f.id, 1.0::double precision AS nsim FROM pgeo.feature f
     WHERE cardinality(targets) > 0 AND f.layer <> 'address' AND f.name_norm = ANY (targets)
-    ORDER BY CASE WHEN focus IS NULL THEN 0 ELSE f.geom <-> focus END
+    ORDER BY CASE WHEN anchor IS NULL THEN 0 ELSE f.geom <-> anchor END
     LIMIT 40
   ),
   town AS (  -- the town itself, for fallbacks when nothing finer matches
@@ -211,7 +222,14 @@ BEGIN
                     greatest(similarity(coalesce(f.locality_norm, ''), loc),
                              similarity(coalesce(f.postal_locality_norm, ''), loc)) END),
                   CASE WHEN pc IS NOT NULL AND f.postcode = pc THEN 1.0 ELSE 0 END,
-                  CASE WHEN f.layer IN ('locality', 'localadmin', 'postalcode') THEN 1.0 ELSE 0 END)
+                  -- an admin result is its own town, unless the query named a place in another
+                  -- town ("long pond, new city" is not the locality Long Pond)
+                  CASE WHEN f.layer IN ('locality', 'localadmin', 'postalcode') AND qn IS NULL THEN 1.0 ELSE 0 END,
+                  -- near the named town counts as agreement for places and venues: the query's
+                  -- town is often a village or the nearest town, not the containing one
+                  -- ("Calvary Bible Church, Stratton" is in Eustis); 1 km 0.85, 3 km 0.6
+                  CASE WHEN townpt IS NOT NULL AND f.layer <> 'address'
+                       THEN exp(-ST_Distance(f.geom::geography, townpt::geography) / 6000.0) ELSE 0 END)
            END AS agree
     FROM cand c JOIN pgeo.feature f ON f.id = c.id
     WHERE geocode.keep(f, p_layers, p_sources, rect)
@@ -258,9 +276,14 @@ BEGIN
   -- separates right answers from lucky guesses (calibration finding F28). Lower-ranked hits
   -- are capped at the reduced top confidence so confidence never rises down the list.
   top AS (SELECT max((h).confidence) AS c FROM hits),
+  -- When a town is among the ties, only other towns count as rivals: a venue or GNIS point
+  -- that shares the town's name ("Portland, Maine") is not a different answer.
+  tied AS (SELECT hits.h FROM hits, top WHERE (hits.h).confidence >= top.c - 0.02),
   amb AS (
     SELECT count(DISTINCT (round((h).lon::numeric, 2), round((h).lat::numeric, 2))) AS n
-    FROM hits, top WHERE (h).confidence >= top.c - 0.02
+    FROM tied
+    WHERE NOT EXISTS (SELECT 1 FROM tied t WHERE (t.h).layer IN ('locality', 'localadmin'))
+       OR (h).layer IN ('locality', 'localadmin')
   )
   SELECT (y.h2).*
   FROM hits CROSS JOIN top CROSS JOIN amb

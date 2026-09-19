@@ -41,7 +41,7 @@ BREAK_FACTOR = 5  # p95 above 5x target counts as broken
 # Memory limits per service (GB) for the "standard" and "floor" profiles. The trial run
 # (20260918-1814) OOM-killed pip at 0.4 GB (it grows under reverse load from ~0.36 GB) and
 # crash-looped interpolation at 1.9 GB (~1.8 GB working set), so the floor sits above that.
-MEM_STD = {"libpostal": 2.2, "interpolation": 2.3, "pip": 0.9, "placeholder": 0.5}
+MEM_STD = {"libpostal": 2.2, "interpolation": 2.3, "pip": 0.9, "placeholder": 0.8}
 # Full run 20260918-1834: placeholder was OOM-killed at 0.4 GB under load (C1 at 16 users,
 # C2 at 12), peaking ~408 MB, so the floor profile gives it 0.8 GB.
 MEM_FLOOR = {"libpostal": 2.0, "interpolation": 2.1, "pip": 0.7, "placeholder": 0.8}
