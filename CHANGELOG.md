@@ -47,6 +47,8 @@ commits where each milestone was complete.
   result box at "95.8", and dollar amounts were typeset as mathematics.
 - Figure 20 (compatibility contract) draws separated cells; 27 x 3 passes previously rendered
   as one solid green block.
+- Table captions stay with their tables in the PDF (Table 9's caption had been left at the foot
+  of the previous page).
 
 ## [0.11.0] - 2026-09-19
 

@@ -85,7 +85,8 @@ class Renderer:
             if body is None:
                 self.missing.append(f"table:{name}")
                 body = "_(table not available)_"
-            return f"**Table {n}.** {caption}\n\n{body}\n"
+            head = "\\needspace{6\\baselineskip}\n\n" if self.target == "pdf" else ""
+            return f"{head}**Table {n}.** {caption}\n\n{body}\n"
         if kind == "figure":
             n = self._number("figure", name)
             fig = self.figures.get(name)

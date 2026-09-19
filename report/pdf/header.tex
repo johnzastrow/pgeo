@@ -16,6 +16,9 @@
 \makeatother
 \setlength{\LTleft}{0pt}
 \setlength{\LTright}{0pt}
+% Keep a table's caption with the table: without this a page break can leave the caption
+% stranded at the foot of the previous page.
+\usepackage{needspace}
 \usepackage{float}
 \floatplacement{figure}{H}
 \makeatletter
