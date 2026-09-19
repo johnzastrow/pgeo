@@ -362,6 +362,18 @@ def cmd_verify(args: argparse.Namespace) -> int:
             ok = want in label
             failures += not ok
             print(f"{'ok  ' if ok else 'FAIL'} {base} {path} {params} -> {label}")
+    # the build stamps geocode.engine_version(); an unstamped database reports "0+unknown" and
+    # every response then carries a meaningless engine version, so treat it as a failure
+    for base in args.url:
+        try:
+            r = httpx.get(f"{base.rstrip('/')}/v1/search", params={"text": "bangor", "size": 1}, timeout=10)
+            ver = (r.json().get("geocoding", {}).get("engine", {}) or {}).get("version", "")
+        except (httpx.HTTPError, ValueError) as e:
+            ver = f"<error {type(e).__name__}>"
+        ok = bool(re.fullmatch(r"\d+\.\d+\.\d+", str(ver)))
+        failures += not ok
+        print(f"{'ok  ' if ok else 'FAIL'} {base} engine version -> {ver}"
+              + ("" if ok else "  (run pgeo-load build, or re-stamp geocode.engine_version())"))
     print("verify:", "passed" if not failures else f"{failures} failure(s)")
     return 1 if failures else 0
 

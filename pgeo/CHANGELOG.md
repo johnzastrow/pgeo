@@ -11,6 +11,9 @@ docs/PGEO_TUNING.md.
 ## [Unreleased]
 
 ### Added
+- `pgeo-tune verify` fails when the running database reports engine version `0+unknown`: the
+  build stamps `geocode.engine_version()`, and an unstamped database puts that placeholder in
+  every API response (it reached the study report's title block).
 - `/v1/address`: the address point's `lat`/`lon` in the `usps` block (differs from the place for `nearest` matches).
 
 ## [0.7.0] - 2026-09-19
