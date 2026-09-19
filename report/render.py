@@ -17,7 +17,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 VALUE = re.compile(r"\{\{value:([A-Za-z0-9_]+)\}\}")
-TOKEN = re.compile(r"\{\{(value|table|figure|ref|callout):([A-Za-z0-9_:]+)(?:\|(.*?))?\}\}", re.S)
+# The argument may itself contain a token (a {{ref:...}} inside a callout or caption), so it
+# is matched as "text or a nested token", not as anything up to the first "}}".
+TOKEN = re.compile(r"\{\{(value|table|figure|ref|callout):([A-Za-z0-9_:]+)"
+                   r"(?:\|((?:[^{}]|\{\{[^{}]*\}\})*?))?\}\}", re.S)
 # Callouts: coloured boxes in the PDF, block quotes in the Markdown.
 CALLOUT = {"key": ("Key result", "keybox"), "impact": ("What this means", "impactbox"),
            "caution": ("Caution", "cautionbox")}
@@ -30,8 +33,12 @@ TEX_ESCAPE = {"\\": r"\textbackslash{}", "&": r"\&", "%": r"\%", "$": r"\$", "#"
 
 
 def tex_text(s: str) -> str:
-    out = "".join(TEX_ESCAPE.get(c, c) for c in s)
-    return re.sub(r'"([^"]*)"', r"``\1''", out)  # pandoc does this for the body text
+    """Escape prose for a raw LaTeX block, leaving any {{token}} for the reference pass."""
+    def esc(part: str) -> str:
+        out = "".join(TEX_ESCAPE.get(c, c) for c in part)
+        return re.sub(r'"([^"]*)"', r"``\1''", out)  # pandoc does this for the body text
+
+    return "".join(p if p.startswith("{{") else esc(p) for p in re.split(r"(\{\{[^{}]*\}\})", s))
 
 
 class Renderer:
