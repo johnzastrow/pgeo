@@ -26,11 +26,15 @@ for Pelias. The gap is largest where people make mistakes: queries with typos
 corruption of 300 base queries, pgeo still answers {{value:fuzz_pgeo_sql_F2}} with two
 character errors per query, where Pelias answers {{value:fuzz_pelias_F2}}.
 
-**Capacity.** Pelias is the faster engine: at equal CPU it keeps {{value:ratio_min}} to
-{{value:ratio_max}} times more concurrent users within the latency targets. pgeo is the smaller
-one: it meets every target for the 3-user goal of this project in a
-{{value:budget_rest_Pmin}} memory budget on one vCPU, where Pelias needs about
-{{value:budget_C1}} to run at all. <!-- PENDING: final pgeo capacity sentence after the post-fix run -->
+**Capacity.** Pelias is the faster engine: at every tested CPU size it keeps
+{{value:ratio_max}} times as many concurrent users within the latency targets as pgeo
+({{value:lim_C1}} against {{value:lim_rest_P1}} on one vCPU, {{value:lim_C4}} against
+{{value:lim_rest_P4}} on four). pgeo is the smaller one: it meets every target for the 3-user goal
+of this project in a {{value:budget_rest_Pmin}} memory budget on one vCPU, and holds
+{{value:lim_rest_Pmin}} users there, where Pelias needs about {{value:budget_C1}} to run at all. A
+single missing index had made pgeo's reverse geocoding 20 to 45 times slower; fixing it raised pgeo's
+one-vCPU capacity from {{value:before_lim_rest_P1}} to {{value:lim_rest_P1}} users.
+<!-- PENDING: minimum server for 3 users per platform (floor search and temporary-VM confirmation) -->
 
 **Compatibility and extensions.** pgeo passes all {{value:compat_cases}} cases of a Pelias API
 compatibility contract on both front ends, so existing Pelias clients work unchanged, and adds
@@ -346,7 +350,13 @@ target (dashed). Every configuration of both engines meets every target.}}
 
 {{table:latency3|Median and p95 latency at 3 users (ms).}}
 
-<!-- PENDING: interpretation of pgeo latency after the reverse fix (post-fix run) -->
+At 3 users every configuration of both engines meets every target with a wide margin, so the
+3-user goal is not what separates them. Pelias answers in 20-50 ms at the 95th percentile on every
+endpoint: Elasticsearch resolves text and geography in compiled index lookups. pgeo's autocomplete
+takes about 40 ms and its search and structured search about 100 ms, because a forward search runs
+several candidate queries and a scoring step in PL/pgSQL inside one database backend. Reverse
+geocoding was pgeo's slow endpoint (225-393 ms, close to its 400 ms target on one vCPU) until the
+missing admin-join index was added; it now takes 5-18 ms ({{ref:table:reverse_fix}}).
 
 ### 3.4 Capacity under load
 
@@ -365,7 +375,27 @@ cross 1 is the endpoint that limits capacity.}}
 
 {{figure:throughput|Throughput as users are added; the star marks the last step within all targets.}}
 
-<!-- PENDING: capacity interpretation tied to architecture (post-fix numbers) -->
+**How each engine scales.** Both engines are CPU-bound under this load, and both scale close to
+linearly with vCPUs as long as their workers can use them: pgeo holds about 24 users per vCPU
+({{value:lim_rest_P1}}, {{value:lim_rest_P2}} and {{value:lim_rest_P4}} users on 1, 2 and 4 vCPU)
+and Pelias about 96 ({{value:lim_C1}}, {{value:lim_C2}} and {{value:lim_C4}}). The ratio of four
+is the difference in CPU cost per request: compiled index lookups in Elasticsearch against
+interpreted candidate queries and scoring in PL/pgSQL.
+
+**What gives out first.** After the index fix, autocomplete is the first endpoint over its target on
+every pgeo configuration ({{ref:figure:endpoint_ramp}}): it has the tightest target (250 ms) and runs
+most often (60% of sessions type ahead, several requests per word). On Pelias the endpoints degrade
+more evenly (which one crosses first varies by configuration), because they share Elasticsearch.
+
+**Memory is not pgeo's limit.** The configuration whose database memory (0.6 GB) is smaller than
+the data holds as many users as the one with 1.0 GB ({{value:lim_rest_Pmin}} and
+{{value:lim_rest_P1}}): the working set of hot index pages is far smaller than the 674 MB database.
+Pelias, in contrast, has a memory floor set by its services (libpostal's model, the interpolation
+database, placeholder's in-memory tables) regardless of load.
+
+**Front end.** PostgREST and FastAPI hold the same number of users up to 4 vCPU. Unconstrained,
+FastAPI reached {{value:lim_api_PM}} users and PostgREST {{value:lim_rest_PM}}: only at high
+concurrency does the gateway's per-request overhead show.
 
 Pelias spreads work across services in different languages: Elasticsearch does the text and
 geo matching in compiled code, and the Node.js API adds parsing and ranking. With four API
