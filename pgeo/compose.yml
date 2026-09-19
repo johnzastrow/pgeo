@@ -52,3 +52,21 @@ services:
       PGEO_WORKERS: "${PGEO_WORKERS:-2}"
       PGEO_POOL_MAX: "${PGEO_POOL_MAX:-8}"
     ports: ["127.0.0.1:4500:4500"]
+
+  rest:
+    # Phase 13: logic-free HTTP gateway in front of the SQL API (schema geocode_api only).
+    # Edge rewrites /v1/<endpoint> -> /rpc/v1_<endpoint> (see docs/HTTP_OPTIONS.md).
+    image: postgrest/postgrest:v16.3@sha256:ec0e25a4e24b0a3bc5e4f011369bfc736bd1b19f513bd01079b86329a7636962
+    container_name: pgeo_rest
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      PGRST_DB_URI: "postgres://pgeo_api:${PGEO_API_PASSWORD}@db:5432/pgeo"
+      PGRST_DB_SCHEMAS: "geocode_api"
+      PGRST_DB_ANON_ROLE: "pgeo_api"
+      PGRST_DB_POOL: "${PGEO_REST_POOL:-8}"
+      PGRST_SERVER_PORT: "3000"
+      PGRST_OPENAPI_MODE: "disabled"
+      PGRST_DB_MAX_ROWS: "40"
+    ports: ["127.0.0.1:4600:3000"]

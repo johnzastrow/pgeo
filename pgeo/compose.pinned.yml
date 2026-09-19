@@ -7,3 +7,5 @@ services:
     cpuset: "4,10"
   api:
     cpuset: "4,10"
+  rest:
+    cpuset: "4,10"

@@ -126,10 +126,11 @@ async def build(settings: Settings, selected: list[str]) -> None:
             await con.execute("ALTER SCHEMA pgeo_build RENAME TO pgeo")
             await con.execute("DROP SCHEMA IF EXISTS pgeo_old CASCADE")
             await run_sql(con, "040_functions.sql")
+            await run_sql(con, "050_api.sql")
             await con.execute(
-                "GRANT USAGE ON SCHEMA pgeo, geocode TO pgeo_api; "
+                "GRANT USAGE ON SCHEMA pgeo, geocode, geocode_api TO pgeo_api; "
                 "GRANT SELECT ON ALL TABLES IN SCHEMA pgeo TO pgeo_api; "
-                "GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA geocode TO pgeo_api"
+                "GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA geocode, geocode_api TO pgeo_api"
             )
         log(f"build complete in {time.time() - t0:.0f}s: {json.dumps(info['features_by_layer'])}")
     finally:
@@ -142,7 +143,11 @@ async def functions_only(settings: Settings) -> None:
         async with con.transaction():
             await run_sql(con, "010_base.sql")
             await run_sql(con, "040_functions.sql")
-            await con.execute("GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA geocode TO pgeo_api")
+            await run_sql(con, "050_api.sql")
+            await con.execute(
+                "GRANT USAGE ON SCHEMA geocode, geocode_api TO pgeo_api; "
+                "GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA geocode, geocode_api TO pgeo_api"
+            )
         log("functions applied")
     finally:
         await con.close()

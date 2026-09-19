@@ -89,6 +89,11 @@ FROM (
 ) t
 GROUP BY street_norm, town;
 
+-- Known town names (lowercase), for the SQL rule parser (geocode.parse_rule).
+CREATE TABLE town AS
+SELECT DISTINCT lower(name) AS name FROM feature WHERE layer IN ('locality', 'localadmin');
+ALTER TABLE town ADD PRIMARY KEY (name);
+
 -- Top 25 non-address features per 1-3 character prefix of the name.
 INSERT INTO ac_prefix (prefix, rank, feature_id)
 SELECT prefix, rn, id FROM (
