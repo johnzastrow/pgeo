@@ -141,7 +141,10 @@ async def build(settings: Settings, selected: list[str]) -> None:
             await con.execute("DROP SCHEMA IF EXISTS pgeo_old CASCADE")
             await run_sql(con, "040_functions.sql")
             await run_sql(con, "050_api.sql")
+            await run_sql(con, "060_address.sql")
             await stamp_version(con)
+            # PostgREST caches the function list; tell it to reload (no-op without PostgREST)
+            await con.execute("NOTIFY pgrst, 'reload schema'")
             await con.execute(
                 "GRANT USAGE ON SCHEMA pgeo, geocode, geocode_api TO pgeo_api; "
                 "GRANT SELECT ON ALL TABLES IN SCHEMA pgeo TO pgeo_api; "
@@ -165,7 +168,10 @@ async def functions_only(settings: Settings) -> None:
             await run_sql(con, "010_base.sql")
             await run_sql(con, "040_functions.sql")
             await run_sql(con, "050_api.sql")
+            await run_sql(con, "060_address.sql")
             await stamp_version(con)
+            # PostgREST caches the function list; tell it to reload (no-op without PostgREST)
+            await con.execute("NOTIFY pgrst, 'reload schema'")
             await con.execute(
                 "GRANT USAGE ON SCHEMA geocode, geocode_api TO pgeo_api; "
                 "GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA geocode, geocode_api TO pgeo_api"

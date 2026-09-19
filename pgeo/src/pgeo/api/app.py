@@ -62,7 +62,7 @@ async def lifespan(app: FastAPI):
     await app.state.pool.close()
 
 
-app = FastAPI(title="pgeo", version="0.1.0", lifespan=lifespan, docs_url=None, redoc_url=None)
+app = FastAPI(title="pgeo", version=ENGINE_VERSION, lifespan=lifespan, docs_url=None, redoc_url=None)
 
 
 @app.exception_handler(BadRequest)
@@ -372,6 +372,32 @@ async def place(request: Request, ids: Annotated[str | None, Query()] = None):
     async with request.app.state.pool.acquire() as con:
         rows = await con.fetch("SELECT * FROM geocode.place($1)", gids)
     return envelope({"ids": gids}, rows)
+
+
+@app.get("/v1/address")
+async def address(request: Request):
+    """Structured USPS Publication 28 address (pgeo extension; not a Pelias endpoint).
+
+    Exactly one of ids=, text=, or point.lat + point.lon; optional radius (km) and unit.
+    Validation and the work are in SQL (geocode_api.v1_address), shared with PostgREST."""
+    q = dict(request.query_params)
+    lat = finite(q.get("point.lat"), "point.lat", -90, 90)
+    lon = finite(q.get("point.lon"), "point.lon", -180, 180)
+    radius = finite(q.get("radius"), "radius", 0.001, 5)
+    ids = q.get("ids")
+    text = q.get("text")
+    unit = q.get("unit")
+    for name, v in (("ids", ids), ("text", text), ("unit", unit)):
+        if v is not None and len(v) > 2000:
+            raise BadRequest(f"{name} is too long")
+    async with request.app.state.pool.acquire() as con:
+        try:
+            doc = await con.fetchval(
+                "SELECT geocode_api.v1_address($1, $2, $3, $4, $5, $6)", ids, text, lat, lon, radius, unit
+            )
+        except asyncpg.exceptions.InvalidParameterValueError as e:  # SQLSTATE 22023: bad input
+            raise BadRequest(e.message) from None
+    return json.loads(doc) if isinstance(doc, str) else doc
 
 
 @app.get("/health")

@@ -23,6 +23,15 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-09-19
+
+### Added
+- Structured address API for LANCER (`docs/ADDRESS_API.md`, pgeo 0.6.0): USPS
+  Publication 28 addresses from a selected feature, free text or a coordinate; non-address
+  results resolve to the nearest street address. The `/v1/address` path is mapped in the
+  pgeo edge and the dev server's engine prefixes.
+- USPS ZIP+4 research (licence, price, what it would add) in `docs/ADDRESS_API.md`.
+
 ## [0.9.0] - 2026-09-18
 
 ### Added
@@ -36,6 +45,10 @@ commits where each milestone was complete.
 
 ### Changed
 - Requires pgeo 0.5.0 (tuning profiles, `pgeo-tune`).
+
+### Fixed
+- Pelias data-volume runs: the runner waits for Elasticsearch before building subset
+  indexes (the 2026-09-18 run failed at start).
 
 ## [0.8.0] - 2026-09-18
 
@@ -114,7 +127,8 @@ commits where each milestone was complete.
   (`docs/DATA_PIPELINE.md`).
 - Project plan, environment facts and decision log.
 
-[Unreleased]: https://git.example.org/jcz/pelias_maine/compare/v0.9.0...HEAD
+[Unreleased]: https://git.example.org/jcz/pelias_maine/compare/v0.10.0...HEAD
+[0.10.0]: https://git.example.org/jcz/pelias_maine/compare/v0.9.0...v0.10.0
 [0.9.0]: https://git.example.org/jcz/pelias_maine/compare/v0.8.0...v0.9.0
 [0.8.0]: https://git.example.org/jcz/pelias_maine/compare/v0.7.0...v0.8.0
 [0.7.0]: https://git.example.org/jcz/pelias_maine/compare/v0.6.1...v0.7.0

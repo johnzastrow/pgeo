@@ -10,6 +10,21 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-09-19
+
+### Added
+- `GET /v1/address` (pgeo extension, both front ends): USPS Publication 28 components,
+  delivery and last lines, municipality, county and FIPS codes, for a selected gid, a
+  free-text address or a coordinate. Venues and streets get the nearest address point
+  (`match: nearest`, `distance_m`); admin areas get place context only. SQL in
+  `pgeo/sql/060_address.sql` with the C1, C2 and directional tables. Docs:
+  `docs/ADDRESS_API.md`.
+- The loader tells PostgREST to reload its schema cache after applying functions.
+
+### Security
+- PostgreSQL never logs bind parameters (`log_parameter_max_length = 0`, also on error):
+  queries carry addresses.
+
 ## [0.5.0] - 2026-09-18
 
 ### Added
