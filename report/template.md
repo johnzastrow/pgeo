@@ -231,7 +231,11 @@ Both builds, the verification suites and the deployment are scripted; `docs/REBU
 repository is the step-by-step runbook and `scripts/rebuild_all.sh` runs it end to end
 (Appendix A).
 
-<!-- PENDING: build resource profiles (CPU, peak memory, disk) for both engines from the dedicated measurement runs -->
+A build is the one time either platform needs a large machine, and it is a machine you can
+rent for an hour and give back: the query host never sees the raw data or the build tools, only a
+435 MB Elasticsearch snapshot or a PostgreSQL dump. {{ref:table:build_resources}} in Section 3.5
+gives the measured cost of each, which is what decides whether a build can share the workstation
+with other work or wants a machine to itself.
 
 ### 2.4 Accuracy testing
 
