@@ -25,7 +25,7 @@ finish).
 The pure-SQL API (PostgREST) and the FastAPI application return identical results
 (95.8%), so every gain below applies to both. What remains to be tuned is server-side
 performance under load. The pgeo load tests ran overnight: every profile meets the 3-user
-target, and reverse geocoding is the bottleneck to tune next (section 5).
+target; reverse geocoding was the bottleneck and has since been fixed (section 5).
 
 ### How accuracy moved, step by step
 
@@ -159,29 +159,38 @@ OS page cache for the rest); `effective_cache_size` about 75%; connections = 2 x
 because the queries are CPU bound. The whole Maine database (674 MB) fits in the page cache
 from the "small" profile up; "tiny" tests what happens when it does not.
 
-**Measured** (pgeo load test 2026-09-18/19, run `20260918-2343-pgeo`; same k6 session,
-SLOs and ramp as Pelias; "limit" = most concurrent users with every endpoint within its
-SLO and < 1% errors):
+**Measured** (pgeo load test 2026-09-19, runs `20260919-1135-pgeo` and `20260919-1543-pgeo`,
+after the reverse-geocoding index fix below; same k6 session, SLOs and ramp as Pelias;
+"limit" = most concurrent users with every endpoint within its SLO and < 1% errors):
 
 | Profile (config) | Budget pure SQL / FastAPI | Limit, pure SQL | Limit, FastAPI | Broken at (SQL / FastAPI) | First endpoint over its SLO |
 |------------------|---------------------------|-----------------|----------------|---------------------------|-----------------------------|
-| tiny (Pmin) | 1.6 / 1.6 GB | 4 | 8 | 64 / 64 | reverse |
-| small (P1) | 2.0 / 2.0 GB | 4 | 6 | 64 / 64 | reverse |
-| medium (P2) | 2.5 / 2.7 GB | 24 | 32 | 96 / 128 | reverse |
-| large (P4) | 3.0 / 3.3 GB | 64 | 96 | 192 / 256 | reverse |
-| workstation (PM) | unconstrained | 128 | 192 | 384 / 512 | reverse (and autocomplete) |
+| tiny (Pmin) | 1.6 / 1.6 GB | 24 | 24 | 64 / 96 | autocomplete |
+| small (P1) | 2.0 / 2.0 GB | 24 | 24 | 96 / 96 | autocomplete |
+| medium (P2) | 2.5 / 2.7 GB | 48 | 48 | 96 / 128 | autocomplete |
+| large (P4) | 3.0 / 3.3 GB | 96 | 96 | 192 / 256 | autocomplete |
+| workstation (PM) | unconstrained | 128 | 192 | 256 / 384 | autocomplete |
 
 - Every profile, including the smallest, meets the SLOs at the 3-user target; no errors
   and no out-of-memory kills in any run.
-- **Reverse geocoding is the bottleneck everywhere**: at 3 users its p95 is 225-390 ms
-  against a 400 ms target, while search is ~100 ms (target 750) and autocomplete ~40 ms
-  (target 250). It is the next tuning target (below).
-- FastAPI sustains more users than PostgREST at 2 and 4 vCPUs (32 vs 24, 96 vs 64); the
-  database work is identical, so the difference is in the gateway (connection handling,
-  per-request overhead). T10 examines it.
-- The libpostal service arm (api-svc) needs ~1.95 GB more memory for the same limits; its
-  P4 run was cut at 32 users (passing) when the Docker daemon on the test host was stopped
-  at 04:32, a host event unrelated to the test.
+- **The bottleneck moved.** Before the index fix, reverse geocoding was the first endpoint
+  over its SLO in every profile, and its p95 at 3 users was 225-390 ms against a 400 ms
+  target. With the index it answers in 5-18 ms, and **autocomplete** is now first over
+  target everywhere, because it has the tightest target (250 ms) and fires several times
+  per typed word. Capacity on one vCPU went from 4 users to 24 (see the before/after table
+  in the study report, Section 3.4).
+- The two front ends now reach the same limits at 1, 2 and 4 vCPU; only unconstrained does
+  FastAPI pull ahead (192 against 128). Before the fix, when every request waited on the
+  same slow reverse query, the gateway's per-request overhead was visible; it no longer is.
+- The libpostal service arm (api-svc) needs ~1.95 GB more memory for the same limits. Its
+  first P4 run was cut at 32 users (passing) when the Docker daemon on the test host was
+  stopped at 04:32, a host event unrelated to the test; it was re-run in full.
+
+**The fix.** `feature_admin_idx` on `feature (admin_id) WHERE admin_id IS NOT NULL` was
+missing, so every reverse request scanned all 906,101 features; a function call in the
+`boundary.gid` check also blocked index use and was inlined. One line of DDL and one
+inlined predicate cut reverse p95 by a factor of 20 to 45 and raised one-vCPU capacity six
+fold. The build creates the index (`pgeo/sql/030_enrich_index.sql`).
 
 Next experiments (plan in PGEO_TUNING.md):
 
@@ -197,7 +206,7 @@ Next experiments (plan in PGEO_TUNING.md):
 | T8 | pg_trgm/FTS vs ParadeDB pg_search | Pending |
 | T9 | WOF vs Overture divisions | Pending |
 | T10 | Prepared statements, PgBouncer; PostgREST vs FastAPI gap | Pending |
-| T11 | Reverse geocoding: the bottleneck in every profile (KNN plus point-in-polygon admin lookup per request) | Next |
+| T11 | Reverse geocoding: was the bottleneck in every profile (KNN plus point-in-polygon admin lookup per request) | Done: `feature_admin_idx` plus an inlined gid check; 225-393 ms -> 5-18 ms |
 
 ## 6. Pelias tuning (reference engine)
 
