@@ -6,6 +6,8 @@ ramping users from 1 until the service degrades or fails. The same tests are re-
 against the Phase 10 PostgreSQL/PostGIS service so the two can be compared on
 (a) raw performance and (b) "good enough" at equal or lower resources.
 
+For a plain-language overview see [TESTING_GUIDE.md](TESTING_GUIDE.md).
+
 Status: plan written 2026-09-18; Pelias runs in progress/recorded in
 [LOAD_TEST_RESULTS.md](LOAD_TEST_RESULTS.md).
 

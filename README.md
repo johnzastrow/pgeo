@@ -28,7 +28,7 @@ curl 'https://geocoder.example.org/v1/search?text=389%20Congress%20St,%20Portlan
 | `infra/ansible/` | Host config for any Debian host (Proxmox VM or VPS): base hardening, Docker, query stack, nginx edge |
 | `web/` | Demo page (MapLibre + self-hosted Protomaps basemap), reusable `pelias-client.js` and `<pelias-search>` element; `web/vendor/` holds pinned third-party assets |
 | `tests/web/` | Browser smoke test (Playwright) for the demo page |
-| `docs/` | `DATA_PIPELINE.md` (runbook), `PROJECT_LOG.md` (goals, questions, decisions, findings) |
+| `docs/` | `DATA_PIPELINE.md` (runbook), `PROJECT_LOG.md` (goals, questions, decisions, findings), `TESTING_GUIDE.md` (how the tests work, in plain language), `LOAD_TEST_PLAN.md`, `PGEO_DESIGN.md` |
 | `data/` | Raw downloads, processed CSVs, Pelias data dir (gitignored) |
 
 ## Build on the workstation
