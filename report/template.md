@@ -850,6 +850,14 @@ is the opposite kind: the memory is not a tuning choice but the sum of what five
 before the first request (the libpostal model, the interpolation database, placeholder's in-memory
 tables and the Elasticsearch heap), so the floor barely moves however little traffic it serves.
 
+**Two kinds of limit.** The trials fail in two distinct ways, and the difference explains why the
+two engines' floors are so far apart. pgeo's failures are all of the first kind: the service keeps
+answering, just too slowly, so its floor is wherever the operator decides the latency is no longer
+acceptable. Most of Pelias's are of the second: below a threshold the service does not run at all.
+libpostal cannot even start below 2 GB, because it loads a fixed model before it serves anything;
+the interpolation service crash-loops at 1.8 GB; Elasticsearch is killed at 0.8 GB. Those are
+properties of the software, not of the load, and no amount of tuning for three users moves them.
+
 **A floor is a pair, not a number.** The two resources are not independent, and the search makes
 that visible: Pelias's `pip` service was killed at 0.55 GB in this search, although the capacity
 tests had it surviving at 0.4 GB. Nothing regressed -- in the capacity tests each service had a
