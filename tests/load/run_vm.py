@@ -94,15 +94,16 @@ def died(h: dict, base: dict) -> bool:
                for k, v in h.items())  # fmt: skip
 
 
-def run_engine(engine: str, base: str, ssh: str, out_dir, quick: bool) -> dict:
-    rid = f"vm-{engine}"
+def run_engine(engine: str, base: str, ssh: str, out_dir, quick: bool, label: str = "", size: dict | None = None) -> dict:
+    rid = f"vm-{engine}" + (f"-{label}" if label else "")
     print(f"\n=== {rid} {base}{ENGINES[engine]}", flush=True)
     rm.API = base + ENGINES[engine]
     names = CONTAINERS[engine]
     base_health = health(ssh, names)
     rm.run_k6(2, "30s", "5s", out_dir / rid / "warmup.json")
-    result = {"id": rid, "engine": engine, "base_config": "VM120", "dataset": None, "config": {"cpus": 4, "host": "VM 120"},
-              "budget_gb": 14, "runs": {}}  # fmt: skip
+    size = size or {"cpus": 4, "cpulimit": 4, "memory_gb": 14, "host": "VM 120"}
+    result = {"id": rid, "engine": engine, "base_config": label or "VM120", "dataset": None, "config": size,
+              "budget_gb": size["memory_gb"], "runs": {}}  # fmt: skip
     val_dur, val_warm = ("60s", "15s") if quick else ("180s", "45s")
     s = RemoteSampler(ssh, names)
     s.start()
@@ -142,6 +143,11 @@ def main() -> int:
     ap.add_argument("--base", default="https://geocoder.example.org")
     ap.add_argument("--ssh", default="jcz@192.0.2.20")
     ap.add_argument("--quick", action="store_true")
+    ap.add_argument("--label", default="", help="run label, e.g. floor-pgeo-1c-0.5-1536mb")
+    ap.add_argument("--cpus", type=int, default=4)
+    ap.add_argument("--cpulimit", type=float, default=0)
+    ap.add_argument("--memory-gb", type=float, default=14)
+    ap.add_argument("--host", default="VM 120")
     a = ap.parse_args()
     out_dir = rm.ROOT / "data" / "loadtest" / (datetime.now().astimezone().strftime("%Y%m%d-%H%M") + "-vm")
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -149,7 +155,8 @@ def main() -> int:
     for e in a.engines.split(","):
         if e not in ENGINES:
             ap.error(f"unknown engine {e}")
-        run_engine(e, a.base.rstrip("/"), a.ssh, out_dir, a.quick)
+        size = {"cpus": a.cpus, "cpulimit": a.cpulimit or a.cpus, "memory_gb": a.memory_gb, "host": a.host}
+        run_engine(e, a.base.rstrip("/"), a.ssh, out_dir, a.quick, a.label, size)
     print(f"done: {out_dir}", flush=True)
     return 0
 
