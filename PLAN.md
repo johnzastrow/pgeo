@@ -415,6 +415,8 @@ its FastAPI layer (Phase 10) on the same accuracy and load tests.
 | Parameter validation | Python | SQL (typed parameters, range checks, allowlists; errors as Pelias-style JSON) |
 | HTTP | uvicorn/FastAPI | **Arm A:** Omnigres `omni_httpd` + `omni_web`, an HTTP server running inside Postgres (PG18 via `postgresql-18-omnigres`; images published for PG17). **Arm B:** PostgREST v16 as a stateless gateway exposing only the `geocode_api` functions; the edge rewrites `/v1/search` to `/rpc/v1_search` |
 
+Options analysis (for and against external gateways vs in-database HTTP): [docs/HTTP_OPTIONS.md](docs/HTTP_OPTIONS.md).
+
 Steps:
 
 1. `pgeo/sql/050_api.sql`: `geocode_api` schema with `v1_search`, `v1_autocomplete`,
