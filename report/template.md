@@ -460,9 +460,9 @@ measured on an identical set.
 
 {{callout:key|One missing database index (the join from admin polygons to their features) made every
 reverse request scan all 906,101 features. Adding it cut reverse latency from 225-393 ms to 5-18 ms
-and raised capacity on one vCPU from {{value:before_lim_rest_P1}} to {{value:lim_rest_P1}} users: a
-six-fold gain from a single line of DDL, found only because the load tests measured each endpoint
-separately.}}
+and raised the number of users one vCPU can serve from {{value:before_lim_rest_P1}} to
+{{value:lim_rest_P1}}, six times as many, from a single line of DDL -- found only because the load
+tests measured each endpoint separately.}}
 
 {{table:tuning_changes|Tuning changes, the problem each solved, and the measured effect.}}
 
