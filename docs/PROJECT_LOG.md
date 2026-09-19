@@ -191,6 +191,8 @@ confidence scores; easy loading and updates.
 | F26 | pgeo's rule parser (no libpostal) scores 92.7% vs 92.4% with libpostal: the ~2 GB libpostal model buys nothing measurable on this test set | Supports G6 (fewer components) |
 | F27 | The pure-SQL API behind PostgREST returns results identical to pgeo+FastAPI with the rule parser (92.7%, same per category) | Phase 13 viable; the application layer adds nothing to accuracy |
 | F28 | pgeo confidence was poorly calibrated (0.94 right vs 0.90 wrong; Pelias 0.98 vs 0.87). Fixed with an ambiguity penalty: now 0.91 vs 0.70, a 2x wider gap than Pelias | See PGEO_TUNING.md |
+| F29 | Users qualify a place with a village or the nearest town, not the containing town ("Calvary Bible Church, Stratton" is in Eustis). Treating the queried town as a *location* (distance-based agreement, tie-break anchor) instead of a name to match lifted venues 81% -> 94% and lakes/summits 86% -> 95%; pgeo 95.8% overall vs Pelias 75.5% | See PGEO_TUNING.md |
+| F30 | Candidate limits must be applied after locality is considered: with hundreds of exact "Main Street" rows, the 40-row cut discarded Bangor's before the focus boost ran | Order candidates by distance to focus/town before limiting |
 | F11 | The whole Maine build is small: ~15 min, 1,649,644 documents, 435 MB snapshot | A VPS deploy is cheap to ship |
 
 ---
