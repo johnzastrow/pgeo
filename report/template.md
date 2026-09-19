@@ -916,7 +916,22 @@ an upper bound until both engines have been scored on real queries neither has s
 
 {{table:recommendations|Which tool for which scenario.}}
 
-<!-- PENDING: final conclusions paragraph once post-fix capacity and VM validation are in -->
+**In one paragraph.** For the service this project set out to build -- Maine data, a handful of
+users, input typed by people who misspell things, and a preference for as few moving parts as
+possible -- the PostgreSQL geocoder is the better instrument on every axis that matters here. It
+answers {{value:acc_pgeo_sql}} of {{value:n_cases}} test queries against {{value:acc_pelias}} for
+Pelias, and the gap widens exactly where real input is worst: typos, half-remembered venue names
+and places that do not exist. It does that from two containers and {{value:floor_pgeo_gb}} of
+memory, where Pelias needs six containers and {{value:floor_pelias_gb}}, which is the difference
+between the cheapest plan a provider sells and a mid-range server. And it speaks the Pelias API
+closely enough that an existing client cannot tell the difference ({{value:compat_cases}} of
+{{value:compat_cases}} contract cases). What it gives up is throughput -- a quarter of Pelias's
+users per CPU -- and planet scale, neither of which this deployment needs. One caveat belongs in
+the last sentence rather than a footnote: pgeo was tuned against the set that scores it, so the
+20-point accuracy gap should be read as an upper bound until both engines meet queries neither has
+seen. The capacity and memory findings carry no such caveat.
+
+<!-- PENDING: one sentence confirming the conclusions against the VM 120 validation -->
 
 ## 6. Next steps
 
