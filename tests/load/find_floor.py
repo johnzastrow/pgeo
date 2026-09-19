@@ -94,7 +94,12 @@ def trial(engine: str, c: dict, out: Path, n: int, minutes: int) -> dict:
             names = None
         rm.wait_ready(timeout=240)
     except (subprocess.CalledProcessError, RuntimeError) as e:
-        return {"id": rid, "config": c, "pass": False, "why": f"did not start: {type(e).__name__}"}
+        why = f"did not start: {type(e).__name__}"
+        out_doc = {"id": rid, "engine": engine, "config": c, "total_gb": total_gb(engine, c), "pass": False, "why": why}
+        (out / f"{rid}.json").write_text(json.dumps(out_doc, indent=1))
+        # print here too: without it a trial that never started leaves a gap in the log
+        print(f"  {rid}: {json.dumps(c)} total {out_doc['total_gb']} GB -> {why}", flush=True)
+        return out_doc
     rm.run_k6(2, "30s", "5s", out / rid / "warmup.json")
     if engine == "pgeo":
         s = rp.Sampler("rest")
