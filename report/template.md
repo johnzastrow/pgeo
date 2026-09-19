@@ -841,6 +841,13 @@ is the opposite kind: the memory is not a tuning choice but the sum of what five
 before the first request (the libpostal model, the interpolation database, placeholder's in-memory
 tables and the Elasticsearch heap), so the floor barely moves however little traffic it serves.
 
+**A floor is a pair, not a number.** The two resources are not independent, and the search makes
+that visible: Pelias's `pip` service was killed at 0.55 GB in this search, although the capacity
+tests had it surviving at 0.4 GB. Nothing regressed -- in the capacity tests each service had a
+whole core, and here it has a quarter of one, so collection and compaction fall behind and the same
+work needs more headroom. Read each floor as the pair of numbers it is: at more CPU both engines
+would fit in less memory, and at less memory they would need more CPU to stay inside the targets.
+
 {{callout:key|The three-user service fits in {{value:floor_pgeo_gb}} on pgeo and
 {{value:floor_pelias_gb}} on Pelias. Both engines idle comfortably below a quarter of a core, so at
 this scale the machine is chosen by memory, not by CPU -- which is why the two platforms land in
