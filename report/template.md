@@ -793,7 +793,24 @@ and planet scale, none of which this deployment uses.
 
 ### 3.11 Production validation on VM 120
 
-<!-- PENDING: validation run on the resized VM 120 through the HTTPS path (both engines, one at a time) -->
+Every number so far comes from the workstation, where the engine and the load generator are pinned
+to separate physical cores and nothing else competes. That isolation is what makes the comparison
+fair, and it is also what makes it artificial: the service people will actually use runs on VM 120
+behind the wharf Caddy, so the last measurement repeats the three-user validation and the ramp
+against the deployed service over HTTPS, one engine at a time, with the edge's rate limits raised
+for the window and restored afterwards.
+
+{{table:vm120|Both engines on VM 120 through the production HTTPS path: the three-user validation,
+the p95 per endpoint and how far the ramp went.}}
+
+Two differences from the controlled runs are built in and worth keeping in mind when comparing the
+numbers. The request now crosses TLS termination, the nginx edge and the LAN, which adds a few
+milliseconds that belong to the service rather than to the engine; and the VM's cores are two CPU
+generations newer than the workstation's (Section 1.2), which works the other way. The purpose here
+is not a cleaner comparison between engines but a check that the service, as deployed, meets the
+targets it was designed for.
+
+<!-- PENDING: interpretation of the VM 120 numbers once the run has been made -->
 
 ### 3.12 The smallest server that works
 
