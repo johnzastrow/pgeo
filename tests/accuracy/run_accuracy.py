@@ -72,8 +72,8 @@ def score(case: dict, body: dict | None, error: str | None) -> dict:
     return res
 
 
-async def run(base: str, extra: dict, concurrency: int) -> list[dict]:
-    cases = json.loads(CASES.read_text())
+async def run(base: str, extra: dict, concurrency: int, cases_path: Path) -> list[dict]:
+    cases = json.loads(cases_path.read_text())
     sem = asyncio.Semaphore(concurrency)
     async with httpx.AsyncClient(base_url=base.rstrip("/"), timeout=20) as client:
 
@@ -88,6 +88,8 @@ async def run(base: str, extra: dict, concurrency: int) -> list[dict]:
                     body, err = None, type(e).__name__
                 out = score(case, body, err)
                 out["ms"] = round((time.perf_counter() - t) * 1000, 1)
+                if "level" in case:
+                    out["level"] = case["level"]
                 return out
 
         return await asyncio.gather(*(one(c) for c in cases))
@@ -102,6 +104,7 @@ def summarize(results: list[dict]) -> dict:
             f"{r['endpoint']}/{r['qtype']}",
             f"kind:{r['kind']}",
             f"qtype:{r['qtype']}",
+            *([f"level:{r['level']}", f"level:{r['level']}/kind:{r['kind']}"] if "level" in r else []),
         ):
             groups.setdefault(key, []).append(r)
     out = {}
@@ -132,9 +135,12 @@ def main() -> None:
     ap.add_argument("--label", default="default")
     ap.add_argument("--param", action="append", default=[], help="extra query param k=v (e.g. pgeo.parse=none)")
     ap.add_argument("--concurrency", type=int, default=4)
+    ap.add_argument(
+        "--cases", type=Path, default=CASES, help="cases file (default cases.json; fuzz_cases.json for rounds)"
+    )
     a = ap.parse_args()
     extra = dict(p.split("=", 1) for p in a.param)
-    results = asyncio.run(run(a.base, extra, a.concurrency))
+    results = asyncio.run(run(a.base, extra, a.concurrency, a.cases))
     summary = summarize(results)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     out = OUT_DIR / f"{a.engine}-{a.label}.json"

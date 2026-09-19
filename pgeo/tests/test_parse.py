@@ -14,7 +14,11 @@ def rp() -> RuleParser:
 def test_full_address_with_commas():
     p = rp().parse("389 Congress St, Portland, ME 04101")
     assert (p.housenumber, p.street, p.locality, p.postcode, p.state) == (
-        "389", "Congress St", "Portland", "04101", "ME",
+        "389",
+        "Congress St",
+        "Portland",
+        "04101",
+        "ME",
     )
 
 
@@ -67,3 +71,19 @@ def test_libpostal_list_and_dict_forms():
 def test_libpostal_venue():
     p = from_libpostal("portland jetport", [{"label": "house", "value": "portland jetport"}])
     assert p.name_query() == "portland jetport"
+
+
+def test_misspelled_town_after_comma_is_kept():
+    p = rp().parse("27 Libert St, Newcatsle, ME")
+    assert (p.housenumber, p.street, p.locality) == ("27", "Libert St", "Newcatsle")
+
+
+def test_libpostal_venue_misread_falls_back_to_rule_street():
+    from pgeo.api.parse import merge_rule_fallback
+
+    lp = from_libpostal(
+        "12 Wenbelle Df, Buckspotr, ME",
+        [{"label": "house_number", "value": "12"}, {"label": "house", "value": "wenbelle df buckspotr me"}],
+    )
+    p = merge_rule_fallback(lp, rp().parse("12 Wenbelle Df, Buckspotr, ME"))
+    assert (p.housenumber, p.street, p.locality, p.name) == ("12", "Wenbelle Df", "Buckspotr", None)

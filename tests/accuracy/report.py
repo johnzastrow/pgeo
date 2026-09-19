@@ -29,13 +29,78 @@ def load(src: Path) -> list[dict]:
     return sorted(runs, key=lambda r: (r["engine"] != "pelias", r["engine"], r["label"]))
 
 
+LEVELS = ["F0", "F1", "F2", "F3", "F4", "F5"]
+FUZZ_KINDS = ["address", "town", "lake_summit", "venue"]
+
+
+def fuzz_section(fuzz: list[dict], png_dir: Path, rel: str) -> list[str]:
+    """Accuracy vs fuzziness: same 300 base queries corrupted at levels F0 (exact) to F5."""
+    names = [f"{r['engine']}/{r['label']}" for r in fuzz]
+    L = [
+        "",
+        "## Accuracy vs fuzziness (rounds F0-F5)",
+        "",
+        "Same 300 base queries at every level: F0 exact, F1 one typo, F2 two, F3 three + "
+        "abbreviation flips + no commas, F4 F3 + a dropped component / word order, F5 heavy "
+        "phonetic corruption (tests/accuracy/build_fuzz_rounds.py).",
+        "",
+        "| Engine / config | " + " | ".join(LEVELS) + " |",
+        "|---|" + "---|" * len(LEVELS),
+    ]
+    for n, r in zip(names, fuzz, strict=True):
+        L.append(
+            f"| {n} | " + " | ".join(pct(r["summary"].get(f"level:{lv}", {}).get("correct")) for lv in LEVELS) + " |"
+        )
+    for kind in FUZZ_KINDS:
+        L += ["", f"**{kind}**", "", "| Engine / config | " + " | ".join(LEVELS) + " |", "|---|" + "---|" * len(LEVELS)]
+        for n, r in zip(names, fuzz, strict=True):
+            L.append(
+                f"| {n} | "
+                + " | ".join(pct(r["summary"].get(f"level:{lv}/kind:{kind}", {}).get("correct")) for lv in LEVELS)
+                + " |"
+            )
+    for n, r in zip(names, fuzz, strict=True):
+        vals = [round(100 * (r["summary"].get(f"level:{lv}", {}).get("correct") or 0)) for lv in LEVELS]
+        L += [
+            "",
+            "```mermaid",
+            "xychart-beta",
+            f'    title "{n}: % correct by fuzz level"',
+            f"    x-axis [{', '.join(LEVELS)}]",
+            '    y-axis "%" 0 --> 100',
+            f"    line [{', '.join(map(str, vals))}]",
+            "```",
+        ]
+    fig, ax = plt.subplots(figsize=(8, 4.5))
+    for n, r in zip(names, fuzz, strict=True):
+        ax.plot(
+            LEVELS,
+            [100 * (r["summary"].get(f"level:{lv}", {}).get("correct") or 0) for lv in LEVELS],
+            marker="o",
+            label=n,
+        )
+    ax.set_ylim(0, 100)
+    ax.set_ylabel("% correct")
+    ax.set_xlabel("fuzz level (F0 exact -> F5 heavy)")
+    ax.set_title("Accuracy vs fuzziness")
+    ax.grid(alpha=0.3)
+    ax.legend(fontsize=8)
+    fig.tight_layout()
+    f = png_dir / "accuracy-vs-fuzz.png"
+    fig.savefig(f, dpi=110)
+    plt.close(fig)
+    return L + ["", f"![accuracy vs fuzz]({rel}/{f.name})"]
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--src", type=Path, default=ROOT / "data" / "accuracy")
     ap.add_argument("--out", type=Path, default=ROOT / "docs" / "ACCURACY_RESULTS.md")
     ap.add_argument("--png-dir", type=Path, default=ROOT / "docs" / "accuracy")
     a = ap.parse_args()
-    runs = load(a.src)
+    everything = load(a.src)
+    fuzz = [r for r in everything if any(k.startswith("level:") for k in r["summary"])]
+    runs = [r for r in everything if r not in fuzz]
     names = [f"{r['engine']}/{r['label']}" for r in runs]
     L = [
         "# Accuracy Results",
@@ -115,6 +180,8 @@ def main() -> None:
         ]
 
     a.png_dir.mkdir(parents=True, exist_ok=True)
+    if fuzz:
+        L += fuzz_section(fuzz, a.png_dir, "accuracy" if a.out.parent.name == "docs" else str(a.png_dir))
     fig, ax = plt.subplots(figsize=(10, 4.5))
     width = 0.8 / max(1, len(runs))
     for i, (n, r) in enumerate(zip(names, runs, strict=True)):

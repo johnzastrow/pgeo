@@ -66,6 +66,7 @@ CREATE TABLE feature (
     name_norm     text,
     street_norm   text,
     locality_norm text,
+    postal_locality_norm text,              -- town as the source wrote it (OA postal city)
     hn_int        integer,
     tokens        tsvector
 );

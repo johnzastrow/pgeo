@@ -18,7 +18,7 @@ import httpx
 from fastapi import FastAPI, Query, Request
 from fastapi.responses import JSONResponse
 
-from pgeo.api.parse import Parsed, RuleParser, from_libpostal
+from pgeo.api.parse import Parsed, RuleParser, from_libpostal, merge_rule_fallback
 from pgeo.settings import Settings
 
 log = logging.getLogger("pgeo.api")
@@ -164,13 +164,14 @@ async def parse(request: Request, text: str) -> Parsed:
         try:
             r = await request.app.state.http.get("/parse", params={"address": text})
             r.raise_for_status()
-            return from_libpostal(text, r.json())
+            return merge_rule_fallback(from_libpostal(text, r.json()), request.app.state.rules.parse(text))
         except (httpx.HTTPError, ValueError):
             log.warning("libpostal service unavailable; falling back to rule parser")
     elif mode == "extension":
         async with request.app.state.pool.acquire() as con:
             comp = await con.fetchval("SELECT postal_parse($1)", text)
-        return from_libpostal(text, json.loads(comp) if isinstance(comp, str) else comp)
+        lp = from_libpostal(text, json.loads(comp) if isinstance(comp, str) else comp)
+        return merge_rule_fallback(lp, request.app.state.rules.parse(text))
     return request.app.state.rules.parse(text)
 
 

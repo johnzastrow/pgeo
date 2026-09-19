@@ -97,6 +97,7 @@ port to wharf (192.0.2.254) only. On the VPS the same VM-side Caddy terminates T
 | 9 | (Optional) Add NH | Updated config | Re-run Phase 4-5 |
 | 10 | PostGIS-native geocoder, tuned against Pelias as the reference (section 10) | `pgeo/` service with a Pelias-compatible API | Shared test corpus + differential harness score |
 | 11 | API authorization: only authorized users/clients may call the API (section 12) | Auth at the edge for browsers and machine clients | Unauthorized requests rejected; keys revocable; audit log |
+| 13 | Postgres as the API endpoint: the whole service inside PostgreSQL, no application server (section 13) | `pgeo/sql/050_api.sql` + in-database HTTP (Omnigres) and/or PostgREST gateway | Same accuracy and load harness vs Pelias and pgeo+FastAPI |
 | 12 | Capacity testing: minimum resources for 3 concurrent users, ramp to limits, repeat for Phase 10 (docs/LOAD_TEST_PLAN.md) | `tests/load/`, `docs/LOAD_TEST_RESULTS.md` | Pelias vs PostGIS comparison at equal resources |
 
 Build-time estimate for Maine: roughly 1-3 hours end-to-end, dominated by downloads,
@@ -314,10 +315,12 @@ as a provisional expectation and flagged as such.
 
 - **Host:** develop and tune on the workstation in Docker (same data and load harness as
   Pelias, cgroup-constrained per config); deploy to a VM only once competitive.
-- **Text search:** core extensions first (`pg_trgm`, FTS, `unaccent`, `fuzzystrmatch`);
-  ParadeDB `pg_search` (BM25, AGPL-3.0) as an A/B arm, adopted only on a clear harness win.
-- **libpostal:** test both as a service (existing `pelias/libpostal-service` container) and
-  as the in-database `pgsql-postal` extension built for PG18, plus a no-libpostal arm.
+- **Text search:** core and contrib only (`pg_trgm`, FTS, `unaccent`, `fuzzystrmatch`), per
+  the user's constraint of 2026-09-18. ParadeDB `pg_search` (third-party, AGPL-3.0) is no
+  longer an arm; at most an optional footnote comparison.
+- **libpostal:** measured as a service and as the in-database `pgsql-postal` extension for
+  comparison, but the **primary parse mode is the rule parser** (core-only constraint;
+  measured only ~2 points behind libpostal while saving ~2 GB RAM).
   Early experiment: whether the ~2 GB model loads per backend or once via
   `shared_preload_libraries` (shared copy-on-write across backends); patch if needed.
 - **API layer:** thin FastAPI service (asyncpg + PgBouncer) returning Pelias-shaped GeoJSON
@@ -390,3 +393,42 @@ an outer layer while the service is LAN/tailnet-only, and required before any VP
 exposure. Requirements to settle when this phase starts: which IdP `auth.wharf` runs, user
 and group model (who may use it), key issuance and revocation workflow, per-key quotas,
 audit log retention (queries contain addresses: treat logs as internal data).
+
+## 13. Phase 13 -- PostgreSQL as the API endpoint (roadmap, requested 2026-09-18)
+
+**Constraint (2026-09-18): stay within PostgreSQL core + contrib extensions (plus PostGIS).**
+Core Postgres has no HTTP server, so the primary design is a logic-free PostgREST gateway in
+front of core SQL; the Omnigres arm below is optional and not pursued unless the core-only
+design falls short. Parsing in this phase is the PL/pgSQL rule parser (libpostal is
+third-party and stays an optional comparison).
+
+Goal: the geocoder runs *entirely* in PostgreSQL 18. Parsing, candidate search, ranking,
+confidence and the Pelias-shaped JSON response are all SQL; the HTTP layer either lives
+inside Postgres or is a logic-free gateway. Compared against Pelias and against pgeo with
+its FastAPI layer (Phase 10) on the same accuracy and load tests.
+
+| Piece | Phase 10 (pgeo + FastAPI) | Phase 13 (pure Postgres) |
+|-------|---------------------------|--------------------------|
+| Parsing | libpostal service / extension / Python rule parser | `postal_parse()` in SQL (pgsql-postal, `shared_preload_libraries`) plus a PL/pgSQL port of the rule parser as fallback |
+| Search, ranking, confidence | SQL functions (`geocode.*`) | same functions |
+| Response | Python formats Pelias GeoJSON | `jsonb_build_object` in SQL (`geocode_api.v1_search(...) RETURNS jsonb`, etc.) |
+| Parameter validation | Python | SQL (typed parameters, range checks, allowlists; errors as Pelias-style JSON) |
+| HTTP | uvicorn/FastAPI | **Arm A:** Omnigres `omni_httpd` + `omni_web`, an HTTP server running inside Postgres (PG18 via `postgresql-18-omnigres`; images published for PG17). **Arm B:** PostgREST v16 as a stateless gateway exposing only the `geocode_api` functions; the edge rewrites `/v1/search` to `/rpc/v1_search` |
+
+Steps:
+
+1. `pgeo/sql/050_api.sql`: `geocode_api` schema with `v1_search`, `v1_autocomplete`,
+   `v1_reverse`, `v1_search_structured`, `v1_place` returning complete Pelias JSON; SQL
+   parser fallback; input validation. Unit tests in SQL (pgTAP or plain assertions) and a
+   parity test against pgeo+FastAPI (identical results expected for the same parse mode).
+2. Arm B (PostgREST): compose service, read-only role with EXECUTE on `geocode_api` only,
+   edge rewrite rules; run accuracy + load.
+3. Arm A (Omnigres): PG18 image with omni_httpd (Debian package), routing table for `/v1/*`,
+   same role model; run accuracy + load. If PG18 packaging blocks, run on the PG17 image
+   and record the version difference.
+4. Compare three ways (Pelias, pgeo+FastAPI, pure Postgres A/B): accuracy, p95, ramp limit,
+   memory, moving parts. Record in docs/PGEO_TUNING.md and the results reports.
+
+Security notes: only `geocode_api` functions are reachable over HTTP; the HTTP role has no
+table privileges beyond what those SECURITY INVOKER functions read via the read-only role;
+request size and statement timeouts enforced in Postgres; rate limiting stays at the edge.

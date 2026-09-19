@@ -48,7 +48,7 @@ services:
       # read-only role created by the loader (least privilege)
       PGEO_DSN: "postgresql://pgeo_api:${PGEO_API_PASSWORD:?set PGEO_API_PASSWORD in pgeo/pgeo.secrets}@db:5432/pgeo"
       PGEO_LIBPOSTAL_URL: "http://libpostal:4400"
-      PGEO_PARSE_MODE: "${PGEO_PARSE_MODE:-service}"
+      PGEO_PARSE_MODE: "${PGEO_PARSE_MODE:-none}"  # rule parser (core-only default, D28)
       PGEO_WORKERS: "${PGEO_WORKERS:-2}"
       PGEO_POOL_MAX: "${PGEO_POOL_MAX:-8}"
     ports: ["127.0.0.1:4500:4500"]

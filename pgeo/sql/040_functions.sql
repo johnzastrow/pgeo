@@ -96,8 +96,8 @@ BEGIN
   addr_exact AS (
     SELECT f.id, s.st_sim, s.loc_sim
     FROM streets s
-    JOIN pgeo.feature f ON f.layer = 'address' AND f.street_norm = s.street_norm
-                        AND f.locality_norm = s.locality_norm AND f.hn_int = hni
+    JOIN pgeo.feature f ON f.layer = 'address' AND f.street_norm = s.street_norm AND f.hn_int = hni
+                        AND (f.locality_norm = s.locality_norm OR f.postal_locality_norm = s.locality_norm)
     WHERE lower(f.housenumber) = hn
   ),
   -- Interpolation on the best streets that lack the exact number: nearest known numbers
@@ -177,7 +177,8 @@ BEGIN
     UNION ALL
     SELECT t.id, 'fallback', 'centroid', 0.45, NULL, NULL, NULL FROM town t
     UNION ALL
-    SELECT p.id, 'exact', 'centroid', 1.0, NULL, NULL, NULL FROM postal p
+    SELECT p.id, CASE WHEN addr_intent THEN 'fallback' ELSE 'exact' END, 'centroid',
+           CASE WHEN addr_intent THEN 0.4 ELSE 1.0 END, NULL, NULL, NULL FROM postal p
   ),
   scored AS (
     SELECT DISTINCT ON (c.id, c.ihn) c.*, f,
@@ -185,7 +186,9 @@ BEGIN
            CASE WHEN loc IS NULL AND pc IS NULL THEN 1.0
                 WHEN loc IS NOT NULL AND c.loc_sim IS NULL AND position(loc in coalesce(f.name_norm, '')) > 0 THEN 1.0
                 ELSE greatest(
-                  coalesce(c.loc_sim, CASE WHEN loc IS NULL THEN 0 ELSE similarity(coalesce(f.locality_norm, ''), loc) END),
+                  coalesce(c.loc_sim, CASE WHEN loc IS NULL THEN 0 ELSE
+                    greatest(similarity(coalesce(f.locality_norm, ''), loc),
+                             similarity(coalesce(f.postal_locality_norm, ''), loc)) END),
                   CASE WHEN pc IS NOT NULL AND f.postcode = pc THEN 1.0 ELSE 0 END,
                   CASE WHEN f.layer IN ('locality', 'localadmin', 'postalcode') THEN 1.0 ELSE 0 END)
            END AS agree
@@ -195,8 +198,7 @@ BEGIN
   ),
   final AS (
     SELECT s.*,
-           least(1.0, s.base * CASE WHEN s.agree >= 0.8 THEN 1.0
-                                    WHEN s.agree >= 0.5 THEN 0.8 ELSE 0.45 END)::real AS conf
+           least(1.0, s.base * (0.4 + 0.6 * least(1.0, s.agree)))::real AS conf
     FROM scored s
   )
   SELECT (d.h).* FROM (
@@ -211,7 +213,8 @@ BEGIN
       geocode.to_hit(fi.f, fi.conf, fi.mt, fi.acc,
                      CASE WHEN focus IS NULL THEN NULL
                           ELSE ST_Distance((fi.f).geom::geography, focus::geography) / 1000 END,
-                     (fi.conf + 0.05 * (fi.f).importance + 0.1 * geocode.focus_boost((fi.f).geom, focus))::real)
+                     (fi.conf + 0.05 * (fi.f).importance + 0.1 * geocode.focus_boost((fi.f).geom, focus)
+                      + CASE (fi.f).source WHEN 'openaddresses' THEN 0.01 ELSE 0 END)::real)
     ELSE
       -- interpolated address: synthesize the row at the interpolated position
       ROW(NULL, 'interpolation:address:' || (fi.f).street_norm || ':' || fi.ihn || ':' || coalesce((fi.f).locality_norm, ''),

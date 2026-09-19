@@ -45,7 +45,7 @@ class Settings:
             host = env.get("PGEO_DB_HOST", "127.0.0.1")
             port = env.get("PGEO_DB_PORT", "5433")
             dsn = f"postgresql://pgeo:{pw}@{host}:{port}/pgeo"
-        mode = env.get("PGEO_PARSE_MODE", "service")
+        mode = env.get("PGEO_PARSE_MODE", "none")  # rule parser: core-only default (D28)
         if mode not in ("service", "extension", "none"):
             raise RuntimeError(f"PGEO_PARSE_MODE must be service|extension|none, not {mode!r}")
         return Settings(

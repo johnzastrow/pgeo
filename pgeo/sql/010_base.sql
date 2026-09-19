@@ -15,8 +15,10 @@ LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT
 AS $$ SELECT public.unaccent('public.unaccent'::regdictionary, t) $$;
 
 -- Canonical form used on both sides of every comparison: lowercase, no accents,
--- punctuation to spaces, and common street/place words reduced to one abbreviation
--- ("Street"/"St" -> "st", "North" -> "n", "Mount" -> "mt", "Saint" -> "st", ...).
+-- punctuation to spaces, and common street/place abbreviations EXPANDED to full words
+-- ("Rd" -> "road", "Mt" -> "mount", "N" -> "north", "St" -> "street", or "saint" when a
+-- name follows: "St George"). Full words make typo matching work: "moountain rd" shares
+-- few trigrams with "mtn rd" (0.25) but many with "mountain road" (0.81).
 CREATE OR REPLACE FUNCTION geocode.norm(t text) RETURNS text
 LANGUAGE plpgsql IMMUTABLE PARALLEL SAFE STRICT
 AS $$
@@ -25,26 +27,26 @@ DECLARE
 BEGIN
   s := regexp_replace(s, '[''’]', '', 'g');                 -- O'Brien -> obrien
   s := regexp_replace(s, '[^a-z0-9]+', ' ', 'g');
-  -- Double the separators so adjacent words ("north east") each keep their own
-  -- bounding spaces for the substitutions below; collapsed again at the end.
+  -- Double the separators so adjacent words each keep their own bounding spaces for the
+  -- substitutions below; collapsed again at the end.
   s := ' ' || replace(trim(s), ' ', '  ') || ' ';
-  -- word substitutions (bounded by spaces so partial words are untouched)
-  s := replace(s, ' street ', ' st ');   s := replace(s, ' road ', ' rd ');
-  s := replace(s, ' avenue ', ' ave ');  s := replace(s, ' av ', ' ave ');
-  s := replace(s, ' drive ', ' dr ');    s := replace(s, ' lane ', ' ln ');
-  s := replace(s, ' court ', ' ct ');    s := replace(s, ' circle ', ' cir ');
-  s := replace(s, ' place ', ' pl ');    s := replace(s, ' terrace ', ' ter ');
-  s := replace(s, ' boulevard ', ' blvd '); s := replace(s, ' parkway ', ' pkwy ');
-  s := replace(s, ' highway ', ' hwy '); s := replace(s, ' route ', ' rte ');
-  s := replace(s, ' rt ', ' rte ');      s := replace(s, ' extension ', ' ext ');
-  s := replace(s, ' square ', ' sq ');   s := replace(s, ' point ', ' pt ');
-  s := replace(s, ' mountain ', ' mtn ');
-  s := replace(s, ' mount ', ' mt ');    s := replace(s, ' saint ', ' st ');
-  s := replace(s, ' fort ', ' ft ');
-  s := replace(s, ' north ', ' n ');     s := replace(s, ' south ', ' s ');
-  s := replace(s, ' east ', ' e ');      s := replace(s, ' west ', ' w ');
-  s := replace(s, ' northeast ', ' ne '); s := replace(s, ' northwest ', ' nw ');
-  s := replace(s, ' southeast ', ' se '); s := replace(s, ' southwest ', ' sw ');
+  -- "st" followed by a name (not a direction or the end) is "saint"
+  s := regexp_replace(s, ' st  (?=(?!(n|s|e|w|ne|nw|se|sw|north|south|east|west|ext|extension) )[a-z])', ' saint  ', 'g');
+  s := replace(s, ' st ', ' street ');
+  s := replace(s, ' rd ', ' road ');      s := replace(s, ' ave ', ' avenue ');
+  s := replace(s, ' av ', ' avenue ');    s := replace(s, ' dr ', ' drive ');
+  s := replace(s, ' ln ', ' lane ');      s := replace(s, ' ct ', ' court ');
+  s := replace(s, ' cir ', ' circle ');   s := replace(s, ' pl ', ' place ');
+  s := replace(s, ' ter ', ' terrace ');  s := replace(s, ' blvd ', ' boulevard ');
+  s := replace(s, ' pkwy ', ' parkway '); s := replace(s, ' hwy ', ' highway ');
+  s := replace(s, ' rte ', ' route ');    s := replace(s, ' rt ', ' route ');
+  s := replace(s, ' ext ', ' extension '); s := replace(s, ' sq ', ' square ');
+  s := replace(s, ' pt ', ' point ');     s := replace(s, ' mtn ', ' mountain ');
+  s := replace(s, ' mt ', ' mount ');     s := replace(s, ' ft ', ' fort ');
+  s := replace(s, ' n ', ' north ');      s := replace(s, ' s ', ' south ');
+  s := replace(s, ' e ', ' east ');       s := replace(s, ' w ', ' west ');
+  s := replace(s, ' ne ', ' northeast '); s := replace(s, ' nw ', ' northwest ');
+  s := replace(s, ' se ', ' southeast '); s := replace(s, ' sw ', ' southwest ');
   RETURN trim(regexp_replace(s, ' +', ' ', 'g'));
 END
 $$;

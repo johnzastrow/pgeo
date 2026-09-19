@@ -39,6 +39,18 @@ class Parsed:
         return self.text
 
 
+def merge_rule_fallback(lp: Parsed, rule: Parsed) -> Parsed:
+    """libpostal often reads a misspelled street as a venue name ("12 Wenbelle Df,
+    Buckspotr" -> house_number + house). When it found a number but no street, take the
+    street and town from the rule parser instead."""
+    if lp.housenumber and not lp.street and rule.housenumber and rule.street:
+        lp.street = rule.street
+        lp.name = None
+        lp.locality = lp.locality or rule.locality
+        lp.postcode = lp.postcode or rule.postcode
+    return lp
+
+
 def from_libpostal(text: str, components: list[dict] | dict) -> Parsed:
     """Map libpostal labels (list of {label, value} or {label: value}) to a Parsed."""
     if isinstance(components, list):
@@ -78,8 +90,10 @@ class RuleParser:
             words = words[:-1]
             if parts and parts[-1].lower().strip(".") in STATES:
                 parts = parts[:-1]
-        # town: last comma part if it is a known town, else longest known suffix of words
-        if len(parts) >= 2 and parts[-1].lower() in self.localities:
+        # town: last comma part if it is a known town, else longest known suffix of words;
+        # "number street, Town" keeps an unknown (possibly misspelled) last part as the town,
+        # since the SQL compares towns fuzzily.
+        if len(parts) >= 2 and (parts[-1].lower() in self.localities or HN_RE.match(parts[0])):
             p.locality = parts[-1]
             head = ", ".join(parts[:-1])
         else:
