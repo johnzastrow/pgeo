@@ -537,7 +537,7 @@ more evenly (which one crosses first varies by configuration), because they shar
 
 **Memory is not pgeo's limit.** The configuration whose database memory (0.6 GB) is smaller than
 the data holds as many users as the one with 1.0 GB ({{value:lim_rest_Pmin}} and
-{{value:lim_rest_P1}}): the working set of hot index pages is far smaller than the 674 MB database.
+{{value:lim_rest_P1}}): the working set of hot index pages is far smaller than the {{value:pgeo_db}} of tables and indexes.
 Pelias, in contrast, has a memory floor set by its services (libpostal's model, the interpolation
 database, placeholder's in-memory tables) regardless of load.
 
@@ -554,11 +554,11 @@ only {{value:lim_C4a}}, because a single Node.js worker becomes the bottleneck.
 
 {{figure:memory|Peak memory in use by service at 3 users. Pelias carries the libpostal model
 (~2 GB), the interpolation database and Elasticsearch's heap regardless of load; pgeo's memory
-is mostly the PostgreSQL page cache for a 674 MB database.}}
+is mostly the PostgreSQL page cache for a {{value:pgeo_db}} database.}}
 
 {{ref:figure:memory}} explains the memory gap in one picture. Pelias pays for the libpostal
 model, the interpolation database and an Elasticsearch heap before it serves a single request;
-pgeo's memory is mostly page cache for a 674 MB database, which is why it still works when the
+pgeo's memory is mostly page cache for a {{value:pgeo_db}} database, which is why it still works when the
 budget is cut to a fraction. This is the difference between a $5 and a $48 server (Section 3.5).
 
 {{figure:cpu|Average CPU by service as users are added on 4 vCPU.}}
@@ -588,7 +588,7 @@ M0 and PM appear in the capacity tables).}}
 | Containers | 6 (Elasticsearch, API, libpostal, placeholder, pip, interpolation) | 2 (PostgreSQL, PostgREST) or 2 (PostgreSQL, FastAPI) |
 | Memory floor (runs at all) | ~8.3 GB: libpostal model ~2 GB, interpolation ~2 GB, Elasticsearch heap 0.8-2 GB | ~1.6 GB (database 0.6 GB) |
 | Memory that grows with load | placeholder, OOM-killed at 0.4-0.5 GB once load arrives (at 16 users on one vCPU, 12 on two, 128 on the four-vCPU configurations); 0.8 GB needed. pip is OOM-killed at 0.4 GB and the interpolation service crash-loops below 1.9 GB | PostgreSQL backends (a few MB each), page cache |
-| Disk (Maine) | ~1.4 GB Elasticsearch data plus ~0.9 GB helper databases; 435 MB snapshot to ship | 674 MB database; data directory ~2.6 GB, the difference being write-ahead log (`max_wal_size` 4 GB) and space still held by tables the build replaced; dump to ship. Size the disk for three to four times the database |
+| Disk (Maine) | ~1.4 GB Elasticsearch data plus ~0.9 GB helper databases; 435 MB snapshot to ship | 654 MB of tables and indexes; data directory ~2.6 GB, the difference being write-ahead log (`max_wal_size` 4 GB) and space still held by tables the build replaced; dump to ship. Size the disk for three to four times the database |
 | CPU scaling | add API workers with CPUs (1 worker on 4 vCPU halves capacity) | add connections with CPUs; front end workers for FastAPI |
 | Scaling out | Elasticsearch replicas and more API instances | read replicas behind PostgREST |
 | Updating data | rebuild index on a workstation, ship snapshot, restore | rebuild database on a workstation, ship dump, restore |
@@ -649,7 +649,7 @@ container limit, which Section 3.12 does.
 
 **Data volume.** For Pelias, capacity fell from {{value:ds_D1}} users with admin areas only to
 {{value:ds_D5}} with every source (Section 3.6); the index grew to 435 MB. pgeo's database grows with
-the same sources to 674 MB; capacity against data volume was not measured for pgeo (Next steps).
+the same sources to 654 MB; capacity against data volume was not measured for pgeo (Next steps).
 Doubling the data (for example adding New Hampshire) roughly doubles both stores; for Pelias the
 extra venues and names cost capacity per query, and for pgeo the trigram candidate sets grow in the
 same way, so both need more CPU per user as coverage grows.
@@ -990,9 +990,13 @@ answer them in full.}}
 
 ## Appendix C. pgeo storage
 
-The database is {{value:pgeo_db}} after the build drops the tables it only needed while loading;
-before that it is 971 MB. Trigram indexes on names dominate: they are what makes a misspelled
-query answerable, and they cost roughly as much space as the rows they index.
+The schema holds {{value:pgeo_db}} in tables and their indexes. Dropping the tables the build needs
+only while loading is what keeps it that small: on the build where it was measured it took the
+database from 971 MB to 674 MB. The database file is larger -- {{value:pgeo_db_file}}
+when this snapshot was taken -- because the atomic schema swap leaves the previous schema in place
+until it is dropped and vacuumed, and that is the number a disk has to hold. Trigram indexes on
+names dominate: they are what makes a misspelled query answerable, and they cost roughly as much
+space as the rows they index.
 
 {{table:pgeo_storage|pgeo tables (including their indexes).}}
 

@@ -169,7 +169,10 @@ def data_values(v: dict, t: dict, snap: dict) -> None:
     v["pelias_docs"] = f"{pel['docs']:,}"
     v["pelias_index"] = mb(pel["index_bytes"])
     v["pgeo_features"] = f"{sum(gl.values()):,}"
-    v["pgeo_db"] = mb(geo["db_bytes"])
+    # tables with their indexes: what the schema actually holds. pg_database_size is larger while
+    # the schema the atomic swap replaced has not been dropped and vacuumed away.
+    v["pgeo_db"] = mb(sum(geo.get("table_bytes", {}).values()) or geo["db_bytes"])
+    v["pgeo_db_file"] = mb(geo["db_bytes"])
     v["pelias_addresses"] = f"{pl.get('address', 0):,}"
     v["pgeo_addresses"] = f"{gl.get('address', 0):,}"
     v["address_ratio"] = f"{pl.get('address', 0) / max(gl.get('address', 1), 1):.2f}"
