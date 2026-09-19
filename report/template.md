@@ -220,7 +220,8 @@ downloaded inputs, and everything is scripted, so a rebuild is one command and a
 the same command with newer downloads (docs/REBUILD.md).
 
 The Pelias build (OSM, OpenAddresses, Who's On First, CSV and interpolation importers) takes
-about 15 minutes on the workstation and produces a 435 MB index plus helper databases. The pgeo
+about 9 minutes on the workstation once the inputs are downloaded, and produces a 435 MB index
+plus helper databases. The pgeo
 build (`pgeo-load build`) loads the same inputs with DuckDB, ogr2ogr and COPY, assigns each
 point its admin hierarchy by point-in-polygon, deduplicates, indexes, and swaps the new schema
 in atomically; it took {{value:pgeo_build_min}} in the latest run on one core.
@@ -613,6 +614,19 @@ cost of a full build of each engine.
 {{table:build_resources|Build resources: a full build of each engine, measured with
 `tests/build/measure_build.py` (wall time, peak memory of all build containers and processes,
 average and peak CPU, disk used by the result).}}
+
+{{callout:caution|pgeo serves three users in {{value:floor_pgeo_gb}} but is built in 5.5 GB, four
+times its own runtime floor. The cheap VPS the floor analysis points at can run the geocoder; it
+cannot build it. Both platforms are built on a workstation and shipped as a snapshot or a dump,
+and that is a requirement rather than a convenience.}}
+
+The two builds fail the "which is cheaper" question in opposite directions, which is worth noting
+because it cuts against the rest of this report. Pelias builds *faster* -- 9 minutes against 13 --
+because its importers run as separate processes across several cores, where pgeo's loader is one
+Python process feeding one database. pgeo is the cheaper build in every other respect: half the
+peak memory (5.5 GB against 11.5), 1.2 cores on average against 2.9, and 2.5 GB of result on disk
+against 8.0. An operator with a spare machine and no patience should prefer Pelias's build; an
+operator renting one by the hour should prefer pgeo's.
 
 #### What this costs on a shared-CPU VPS
 

@@ -68,31 +68,32 @@
    }
   ],
   "table_bytes": {
-   "feature": 642023424,
-   "admin": 22749184,
-   "street_name": 17014784,
+   "feature": 844177408,
+   "admin": 22880256,
+   "street_name": 17006592,
    "ac_prefix": 3514368,
    "town": 172032,
    "build_info": 65536
   },
   "index_bytes": {
    "feature_gid_idx": 54542336,
-   "feature_geom_idx": 37396480,
+   "feature_geom_idx": 37404672,
    "feature_addr_idx": 34537472,
    "feature_addr_street_hn_idx": 24305664,
    "feature_addr_hn_idx": 23928832,
    "feature_pkey": 20373504,
-   "feature_tokens_idx": 17932288,
-   "feature_name_trgm_idx": 13139968,
+   "feature_tokens_idx": 18604032,
+   "feature_name_trgm_idx": 13664256,
    "feature_layer_idx": 6299648,
    "feature_name_idx": 6070272,
    "street_name_pkey": 4997120,
-   "street_name_trgm_idx": 3907584,
+   "street_name_trgm_idx": 3899392,
    "feature_street_idx": 3006464,
    "ac_prefix_pkey": 1179648,
    "street_name_locality_idx": 663552,
    "admin_pkey": 139264,
    "admin_geom_idx": 114688,
+   "feature_admin_idx": 90112,
    "town_pkey": 65536,
    "feature_postcode_idx": 40960,
    "admin_placetype_idx": 40960,
@@ -107,11 +108,11 @@
     "zcta",
     "overture"
    ],
-   "built_at": "2026-09-18T21:28:26-0400",
+   "built_at": "2026-09-19T19:29:47-0400",
    "timings_s": {
-    "osm": 43.0,
-    "stage": 20.0,
-    "enrich_index": 727.4
+    "osm": 38.8,
+    "stage": 10.9,
+    "enrich_index": 726.6
    },
    "raw_counts": {
     "gnis": 20104,
@@ -134,9 +135,9 @@
   },
   "postgres": "PostgreSQL 18.6 (Debian 18.6-1.pgdg13+2)",
   "postgis": "3.6.4",
-  "db_bytes": 1400182463,
-  "engine_version": "0+unknown",
-  "captured": "2026-09-19T11:25:10"
+  "db_bytes": 910317247,
+  "engine_version": "0.7.0",
+  "captured": "2026-09-19T19:42:48"
  },
  "pelias": {
   "by_layer_source": [
@@ -212,7 +213,7 @@
    }
   ],
   "docs": 1649644,
-  "index_bytes": 456027545,
+  "index_bytes": 500307044,
   "elasticsearch": "7.17.27",
   "images": [
    "pelias/api",
@@ -230,7 +231,7 @@
    "pelias/transit",
    "pelias/whosonfirst"
   ],
-  "captured": "2026-09-19T11:25:10"
+  "captured": "2026-09-19T19:42:48"
  },
  "host": {
   "cpu": "AMD Ryzen 5 3600 6-Core Processor",
@@ -238,7 +239,7 @@
   "memory_gb": 31.3,
   "kernel": "7.0.0-31-generic",
   "docker": "Docker version 29.1.3, build 29.1.3-0ubuntu4.1",
-  "captured": "2026-09-19T11:25:10"
+  "captured": "2026-09-19T19:42:48"
  },
  "raw_data": [
   {
@@ -281,7 +282,7 @@
    "source": "TIGER / OA interpolation",
    "what": "Pelias interpolation database",
    "path": "data/pelias/interpolation",
-   "bytes": 348643569
+   "bytes": 348671756
   }
  ],
  "test_sets": {
