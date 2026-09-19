@@ -82,6 +82,9 @@ class Renderer:
             return f"{kind.capitalize()} {self.numbers[key]}"
 
         out = TOKEN.sub(lambda m: ref(m) if m.group(1) == "ref" else m.group(0), first)
+        # "Table Table 3": the template wrote the word before a reference that already includes it
+        for dup in re.findall(r"\b(Table Table|Figure Figure) \d+", out):
+            self.missing.append(f"doubled word before a reference: {dup}")
         # anything that still looks like a token is a template error (e.g. a malformed name)
         for left in re.findall(r"\{\{[^}]*\}\}", out):
             self.missing.append(f"unrendered {left[:60]}")

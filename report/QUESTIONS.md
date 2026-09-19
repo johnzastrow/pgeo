@@ -1,7 +1,7 @@
 # Questions Ledger
 
 Every question the project owner asked during the work, and where the report answers it. The report's
-Appendix C ("Questions asked during the project") is written from this list; review it against the
+Appendix B ("Questions asked during the project") is written from this list; review it against the
 finished report before each release. Status: answered / pending (awaiting a measurement) / open
 (not investigated; the report says so).
 
@@ -24,7 +24,7 @@ finished report before each release. Status: answered / pending (awaiting a meas
 | 15 | Do the two platforms now provide feature and accuracy parity? | 3.10 | answered |
 | 16 | Is there any reason to use Pelias when the pgeo results are so good? | 4 (Discussion) | answered |
 | 17 | Can we use the USPS ZIP+4 data to improve addresses? | 3.9 (address API) | answered |
-| 18 | Newer libpostal (Senzing libpostal-data): does it help with accuracy or speed in the US? | Appendix C, Next steps | open |
+| 18 | Newer libpostal (Senzing libpostal-data): does it help with accuracy or speed in the US? | Appendix B, Next steps | open |
 | 19 | (Requirement) When search returns a non-address, reverse geocode to the nearest high-quality street address. | 3.9 (address API) | answered |
 | 20 | Minimum server resources for 3 concurrent users (Maine data)? | 3.12 | pending (floor search, temporary VMs) |
 | 21 | How many users can that minimum server scale to, per platform? | 3.12 | pending |

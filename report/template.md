@@ -266,7 +266,7 @@ both engines: containers are recreated for every configuration (clearing the Ela
 cache and PostgreSQL's shared buffers), a fixed warm-up runs before measuring, and warm-up requests
 are excluded from the results. The operating system's page cache survives container recreation.
 All numbers therefore describe a server in continuous use, not a cold start. The query corpus is
-large (Table {{ref:table:corpus}}) and drawn at random, so exact repeats are rare.
+large ({{ref:table:corpus}}) and drawn at random, so exact repeats are rare.
 
 **Scope.** Every test in this section was run on both engines with the same session, corpus, targets
 and ramp; pgeo additionally with both of its front ends.
@@ -457,7 +457,7 @@ is mostly the PostgreSQL page cache for a 674 MB database.}}
 
 #### Resource requirements
 
-**Operation.** Table {{ref:table:sizing}} turns the capacity results into a sizing guide: for a
+**Operation.** {{ref:table:sizing}} turns the capacity results into a sizing guide: for a
 target number of concurrent users, the smallest tested configuration of each engine that kept every
 endpoint within its latency target. Budgets include 0.8 GB for the operating system. One "user" is a
 person actively using the search page (a request every 3 to 8 seconds); a service with many
@@ -483,7 +483,7 @@ M0 and PM appear in the capacity tables).}}
 {{table:ops_requirements|Operating requirements of each platform (Maine data).}}
 
 **Build.** Both engines are built on a workstation and shipped to the query host, so the query host
-never needs the raw data or the build tools. Table {{ref:table:build_resources}} gives the measured
+never needs the raw data or the build tools. {{ref:table:build_resources}} gives the measured
 cost of a full build of each engine.
 
 {{table:build_resources|Build resources: a full build of each engine, measured with
@@ -714,7 +714,7 @@ Inputs: `report/inputs.toml`. Figures are published as PNG (used in this report)
 `tests/load/run_matrix_pgeo.py` (pgeo); accuracy: `tests/accuracy/`; compatibility:
 `tests/compat/`.
 
-## Appendix C. Questions asked during the project
+## Appendix B. Questions asked during the project
 
 Every question the project owner asked during the work, with a short answer and where the report
 answers it in full.
@@ -751,7 +751,7 @@ answers it in full.
 {{table:questions|Questions asked during the project, with short answers and the sections that
 answer them in full.}}
 
-## Appendix B. pgeo storage
+## Appendix C. pgeo storage
 
 {{table:pgeo_storage|pgeo tables (including their indexes).}}
 
