@@ -1,0 +1,18 @@
+title: "Self-Hosted Geocoding for Maine"
+subtitle: "Pelias and a PostgreSQL/PostGIS geocoder (pgeo): design, tuning, accuracy and capacity"
+author: "pelias_maine project"
+lang: en-US
+documentclass: article
+papersize: letter
+fontsize: 10pt
+geometry: "margin=2.1cm"
+mainfont: "Noto Sans"
+mainfontoptions: ["BoldFont=Noto Sans Bold", "ItalicFont=Noto Sans Italic", "BoldItalicFont=Noto Sans Bold Italic"]
+sansfont: "Noto Sans"
+monofont: "DejaVu Sans Mono"
+monofontoptions: "Scale=0.85"
+linestretch: 1.12
+colorlinks: true
+linkcolor: "black"
+urlcolor: "blue"
+toc-title: "Contents"

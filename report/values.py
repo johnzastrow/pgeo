@@ -1,0 +1,325 @@
+"""Numbers and tables for the report, computed from saved results (report/inputs.toml)."""
+
+from __future__ import annotations
+
+import json
+import math
+import tomllib
+from collections import defaultdict
+from pathlib import Path
+
+import figures as F
+from render import md_table
+
+ROOT = Path(__file__).resolve().parents[1]
+INPUTS = tomllib.loads((ROOT / "report" / "inputs.toml").read_text())
+SLO = F.SLO
+EPS = F.EPS
+
+
+def pct(x: float, d: int = 1) -> str:
+    return f"{x:.{d}f}%"
+
+
+def gb(nbytes: float | None, d: int = 2) -> str:
+    return "-" if nbytes is None else f"{nbytes / 1024**3:.{d}f} GB"
+
+
+def mb(nbytes: float | None) -> str:
+    return "-" if nbytes is None else f"{nbytes / 1024**2:,.0f} MB"
+
+
+def first_fail(run: dict) -> tuple[int | None, list[str]]:
+    for st in run["runs"]["ramp"]:
+        if not st["pass"]:
+            return st["vus"], [ep for ep, v in st["endpoints"].items() if v.get("p(95)", 0) > SLO[ep]] or (
+                ["errors"] if st["error_rate"] >= 0.01 else [])
+    return None, []
+
+
+def peak_mem_mb(run: dict) -> int:
+    return round(sum(v.get("mem_max_mb", 0) for k, v in run["runs"]["validate"]["resources"].items() if k != "_stack"))
+
+
+def rps_at(run: dict, users: int | None) -> float | None:
+    return next((s["req_rate"] for s in run["runs"]["ramp"] if s["vus"] == users), None)
+
+
+# ---- accuracy ---------------------------------------------------------------------------------
+
+
+def accuracy_values(v: dict, t: dict) -> None:
+    acc = F.load_accuracy("main")
+    fz = F.load_accuracy("fuzz")
+    for e, d in acc.items():
+        rows = d["results"]
+        key = e.replace("-", "_")
+        v[f"acc_{key}"] = pct(F.rate(rows))
+        g = F.by(rows, "qtype")
+        for q in F.QTYPES:
+            v[f"acc_{key}_{q}"] = pct(F.rate(g[q]), 0)
+        k = F.by([r for r in rows if r["qtype"] == "exact"], "kind")
+        for kind in ("address", "town", "lake_summit", "venue", "zip", "reverse_address"):
+            v[f"acc_{key}_exact_{kind}"] = pct(F.rate(k[kind]), 0)
+        s = d["summary"]["ALL"]
+        v[f"conf_right_{key}"] = f"{s['conf_when_right']:.2f}" if s.get("conf_when_right") is not None else "-"
+        v[f"conf_wrong_{key}"] = f"{s['conf_when_wrong']:.2f}" if s.get("conf_when_wrong") is not None else "-"
+        v[f"p50_{key}"] = f"{s['p50_ms']:.0f} ms"
+        v[f"n_wrong_{key}"] = f"{sum(not r['correct'] for r in rows):,}"
+    n_cases = len(next(iter(acc.values()))["results"]) if acc else 0
+    v["n_cases"] = f"{n_cases:,}"
+    engines = [e for e in ("pelias", "pgeo-sql", "pgeo-api", "pgeo-api-svc") if e in acc]
+    label = {"pelias": "Pelias", "pgeo-sql": "pgeo pure SQL", "pgeo-api": "pgeo FastAPI (rule parser)",
+             "pgeo-api-svc": "pgeo FastAPI (libpostal service)"}  # fmt: skip
+    rows = []
+    for e in engines:
+        s = acc[e]["summary"]["ALL"]
+        g = F.by(acc[e]["results"], "qtype")
+        rows.append([label[e], pct(100 * s["correct"]), pct(100 * s["hit1"]), pct(100 * s["hit5"]),
+                     *(pct(F.rate(g[q]), 0) for q in F.QTYPES), f"{s['conf_when_right']:.2f} / {s['conf_when_wrong']:.2f}",
+                     f"{s['p50_ms']:.0f}"])  # fmt: skip
+    t["accuracy_overall"] = md_table(
+        ["Engine", "Correct", "Hit@1", "Hit@5", "Exact", "Typo", "Variant", "Miss", "Conf. right / wrong", "p50 ms"],
+        rows, "lrrrrrrrcr")
+    kinds = ["address", "town", "lake_summit", "venue", "zip", "reverse_address", "miss"]
+    rows = []
+    for kind in kinds:
+        row = [F.KIND_LABEL[kind]]
+        n = 0
+        for e in engines:
+            rs = [r for r in acc[e]["results"] if r["kind"] == kind]
+            n = len(rs)
+            row.append(pct(F.rate(rs), 0))
+        rows.append([row[0], f"{n:,}", *row[1:]])
+    t["accuracy_category"] = md_table(["Category", "Cases", *(label[e] for e in engines)], rows, "lr" + "r" * len(engines))
+    # fuzz
+    levels = [f"F{i}" for i in range(6)]
+    rows = []
+    for e, d in fz.items():
+        g = F.by(d["results"], "level")
+        rows.append([label[e], *(pct(F.rate(g[lv]), 0) for lv in levels)])
+        for lv in levels:
+            v[f"fuzz_{e.replace('-', '_')}_{lv}"] = pct(F.rate(g[lv]), 0)
+    t["fuzz_results"] = md_table(["Engine", *levels], rows, "l" + "r" * 6)
+    # remaining failures of the main pgeo engine
+    if "pgeo-sql" in acc:
+        bad = [r for r in acc["pgeo-sql"]["results"] if not r["correct"]]
+        grp = defaultdict(int)
+        for r in bad:
+            grp[f"{F.KIND_LABEL.get(r['kind'], r['kind'])} ({r['qtype']})"] += 1
+        t["pgeo_failures"] = md_table(["Category (query quality)", "Failures"],
+                                      [[k, n] for k, n in sorted(grp.items(), key=lambda x: -x[1])], "lr")
+        v["pgeo_failures_total"] = f"{len(bad)}"
+
+
+# ---- test sets and corpus -------------------------------------------------------------------
+
+
+def testset_values(v: dict, t: dict, snap: dict) -> None:
+    ts = snap["test_sets"]
+    comp = defaultdict(lambda: defaultdict(int))
+    for key, n in ts["accuracy_composition"].items():
+        ep, kind, q = key.split("|")
+        comp[(ep, kind)][q] += n
+    rows = []
+    for (ep, kind), qs in sorted(comp.items(), key=lambda x: (x[0][0], x[0][1])):
+        rows.append([ep, F.KIND_LABEL.get(kind, kind), *(qs.get(q, 0) or "" for q in F.QTYPES), sum(qs.values())])
+    t["testset"] = md_table(["Endpoint", "Category", "Exact", "Typo", "Variant", "Miss", "Total"], rows, "llrrrrr")
+    v["n_fuzz"] = f"{ts['fuzz_cases']:,}"
+    c = ts["load_corpus"]
+    t["corpus"] = md_table(["Corpus pool", "Items", "Used for"], [
+        ["addresses", f"{c.get('addresses', 0):,}", "type-ahead and search, exact form"],
+        ["places", f"{c.get('places', 0):,}", "towns, lakes, summits"],
+        ["venues", f"{c.get('venues', 0):,}", "businesses and landmarks"],
+        ["zips", f"{c.get('zips', 0):,}", "ZIP code searches"],
+        ["structured", f"{c.get('structured', 0):,}", "structured search field sets"],
+        ["typos", f"{c.get('typos', 0):,}", "one or two character errors"],
+        ["variants", f"{c.get('variants', 0):,}", "off-name variants (abbreviations, missing town)"],
+        ["misses", f"{c.get('misses', 0):,}", "places that do not exist in Maine"],
+        ["oa_points / random_points", f"{c.get('oa_points', 0):,} / {c.get('random_points', 0):,}", "reverse geocoding on land"],
+        ["miss_points", f"{c.get('miss_points', 0):,}", "reverse geocoding offshore (misses)"],
+        ["foci", f"{c.get('foci', 0):,}", "focus points (map centers) for type-ahead"],
+    ], "lrl")
+
+
+# ---- data inventory ---------------------------------------------------------------------------
+
+
+def data_values(v: dict, t: dict, snap: dict) -> None:
+    pel, geo = snap["pelias"], snap["pgeo"]
+    by_src = lambda rows: {s: sum(r["n"] for r in rows if r["source"] == s) for s in {r["source"] for r in rows}}  # noqa: E731
+    by_layer = lambda rows: {s: sum(r["n"] for r in rows if r["layer"] == s) for s in {r["layer"] for r in rows}}  # noqa: E731
+    ps, gs = by_src(pel["by_layer_source"]), by_src(geo["by_layer_source"])
+    pl, gl = by_layer(pel["by_layer_source"]), by_layer(geo["by_layer_source"])
+    v["pelias_docs"] = f"{pel['docs']:,}"
+    v["pelias_index"] = mb(pel["index_bytes"])
+    v["pgeo_features"] = f"{sum(gl.values()):,}"
+    v["pgeo_db"] = mb(geo["db_bytes"])
+    v["pelias_addresses"] = f"{pl.get('address', 0):,}"
+    v["pgeo_addresses"] = f"{gl.get('address', 0):,}"
+    v["address_ratio"] = f"{pl.get('address', 0) / max(gl.get('address', 1), 1):.2f}"
+    raw = {r["source"]: r for r in snap["raw_data"]}
+    names = {"openaddresses": "OpenAddresses", "openstreetmap": "OpenStreetMap", "whosonfirst": "Who's On First",
+             "gnis": "USGS GNIS", "zcta": "Census ZCTA", "overture": "Overture Maps"}  # fmt: skip
+    what = {"openaddresses": "address points (Maine statewide E911 feed)",
+            "openstreetmap": "addresses, streets, venues (Geofabrik extract)",
+            "whosonfirst": "admin polygons: towns, counties, ZIPs, neighbourhoods",
+            "gnis": "named features: lakes, summits, streams, populated places",
+            "zcta": "ZIP code centroids", "overture": "places (businesses, landmarks), 2026-08-19 release"}  # fmt: skip
+    rows = []
+    for s in ["openaddresses", "openstreetmap", "overture", "gnis", "whosonfirst", "zcta"]:
+        r = raw.get(names[s], {})
+        rows.append([names[s], what[s], mb(r.get("bytes")), f"{ps.get(s, 0):,}", f"{gs.get(s, 0):,}"])
+    rows.append(["Total", "", "", f"{sum(ps.values()):,}", f"{sum(gs.values()):,}"])
+    t["sources"] = md_table(["Source", "Content", "Raw input", "Pelias documents", "pgeo features"], rows, "llrrr")
+    layers = ["address", "venue", "street", "locality", "localadmin", "neighbourhood", "postalcode", "county", "region",
+              "country"]  # fmt: skip
+    t["layers"] = md_table(["Layer", "Pelias", "pgeo", "pgeo / Pelias"],
+                           [[x, f"{pl.get(x, 0):,}", f"{gl.get(x, 0):,}",
+                             f"{gl.get(x, 0) / pl[x]:.2f}" if pl.get(x) else "-"] for x in layers], "lrrr")  # fmt: skip
+    # pgeo tables and indexes
+    tb = geo.get("table_bytes", {})
+    ib = geo.get("index_bytes", {})
+    t["pgeo_storage"] = md_table(["Table", "Size (incl. indexes)"], [[k, mb(b)] for k, b in tb.items()], "lr")
+    t["pgeo_indexes"] = md_table(["Index", "Size"], [[k, mb(b)] for k, b in list(ib.items())[:12]], "lr")
+
+
+# ---- load -----------------------------------------------------------------------------------------
+
+
+def load_values(v: dict, t: dict) -> None:
+    pel, pg, ds = F.pelias_runs(), F.pgeo_runs(), F.dataset_runs()
+    before = F.load_runs(INPUTS["load"].get("pgeo_before", []))
+
+    def cfg_rows(runs: dict, ids: list[str], pgeo: bool) -> list[list]:
+        rows = []
+        for cid in ids:
+            if cid not in runs:
+                continue
+            r = runs[cid]
+            c = r["config"]
+            fu, eps = first_fail(r)
+            rows.append([
+                cid, c.get("cpus") or "all", "-" if r["budget_gb"] is None else f"{r['budget_gb']} GB",
+                (f"sb {c['sb']}, {c['conns']} conn." if pgeo else f"heap {c['heap']}, {c['workers']} worker(s)"),
+                f"{r['limit_users']}", r.get("breaking_users") or "not reached",
+                ", ".join(eps) + (f" at {fu}" if fu else "") if eps else "-",
+                f"{rps_at(r, r['limit_users']) or 0:.0f}", f"{peak_mem_mb(r) / 1024:.1f} GB",
+            ])
+        return rows
+
+    hdr = ["Config", "vCPU", "Budget", "Settings", "Users within SLO", "Broken at", "First over target", "req/s at limit",
+           "Memory at 3 users"]  # fmt: skip
+    t["pelias_limits"] = md_table(hdr, cfg_rows(pel, ["C1", "C1s", "C2", "C3", "C4", "C4a", "M0"], False), "lrrlrrlrr")
+    pg_ids = [f"{e}-{c}" for e in ("rest", "api", "api-svc") for c in ("Pmin", "P1", "P2", "P4", "PM")]
+    t["pgeo_limits"] = md_table(hdr, cfg_rows(pg, pg_ids, True), "lrrlrrlrr")
+    if before:
+        rows = []
+        for cid in [f"{e}-{c}" for e in ("rest", "api") for c in ("Pmin", "P1", "P2", "P4", "PM")]:
+            if cid in before and cid in pg:
+                b, a = before[cid], pg[cid]
+                rows.append([cid, b["limit_users"], a["limit_users"],
+                             f"{b['runs']['validate']['endpoints']['reverse']['p(95)']:.0f}",
+                             f"{a['runs']['validate']['endpoints']['reverse']['p(95)']:.0f}"])
+        t["reverse_fix"] = md_table(["Config", "Users within SLO, before", "after", "Reverse p95 at 3 users (ms), before",
+                                     "after"], rows, "lrrrr")  # fmt: skip
+    # latency at 3 users
+    rows = []
+    for runs, ids in ((pel, ["C1", "C2", "C3", "C4", "M0"]), (pg, pg_ids)):
+        for cid in ids:
+            if cid not in runs:
+                continue
+            e = runs[cid]["runs"]["validate"]["endpoints"]
+            rows.append([cid, *(f"{e.get(ep, {}).get('med', float('nan')):.0f} / {e.get(ep, {}).get('p(95)', float('nan')):.0f}"
+                                for ep in EPS)])  # fmt: skip
+    t["latency3"] = md_table(["Config", *(f"{F.EP_LABEL[ep]} p50 / p95 ms" for ep in EPS)], rows, "lrrrr")
+    t["slo"] = md_table(["Endpoint", "p95 target", "Why"], [
+        ["Autocomplete", "250 ms", "type-ahead must keep up with typing"],
+        ["Search", "750 ms", "a full search after pressing Enter"],
+        ["Structured search", "750 ms", "form-based search"],
+        ["Reverse", "400 ms", "map click; feels immediate"],
+        ["All", "errors < 1%", "no restarts or out-of-memory kills during a run"],
+    ], "lrl")
+    # data volume
+    rows = []
+    for cid in sorted(ds, key=lambda k: ds[k]["dataset"]):
+        r = ds[cid]
+        e = r["runs"]["validate"]["endpoints"]
+        rows.append([r["dataset"], f"{r['docs']:,}", f"{r['index_mb']:,} MB", f"{r['limit_users']}",
+                     r.get("breaking_users") or "not reached",
+                     *(f"{e.get(ep, {}).get('p(95)', float('nan')):.0f}" for ep in EPS)])  # fmt: skip
+    t["datavol"] = md_table(["Dataset", "Documents", "Index", "Users within SLO", "Broken at",
+                             *(f"{F.EP_LABEL[ep]} p95" for ep in EPS)], rows, "lrrrrrrrr")  # fmt: skip
+    # headline numbers
+    for cid in ("C1", "C2", "C3", "C4", "C4a", "M0"):
+        if cid in pel:
+            v[f"lim_{cid}"] = str(pel[cid]["limit_users"])
+            v[f"budget_{cid}"] = f"{pel[cid]['budget_gb']} GB" if pel[cid]["budget_gb"] else "unlimited"
+    for cid in pg:
+        v[f"lim_{cid.replace('-', '_')}"] = str(pg[cid]["limit_users"])
+        v[f"budget_{cid.replace('-', '_')}"] = f"{pg[cid]['budget_gb']} GB" if pg[cid]["budget_gb"] else "unlimited"
+    for cid in before:
+        v[f"before_lim_{cid.replace('-', '_')}"] = str(before[cid]["limit_users"])
+    # throughput ratio per CPU
+    ratios = []
+    for p_id, g_ids in (("C1", ["rest-P1", "api-P1"]), ("C2", ["rest-P2", "api-P2"]), ("C4", ["rest-P4", "api-P4"])):
+        for g in g_ids:
+            if p_id in pel and g in pg and pg[g]["limit_users"]:
+                ratios.append(pel[p_id]["limit_users"] / pg[g]["limit_users"])
+    if ratios:
+        v["ratio_min"] = f"{min(ratios):.0f}"
+        v["ratio_max"] = f"{max(ratios):.0f}"
+    ds_sorted = sorted(ds.values(), key=lambda r: r["dataset"])
+    for r in ds_sorted:
+        v[f"ds_{r['dataset']}"] = str(r["limit_users"])
+
+
+# ---- compatibility -------------------------------------------------------------------------------
+
+
+def compat_values(v: dict, t: dict) -> None:
+    p = ROOT / INPUTS["compat"]["result"]
+    if not p.is_file():
+        return
+    d = json.loads(p.read_text())
+    engines = list(d["engines"])
+    rows = []
+    for c in d["cases"]:
+        cells = []
+        for e in engines:
+            res = c["results"][e]
+            cells.append("pass" if res is None else ("differs" if e == "pelias" else "FAIL"))
+        q = "&".join(f"{k}={val}" for k, val in c["params"].items())
+        rows.append([c["case"], f"`/v1/{c['path']}?{q}`"[:90] + ("`" if len(q) > 70 else ""), *cells])
+    t["compat"] = md_table(["Case", "Request", "Pelias", "pgeo FastAPI", "pgeo pure SQL"], rows, "llccc")
+    v["compat_cases"] = str(len(d["cases"]))
+    v["compat_failures"] = str(d["failures"])
+
+
+def build_all(snap: dict) -> tuple[dict, dict]:
+    v: dict = {}
+    t: dict = {}
+    accuracy_values(v, t)
+    testset_values(v, t, snap)
+    data_values(v, t, snap)
+    load_values(v, t)
+    compat_values(v, t)
+    host = snap["host"]
+    v["host_cpu"] = host["cpu"]
+    v["host_threads"] = str(host["logical_cpus"])
+    v["host_mem"] = f"{host['memory_gb']:.0f} GB"
+    v["pg_version"] = snap["pgeo"].get("postgres") or "-"
+    v["postgis_version"] = snap["pgeo"].get("postgis") or "-"
+    v["es_version"] = snap["pelias"].get("elasticsearch") or "-"
+    v["pgeo_version"] = snap["pgeo"].get("engine_version") or "-"
+    b = (snap["pgeo"].get("build") or {}).get("timings_s") or {}
+    v["pgeo_build_min"] = f"{sum(b.values()) / 60:.0f} min" if b else "-"
+    t["pgeo_build_steps"] = md_table(["Build step", "Seconds"], [[k, f"{s:,.0f}"] for k, s in b.items()], "lr") if b else None
+    return v, t
+
+
+if __name__ == "__main__":
+    snap = json.loads((ROOT / INPUTS["snapshot"]["file"]).read_text())
+    vals, tabs = build_all(snap)
+    print(len(vals), "values;", len(tabs), "tables")
+    print({k: vals[k] for k in list(vals)[:25]})

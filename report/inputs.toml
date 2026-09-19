@@ -5,6 +5,9 @@
 # Pelias capacity matrix: later directories win for the same configuration id
 pelias = ["data/loadtest/20260918-1834", "data/loadtest/20260918-2051"]
 pelias_datasets = ["data/loadtest/20260919-0718"]
+# before the reverse-geocoding index (pgeo 0.6.0), kept for the before/after comparison
+pgeo_before = ["data/loadtest/20260918-2343-pgeo", "data/loadtest/20260919-0350-pgeo"]
+# current pgeo (switch to the post-fix run, data/loadtest/20260919-1133-pgeo, when it completes)
 pgeo = ["data/loadtest/20260918-2343-pgeo", "data/loadtest/20260919-0350-pgeo"]
 
 [accuracy]

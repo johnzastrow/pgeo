@@ -61,7 +61,7 @@ def data_pipeline(out: Path) -> str:
     sources = [
         ("OpenStreetMap\nGeofabrik PBF, 87 MB", 0.87), ("OpenAddresses\nME statewide, 223 MB", 0.72),
         ("Who's On First\nadmin polygons", 0.57), ("USGS GNIS\nnames, 3.6 MB", 0.40),
-        ("Census ZCTA\ngazetteer, 0.9 MB", 0.25), ("Overture Maps\nplaces parquet, 203 MB", 0.10),
+        ("Census ZCTA\ngazetteer, 0.9 MB", 0.25), ("Overture Maps\nplaces parquet, 16 MB", 0.10),
     ]  # fmt: skip
     for t, y in sources:
         box(ax, 0.01, y - 0.055, 0.19, 0.11, t, fc=LIGHT_N)

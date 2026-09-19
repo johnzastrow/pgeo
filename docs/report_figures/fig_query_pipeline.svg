@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="408.96pt" height="145.8pt" viewBox="0 0 408.96 145.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-09-19T11:52:09.919907</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.2, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 145.8 
+L 408.96 145.8 
+L 408.96 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 12.03696 134.4384 
+L 53.41824 134.4384 
+Q 59.44464 134.4384 59.44464 132.3594 
+L 59.44464 30.0726 
+Q 59.44464 27.9936 53.41824 27.9936 
+L 12.03696 27.9936 
+Q 6.01056 27.9936 6.01056 30.0726 
+L 6.01056 132.3594 
+Q 6.01056 134.4384 12.03696 134.4384 
+z
+" clip-path="url(#pf5ee8dd238)" style="fill: #f8e3df; stroke: #c0392b; stroke-width: 0.9; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 60.64325 81.216 
+Q 61.455131 81.216 61.260781 81.216 
+" clip-path="url(#pf5ee8dd238)" style="fill: none; stroke: #c0392b; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 57.660781 79.416 
+L 61.260781 81.216 
+L 57.660781 83.016 
+z
+" clip-path="url(#pf5ee8dd238)" style="fill: #c0392b; stroke: #c0392b; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 69.48864 134.4384 
+L 110.86992 134.4384 
+Q 116.89632 134.4384 116.89632 132.3594 
+L 116.89632 30.0726 
+Q 116.89632 27.9936 110.86992 27.9936 
+L 69.48864 27.9936 
+Q 63.46224 27.9936 63.46224 30.0726 
+L 63.46224 132.3594 
+Q 63.46224 134.4384 69.48864 134.4384 
+z
+" clip-path="url(#pf5ee8dd238)" style="fill: #f8e3df; stroke: #c0392b; stroke-width: 0.9; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 118.09493 81.216 
+Q 118.906811 81.216 118.712461 81.216 
+" clip-path="url(#pf5ee8dd238)" style="fill: none; stroke: #c0392b; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 115.112461 79.416 
+L 118.712461 81.216 
+L 115.112461 83.016 
+z
+" clip-path="url(#pf5ee8dd238)" style="fill: #c0392b; stroke: #c0392b; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 126.94032 134.4384 
+L 168.3216 134.4384 
+Q 174.348 134.4384 174.348 132.3594 
+L 174.348 30.0726 
+Q 174.348 27.9936 168.3216 27.9936 
+L 126.94032 27.9936 
+Q 120.91392 27.9936 120.91392 30.0726 
+L 120.91392 132.3594 
+Q 120.91392 134.4384 126.94032 134.4384 
+z
+" clip-path="url(#pf5ee8dd238)" style="fill: #f8e3df; stroke: #c0392b; stroke-width: 0.9; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 175.54661 81.216 
+Q 176.358491 81.216 176.164141 81.216 
+" clip-path="url(#pf5ee8dd238)" style="fill: none; stroke: #c0392b; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 172.564141 79.416 
+L 176.164141 81.216 
+L 172.564141 83.016 
+z
+" clip-path="url(#pf5ee8dd238)" style="fill: #c0392b; stroke: #c0392b; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 184.392 134.4384 
+L 225.77328 134.4384 
+Q 231.79968 134.4384 231.79968 132.3594 
+L 231.79968 30.0726 
+Q 231.79968 27.9936 225.77328 27.9936 
+L 184.392 27.9936 
+Q 178.3656 27.9936 178.3656 30.0726 
+L 178.3656 132.3594 
+Q 178.3656 134.4384 184.392 134.4384 
+z
+" clip-path="url(#pf5ee8dd238)" style="fill: #f8e3df; stroke: #c0392b; stroke-width: 0.9; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 232.99829 81.216 
+Q 233.810171 81.216 233.615821 81.216 
+" clip-path="url(#pf5ee8dd238)" style="fill: none; stroke: #c0392b; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 230.015821 79.416 
+L 233.615821 81.216 
+L 230.015821 83.016 
+z
+" clip-path="url(#pf5ee8dd238)" style="fill: #c0392b; stroke: #c0392b; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 241.84368 134.4384 
+L 283.22496 134.4384 
+Q 289.25136 134.4384 289.25136 132.3594 
+L 289.25136 30.0726 
+Q 289.25136 27.9936 283.22496 27.9936 
+L 241.84368 27.9936 
+Q 235.81728 27.9936 235.81728 30.0726 
+L 235.81728 132.3594 
+Q 235.81728 134.4384 241.84368 134.4384 
+z
+" clip-path="url(#pf5ee8dd238)" style="fill: #f8e3df; stroke: #c0392b; stroke-width: 0.9; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 290.44997 81.216 
+Q 291.261851 81.216 291.067501 81.216 
+" clip-path="url(#pf5ee8dd238)" style="fill: none; stroke: #c0392b; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 287.467501 79.416 
+L 291.067501 81.216 
+L 287.467501 83.016 
+z
+" clip-path="url(#pf5ee8dd238)" style="fill: #c0392b; stroke: #c0392b; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 299.29536 134.4384 
+L 340.67664 134.4384 
+Q 346.70304 134.4384 346.70304 132.3594 
+L 346.70304 30.0726 
+Q 346.70304 27.9936 340.67664 27.9936 
+L 299.29536 27.9936 
+Q 293.26896 27.9936 293.26896 30.0726 
+L 293.26896 132.3594 
+Q 293.26896 134.4384 299.29536 134.4384 
+z
+" clip-path="url(#pf5ee8dd238)" style="fill: #f8e3df; stroke: #c0392b; stroke-width: 0.9; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 347.90165 81.216 
+Q 348.713531 81.216 348.519181 81.216 
+" clip-path="url(#pf5ee8dd238)" style="fill: none; stroke: #c0392b; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 344.919181 79.416 
+L 348.519181 81.216 
+L 344.919181 83.016 
+z
+" clip-path="url(#pf5ee8dd238)" style="fill: #c0392b; stroke: #c0392b; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 356.74704 134.4384 
+L 398.12832 134.4384 
+Q 404.15472 134.4384 404.15472 132.3594 
+L 404.15472 30.0726 
+Q 404.15472 27.9936 398.12832 27.9936 
+L 356.74704 27.9936 
+Q 350.72064 27.9936 350.72064 30.0726 
+L 350.72064 132.3594 
+Q 350.72064 134.4384 356.74704 134.4384 
+z
+" clip-path="url(#pf5ee8dd238)" style="fill: #f8e3df; stroke: #c0392b; stroke-width: 0.9; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 7px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; text-anchor: middle" x="32.7276" y="47.26635" transform="rotate(-0 32.7276 47.26635)">1 Normalize</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(10.305881 79.1589)">expand abbrev.:</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(16.995413 88.5867)">st -&gt; street,</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(14.383069 97.9845)">mt -&gt; mount;</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(15.298538 107.3523)">drop trailing</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(17.773069 117.4401)">state word</text>
+   </g>
+   <g id="text_3">
+    <text style="font-weight: 700; font-size: 7px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; text-anchor: middle" x="90.17928" y="47.140569" transform="rotate(-0 90.17928 47.140569)">2 Parse</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(73.901468 79.1589)">rule parser:</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(68.816468 88.889512)">number, street,</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(76.583655 98.1495)">town, ZIP,</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(75.515843 107.049487)">name part</text>
+   </g>
+   <g id="text_5">
+    <text style="font-weight: 700; font-size: 7px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; text-anchor: middle" x="147.63096" y="47.26635" transform="rotate(-0 147.63096 47.26635)">3 Candidates</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(125.968616 79.089994)">trigram names;</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(126.099398 89.2467)">streets + house</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(134.10096 98.287312)">numbers;</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(128.542991 107.3523)">interpolation;</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(143.082679 117.332287)">ZIP</text>
+   </g>
+   <g id="text_7">
+    <text style="font-weight: 700; font-size: 7px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif" transform="translate(186.689046 47.26635)">4 Anchor +</text>
+    <text style="font-weight: 700; font-size: 7px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif" transform="translate(196.416312 57.29455)">filter</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(187.81764 79.506712)">focus, circle,</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(188.025296 88.943887)">rect or town</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(183.102484 97.9545)">location; layers,</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(187.376546 107.3523)">sources, gid,</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(190.38264 116.681194)">categories</text>
+   </g>
+   <g id="text_9">
+    <text style="font-weight: 700; font-size: 7px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; text-anchor: middle" x="262.53432" y="47.140569" transform="rotate(-0 262.53432 47.140569)">5 Score</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(240.84807 79.1589)">name similarity</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(253.117601 88.943887)">x town</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(242.01432 97.9545)">agreement (by</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(244.243695 107.3523)">name and by</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(249.826507 116.996194)">distance)</text>
+   </g>
+   <g id="text_11">
+    <text style="font-weight: 700; font-size: 7px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif" transform="translate(300.704828 46.46135)">6 Dedupe +</text>
+    <text style="font-weight: 700; font-size: 7px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif" transform="translate(302.058344 56.47205)">ambiguity</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(300.269906 79.1589)">one result per</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(306.648188 88.889512)">label; ties</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(298.118812 97.9545)">between places</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(295.949906 108.0573)">lower confidence</text>
+   </g>
+   <g id="text_13">
+    <text style="font-weight: 700; font-size: 7px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif" transform="translate(364.270571 47.26635)">7 Pelias</text>
+    <text style="font-weight: 700; font-size: 7px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif" transform="translate(368.719946 56.45455)">JSON</text>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(364.65768 79.2039)">GeoJSON</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(357.700961 88.5567)">envelope with</text>
+    <text style="font-size: 6px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #222222" transform="translate(357.572055 97.9545)">hierarchy gids</text>
+   </g>
+   <g id="text_15">
+    <text style="font-style: italic; font-size: 7px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #4d4d4d" x="204.48" y="13.302" transform="rotate(-0 204.48 13.302)">Every step runs inside PostgreSQL; the FastAPI and PostgREST front ends pass parameters in and JSON out</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pf5ee8dd238">
+   <rect x="3.6" y="3.6" width="401.76" height="138.6"/>
+  </clipPath>
+ </defs>
+</svg>

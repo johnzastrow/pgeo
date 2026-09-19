@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="408.96pt" height="145.8pt" viewBox="0 0 408.96 145.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-09-19T11:52:10.122628</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.2, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 145.8 
+L 408.96 145.8 
+L 408.96 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 12.03696 115.0344 
+L 103.63824 115.0344 
+Q 109.66464 115.0344 109.66464 112.9554 
+L 109.66464 24.5286 
+Q 109.66464 22.4496 103.63824 22.4496 
+L 12.03696 22.4496 
+Q 6.01056 22.4496 6.01056 24.5286 
+L 6.01056 112.9554 
+Q 6.01056 115.0344 12.03696 115.0344 
+z
+" clip-path="url(#p3429fbc28a)" style="fill: #efefef; stroke: #4d4d4d; stroke-width: 0.9; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 148.63536 115.0344 
+L 256.30704 115.0344 
+Q 262.33344 115.0344 262.33344 112.9554 
+L 262.33344 24.5286 
+Q 262.33344 22.4496 256.30704 22.4496 
+L 148.63536 22.4496 
+Q 142.60896 22.4496 142.60896 24.5286 
+L 142.60896 112.9554 
+Q 142.60896 115.0344 148.63536 115.0344 
+z
+" clip-path="url(#p3429fbc28a)" style="fill: #e3edf5; stroke: #1f5f8b; stroke-width: 0.9; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 301.30416 65.1384 
+L 396.92304 65.1384 
+Q 402.94944 65.1384 402.94944 63.0594 
+L 402.94944 24.5286 
+Q 402.94944 22.4496 396.92304 22.4496 
+L 301.30416 22.4496 
+Q 295.27776 22.4496 295.27776 24.5286 
+L 295.27776 63.0594 
+Q 295.27776 65.1384 301.30416 65.1384 
+z
+" clip-path="url(#p3429fbc28a)" style="fill: #ffffff; stroke: #4d4d4d; stroke-width: 0.9; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 301.30416 115.0344 
+L 396.92304 115.0344 
+Q 402.94944 115.0344 402.94944 112.9554 
+L 402.94944 74.4246 
+Q 402.94944 72.3456 396.92304 72.3456 
+L 301.30416 72.3456 
+Q 295.27776 72.3456 295.27776 74.4246 
+L 295.27776 112.9554 
+Q 295.27776 115.0344 301.30416 115.0344 
+z
+" clip-path="url(#p3429fbc28a)" style="fill: #ffffff; stroke: #4d4d4d; stroke-width: 0.9; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 110.057082 68.742 
+Q 126.137876 68.742 141.21244 68.742 
+" clip-path="url(#p3429fbc28a)" style="fill: none; stroke: #4d4d4d; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 137.61244 66.942 
+L 141.21244 68.742 
+L 137.61244 70.542 
+z
+" clip-path="url(#p3429fbc28a)" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 262.725882 45.18 
+Q 278.806676 45.18 293.88124 45.18 
+" clip-path="url(#p3429fbc28a)" style="fill: none; stroke: #4d4d4d; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 290.28124 43.38 
+L 293.88124 45.18 
+L 290.28124 46.98 
+z
+" clip-path="url(#p3429fbc28a)" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 262.725882 92.304 
+Q 278.806676 92.304 293.88124 92.304 
+" clip-path="url(#p3429fbc28a)" style="fill: none; stroke: #4d4d4d; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 290.28124 90.504 
+L 293.88124 92.304 
+L 290.28124 94.104 
+z
+" clip-path="url(#p3429fbc28a)" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 6.5px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #111111" transform="translate(22.507053 46.08625)">k6 2.2.0 load generator</text>
+    <text style="font-size: 6.5px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #111111" transform="translate(31.031702 55.82455)">(pinned to core 5)</text>
+    <text style="font-size: 6.5px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #111111" transform="translate(57.8376 63.87285)"/>
+    <text style="font-size: 6.5px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #111111" transform="translate(18.031702 75.30115)">per user: 60% type-ahead,</text>
+    <text style="font-size: 6.5px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #111111" transform="translate(14.733459 85.399997)">15% search, 10% structured,</text>
+    <text style="font-size: 6.5px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #111111" transform="translate(21.820491 95.138297)">15% reverse; 3-8 s think</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 6.5px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #111111" transform="translate(175.3337 41.2171)">engine under test</text>
+    <text style="font-size: 6.5px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #111111" transform="translate(166.990848 50.9554)">(pinned to cores 0..N-1)</text>
+    <text style="font-size: 6.5px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #111111" transform="translate(202.4712 59.0037)"/>
+    <text style="font-size: 6.5px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #111111" transform="translate(163.672802 70.432)">memory limit per service,</text>
+    <text style="font-size: 6.5px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #111111" transform="translate(189.718505 79.474597)">no swap</text>
+    <text style="font-size: 6.5px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #111111" transform="translate(202.4712 88.2186)"/>
+    <text style="font-size: 6.5px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #111111" transform="translate(157.511513 100.007447)">1, 2, 4 vCPU or unconstrained</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 6.5px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #111111" transform="translate(302.199342 35.7457)">sampler: docker stats every 2 s</text>
+    <text style="font-size: 6.5px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #111111" transform="translate(311.056608 45.484)">CPU, memory, OOM kills,</text>
+    <text style="font-size: 6.5px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #111111" transform="translate(337.378053 55.641753)">restarts</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 6.5px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #111111" transform="translate(304.078248 80.655753)">ramp 1, 2, 3, 4, 6 ... 512 users;</text>
+    <text style="font-size: 6.5px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #111111" transform="translate(306.908795 90.51085)">15 s warm-up + 60 s steady;</text>
+    <text style="font-size: 6.5px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #111111" transform="translate(319.435006 100.132353)">stop at &gt; 5% errors,</text>
+    <text style="font-size: 6.5px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; fill: #111111" transform="translate(310.221256 109.98745)">p95 &gt; 5x target or a crash</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 7px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #4d4d4d" x="126.1368" y="66.691" transform="rotate(-0 126.1368 66.691)">HTTP</text>
+   </g>
+   <g id="text_6">
+    <text style="font-style: italic; font-size: 6.8px; font-family: 'Noto Sans', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #4d4d4d" x="204.48" y="135.27" transform="rotate(-0 204.48 135.27)">Host: AMD Ryzen 5 3600 (6 cores / 12 threads), 31 GB RAM, NVMe. The engine and the load generator never share a physical core.</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p3429fbc28a">
+   <rect x="3.6" y="3.6" width="401.76" height="138.6"/>
+  </clipPath>
+ </defs>
+</svg>

@@ -1,0 +1,25 @@
+% Report styling (pandoc + XeLaTeX). Sans-serif throughout; compact tables; figures sized to
+% the text width; no automatic figure numbering (the report numbers figures itself).
+\usepackage{etoolbox}
+\renewcommand{\familydefault}{\sfdefault}
+\AtBeginEnvironment{longtable}{\footnotesize}
+\setlength{\LTleft}{0pt}
+\setlength{\LTright}{0pt}
+\usepackage{float}
+\floatplacement{figure}{H}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\makeatother
+\setkeys{Gin}{width=\maxwidth,keepaspectratio}
+\usepackage{caption}
+\captionsetup{labelformat=empty}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\color[HTML]{1f5f8b}}{}{0pt}{}
+\titleformat{\subsection}{\large\bfseries}{}{0pt}{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Self-Hosted Geocoding for Maine}
+\fancyhead[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\setlength{\headheight}{14pt}

@@ -135,7 +135,7 @@ def fig_accuracy_category(out: Path) -> str:
         vals = [rate(g[k]) for k in kinds] + [rate(rows)]
         bars = ax.bar(x + (i - (len(engines) - 1) / 2) * w, vals, w, color=ENGINE_COLOR[e], label=ENGINE_LABEL[e])
         bar_labels(ax, bars, fs=5.8)
-    ax.set_xticks(x, [KIND_LABEL[k] for k in kinds] + ["All 1,560"])
+    ax.set_xticks(x, [KIND_LABEL[k].replace(", ", ",\n") for k in kinds] + ["All\n1,560"])
     ax.set_ylim(0, 110)
     ax.set_ylabel("correct at rank 1 (%)")
     ax.axvline(len(kinds) - 0.5, color=NEUTRAL, lw=0.6, ls=":")
@@ -154,7 +154,7 @@ def fig_accuracy_quality(out: Path) -> str:
         bars = ax.bar(x + (i - (len(engines) - 1) / 2) * w, [rate(g[q]) for q in QTYPES], w, color=ENGINE_COLOR[e],
                       label=ENGINE_LABEL[e])  # fmt: skip
         bar_labels(ax, bars, fs=6)
-    ax.set_xticks(x, ["Exact", "Typo", "Variant (off-name)", "Miss (should fail)"])
+    ax.set_xticks(x, ["Exact", "Typo", "Variant\n(off-name)", "Miss\n(should fail)"])
     ax.set_ylim(0, 112)
     ax.set_ylabel("correct (%)")
     ax.legend(ncols=3, loc="upper center", bbox_to_anchor=(0.5, 1.14), fontsize=7)
@@ -175,7 +175,8 @@ def fig_fuzz(out: Path) -> str:
             ax.plot(levels, vals, marker="o", ms=2.5, color=ENGINE_COLOR[e], lw=1)
     axes[0].set_title("All 300 bases")
     axes[0].set_ylabel("correct (%)")
-    axes[0].legend(loc="lower left", fontsize=6.5)
+    fig.legend(*axes[0].get_legend_handles_labels(), ncols=2, loc="upper center", bbox_to_anchor=(0.5, 1.07),
+               fontsize=7)  # fmt: skip
     for ax, k in zip(axes[1:], kinds, strict=True):
         ax.set_title(KIND_LABEL[k], fontsize=8)
         ax.tick_params(axis="x", labelsize=6)
@@ -241,32 +242,25 @@ PGEO_SHOW = ["Pmin", "P1", "P2", "P4", "PM"]
 
 def fig_latency_3users(out: Path) -> str:
     pel, pg = pelias_runs(), pgeo_runs()
-    groups = [("Pelias", [(c, pel[c]) for c in PELIAS_SHOW if c in pel]),
-              ("pgeo pure SQL", [(c, pg[f"rest-{c}"]) for c in PGEO_SHOW if f"rest-{c}" in pg]),
-              ("pgeo FastAPI", [(c, pg[f"api-{c}"]) for c in PGEO_SHOW if f"api-{c}" in pg])]  # fmt: skip
-    colors = [PELIAS, PGEO_SQL, PGEO_API]
-    fig, axes = plt.subplots(1, 4, figsize=(7.4, 3.0), sharey=False)
+    rows = [(c, pel[c], PELIAS) for c in PELIAS_SHOW if c in pel]
+    rows += [(f"rest-{c}", pg[f"rest-{c}"], PGEO_SQL) for c in PGEO_SHOW if f"rest-{c}" in pg]
+    rows += [(f"api-{c}", pg[f"api-{c}"], PGEO_API) for c in PGEO_SHOW if f"api-{c}" in pg]
+    y = np.arange(len(rows))
+    fig, axes = plt.subplots(1, 4, figsize=(7.4, 3.6), sharey=True)
     for ax, ep in zip(axes, EPS, strict=True):
-        xs, labels, vals, cols = [], [], [], []
-        pos = 0
-        for (gname, items), col in zip(groups, colors, strict=True):
-            for cid, r in items:
-                xs.append(pos)
-                labels.append(cid)
-                vals.append(r["runs"]["validate"]["endpoints"].get(ep, {}).get("p(95)", np.nan))
-                cols.append(col)
-                pos += 1
-            pos += 0.6
-        ax.bar(xs, vals, color=cols, width=0.85)
-        ax.axhline(SLO[ep], color=SLO_RED, ls="--", lw=1)
-        ax.text(xs[-1] + 0.4, SLO[ep], f"target {SLO[ep]} ms", color=SLO_RED, fontsize=6, ha="right", va="bottom")
-        ax.set_title(EP_LABEL[ep])
-        ax.set_xticks(xs, labels, rotation=90, fontsize=5.8)
-        ax.set_ylim(0, SLO[ep] * 1.15)
-        ax.grid(axis="x", visible=False)
-    axes[0].set_ylabel("p95 latency at 3 users (ms)")
-    handles = [Line2D([], [], color=c, lw=6) for c in colors]
-    fig.legend(handles, [g[0] for g in groups], ncols=3, loc="upper center", bbox_to_anchor=(0.5, 1.06))
+        vals = [r["runs"]["validate"]["endpoints"].get(ep, {}).get("p(95)", np.nan) for _, r, _ in rows]
+        ax.barh(y, vals, color=[c for _, _, c in rows], height=0.72)
+        ax.axvline(SLO[ep], color=SLO_RED, ls="--", lw=1)
+        ax.set_xlim(0, SLO[ep] * 1.12)
+        ax.set_title(f"{EP_LABEL[ep]}\n(target {SLO[ep]} ms)", fontsize=8)
+        ax.grid(axis="y", visible=False)
+        ax.tick_params(axis="x", labelsize=6.5)
+    axes[0].set_yticks(y, [cid for cid, _, _ in rows], fontsize=6.8)
+    axes[0].invert_yaxis()
+    fig.supxlabel("p95 latency at 3 users (ms)", fontsize=8)
+    handles = [Line2D([], [], color=c, lw=6) for c in (PELIAS, PGEO_SQL, PGEO_API)]
+    fig.legend(handles, ["Pelias", "pgeo pure SQL (rest)", "pgeo FastAPI (api)"], ncols=3, loc="upper center",
+               bbox_to_anchor=(0.5, 1.05))  # fmt: skip
     fig.tight_layout()
     return save(fig, out, "fig_latency_3users")
 
