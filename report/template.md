@@ -432,8 +432,17 @@ first-result confidence when right and when wrong; the ambiguity penalty widened
 {{value:acc_pgeo_sql}}. Two things stand out. Most of the gain came from understanding how people
 write place names (abbreviations, the town as a location, ties), not from more powerful matching.
 And the calibration panel shows the ambiguity penalty pulling wrong-answer confidence down from 0.90
-to {{value:conf_wrong_pgeo_sql}} while right answers stayed high, which is what makes the confidence
-score usable.
+to {{value:conf_wrong_pgeo_sql}} while right answers barely moved (0.94 to
+{{value:conf_right_pgeo_sql}}), which is what makes the confidence score usable.
+
+Two failures behind these steps are worth naming, because they are the kind a test set catches and
+a demonstration does not. "Portlnd, ME" returned venues literally named "Portland, ME" rather than
+the city, which is why similarity is measured in the direction (query, name). And in autocomplete
+"st" expanded to "saint" as readily as to "street", so a half-typed street query returned saints'
+places until the expansion became context-dependent. One caveat belongs with the trajectory: the
+word_similarity round also corrected the test set (non-unique names such as "Mud Pond" were
+qualified with their town, for both engines), so the step before it and the step after it are not
+measured on an identical set.
 
 ```table tuning_changes
 | Step | Change | Problem solved | Effect |
