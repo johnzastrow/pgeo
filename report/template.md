@@ -94,9 +94,9 @@ product**. That principle motivated building pgeo alongside Pelias and measuring
 
 | Item | State at the start |
 |---|---|
-| Infrastructure | Proxmox VE 9.2 node (prox82); Debian 13 cloud-init template; a TLS-terminating Caddy on the "wharf" VM with public DNS-01 certificates; Forgejo for source control |
+| Infrastructure | Proxmox VE 9.2 node (prox82): AMD Ryzen 5 7600X (Zen 4, 6 cores / 12 threads), 46 GB RAM, guests configured `cpu=host` with ballooning off; Debian 13 cloud-init template; a TLS-terminating Caddy on the "wharf" VM with public DNS-01 certificates; Forgejo for source control |
 | Target host | VM 120 (`geocoder.example.org`), 4 vCPU and 10 GB RAM, NVMe storage, LAN only |
-| Build and test host | Workstation: {{value:host_cpu}}, {{value:host_threads}} threads, {{value:host_mem}} RAM |
+| Build and test host | Workstation: {{value:host_cpu}}, {{value:host_threads}} threads, {{value:host_mem}} RAM. Two CPU generations behind the Proxmox host (Zen 2 against Zen 4), so a VM core on the host is the faster core: the controlled results in Section 3 are, if anything, conservative for the production VM |
 | Reference recipe | The Pelias `docker` project for Texas, adapted for Maine |
 | Data | Open data only. No OpenAddresses API token is needed: the statewide Maine file is downloaded without one |
 | Where things run | Builds and all controlled tests run on the workstation; the service runs on VM 120 on the Proxmox host (192.0.2.10) and is reached through the wharf Caddy |
@@ -355,7 +355,9 @@ The final state is protected by:
 - **tuning profiles** (`pgeo-tune`): measured PostgreSQL and front-end settings per machine size,
   applied and verified against the running server;
 - an **accuracy gate** (`tests/accuracy/gate.py`) that fails a build if accuracy, any category,
-  calibration or any fuzz level regresses beyond small tolerances;
+  calibration or any fuzz level regresses beyond small tolerances. Replayed against results from
+  before the town-aware ranking step it reports five regressions, so it does catch the kind of
+  tuning this project could otherwise lose silently;
 - a **rebuild pipeline** (`scripts/pgeo_rebuild.sh`): build, profile, known-answer checks, gate.
 
 ## 3. Results
@@ -576,8 +578,8 @@ M0 and PM appear in the capacity tables).}}
 |---|---|---|
 | Containers | 6 (Elasticsearch, API, libpostal, placeholder, pip, interpolation) | 2 (PostgreSQL, PostgREST) or 2 (PostgreSQL, FastAPI) |
 | Memory floor (runs at all) | ~8.3 GB: libpostal model ~2 GB, interpolation ~2 GB, Elasticsearch heap 0.8-2 GB | ~1.6 GB (database 0.6 GB) |
-| Memory that grows with load | placeholder (OOM-killed at 0.4-0.5 GB under load; 0.8 GB needed) | PostgreSQL backends (a few MB each), page cache |
-| Disk (Maine) | ~1.4 GB Elasticsearch data plus ~0.9 GB helper databases; 435 MB snapshot to ship | 674 MB database; data directory ~2.6 GB with write-ahead log; dump to ship |
+| Memory that grows with load | placeholder, OOM-killed at 0.4-0.5 GB once load arrives (at 16 users on one vCPU, 12 on two, 128 on the four-vCPU configurations); 0.8 GB needed. pip is OOM-killed at 0.4 GB and the interpolation service crash-loops below 1.9 GB | PostgreSQL backends (a few MB each), page cache |
+| Disk (Maine) | ~1.4 GB Elasticsearch data plus ~0.9 GB helper databases; 435 MB snapshot to ship | 674 MB database; data directory ~2.6 GB, the difference being write-ahead log (`max_wal_size` 4 GB) and space still held by tables the build replaced; dump to ship. Size the disk for three to four times the database |
 | CPU scaling | add API workers with CPUs (1 worker on 4 vCPU halves capacity) | add connections with CPUs; front end workers for FastAPI |
 | Scaling out | Elasticsearch replicas and more API instances | read replicas behind PostgREST |
 | Updating data | rebuild index on a workstation, ship snapshot, restore | rebuild database on a workstation, ship dump, restore |
@@ -684,9 +686,18 @@ Before this work pgeo failed 28 contract checks; the fixes added `boundary.circl
 `boundary.gid`, `boundary.country` and `categories` filtering, the Pelias hierarchy identifiers
 (`locality_gid`, `county_gid`, ...), Pelias-shaped error responses from the pure-SQL path, and an
 edge rule that renames `boundary.circle.lat/lon` (which PostgREST would otherwise read as the focus
-point's `lat/lon`). Remaining differences (docs/PELIAS_COMPATIBILITY.md): OpenAddresses records
-have different identifiers in the two engines, `categories` uses the sources' own category names,
-and the pure-SQL path rejects parameters it does not know where Pelias ignores them.
+point's `lat/lon`). Pelias-shaped errors come out of SQL through PostgREST's
+`response.status` setting; a parameter PostgREST does not know produces a 404, which the edge
+turns into the Pelias-shaped 400 a client expects.
+
+Remaining differences (docs/PELIAS_COMPATIBILITY.md): OpenAddresses records carry different
+identifiers in the two engines (Pelias `openaddresses:address:us/me/statewide:<hash>` against
+pgeo's `openaddresses:address:<hash>`), so a gid saved from Pelias does not resolve in pgeo and
+clients that store gids must re-resolve them after a switch; `categories` uses the sources' own
+category names (Overture's `restaurant`, OpenStreetMap's `natural=water`) rather than the Pelias
+category taxonomy; and the pure-SQL path rejects parameters it does not know where Pelias ignores
+them. Pelias also names counties "Cumberland County" where pgeo stored "Cumberland"; pgeo now
+appends " County" on output so the two agree.
 
 ### 3.9 Features
 
@@ -916,10 +927,19 @@ scripts/build_report.sh --refresh          # refresh live snapshot and contract 
 scripts/build_report.sh --refresh-accuracy # also re-run the accuracy and fuzz sets
 ```
 
-Inputs: `report/inputs.toml`. Figures are published as PNG (used in this report) and SVG
-(editable) in `docs/report_figures/`. Load tests: `tests/load/run_matrix.py` (Pelias) and
-`tests/load/run_matrix_pgeo.py` (pgeo); accuracy: `tests/accuracy/`; compatibility:
+Inputs: `report/inputs.toml`. The build renders this document twice from one template, as
+Markdown (`docs/REPORT.md`) and, through pandoc and XeLaTeX, as PDF (`docs/REPORT.pdf`); figures
+are published as PNG at 300 dpi (used here) and SVG (editable) in `docs/report_figures/`. Load
+tests: `tests/load/run_matrix.py` (Pelias) and `tests/load/run_matrix_pgeo.py` (pgeo); the
+minimum-server search: `tests/load/find_floor.py`; accuracy: `tests/accuracy/`; compatibility:
 `tests/compat/`.
+
+The repository versions three components separately -- the project (`VERSION`), pgeo
+(`pgeo/pyproject.toml`) and the data preparation tools (`prep/pyproject.toml`) -- under semantic
+versioning, each with its own changelog and git tags (`vX.Y.Z`, `pgeo-vX.Y.Z`, `prep-vX.Y.Z`);
+the tags for work that predates this scheme were applied retroactively. A full rebuild run end
+to end against the accuracy gate scored 95.7% and passed, which is the check that a rebuilt
+system reproduces the results in this report.
 
 ## Appendix B. Questions asked during the project
 
@@ -960,6 +980,10 @@ answers it in full.
 answer them in full.}}
 
 ## Appendix C. pgeo storage
+
+The database is {{value:pgeo_db}} after the build drops the tables it only needed while loading;
+before that it is 971 MB. Trigram indexes on names dominate: they are what makes a misspelled
+query answerable, and they cost roughly as much space as the rows they index.
 
 {{table:pgeo_storage|pgeo tables (including their indexes).}}
 

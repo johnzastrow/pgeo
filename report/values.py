@@ -185,6 +185,10 @@ def data_values(v: dict, t: dict, snap: dict) -> None:
     for s in ["openaddresses", "openstreetmap", "overture", "gnis", "whosonfirst", "zcta"]:
         r = raw.get(names[s], {})
         rows.append([names[s], what[s], mb(r.get("bytes")), f"{ps.get(s, 0):,}", f"{gs.get(s, 0):,}"])
+    # the interpolation database is a Pelias-only input: no documents, but it is data to build and ship
+    interp = raw.get("TIGER / OA interpolation", {})
+    rows.append(["TIGER / OpenAddresses", "street ranges for the Pelias interpolation service",
+                 mb(interp.get("bytes")), "(not indexed)", "-"])
     rows.append(["Total", "", "", f"{sum(ps.values()):,}", f"{sum(gs.values()):,}"])
     t["sources"] = md_table(["Source", "Content", "Raw input", "Pelias documents", "pgeo features"], rows, "llrrr")
     layers = ["address", "venue", "street", "locality", "localadmin", "neighbourhood", "postalcode", "county", "region",
