@@ -121,6 +121,17 @@ BEGIN
     JOIN pgeo.feature f ON f.layer = 'address' AND f.street_norm = s.street_norm AND f.hn_int = hni
                         AND (f.locality_norm = s.locality_norm OR f.postal_locality_norm = s.locality_norm)
     WHERE lower(f.housenumber) = hn
+    UNION ALL
+    -- The same number on the best street names in *any* town. "streets" keeps 25 of ~150
+    -- (Church Street, town) pairs, so without this "21 Church St, Maine" looked unique.
+    SELECT f.id, n.st_sim,
+           CASE WHEN loc IS NULL THEN NULL
+                ELSE greatest(similarity(coalesce(f.locality_norm, ''), loc),
+                              similarity(coalesce(f.postal_locality_norm, ''), loc)) END
+    FROM (SELECT x.street_norm, max(x.st_sim) AS st_sim FROM streets x
+          GROUP BY x.street_norm ORDER BY 2 DESC LIMIT 3) n
+    JOIN pgeo.feature f ON f.layer = 'address' AND f.street_norm = n.street_norm AND f.hn_int = hni
+    WHERE lower(f.housenumber) = hn
   ),
   -- Interpolation on the best streets that lack the exact number: nearest known numbers
   -- below and above on the same street and town, position linearly between them.
