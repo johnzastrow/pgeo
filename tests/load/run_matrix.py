@@ -122,6 +122,23 @@ def es(method: str, path: str, body: dict | None = None, timeout: int = 3600) ->
     return json.loads(r.stdout or "{}")
 
 
+def wait_es(timeout: int = 600) -> None:
+    """Wait for Elasticsearch after a stack restart (the 2026-09-18 dataset run failed on
+    `GET /pelias` because the previous run had just recreated the stack)."""
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        try:
+            if es("GET", "/_cluster/health?wait_for_status=yellow&timeout=10s", timeout=20).get("status") in (
+                "yellow",
+                "green",
+            ):
+                return
+        except RuntimeError:
+            pass
+        time.sleep(5)
+    raise RuntimeError("Elasticsearch not ready")
+
+
 def index_name(dataset: str | None) -> str:
     return "pelias" if dataset in (None, "D5") else f"pelias_{dataset.lower()}"
 
@@ -504,6 +521,8 @@ def main() -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
     print(f"run {run_id} -> {out_dir}", flush=True)
     try:
+        if any(d is not None for d in datasets):
+            wait_es()
         for d in datasets:
             if d is not None:
                 print(

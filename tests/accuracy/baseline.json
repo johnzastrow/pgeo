@@ -1,0 +1,71 @@
+{
+ "conf_when_wrong": 0.686,
+ "correct": 0.958,
+ "fuzz": {
+  "F0": 0.98,
+  "F1": 0.87,
+  "F2": 0.747,
+  "F3": 0.46,
+  "F4": 0.45,
+  "F5": 0.493
+ },
+ "groups": {
+  "address/exact": [
+   367,
+   370
+  ],
+  "address/typo": [
+   82,
+   87
+  ],
+  "address/variant": [
+   89,
+   93
+  ],
+  "lake_summit/exact": [
+   79,
+   83
+  ],
+  "lake_summit/typo": [
+   21,
+   35
+  ],
+  "lake_summit/variant": [
+   30,
+   32
+  ],
+  "miss/miss": [
+   142,
+   150
+  ],
+  "reverse_address/exact": [
+   199,
+   200
+  ],
+  "town/exact": [
+   162,
+   167
+  ],
+  "town/typo": [
+   30,
+   34
+  ],
+  "town/variant": [
+   23,
+   24
+  ],
+  "venue/exact": [
+   172,
+   183
+  ],
+  "venue/typo": [
+   40,
+   42
+  ],
+  "zip/exact": [
+   59,
+   60
+  ]
+ },
+ "source": "pgeo/sql-rest"
+}

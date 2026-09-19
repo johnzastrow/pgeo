@@ -14,3 +14,7 @@ projects/*/pelias.json
 # pgeo local secrets
 pgeo/.env
 *.secrets
+# pgeo-tune output (generated from pgeo/tuning/profiles/*.toml)
+pgeo/docker/db/tuning/active.conf
+pgeo/tuning/active.vars
+pgeo/tuning/profiles/auto.toml

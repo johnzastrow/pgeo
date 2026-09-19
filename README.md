@@ -6,6 +6,9 @@ full plan, decisions, and security baseline, and
 [docs/DATA_PIPELINE.md](docs/DATA_PIPELINE.md) for the step-by-step data extraction and
 loading runbook (every step with manual commands, checks, and reference counts).
 
+Version: see [VERSION](VERSION) and [CHANGELOG.md](CHANGELOG.md) (semver; pgeo and
+pelias-prep are versioned separately in their own changelogs).
+
 ## Endpoint
 
 All clients use **https://geocoder.example.org** (LAN and tailnet only; TLS at the
@@ -22,13 +25,15 @@ curl 'https://geocoder.example.org/v1/search?text=389%20Congress%20St,%20Portlan
 |------|---------|
 | `projects/pelias_maine/` | Pelias project: compose file (pinned images), `pelias.template.json`, synonyms, test cases |
 | `prep/` | Python (uv) package `pelias-prep`: GNIS, Census ZCTA, Overture Places -> Pelias CSV |
+| `pgeo/` | PostgreSQL 18/PostGIS geocoder with a Pelias-compatible API (FastAPI, or pure SQL via PostgREST); `pgeo/tuning/profiles/` holds the measured tuning profiles |
 | `scripts/` | Fetch raw data, vendor the pelias CLI, render config, build, snapshot |
 | `infra/proxmox/` | Debian 13 cloud-init template + VM creation (run on the Proxmox host) |
 | `infra/wharf/` | Reference copy of the wharf Caddy site block |
 | `infra/ansible/` | Host config for any Debian host (Proxmox VM or VPS): base hardening, Docker, query stack, nginx edge |
 | `web/` | Demo page (MapLibre + self-hosted Protomaps basemap), reusable `pelias-client.js` and `<pelias-search>` element; `web/vendor/` holds pinned third-party assets |
 | `tests/web/` | Browser smoke test (Playwright) for the demo page |
-| `docs/` | `DATA_PIPELINE.md` (runbook), `PROJECT_LOG.md` (goals, questions, decisions, findings), `TESTING_GUIDE.md` (how the tests work, in plain language), `LOAD_TEST_PLAN.md`, `PGEO_DESIGN.md` |
+| `tests/accuracy/`, `tests/load/` | Accuracy set (1,560 cases), fuzz rounds, regression gate; capacity tests (k6) for both engines |
+| `docs/` | `DATA_PIPELINE.md` (runbook), `PROJECT_LOG.md` (goals, questions, decisions, findings), `TESTING_GUIDE.md` (how the tests work, in plain language), `LOAD_TEST_PLAN.md`, `PGEO_DESIGN.md`, `TUNING_REPORT.md` (all tuning and how to re-apply it), `PGEO_TUNING.md` (change log), `ACCURACY_RESULTS.md`, `HTTP_OPTIONS.md` |
 | `data/` | Raw downloads, processed CSVs, Pelias data dir (gitignored) |
 
 ## Build on the workstation
@@ -57,6 +62,15 @@ cd infra/ansible && ansible-playbook site.yml -e pelias_snapshot_name=<snapshot>
 Then add the `geocoder.example.org` site on the wharf Caddy, reverse-proxying to
 `<vm-ip>:8080`.
 
+## pgeo: rebuild with all tuning applied
+
+```bash
+scripts/pgeo_rebuild.sh --profile medium   # build, tuning profile, known-answer checks, accuracy gate
+uv run --project pgeo pgeo-tune list       # profiles (tiny, small, medium, large, workstation)
+```
+
+Details: [docs/TUNING_REPORT.md](docs/TUNING_REPORT.md), section 7.
+
 ## Demo page
 
 Live at https://geocoder.example.org/ : autocomplete with map-center bias and
@@ -67,6 +81,7 @@ reverse geocode, and a small CSV batch tool (forward or reverse, 250 rows, 4 req
 scripts/vendor_web.sh                 # re-vendor pinned libs/fonts/glyphs/sprites (integrity-checked)
 scripts/dev_web.sh                    # local preview at http://127.0.0.1:8088 (same CSP as prod)
 python3 tests/web/smoke_demo.py       # browser test (or pass https://geocoder.example.org)
+# The local preview adds an engine switch (Pelias / pgeo SQL / pgeo FastAPI); production has none.
 cd infra/ansible && ansible-playbook site.yml -e pelias_snapshot_name=<snapshot>   # deploy
 ```
 

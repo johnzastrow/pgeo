@@ -1,0 +1,23 @@
+# pgeo tuning profile: 2 vCPU, ~2.6 GB VM
+# Applied with:  uv run --project pgeo pgeo-tune apply medium
+# Same values as load-test config P2 in tests/load/run_matrix_pgeo.py (kept in sync by
+# pgeo/tests/test_tune.py); measured results: docs/LOAD_TEST_RESULTS.md.
+
+[machine]  # cpus / db_memory_gb 0 = unconstrained
+description = "2 vCPU, ~2.6 GB VM"
+cpus = 2
+db_memory_gb = 1.5
+load_test_config = "P2"
+
+[postgres]
+shared_buffers = "384MB"
+effective_cache_size = "1GB"
+work_mem = "16MB"
+max_parallel_workers_per_gather = 0  # base default; T2 (intra-query parallelism) not yet measured
+jit = "off"                          # base default; T4 not yet measured
+
+[frontend]
+api_workers = 2       # uvicorn processes (one per vCPU)
+api_pool_max = 3      # connections per API worker
+rest_pool = 6         # PostgREST connection pool
+parse_mode = "none"   # rule parser: best measured accuracy, no 2 GB libpostal model

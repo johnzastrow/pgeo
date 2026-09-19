@@ -113,7 +113,7 @@ AS $$
       'version', '0.2',
       'attribution', 'pgeo (PostgreSQL/PostGIS): OSM, OpenAddresses, WOF, USGS GNIS, US Census, Overture',
       'query', p_query,
-      'engine', jsonb_build_object('name', 'pgeo-sql', 'author', 'pelias_maine', 'version', '0.1.0'),
+      'engine', jsonb_build_object('name', 'pgeo-sql', 'author', 'pelias_maine', 'version', geocode.engine_version()),
       'timestamp', (extract(epoch FROM clock_timestamp()) * 1000)::bigint,
       'errors', to_jsonb(p_errors)),
     'type', 'FeatureCollection',

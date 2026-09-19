@@ -1,0 +1,128 @@
+# Changelog: pelias_maine
+
+All notable changes to this project. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
+versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## Versioning
+
+The repository holds three independently versioned components:
+
+| Component | Version source | Changelog | Git tag |
+|-----------|----------------|-----------|---------|
+| Project: Pelias deployment, infrastructure, demo page, test harnesses, docs | `VERSION` | this file | `vX.Y.Z` |
+| pgeo: PostgreSQL/PostGIS geocoder (Python package + SQL) | `pgeo/pyproject.toml` | [pgeo/CHANGELOG.md](pgeo/CHANGELOG.md) | `pgeo-vX.Y.Z` |
+| pelias-prep: data preparation tools | `prep/pyproject.toml` | [prep/CHANGELOG.md](prep/CHANGELOG.md) | `prep-vX.Y.Z` |
+
+Rules: PATCH for fixes, dependency bumps and documentation; MINOR for new features and
+backward-compatible changes; MAJOR for breaking changes (API behaviour, configuration or
+data layout that existing deployments must change for). All components are pre-1.0: the
+service is not yet in production use (API authorization, Phase 11, is still open). Every
+functional change bumps the affected component and adds a dated entry here or in the
+component changelog. Versions before 0.9.0 were assigned retroactively on 2026-09-18 to the
+commits where each milestone was complete.
+
+## [Unreleased]
+
+## [0.9.0] - 2026-09-18
+
+### Added
+- Tuning report (`docs/TUNING_REPORT.md`): every ranking, build and server tuning change,
+  its measured effect, and how to carry it into later builds.
+- `scripts/pgeo_rebuild.sh`: rebuild pgeo, apply a tuning profile, run known-answer checks
+  and the accuracy gate in one command.
+- Accuracy regression gate (`tests/accuracy/gate.py`) with a committed baseline
+  (`tests/accuracy/baseline.json`, pgeo pure SQL at 95.8%).
+- This changelog, `VERSION` and per-component changelogs; retroactive tags.
+
+### Changed
+- Requires pgeo 0.5.0 (tuning profiles, `pgeo-tune`).
+
+## [0.8.0] - 2026-09-18
+
+### Added
+- Demo page engine switch for side-by-side comparison (Pelias, pgeo pure SQL, pgeo
+  FastAPI). Development server only: it injects a `demo-engines` meta tag; production
+  serves the page unmodified and makes no extra request.
+- Browser smoke test exercises every engine when the switch is present.
+
+## [0.7.0] - 2026-09-18
+
+### Added
+- pgeo load-test runner (`tests/load/run_matrix_pgeo.py`): same k6 session, SLOs and ramp as
+  the Pelias runner; engines `rest`, `api`, `api-svc`; configurations Pmin, P1, P2, P4, PM.
+
+### Changed
+- Pelias standard memory profile: placeholder 0.5 GB -> 0.8 GB after OOM kills at 128 users
+  (configurations C3, C4, C4a).
+
+## [0.6.1] - 2026-09-18
+
+### Fixed
+- Accuracy test set: non-unique lake, summit and venue names are qualified with the nearest
+  town (a bare "Mud Pond" has no single right answer). Applies to both engines.
+
+## [0.6.0] - 2026-09-18
+
+### Added
+- Phase 13: pure-SQL API served through PostgREST with unchanged Pelias URLs; local edge
+  `scripts/dev/nginx.pgeo-rest.conf` maps `/v1/*` to `/rpc/v1_*` (GET only).
+- Research: HTTP options for "Postgres as the endpoint" (`docs/HTTP_OPTIONS.md`); guiding
+  principle G6 and the final comparison scorecard.
+
+## [0.5.0] - 2026-09-18
+
+### Added
+- Fuzz accuracy rounds: 1,800 cases in six levels of increasing corruption (F0-F5).
+- Phase 13 plan; pgeo tuning log (`docs/PGEO_TUNING.md`).
+
+## [0.4.1] - 2026-09-18
+
+### Added
+- Plain-language testing guide (`docs/TESTING_GUIDE.md`).
+
+## [0.4.0] - 2026-09-18
+
+### Added
+- Engine-independent accuracy harness: 1,560 cases with ground truth from the source data
+  (addresses, towns, lakes and summits, venues, ZIPs, reverse, misses; exact, typo and
+  variant query quality).
+
+## [0.3.0] - 2026-09-18
+
+### Added
+- Capacity test harness: k6 session model, configuration matrix with CPU pinning and memory
+  limits, ramp to the breaking point, Markdown/Mermaid/matplotlib report.
+- Data-volume dimension (subset indexes D1-D5).
+- Phase 11 plan: API authorization options.
+- pgeo design document (Phase 10).
+
+## [0.2.0] - 2026-09-18
+
+### Added
+- "Chart Room" demo page: MapLibre GL with a self-hosted Protomaps basemap, autocomplete
+  with focus biasing, structured search, reverse geocoding by map click, CSV batch
+  geocoder. Vendored libraries with sha512 pins; strict Content-Security-Policy.
+
+## [0.1.0] - 2026-09-18
+
+### Added
+- Pelias for Maine built and deployed on Proxmox VM 120 (`geocoder.example.org`,
+  LAN only, HTTPS via the wharf Caddy): Debian 13 template, Ansible roles (base, docker,
+  pelias runtime, nginx edge), pinned docker-compose project.
+- Data: OpenStreetMap, OpenAddresses, Who's On First, TIGER interpolation, USGS GNIS,
+  Census ZCTA and Overture places, with a documented manual pipeline
+  (`docs/DATA_PIPELINE.md`).
+- Project plan, environment facts and decision log.
+
+[Unreleased]: https://git.example.org/jcz/pelias_maine/compare/v0.9.0...HEAD
+[0.9.0]: https://git.example.org/jcz/pelias_maine/compare/v0.8.0...v0.9.0
+[0.8.0]: https://git.example.org/jcz/pelias_maine/compare/v0.7.0...v0.8.0
+[0.7.0]: https://git.example.org/jcz/pelias_maine/compare/v0.6.1...v0.7.0
+[0.6.1]: https://git.example.org/jcz/pelias_maine/compare/v0.6.0...v0.6.1
+[0.6.0]: https://git.example.org/jcz/pelias_maine/compare/v0.5.0...v0.6.0
+[0.5.0]: https://git.example.org/jcz/pelias_maine/compare/v0.4.1...v0.5.0
+[0.4.1]: https://git.example.org/jcz/pelias_maine/compare/v0.4.0...v0.4.1
+[0.4.0]: https://git.example.org/jcz/pelias_maine/compare/v0.3.0...v0.4.0
+[0.3.0]: https://git.example.org/jcz/pelias_maine/compare/v0.2.0...v0.3.0
+[0.2.0]: https://git.example.org/jcz/pelias_maine/compare/v0.1.0...v0.2.0
+[0.1.0]: https://git.example.org/jcz/pelias_maine/releases/tag/v0.1.0

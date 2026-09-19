@@ -11,6 +11,7 @@ import logging
 import math
 import time
 from contextlib import asynccontextmanager
+from importlib.metadata import PackageNotFoundError, version
 from typing import Annotated
 
 import asyncpg
@@ -28,6 +29,10 @@ LAYER_ALIASES = {"coarse": ["neighbourhood", "locality", "localadmin", "county",
 SOURCES = {"openaddresses", "openstreetmap", "whosonfirst", "gnis", "zcta", "overture", "interpolation"}
 SOURCE_ALIASES = {"oa": "openaddresses", "osm": "openstreetmap", "wof": "whosonfirst"}
 MAX_TEXT = 200
+try:
+    ENGINE_VERSION = version("pgeo")  # single source: pgeo/pyproject.toml
+except PackageNotFoundError:
+    ENGINE_VERSION = "0+unknown"
 ATTRIBUTION = "https://geocoder.example.org/ (pgeo: OSM, OpenAddresses, WOF, USGS GNIS, US Census, Overture)"
 
 
@@ -220,7 +225,7 @@ def envelope(query: dict, rows: list, errors: list[str] | None = None, parsed: P
         "version": "0.2",
         "attribution": ATTRIBUTION,
         "query": query,
-        "engine": {"name": "pgeo", "author": "pelias_maine", "version": "0.1.0"},
+        "engine": {"name": "pgeo", "author": "pelias_maine", "version": ENGINE_VERSION},
         "timestamp": int(time.time() * 1000),
     }
     if parsed is not None:

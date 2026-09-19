@@ -56,6 +56,12 @@ CREATE OR REPLACE FUNCTION geocode.hn_int(hn text) RETURNS integer
 LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT
 AS $$ SELECT nullif(substring(hn from '^\s*(\d{1,7})'), '')::integer $$;
 
+-- Engine version reported by the SQL API. The loader replaces this placeholder with the
+-- package version from pgeo/pyproject.toml after applying 050_api.sql (single source).
+CREATE OR REPLACE FUNCTION geocode.engine_version() RETURNS text
+LANGUAGE sql IMMUTABLE PARALLEL SAFE
+AS $$ SELECT '0+unknown'::text $$;
+
 -- Pelias reverse-geocoding confidence bands by distance.
 CREATE OR REPLACE FUNCTION geocode.distance_confidence(meters double precision) RETURNS real
 LANGUAGE sql IMMUTABLE PARALLEL SAFE

@@ -33,6 +33,19 @@ def log(msg: str) -> None:
     print(f"[{time.strftime('%H:%M:%S')}] {msg}", flush=True)
 
 
+async def stamp_version(con: asyncpg.Connection) -> None:
+    """geocode.engine_version() returns the package version (single source: pyproject.toml)."""
+    from importlib.metadata import version
+
+    v = version("pgeo")
+    if not re.fullmatch(r"\d+\.\d+\.\d+", v):  # validated before it becomes SQL text
+        raise ValueError(f"unexpected package version {v!r}")
+    await con.execute(
+        "CREATE OR REPLACE FUNCTION geocode.engine_version() RETURNS text "
+        f"LANGUAGE sql IMMUTABLE PARALLEL SAFE AS $$ SELECT '{v}'::text $$"
+    )
+
+
 async def run_sql(con: asyncpg.Connection, name: str) -> None:
     await con.execute((SQL_DIR / name).read_text())
 
@@ -128,11 +141,18 @@ async def build(settings: Settings, selected: list[str]) -> None:
             await con.execute("DROP SCHEMA IF EXISTS pgeo_old CASCADE")
             await run_sql(con, "040_functions.sql")
             await run_sql(con, "050_api.sql")
+            await stamp_version(con)
             await con.execute(
                 "GRANT USAGE ON SCHEMA pgeo, geocode, geocode_api TO pgeo_api; "
                 "GRANT SELECT ON ALL TABLES IN SCHEMA pgeo TO pgeo_api; "
                 "GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA geocode, geocode_api TO pgeo_api"
             )
+        # VACUUM sets the visibility map, so index-only scans skip the heap from the first query
+        # of a fresh build (ANALYZE ran in 030; VACUUM cannot run inside the swap transaction).
+        for (stmt,) in await con.fetch(
+            "SELECT format('VACUUM (ANALYZE) %I.%I', schemaname, tablename) FROM pg_tables WHERE schemaname = 'pgeo'"
+        ):
+            await con.execute(stmt)
         log(f"build complete in {time.time() - t0:.0f}s: {json.dumps(info['features_by_layer'])}")
     finally:
         await con.close()
@@ -145,6 +165,7 @@ async def functions_only(settings: Settings) -> None:
             await run_sql(con, "010_base.sql")
             await run_sql(con, "040_functions.sql")
             await run_sql(con, "050_api.sql")
+            await stamp_version(con)
             await con.execute(
                 "GRANT USAGE ON SCHEMA geocode, geocode_api TO pgeo_api; "
                 "GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA geocode, geocode_api TO pgeo_api"

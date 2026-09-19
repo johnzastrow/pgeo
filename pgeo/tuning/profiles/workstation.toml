@@ -1,0 +1,23 @@
+# pgeo tuning profile: Development workstation, no limits
+# Applied with:  uv run --project pgeo pgeo-tune apply workstation
+# Same values as load-test config PM in tests/load/run_matrix_pgeo.py (kept in sync by
+# pgeo/tests/test_tune.py); measured results: docs/LOAD_TEST_RESULTS.md.
+
+[machine]  # cpus / db_memory_gb 0 = unconstrained
+description = "Development workstation, no limits"
+cpus = 0
+db_memory_gb = 0
+load_test_config = "PM"
+
+[postgres]
+shared_buffers = "1GB"
+effective_cache_size = "4GB"
+work_mem = "32MB"
+max_parallel_workers_per_gather = 0  # base default; T2 (intra-query parallelism) not yet measured
+jit = "off"                          # base default; T4 not yet measured
+
+[frontend]
+api_workers = 4       # uvicorn processes (one per vCPU)
+api_pool_max = 4      # connections per API worker
+rest_pool = 16         # PostgREST connection pool
+parse_mode = "none"   # rule parser: best measured accuracy, no 2 GB libpostal model
