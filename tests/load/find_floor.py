@@ -27,12 +27,12 @@ OS_GB = rm.OS_RESERVE_GB
 
 # pgeo pure SQL: db and PostgREST memory (GB), shared_buffers follows the db limit (~25%)
 PGEO_START = {"cpus": 1.0, "db": 0.6, "rest": 0.25}
-PGEO_STEPS = [("cpus", [0.5, 0.25]), ("db", [0.45, 0.35, 0.25]), ("rest", [0.15, 0.1])]
+PGEO_STEPS = [("cpus", [0.5, 0.25, 0.15, 0.1]), ("db", [0.45, 0.35, 0.25]), ("rest", [0.15, 0.1])]
 
 # Pelias: per-service memory (GB); Elasticsearch heap is 60% of its limit
 PELIAS_START = {"cpus": 1.0, "es": 1.5, "api": 0.42, "libpostal": 2.0, "interpolation": 2.1, "pip": 0.7,
                 "placeholder": 0.8}  # fmt: skip
-PELIAS_STEPS = [("cpus", [0.5, 0.25]), ("es", [1.2, 1.0, 0.8]), ("placeholder", [0.6, 0.45, 0.35]),
+PELIAS_STEPS = [("cpus", [0.5, 0.25, 0.15]), ("es", [1.2, 1.0, 0.8]), ("placeholder", [0.6, 0.45, 0.35]),
                 ("pip", [0.55, 0.45]), ("interpolation", [1.8, 1.5, 1.2]), ("libpostal", [1.8, 1.6]),
                 ("api", [0.3, 0.22])]  # fmt: skip
 
