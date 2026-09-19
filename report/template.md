@@ -590,7 +590,7 @@ M0 and PM appear in the capacity tables).}}
 | Resource | Pelias | pgeo |
 |---|---|---|
 | Containers | 6 (Elasticsearch, API, libpostal, placeholder, pip, interpolation) | 2 (PostgreSQL, PostgREST) or 2 (PostgreSQL, FastAPI) |
-| Memory floor (runs at all) | ~8.3 GB: libpostal model ~2 GB, interpolation ~2 GB, Elasticsearch heap 0.8-2 GB | ~1.6 GB (database 0.6 GB) |
+| Memory in the standard profile | 8.3 GB: libpostal model ~2 GB, interpolation ~2 GB, Elasticsearch heap 0.8-2 GB. Section 3.12 shrinks each service to find the real floor | 1.6 GB (database 0.6 GB); floor in Section 3.12 |
 | Memory that grows with load | placeholder, OOM-killed at 0.4-0.5 GB once load arrives (at 16 users on one vCPU, 12 on two, 128 on the four-vCPU configurations); 0.8 GB needed. pip is OOM-killed at 0.4 GB and the interpolation service crash-loops below 1.9 GB | PostgreSQL backends (a few MB each), page cache |
 | Disk (Maine) | ~1.4 GB Elasticsearch data plus ~0.9 GB helper databases; 435 MB snapshot to ship | 654 MB of tables and indexes; data directory ~2.6 GB, the difference being write-ahead log (`max_wal_size` 4 GB) and space still held by tables the build replaced; dump to ship. Size the disk for three to four times the database |
 | CPU scaling | add API workers with CPUs (1 worker on 4 vCPU halves capacity) | add connections with CPUs; front end workers for FastAPI |
@@ -869,7 +869,7 @@ caches aggressively, and Pelias parallelizes across services. pgeo's PL/pgSQL ru
 candidate queries and scoring steps per request in an interpreted language inside one backend.
 
 **Is there still a reason to use Pelias?** Yes, in four situations: (1) many concurrent users per
-server, where Pelias's four-fold throughput per CPU saves hardware once its ~8 GB memory floor is
+server, where Pelias's four-fold throughput per CPU saves hardware once its {{value:floor_pelias_gb}} memory floor is
 paid; (2) coverage beyond one or two states, for which Pelias is designed and pgeo is untested;
 (3) international addresses and multilingual names (libpostal, Pelias language support); (4) when a
 maintained upstream project matters more than accuracy, since pgeo is this project's own code. For
