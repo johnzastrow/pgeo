@@ -60,7 +60,10 @@ RETURNS SETOF geocode.hit
 LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
 DECLARE
-  qf    text := nullif(geocode.norm(coalesce(p_text, '')), '');      -- full query
+  -- full query without a trailing state/country ("portlnd me"): venues literally named
+  -- "Portland, ME" otherwise match the state word better than the town does
+  qf    text := nullif(regexp_replace(geocode.norm(coalesce(p_text, '')),
+                                      '(\s+(me|maine))?(\s+(us|usa|united states))?$', ''), '');
   qn    text := nullif(geocode.norm(p_name), '');                     -- parser's name part
   st    text := nullif(geocode.norm(p_street), '');
   loc   text := nullif(geocode.norm(p_locality), '');
@@ -147,16 +150,23 @@ BEGIN
              -- word_similarity(query, name): how well the query appears inside the name ("jetport"
              -- in "portland international jetport"). The reverse direction let one-word generic
              -- names ("Mountain", "Hill") match any query that contains that word.
-             greatest(similarity(f.name_norm, q.txt), 0.9 * word_similarity(q.txt, f.name_norm))::double precision AS nsim
+             -- The small whole-string term breaks ties among names that all contain the query
+             -- ("Portlnd" in Portland, New Portland, Portland Glass): the closest name wins.
+             (greatest(similarity(f.name_norm, q.txt), 0.9 * word_similarity(q.txt, f.name_norm))
+              + 0.1 * similarity(f.name_norm, q.txt))::double precision AS nsim
       FROM pgeo.feature f
       WHERE f.layer <> 'address' AND f.name_norm % q.txt
-      ORDER BY similarity(f.name_norm, q.txt) DESC
+      -- ties (hundreds of "Main Street"s) are broken by distance to the focus point, so the
+      -- nearby ones survive the candidate limit
+      ORDER BY similarity(f.name_norm, q.txt) DESC,
+               CASE WHEN focus IS NULL THEN 0 ELSE f.geom <-> focus END
       LIMIT 60) n
     GROUP BY n.id
   ),
   names_exact AS (
     SELECT f.id, 1.0::double precision AS nsim FROM pgeo.feature f
     WHERE cardinality(targets) > 0 AND f.layer <> 'address' AND f.name_norm = ANY (targets)
+    ORDER BY CASE WHEN focus IS NULL THEN 0 ELSE f.geom <-> focus END
     LIMIT 40
   ),
   town AS (  -- the town itself, for fallbacks when nothing finer matches
@@ -183,7 +193,7 @@ BEGIN
     SELECT sf.id, 'fallback', 'centroid', 0.2 + 0.3 * sf.st_sim + 0.1, sf.loc_sim, NULL, NULL FROM street_fb sf
     UNION ALL
     SELECT n.id, CASE WHEN n.nsim >= 0.99 THEN 'exact' ELSE 'fallback' END, 'centroid',
-           n.nsim, NULL, NULL, NULL
+           least(n.nsim, 1.0), NULL, NULL, NULL
     FROM (SELECT * FROM names UNION ALL SELECT * FROM names_exact) n
     UNION ALL
     SELECT t.id, 'fallback', 'centroid', 0.45, NULL, NULL, NULL FROM town t
@@ -245,7 +255,8 @@ BEGIN
   ),
   -- Ambiguity: when several distinct places (~1 km grid) tie with the top confidence, the
   -- query cannot say which one is meant ("Mud Pond"). Their confidence is scaled down so it
-  -- separates right answers from lucky guesses (calibration finding F28).
+  -- separates right answers from lucky guesses (calibration finding F28). Lower-ranked hits
+  -- are capped at the reduced top confidence so confidence never rises down the list.
   top AS (SELECT max((h).confidence) AS c FROM hits),
   amb AS (
     SELECT count(DISTINCT (round((h).lon::numeric, 2), round((h).lat::numeric, 2))) AS n
@@ -255,9 +266,11 @@ BEGIN
   FROM hits CROSS JOIN top CROSS JOIN amb
   CROSS JOIN LATERAL (
     SELECT geocode.set_conf(hits.h,
-             CASE WHEN (hits.h).confidence >= top.c - 0.02 AND amb.n > 1
+             CASE WHEN amb.n <= 1 THEN (hits.h).confidence
+                  WHEN (hits.h).confidence >= top.c - 0.02
                   THEN ((hits.h).confidence / (1 + 0.35 * (least(amb.n, 6) - 1)))::real
-                  ELSE (hits.h).confidence END) AS h2
+                  ELSE least((hits.h).confidence, top.c / (1 + 0.35 * (least(amb.n, 6) - 1)))::real
+             END) AS h2
   ) y
   ORDER BY (y.h2).score DESC
   LIMIT lim;
@@ -342,13 +355,14 @@ BEGIN
     PERFORM set_config('pg_trgm.similarity_threshold', '0.35', true);
     RETURN QUERY
     SELECT (z.h).*
-    FROM pgeo.feature f
+    FROM (SELECT DISTINCT ON (x.label) x.* FROM pgeo.feature x   -- one row per label (locality/localadmin)
+          WHERE x.layer <> 'address' AND x.name_norm % q AND NOT (x.tokens @@ tsq)
+          ORDER BY x.label, CASE x.layer WHEN 'locality' THEN 0 ELSE 1 END, x.importance DESC) f
     CROSS JOIN LATERAL (SELECT geocode.to_hit(f, NULL, 'fallback', 'centroid',
              CASE WHEN focus IS NULL THEN NULL ELSE ST_Distance(f.geom::geography, focus::geography) / 1000 END,
              (similarity(f.name_norm, q) + 0.2 * f.importance
               + 0.2 * geocode.focus_boost(f.geom, focus))::real) AS h) z
-    WHERE f.layer <> 'address' AND f.name_norm % q AND NOT (f.tokens @@ tsq)
-      AND geocode.keep(f, p_layers, p_sources, rect)
+    WHERE geocode.keep(f, p_layers, p_sources, rect)
     ORDER BY (z.h).score DESC
     LIMIT lim - found;
   END IF;

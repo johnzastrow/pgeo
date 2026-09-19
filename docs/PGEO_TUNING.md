@@ -22,9 +22,10 @@ does not reduce accuracy; speed gains that cost accuracy are rejected. Design:
 
 Open tuning items noted during testing:
 
-- Focus-point weight too weak: "main st" near Bangor ranks Ellsworth and Belfast first.
-- "Portlnd, ME" ranks Overture venues literally named "Portland, ME" above the town.
-- Autocomplete repeats Portland as locality and localadmin in the typo fallback branch.
+- ~~Focus-point weight too weak~~: fixed 2026-09-18 (see log); the weight was fine, the nearby
+  candidates never survived the candidate limit.
+- ~~"Portlnd, ME" ranks Overture venues literally named "Portland, ME" above the town~~: fixed.
+- ~~Autocomplete repeats Portland as locality and localadmin in the typo fallback branch~~: fixed.
 
 ## Log
 
@@ -45,3 +46,4 @@ Open items from this round:
 - ~~Confidence calibration~~: done (next row).
 - Venues 80% and lakes/summits 77%: next failure analysis.
 | 2026-09-18 | Ambiguity-aware confidence: when several distinct places (~1 km grid) tie with the top confidence, their confidence is divided by 1 + 0.35 x (places - 1) | Wrong answers were mostly ties (70 of 85 wrong exact matches had 2+ equal candidates; 746 of 887 right ones were unique) | rule parser 92.7% -> 92.9%, misses 93% -> 95%; confidence right/wrong 0.94/0.90 -> **0.91/0.70** (Pelias 0.98/0.87) | none |
+| 2026-09-18 | Name targets drop a trailing state/country ("portlnd me" -> "portlnd"); name candidates tie-broken by distance to the focus point before the 40/60-row limits; +0.1 x whole-string similarity as a tie-breaker over word_similarity; lower-ranked hits capped at the reduced top confidence; autocomplete typo fallback deduped by label | "Portlnd, ME" returned Overture venues named "Portland, ME" and no town (the state word matched them); "main st" near Bangor: hundreds of exact "Main Street" rows were cut to an arbitrary 40 before the focus boost applied, so Bangor's never competed; every name containing "portland" tied on word_similarity | pure SQL 92.9% -> **93.1%** (venue typos 32 -> 34 of 42, lakes exact 70 -> 71; 4 fixed, 1 lost); fuzz F0-F5 94.3 / 85.0 / 74.0 / 46.0 / 44.7 / 49.0 (was 94.0 / 83.7 / 73.3 / 46.3 / 44.3 / 48.7); calibration 0.91 / 0.71 | p50 40 ms (unchanged) |
