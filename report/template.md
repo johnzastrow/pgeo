@@ -31,7 +31,7 @@ character errors per query, where Pelias answers {{value:fuzz_pelias_F2}}.
 ({{value:lim_C1}} against {{value:lim_rest_P1}} on one vCPU, {{value:lim_C4}} against
 {{value:lim_rest_P4}} on four). pgeo is the smaller one: it meets every target for the 3-user goal
 of this project in a {{value:budget_rest_Pmin}} memory budget on one vCPU, and holds
-{{value:lim_rest_Pmin}} users there, where Pelias needs about {{value:budget_C1}} to run at all. A
+{{value:lim_rest_Pmin}} users there, where the same test needs about {{value:budget_C1}} for Pelias in its standard profile and {{value:floor_pelias_gb}} once every service is squeezed to its floor (Section 3.12). A
 single missing index had made pgeo's reverse geocoding 20 to 45 times slower; fixing it raised pgeo's
 one-vCPU capacity from {{value:before_lim_rest_P1}} to {{value:lim_rest_P1}} users.
 **The smallest server.** Shrinking one resource at a time until the three-user load stopped
