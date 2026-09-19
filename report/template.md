@@ -648,8 +648,16 @@ Measured against these plans: pgeo's {{value:floor_pgeo_gb}} floor is {{value:fl
 of containers plus the 0.8 GB this study reserves for the operating system, so a 1 GB plan works
 only with a minimal OS and nothing else resident, while a 2 GB plan leaves real headroom; Pelias's
 {{value:floor_pelias_gb}} floor needs the 8 GB tier, four to ten times the monthly price for the
-same three users depending on which plan pgeo goes on. The 1 GB case is the one worth confirming on a real machine rather than a
-container limit, which Section 3.12 does.
+same three users depending on which plan pgeo goes on.
+
+The 1 GB case needs a caveat the table cannot carry. `pgeo-tune auto --cpus 1 --mem-gb 1` refuses
+to produce a configuration at all: its sizing rule reserves 0.8 GB for the operating system and
+0.35 GB for the HTTP front end, which leaves the database less than nothing. The floor search says
+the containers themselves need only {{value:floor_pgeo_ct_gb}}, so a 1 GB plan can work -- but only
+on a minimal operating system, with the settings written by hand rather than by the tool, and with
+nothing else resident on the machine. That is the difference between a configuration this project
+supports and one it merely measured, and it is why the 1 GB case is confirmed on a real machine
+rather than a container limit in Section 3.12.
 <!-- PENDING: replace the 1 GB expectation above with the temporary-VM result -->
 
 **Data volume.** For Pelias, capacity fell from {{value:ds_D1}} users with admin areas only to
