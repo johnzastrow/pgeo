@@ -108,3 +108,10 @@ and observations made during the work (marked "session").
       operations and tuning tooling.
 - [ ] Web UI (demo page) features, including the engine switch and the Address tab.
 - [ ] Report build pipeline: re-runnable (scripts/build_report.sh), Markdown and PDF.
+
+## Headline conclusion requested (user, 2026-09-19)
+
+- [ ] The smallest server that supports 3 concurrent users, per platform: found by the floor
+      search (tests/load/find_floor.py: shrink CPU quota and each service's memory at 3 users)
+      and confirmed on a temporary Proxmox VM of that size.
+- [ ] On that minimum VM, how many users each platform scales to (full ramp on the VM).
