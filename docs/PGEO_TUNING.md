@@ -20,6 +20,12 @@ does not reduce accuracy; speed gains that cost accuracy are rejected. Design:
 | T9 | Admin hierarchy | WOF vs Overture divisions | reverse and town accuracy |
 | T10 | Connections | prepared statements, statement cache, PgBouncer transaction pooling | p95 at high concurrency |
 
+Open tuning items noted during testing:
+
+- Focus-point weight too weak: "main st" near Bangor ranks Ellsworth and Belfast first.
+- "Portlnd, ME" ranks Overture venues literally named "Portland, ME" above the town.
+- Autocomplete repeats Portland as locality and localadmin in the typo fallback branch.
+
 ## Log
 
 | Date | Change | Why | Accuracy before -> after | Speed effect |

@@ -185,6 +185,8 @@ confidence scores; easy loading and updates.
 | F20 | Complete misses mostly behave (gibberish, out-of-state, offshore reverse -> no result; impossible house numbers -> the street at 0.8), but invented names sharing a common word get confident false positives ("Trumyux Brewing Co" -> Belleflower Brewing, confidence 1.0) | Confidence is not a reliable "did it really match" signal; Phase 10 target |
 | F21 | Memory floor is set by fixed-size services: pip OOM-killed at 0.4 GB under reverse load, interpolation crash-looped at 1.9 GB; ES heap is the only big adjustable | Profiles raised; see LOAD_TEST_PLAN.md |
 | F22 | Pelias API runs one Node.js worker by default (`CPUS` env enables more), so extra vCPUs do not help the API itself unless `CPUS` is set | Tested as C4 vs C4a |
+| F23 | PostgREST keeps only the last segment of dotted query keys; naming the SQL API arguments after those segments makes Pelias URLs work through PostgREST with only a path rewrite | Phase 13 edge = path mapping only |
+| F24 | Stricter address dedupe (number + street + town, preferring OA) reduced pgeo addresses from 754,490 to 702,701 | Removes OSM copies of OA points that sat >100 m away |
 | F11 | The whole Maine build is small: ~15 min, 1,649,644 documents, 435 MB snapshot | A VPS deploy is cheap to ship |
 
 ---
