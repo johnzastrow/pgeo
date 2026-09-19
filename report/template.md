@@ -601,9 +601,10 @@ M0 and PM appear in the capacity tables).}}
 {{table:ops_requirements|Operating requirements of each platform (Maine data).}}
 
 {{callout:impact|The memory floors put the two platforms in different price classes: pgeo fits the
-cheapest shared-CPU plans most providers sell, while Pelias needs a server roughly ten times the
-price for the same three users. Over a year that is the difference between about $60 and about $580
-at advertised rates.}}
+cheapest shared-CPU plans most providers sell, while Pelias needs a mid-range server for the same
+three users. At advertised rates that is about $60 a year on a 1 GB plan, or $145 on a 2 GB plan
+with room to spare, against about $580 for the 8 GB plan Pelias needs -- a factor of four to ten,
+depending on how tight a plan you are willing to run pgeo on.}}
 
 **Build.** Both engines are built on a workstation and shipped to the query host, so the query host
 never needs the raw data or the build tools. {{ref:table:build_resources}} gives the measured
@@ -646,8 +647,8 @@ Sources: [Linode/Akamai](https://techdocs.akamai.com/cloud-computing/docs/shared
 Measured against these plans: pgeo's {{value:floor_pgeo_gb}} floor is {{value:floor_pgeo_ct_gb}}
 of containers plus the 0.8 GB this study reserves for the operating system, so a 1 GB plan works
 only with a minimal OS and nothing else resident, while a 2 GB plan leaves real headroom; Pelias's
-{{value:floor_pelias_gb}} floor needs the 8 GB tier, roughly ten times the monthly price for the
-same three users. The 1 GB case is the one worth confirming on a real machine rather than a
+{{value:floor_pelias_gb}} floor needs the 8 GB tier, four to ten times the monthly price for the
+same three users depending on which plan pgeo goes on. The 1 GB case is the one worth confirming on a real machine rather than a
 container limit, which Section 3.12 does.
 <!-- PENDING: replace the 1 GB expectation above with the temporary-VM result -->
 
@@ -1028,7 +1029,7 @@ answers it in full.
 | What does each platform need to build and to run, and what loads and data can it support? | Sizing guide by load; operating and build requirements | 3.5 |
 | What features does each platform provide? | Feature matrix and parity table | 3.9, 3.10 |
 | How small can a server be for 3 concurrent users, and how many users does it then scale to? | See Section 3.12 | 3.12 |
-| What do the measured floors mean in shared-CPU VPS plans (Linode, DigitalOcean, Vultr, Hetzner and others)? | pgeo fits the cheapest 1-2 GB plans; Pelias needs an 8 GB plan, roughly ten times the price | 3.5 (Table 24), 3.12 |
+| What do the measured floors mean in shared-CPU VPS plans (Linode, DigitalOcean, Vultr, Hetzner and others)? | pgeo fits the cheapest 1-2 GB plans; Pelias needs an 8 GB plan, four to ten times the price | 3.5 (Table 24), 3.12 |
 ```
 
 {{table:questions|Questions asked during the project, with short answers and the sections that
