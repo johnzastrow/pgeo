@@ -76,6 +76,11 @@ and observations made during the work (marked "session").
 
 ## Operations
 
+- [ ] Proxmox host prox82: AMD Ryzen 5 7600X (Zen 4, 6 cores / 12 threads, boost 5.4 GHz), 46 GB RAM;
+      VM 120 uses cpu=host, no ballooning. Workstation (all load tests): Ryzen 5 3600 (Zen 2, 4.2 GHz).
+      Expect the VM to outperform the workstation per vCPU; VM validation run gives the factor. (session)
+- [ ] Reverse index fix effect: rest-Pmin 4 -> 24+ users (post-fix run in progress at time of note). (session)
+
 - [ ] pgeo-tune profiles, accuracy gate, pgeo_rebuild.sh (verified end to end: 95.7%, gate passed).
 - [ ] Semver per component; retroactive tags.
 - [ ] Build times: Pelias ~15 min, pgeo ~13 min (single core).

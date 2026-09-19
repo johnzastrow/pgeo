@@ -2,9 +2,14 @@
   hosts: pelias
   become: true
   roles:
-    - base
-    - docker
-    - pelias_runtime
+    - role: base
+      tags: [base]
+    - role: docker
+      tags: [docker]
+    - role: pelias_runtime
+      tags: [pelias]
     - role: pgeo_runtime
+      tags: [pgeo]
       when: pgeo_enabled | bool
-    - edge
+    - role: edge
+      tags: [edge]
