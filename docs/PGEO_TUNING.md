@@ -37,3 +37,11 @@ Open tuning items noted during testing:
 | 2026-09-18 | `norm()` expands abbreviations instead of shortening ("rd" -> "road", "mt" -> "mount", "st" -> "street"/"saint") | Typos in spelled-out words failed: sim("mtn rd", "moountain rd") = 0.25 vs sim("mountain road", "moountain road") = 0.81 | combined with the next row | |
 | 2026-09-18 | Towns matched against WOF town and postal city; ZIP is only a fallback when an address is present; continuous town-agreement penalty; addresses deduped on number + street + town preferring OpenAddresses; rule-parser street fallback when libpostal finds a number but no street | Failure analysis of the baseline: structured search 0% at rank 1 (ZIP outranked the address), duplicate OA/OSM addresses, libpostal misreading misspelled streets as venue names | overall 80.3% -> **90.4%** (service), rule parser 78.1% -> **89.0%**; addresses 68% -> 98%; structured 0% -> 100%; typos 69% -> 73% | p50 unchanged (~50-80 ms single core) |
 | 2026-09-18 | Fuzz rounds baseline (service / rule parser) | New test | F0 91/91, F1 75/74, F2 68/67, F3 47/39, F4 35/38, F5 41/45 (% correct) | |
+| 2026-09-18 | word_similarity direction flipped to (query, name); accuracy set qualifies non-unique lake/summit/venue names with the nearest town (applies to both engines) | Generic one-word names ("Mountain", "Hill") matched any query; bare "Mud Pond" has no single right answer | service 92.4%, rule parser **92.7%**, pure SQL via PostgREST **92.7%** (identical per category to FastAPI + rule parser); lakes/summits 59% -> 77% | |
+| 2026-09-18 | Comparison with Pelias on the same sets | | Pelias 75.5% overall (typos 30%, misses 41%, lakes 37%); fuzz F1 34% / F2 10% vs pgeo 84% / 73% | Latency not yet comparable (see load tests) |
+
+Open items from this round:
+
+- **Confidence calibration**: pgeo's mean confidence is 0.94 when right vs 0.90 when wrong
+  (Pelias 0.98 vs 0.87); confidence should separate right from wrong much better.
+- Venues 80% and lakes/summits 77%: next failure analysis.
