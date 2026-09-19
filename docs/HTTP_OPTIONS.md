@@ -111,6 +111,17 @@ servers, so they do not apply.
 4. **Kept for comparison: FastAPI** (Phase 10), so the report can show what a pure-SQL
    design gains or loses against an application layer on accuracy, latency and memory.
 
+## 7. Result of the first test (2026-09-18)
+
+PostgREST v16.3 keeps only the **last segment** of a dotted query key (`focus.point.lat`
+arrives as `lat`, `boundary.rect.min_lon` as `min_lon`). Within each Pelias endpoint these
+last segments do not collide, so the SQL API names its arguments `lat`, `lon`, `min_lon`,
+..., `radius`, and Pelias URLs pass through with **no parameter rewriting**; the edge only
+maps paths (`/v1/search` -> `/rpc/v1_search`, `scripts/dev/nginx.pgeo-rest.conf`).
+Verified: search with focus and bounding box, reverse, structured, autocomplete, place;
+invalid input returns HTTP 400 with the SQL validation message; tables are not reachable
+(only schema `geocode_api` is exposed).
+
 ## Sources
 
 - PostgREST, functions as RPC: <https://docs.postgrest.org/en/stable/references/api/functions.html>

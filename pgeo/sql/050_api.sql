@@ -3,7 +3,10 @@
 -- geocode_api.v1_*       Pelias-compatible endpoints returning complete GeoJSON (jsonb)
 -- Exposed over HTTP by a logic-free gateway (PostgREST); only schema geocode_api is exposed.
 
-CREATE SCHEMA IF NOT EXISTS geocode_api;
+-- Recreated on every apply: holds only these functions (argument names can change, which
+-- CREATE OR REPLACE cannot do); the loader re-grants access afterwards.
+DROP SCHEMA IF EXISTS geocode_api CASCADE;
+CREATE SCHEMA geocode_api;
 
 -- ---------------------------------------------------------------------------------------
 -- Rule parser: house number, street, town (known towns from pgeo.town, or the last comma
@@ -159,15 +162,18 @@ BEGIN
 END $$;
 
 -- ---------------------------------------------------------------------------------------
--- Endpoints. Argument names match Pelias query parameters (quoted where they contain dots)
--- so a gateway can map the query string onto them 1:1.
+-- Endpoints. Argument names are the LAST segment of the Pelias parameter names
+-- (focus.point.lat -> lat, boundary.rect.min_lon -> min_lon, point.lat -> lat,
+-- boundary.circle.radius -> radius): PostgREST keeps only the last segment of a dotted
+-- query key, so Pelias-style URLs map onto these arguments with no rewriting. Within each
+-- endpoint the last segments do not collide.
 -- ---------------------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION geocode_api.v1_search(
     text text,
     size integer DEFAULT 10,
-    "focus.point.lat" double precision DEFAULT NULL, "focus.point.lon" double precision DEFAULT NULL,
-    "boundary.rect.min_lon" double precision DEFAULT NULL, "boundary.rect.min_lat" double precision DEFAULT NULL,
-    "boundary.rect.max_lon" double precision DEFAULT NULL, "boundary.rect.max_lat" double precision DEFAULT NULL,
+    lat double precision DEFAULT NULL, lon double precision DEFAULT NULL,
+    min_lon double precision DEFAULT NULL, min_lat double precision DEFAULT NULL,
+    max_lon double precision DEFAULT NULL, max_lat double precision DEFAULT NULL,
     layers text DEFAULT NULL, sources text DEFAULT NULL, parser text DEFAULT 'rule')
 RETURNS jsonb LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
@@ -178,10 +184,10 @@ DECLARE
   rect double precision[];
   feats jsonb;
 BEGIN
-  PERFORM geocode.check_range("focus.point.lat", -90, 90, 'focus.point.lat');
-  PERFORM geocode.check_range("focus.point.lon", -180, 180, 'focus.point.lon');
-  IF "boundary.rect.min_lon" IS NOT NULL THEN
-    rect := ARRAY["boundary.rect.min_lon", "boundary.rect.min_lat", "boundary.rect.max_lon", "boundary.rect.max_lat"];
+  PERFORM geocode.check_range(lat, -90, 90, 'focus.point.lat');
+  PERFORM geocode.check_range(lon, -180, 180, 'focus.point.lon');
+  IF min_lon IS NOT NULL THEN
+    rect := ARRAY[min_lon, min_lat, max_lon, max_lat];
   END IF;
   p := geocode.parse_rule(t);
   IF parser = 'postal' THEN
@@ -197,7 +203,7 @@ BEGIN
   END IF;
   SELECT jsonb_agg(geocode.feature_json(h) ORDER BY h.score DESC) INTO feats
   FROM geocode.search(t, p.name, p.housenumber, p.street, p.locality, p.postcode,
-                      "focus.point.lon", "focus.point.lat",
+                      lon, lat,
                       geocode.check_list(layers, ARRAY['address','venue','street','neighbourhood','locality','localadmin','county','region','postalcode'], 'layers'),
                       geocode.check_list(sources, ARRAY['openaddresses','openstreetmap','whosonfirst','gnis','zcta','overture','interpolation'], 'sources'),
                       rect, least(greatest(coalesce(size, 10), 1), 40)) h;
@@ -209,7 +215,7 @@ CREATE OR REPLACE FUNCTION geocode_api.v1_search_structured(
     address text DEFAULT NULL, neighbourhood text DEFAULT NULL, locality text DEFAULT NULL,
     county text DEFAULT NULL, region text DEFAULT NULL, postalcode text DEFAULT NULL,
     country text DEFAULT NULL, size integer DEFAULT 10,
-    "focus.point.lat" double precision DEFAULT NULL, "focus.point.lon" double precision DEFAULT NULL,
+    lat double precision DEFAULT NULL, lon double precision DEFAULT NULL,
     layers text DEFAULT NULL, sources text DEFAULT NULL)
 RETURNS jsonb LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
@@ -230,7 +236,7 @@ BEGIN
   END IF;
   SELECT jsonb_agg(geocode.feature_json(h) ORDER BY h.score DESC) INTO feats
   FROM geocode.search(full_text, nm, a.housenumber, a.street, coalesce(locality, neighbourhood), postalcode,
-                      "focus.point.lon", "focus.point.lat",
+                      lon, lat,
                       geocode.check_list(layers, ARRAY['address','venue','street','neighbourhood','locality','localadmin','county','region','postalcode'], 'layers'),
                       geocode.check_list(sources, ARRAY['openaddresses','openstreetmap','whosonfirst','gnis','zcta','overture','interpolation'], 'sources'),
                       NULL, least(greatest(coalesce(size, 10), 1), 40)) h;
@@ -241,9 +247,9 @@ $$;
 
 CREATE OR REPLACE FUNCTION geocode_api.v1_autocomplete(
     text text, size integer DEFAULT 10,
-    "focus.point.lat" double precision DEFAULT NULL, "focus.point.lon" double precision DEFAULT NULL,
-    "boundary.rect.min_lon" double precision DEFAULT NULL, "boundary.rect.min_lat" double precision DEFAULT NULL,
-    "boundary.rect.max_lon" double precision DEFAULT NULL, "boundary.rect.max_lat" double precision DEFAULT NULL,
+    lat double precision DEFAULT NULL, lon double precision DEFAULT NULL,
+    min_lon double precision DEFAULT NULL, min_lat double precision DEFAULT NULL,
+    max_lon double precision DEFAULT NULL, max_lat double precision DEFAULT NULL,
     layers text DEFAULT NULL, sources text DEFAULT NULL)
 RETURNS jsonb LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
@@ -252,13 +258,13 @@ DECLARE
   rect double precision[];
   feats jsonb;
 BEGIN
-  PERFORM geocode.check_range("focus.point.lat", -90, 90, 'focus.point.lat');
-  PERFORM geocode.check_range("focus.point.lon", -180, 180, 'focus.point.lon');
-  IF "boundary.rect.min_lon" IS NOT NULL THEN
-    rect := ARRAY["boundary.rect.min_lon", "boundary.rect.min_lat", "boundary.rect.max_lon", "boundary.rect.max_lat"];
+  PERFORM geocode.check_range(lat, -90, 90, 'focus.point.lat');
+  PERFORM geocode.check_range(lon, -180, 180, 'focus.point.lon');
+  IF min_lon IS NOT NULL THEN
+    rect := ARRAY[min_lon, min_lat, max_lon, max_lat];
   END IF;
   SELECT jsonb_agg(geocode.feature_json(h)) INTO feats
-  FROM geocode.autocomplete(t, "focus.point.lon", "focus.point.lat",
+  FROM geocode.autocomplete(t, lon, lat,
          geocode.check_list(layers, ARRAY['address','venue','street','neighbourhood','locality','localadmin','county','region','postalcode'], 'layers'),
          geocode.check_list(sources, ARRAY['openaddresses','openstreetmap','whosonfirst','gnis','zcta','overture','interpolation'], 'sources'),
          rect, least(greatest(coalesce(size, 10), 1), 40)) h;
@@ -267,24 +273,24 @@ END
 $$;
 
 CREATE OR REPLACE FUNCTION geocode_api.v1_reverse(
-    "point.lat" double precision, "point.lon" double precision, size integer DEFAULT 10,
-    "boundary.circle.radius" double precision DEFAULT NULL, layers text DEFAULT NULL, sources text DEFAULT NULL)
+    lat double precision, lon double precision, size integer DEFAULT 10,
+    radius double precision DEFAULT NULL, layers text DEFAULT NULL, sources text DEFAULT NULL)
 RETURNS jsonb LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
 DECLARE feats jsonb;
 BEGIN
-  IF "point.lat" IS NULL OR "point.lon" IS NULL THEN
+  IF lat IS NULL OR lon IS NULL THEN
     RAISE EXCEPTION USING ERRCODE = '22023', MESSAGE = 'point.lat and point.lon are required';
   END IF;
-  PERFORM geocode.check_range("point.lat", -90, 90, 'point.lat');
-  PERFORM geocode.check_range("point.lon", -180, 180, 'point.lon');
-  PERFORM geocode.check_range("boundary.circle.radius", 0.001, 50, 'boundary.circle.radius');
+  PERFORM geocode.check_range(lat, -90, 90, 'point.lat');
+  PERFORM geocode.check_range(lon, -180, 180, 'point.lon');
+  PERFORM geocode.check_range(radius, 0.001, 50, 'boundary.circle.radius');
   SELECT jsonb_agg(geocode.feature_json(h)) INTO feats
-  FROM geocode.reverse("point.lon", "point.lat",
+  FROM geocode.reverse(lon, lat,
          geocode.check_list(layers, ARRAY['address','venue','street','neighbourhood','locality','localadmin','county','region','postalcode'], 'layers'),
          geocode.check_list(sources, ARRAY['openaddresses','openstreetmap','whosonfirst','gnis','zcta','overture'], 'sources'),
-         "boundary.circle.radius", least(greatest(coalesce(size, 10), 1), 40)) h;
-  RETURN geocode.envelope(jsonb_build_object('point.lat', "point.lat", 'point.lon', "point.lon", 'size', size), feats);
+         radius, least(greatest(coalesce(size, 10), 1), 40)) h;
+  RETURN geocode.envelope(jsonb_build_object('point.lat', lat, 'point.lon', lon, 'size', size), feats);
 END
 $$;
 
