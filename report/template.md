@@ -929,7 +929,7 @@ an upper bound until both engines have been scored on real queries neither has s
 ```table recommendations
 | Scenario | Recommended | Why |
 |---|---|---|
-| A few users on a small VM or VPS (this project's target) | pgeo, pure SQL | meets all targets in 1.6-3.3 GB; most accurate; 2-3 containers |
+| A few users on a small VM or VPS (this project's target) | pgeo, pure SQL | meets all targets from 1.4 GB and a quarter core (Section 3.12); most accurate; 2-3 containers |
 | Messy input: typos, variants, venues, impossible places | pgeo | 87% vs 30% on typos; misses handled 95% vs 41% |
 | Structured US addresses for another system (LANCER) | pgeo | `/v1/address`; nearest street address for venues |
 | Hundreds of concurrent users per vCPU | Pelias | four times the throughput per CPU |
