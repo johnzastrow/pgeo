@@ -50,9 +50,13 @@ and observations made during the work (marked "session").
 - [ ] Pelias limits: 96 (1 vCPU), 192 (2), 384 (4 vCPU, 4 workers), 192 (4 vCPU, 1 worker),
       M0 192; memory floor ~8.3 GB; placeholder OOM at 0.4-0.5 GB (C1@16, C2@12, C3/C4/C4a@128),
       pip OOM at 0.4 GB, interpolation crash-loop at 1.9 GB.
-- [ ] pgeo limits: pure SQL 4/4/24/64/128, FastAPI 8/6/32/96/192 (Pmin/P1/P2/P4/PM); budgets
-      1.6-3.3 GB; reverse is first over target everywhere; FastAPI beats PostgREST at 2-4 vCPU.
-- [ ] Pelias 4-24x more users per CPU; pgeo meets 3 users in 1.6 GB (Pelias needs ~8.3 GB).
+- [ ] pgeo limits after the reverse-geocoding index (0.7.0): pure SQL 24/24/48/96/128, FastAPI
+      24/24/48/96/192 (Pmin/P1/P2/P4/PM); budgets 1.6-3.3 GB; autocomplete is now the first
+      endpoint over target everywhere. Before the index: pure SQL 4/4/24/64/128.
+- [ ] Pelias 4x more users per CPU at every size (96/192/384 against 24/48/96); pgeo meets the
+      3-user target in 1.6 GB where Pelias needs ~8.3 GB.
+- [ ] Minimum server for 3 users (find_floor.py): pgeo 0.25 vCPU / 1.40 GB total (db 0.45,
+      PostgREST 0.15, 0.8 OS); every failed step failed on latency, never on memory.
 - [ ] Data volume (Pelias C3): D1 384, D2 384, D3 256, D4 256, D5 192; addresses nearly free,
       OSM and Overture cost a step each.
 - [ ] Workers matter: C4a (1 API worker on 4 vCPU) 192 vs C4 384.

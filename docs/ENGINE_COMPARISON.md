@@ -13,7 +13,7 @@ errors < 1%. "Limit" = most concurrent users with every endpoint within target.
 ## Answers
 
 - **(a) Speed and throughput: Pelias is clearly faster.** At the same CPU count it serves
-  4 to 24 times more users within the targets, and its p95 at 3 users is 20-50 ms on every
+  about four times more users within the targets, and its p95 at 3 users is 20-50 ms on every
   endpoint versus 35-390 ms for pgeo.
 - **(b) Good enough at lower resources: yes, for the stated need.** pgeo meets every target
   at 3 users on the smallest configuration tested (1 vCPU, 1.6 GB budget), where Pelias
@@ -58,7 +58,7 @@ widen every text match) cost one ramp step each. The pgeo equivalent (subset bui
 | Need | Better choice | Why |
 |------|---------------|-----|
 | Small VM or VPS, a handful of users (the stated target) | pgeo | 1.6-2.7 GB instead of 8.3-9.5 GB; more accurate |
-| Hundreds of concurrent users per vCPU | Pelias (today) | 4-24x the throughput per CPU |
+| Hundreds of concurrent users per vCPU | Pelias (today) | 4x the throughput per CPU |
 | Messy input: typos, variants, misses, venues | pgeo | 87% vs 30% on typos; misses handled 95% vs 41% |
 | Fewest components, data in PostgreSQL (G6) | pgeo pure SQL | Database + stateless gateway |
 | Structured USPS addresses (LANCER) | pgeo | `/v1/address` exists only in pgeo |
