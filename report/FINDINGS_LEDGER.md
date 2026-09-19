@@ -117,3 +117,4 @@ and observations made during the work (marked "session").
 - [ ] On that minimum VM, how many users each platform scales to (full ramp on the VM).
 
 - [x] (report Appendix A, Section 2.3) Rebuild runbook docs/REBUILD.md and scripts/rebuild_all.sh referenced (user request 2026-09-19).
+- [x] (report 4 Discussion) When Pelias is still the right tool; tuning-on-test-set caveat; shadow comparison on real traffic (user question 2026-09-19).

@@ -362,6 +362,56 @@ def resource_values(v: dict, t: dict) -> None:
                                      "Disk after build", "Measured"], rows, "lrrrrl")  # fmt: skip
 
 
+def floor_values(v: dict, t: dict) -> None:
+    """Minimum server for 3 users: the search path, the floor per engine, and its VM confirmation."""
+    ld = INPUTS["load"]
+    fdir = ROOT / ld.get("floor", "")
+    label = {"pgeo": "pgeo (pure SQL)", "pelias": "Pelias"}
+    rows, path_rows = [], []
+    for engine in ("pgeo", "pelias"):
+        f = fdir / f"floor-{engine}.json"
+        if not ld.get("floor") or not f.is_file():
+            continue
+        d = json.loads(f.read_text())
+        r = d.get("result")
+        if r:
+            v[f"floor_{engine}_vcpu"] = f"{r['vcpu']:g}"
+            v[f"floor_{engine}_gb"] = f"{r['memory_gb']:.2f} GB"
+        for i, p in enumerate(d["path"]):
+            c = p["config"]
+            size = ", ".join(f"{k} {val:g}" for k, val in c.items())
+            path_rows.append([label[engine], i, size, f"{p.get('total_gb') or 0:.2f} GB", "pass" if p["pass"] else "fail",
+                              p["why"]])  # fmt: skip
+    if path_rows:
+        t["floor_path"] = md_table(["Engine", "Trial", "Configuration (vCPU quota; memory limits in GB)", "Total",
+                                    "3 users", "Result"], path_rows, "lrlrcl")  # fmt: skip
+    # temporary-VM confirmation (3-user validation + ramp on a real VM of the floor size)
+    vm_runs = F.load_runs(ld.get("floor_vm", []))
+    for rid, r in sorted(vm_runs.items()):
+        c = r["config"]
+        eng = r.get("engine", "")
+        val = r["runs"]["validate"]
+        rows.append([label.get(eng, eng), f"{c.get('cpus')} vCPU (limit {c.get('cpulimit'):g})",
+                     f"{c.get('memory_gb'):g} GB", "pass" if val["pass"] else "fail",
+                     f"{val['worst_p95_ratio']:.2f}", str(r["limit_users"]), r.get("breaking_users") or "not reached"])
+        v[f"floorvm_{eng}_limit"] = str(r["limit_users"])
+        v[f"floorvm_{eng}_size"] = f"{c.get('cpulimit'):g} vCPU, {c.get('memory_gb'):g} GB"
+    if rows:
+        t["floor_vm"] = md_table(["Engine", "VM CPU", "VM memory", "3 users", "Worst p95 / target at 3",
+                                  "Users within targets", "Broken at"], rows, "lllcrrr")  # fmt: skip
+    vm = F.load_runs(ld.get("vm120", []))
+    rows = []
+    for rid, r in sorted(vm.items()):
+        val = r["runs"]["validate"]
+        rows.append([r.get("engine", rid), "pass" if val["pass"] else "fail",
+                     *(f"{val['endpoints'].get(ep, {}).get('p(95)', float('nan')):.0f}" for ep in EPS),
+                     str(r["limit_users"]), r.get("breaking_users") or "not reached"])  # fmt: skip
+        v[f"vm120_{r.get('engine', rid)}_limit"] = str(r["limit_users"])
+    if rows:
+        t["vm120"] = md_table(["Engine", "3 users", *(f"{F.EP_LABEL[ep]} p95" for ep in EPS), "Users within targets",
+                               "Broken at"], rows, "lcrrrrrr")  # fmt: skip
+
+
 def build_all(snap: dict) -> tuple[dict, dict]:
     v: dict = {}
     t: dict = {}
@@ -371,6 +421,7 @@ def build_all(snap: dict) -> tuple[dict, dict]:
     load_values(v, t)
     compat_values(v, t)
     resource_values(v, t)
+    floor_values(v, t)
     host = snap["host"]
     v["host_cpu"] = host["cpu"]
     v["host_threads"] = str(host["logical_cpus"])

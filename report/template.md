@@ -562,6 +562,19 @@ assume.
 caches aggressively, and Pelias parallelizes across services. pgeo's PL/pgSQL runs several
 candidate queries and scoring steps per request in an interpreted language inside one backend.
 
+**Is there still a reason to use Pelias?** Yes, in four situations: (1) many concurrent users per
+server, where Pelias's four-fold throughput per CPU saves hardware once its ~8 GB memory floor is
+paid; (2) coverage beyond one or two states, for which Pelias is designed and pgeo is untested;
+(3) international addresses and multilingual names (libpostal, Pelias language support); (4) when a
+maintained upstream project matters more than accuracy, since pgeo is this project's own code. For
+the deployment studied here (Maine, a handful of users, messy input, LANCER), none of these applies.
+
+**The tuning caveat.** pgeo was tuned in rounds that started from this test set's failing cases;
+Pelias was run as published. The fuzz rounds (corruptions of queries the tuning never saw as such)
+and the source-derived ground truth limit the effect, but part of the 20-point gap may be fit to the
+test set. The decisive check is real queries neither engine was tuned on: running both engines side
+by side on the query host and scoring the first weeks of actual searches (Next steps).
+
 **Threats to validity.**
 
 - The accuracy set comes from the same sources both engines load; it measures finding what is in
@@ -603,6 +616,9 @@ candidate queries and scoring steps per request in an interpreted language insid
   (subset builds) as was done for Pelias.
 - **Category taxonomy**: map source categories to Pelias's taxonomy so `categories=food` works.
 - **Test set**: remove the eight false misses; add real user queries once the service is in use.
+- **Shadow comparison on real traffic**: keep Pelias beside pgeo on the query host for a few weeks,
+  score both on real searches (neither engine tuned on them), then decide whether to retire Pelias
+  (saving ~8.5 GB of memory on the host).
 - **libpostal model update** (Senzing libpostal-data): re-test the libpostal arm for accuracy and
   memory.
 - **Authorization** (Phase 11): single sign-on plus hashed API keys at the edge before LANCER uses
