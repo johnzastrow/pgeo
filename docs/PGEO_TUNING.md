@@ -15,8 +15,8 @@ does not reduce accuracy; speed gains that cost accuracy are rejected. Design:
 | T4 | JIT | `jit` on vs off (off by default for short queries) | p95 |
 | T5 | Text indexes | GIN vs GiST trigram (`gist_trgm_ops` supports `<->` KNN ordering), partial indexes per layer | EXPLAIN (ANALYZE, BUFFERS) on slowest cases, then load |
 | T6 | Autocomplete | prefix table depth, tsquery candidate limit, typo fallback threshold | autocomplete accuracy + p95 |
-| T7 | Parsing | rule parser (primary, core-only) vs libpostal service / extension (comparison only) | accuracy, memory, p95 |
-| T8 | Text search engine | core pg_trgm/FTS only (constraint D28); pg_search dropped | n/a |
+| T7 | Parsing | libpostal as service vs extension (shared_preload_libraries vs per-backend load) vs rule parser | accuracy, memory, p95 |
+| T8 | Text search engine | core pg_trgm/FTS vs ParadeDB pg_search (BM25, AGPL-3.0) | accuracy + p95 |
 | T9 | Admin hierarchy | WOF vs Overture divisions | reverse and town accuracy |
 | T10 | Connections | prepared statements, statement cache, PgBouncer transaction pooling | p95 at high concurrency |
 

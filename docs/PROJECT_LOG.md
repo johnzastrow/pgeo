@@ -118,7 +118,7 @@ confidence scores; easy loading and updates.
 | 2026-09-18 | Add progressively fuzzier accuracy rounds? | Yes: F0-F5 rounds on the same 300 base queries (tests/accuracy/build_fuzz_rounds.py) |
 | 2026-09-18 | Add a phase where Postgres itself is the API endpoint? | Yes: Phase 13 (Omnigres omni_httpd in-database HTTP vs PostgREST gateway) |
 | 2026-09-18 | Is Postgres parallelism tuned? | Between-query parallelism (processes per connection, pool/API workers vs cores) is the main lever; within-query parallel workers off by default for short queries, to be measured (tuning T1/T2) |
-| 2026-09-18 | Stay within Postgres core + contrib? | Yes (D28); PostGIS kept as the spatial foundation |
+| 2026-09-18 | Stay within Postgres core + contrib? | For the HTTP part only (clarified): PostgREST instead of Omnigres (D28); keep everything already built |
 | 2026-09-18 | SSH key for the VM? | `~/.ssh/id_ed25519.pub` (pasted, since `~/.ssh` reads are blocked by permission rules) |
 
 ---
@@ -153,7 +153,7 @@ confidence scores; easy loading and updates.
 | D25 | Unattended-session grants (2026-09-18): FastAPI API layer; load-test VM 120 including ramp to crash; commit + push at verified milestones; Phase 10 "finished" = parity (search, autocomplete, reverse, structured, place) + accuracy harness + tuning log + load comparison report; WOF admin with Overture divisions as A/B; demo engine switch (local only); resize VM 120 if clearly needed; official postgis PG18 image by digest + libpostal/pgsql-postal built from pinned commits + pg_search release for A/B | User answered all open questions up front so work can finish without them | Ask at each step |
 | D26 | Phase 13: Postgres as the API endpoint, two arms (Omnigres in-database HTTP; PostgREST gateway) | User request: the service purely in Postgres | Keep FastAPI only |
 | D27 | norm() expands abbreviations to full words | Typo matching: trigram overlap is much higher on full words (0.81 vs 0.25) | Abbreviate (first version) |
-| D28 | Keep pgeo within PostgreSQL core + contrib extensions (plus PostGIS): rule parser primary, libpostal and pg_search only as comparisons, Phase 13 via PostgREST gateway rather than Omnigres | User constraint 2026-09-18 | Third-party extensions (pgsql-postal, pg_search, omni_httpd) as primary |
+| D28 | Phase 13 HTTP layer uses no third-party Postgres extension: PostgREST gateway (core SQL behind it), not Omnigres omni_httpd. Scope clarified by the user: the constraint is for the HTTP part only; everything already built stays | User constraint 2026-09-18 (clarified) | Omnigres in-database HTTP |
 | D19 | Phase 10 targets PostgreSQL 18 + PostGIS 3.6 | User choice | PostgreSQL 17 |
 
 ---

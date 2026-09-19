@@ -315,12 +315,11 @@ as a provisional expectation and flagged as such.
 
 - **Host:** develop and tune on the workstation in Docker (same data and load harness as
   Pelias, cgroup-constrained per config); deploy to a VM only once competitive.
-- **Text search:** core and contrib only (`pg_trgm`, FTS, `unaccent`, `fuzzystrmatch`), per
-  the user's constraint of 2026-09-18. ParadeDB `pg_search` (third-party, AGPL-3.0) is no
-  longer an arm; at most an optional footnote comparison.
-- **libpostal:** measured as a service and as the in-database `pgsql-postal` extension for
-  comparison, but the **primary parse mode is the rule parser** (core-only constraint;
-  measured only ~2 points behind libpostal while saving ~2 GB RAM).
+- **Text search:** core extensions first (`pg_trgm`, FTS, `unaccent`, `fuzzystrmatch`);
+  ParadeDB `pg_search` (BM25, AGPL-3.0) as an A/B arm, adopted only on a clear harness win.
+- **libpostal:** test both as a service (existing `pelias/libpostal-service` container) and
+  as the in-database `pgsql-postal` extension built for PG18, plus a no-libpostal arm (rule
+  parser; measured ~2 points behind libpostal while saving ~2 GB RAM).
   Early experiment: whether the ~2 GB model loads per backend or once via
   `shared_preload_libraries` (shared copy-on-write across backends); patch if needed.
 - **API layer:** thin FastAPI service (asyncpg + PgBouncer) returning Pelias-shaped GeoJSON
@@ -396,11 +395,12 @@ audit log retention (queries contain addresses: treat logs as internal data).
 
 ## 13. Phase 13 -- PostgreSQL as the API endpoint (roadmap, requested 2026-09-18)
 
-**Constraint (2026-09-18): stay within PostgreSQL core + contrib extensions (plus PostGIS).**
-Core Postgres has no HTTP server, so the primary design is a logic-free PostgREST gateway in
-front of core SQL; the Omnigres arm below is optional and not pursued unless the core-only
-design falls short. Parsing in this phase is the PL/pgSQL rule parser (libpostal is
-third-party and stays an optional comparison).
+**Constraint (2026-09-18, HTTP part only): the HTTP layer uses no third-party Postgres
+extension (core + contrib only).** Core Postgres has no HTTP server, so the design is a
+logic-free PostgREST gateway in front of the SQL API; Omnigres (`omni_httpd`, third-party)
+is not pursued. Everything else built in Phase 10 is kept as is (libpostal service and
+extension arms, pg_search A/B). Parsing in the SQL API: PL/pgSQL rule parser, with
+libpostal (`postal_parse()`) used when installed and requested.
 
 Goal: the geocoder runs *entirely* in PostgreSQL 18. Parsing, candidate search, ranking,
 confidence and the Pelias-shaped JSON response are all SQL; the HTTP layer either lives
