@@ -75,7 +75,7 @@ def main() -> int:
     if "<!-- PENDING" in template and not a.draft:
         print("report: template still has PENDING markers (use --draft to build anyway)", file=sys.stderr)
         return 1
-    r = Renderer(vals, tabs, figs, fig_dir_rel=FIG_PUBLISH.name)
+    r = Renderer(vals, tabs, figs, fig_dir_rel=FIG_PUBLISH.name, target="md")
     md = r.render(template)
     if r.missing:
         print("report: unresolved references:\n  " + "\n  ".join(sorted(set(r.missing))), file=sys.stderr)
@@ -88,15 +88,17 @@ def main() -> int:
         print("report: pdf")
         # The PDF takes its title block from pdf/metadata.yaml: drop the Markdown's own title lines
         pdf_md = BUILD / "report_pdf.md"
-        lines = md.splitlines()
-        body = "\n".join(lines[3:]) if lines[0].startswith("# ") else md
-        pdf_md.write_text(body)
+        rp = Renderer(vals, tabs, figs, fig_dir_rel=FIG_PUBLISH.name, target="pdf")
+        pdf_text = rp.render(template)
+        lines = pdf_text.splitlines()
+        pdf_md.write_text("\n".join(lines[3:]) if lines[0].startswith("# ") else pdf_text)
         cmd = [
             "pandoc", str(pdf_md), "-o", str(OUT_PDF),
-            "--from", "markdown+pipe_tables+implicit_figures-yaml_metadata_block",
+            "--from", "markdown+pipe_tables+implicit_figures+raw_tex-yaml_metadata_block-tex_math_dollars-tex_math_single_backslash",
             "--pdf-engine", "xelatex",
             "--metadata-file", str(HERE / "pdf" / "metadata.yaml"),
             "--include-in-header", str(HERE / "pdf" / "header.tex"),
+            "--lua-filter", str(HERE / "pdf" / "breakcode.lua"),
             "--resource-path", str(DOCS),
             "--toc", "--toc-depth", "2",
         ]  # fmt: skip

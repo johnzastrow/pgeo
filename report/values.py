@@ -317,7 +317,8 @@ def compat_values(v: dict, t: dict) -> None:
             res = c["results"][e]
             cells.append("pass" if res is None else ("differs" if e == "pelias" else "FAIL"))
         q = "&".join(f"{k}={val}" for k, val in c["params"].items())
-        rows.append([c["case"], f"`/v1/{c['path']}?{q}`"[:90] + ("`" if len(q) > 70 else ""), *cells])
+        # full request: the PDF breaks long code spans at punctuation (report/pdf/breakcode.lua)
+        rows.append([c["case"], f"`/v1/{c['path']}?{q}`", *cells])
     t["compat"] = md_table(["Case", "Request", "Pelias", "pgeo FastAPI", "pgeo pure SQL"], rows, "llccc")
     v["compat_cases"] = str(len(d["cases"]))
     v["compat_failures"] = str(d["failures"])

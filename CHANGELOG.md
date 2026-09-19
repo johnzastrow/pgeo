@@ -40,6 +40,13 @@ commits where each milestone was complete.
 ### Fixed
 - pgeo load runner mounts a per-run tuning directory (mounting a file inside the read-only
   base directory failed when the file did not exist).
+- Report PDF readability: request strings in the compatibility tables now wrap instead of
+  running into the margin (`report/pdf/breakcode.lua`), table cells hyphenate their first
+  word, and column padding is narrower - 51 overfull boxes down to 4 below 3 pt.
+- Report callouts are escaped for LaTeX: a percent sign silently truncated the first Key
+  result box at "95.8", and dollar amounts were typeset as mathematics.
+- Figure 20 (compatibility contract) draws separated cells; 27 x 3 passes previously rendered
+  as one solid green block.
 
 ## [0.11.0] - 2026-09-19
 

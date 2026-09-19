@@ -33,3 +33,4 @@ finished report before each release. Status: answered / pending (awaiting a meas
 | 24 | Arguments for and against the external HTTP options (vs Postgres core/contrib only). | 2.1 | answered |
 | 25 | Resources required for building and operating each platform, and which loads and data they support. | 3.5 | pending (build measurements) |
 | 26 | Features each platform provides. | 3.9 | answered |
+| 27 | Translate the lowest CPU finding to common shared-CPU VPS sizes (Linode nano, DigitalOcean, Vultr, Hetzner, others). | 3.5 (VPS table), 3.12 | pending (VM confirmation at 1 GB and 2 GB) |

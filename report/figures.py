@@ -10,8 +10,8 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.colors import ListedColormap
 from matplotlib.lines import Line2D
+from matplotlib.patches import Rectangle
 
 import style
 from style import ENGINE_COLOR, ENGINE_LABEL, GOOD, NEUTRAL, PELIAS, PGEO_API, PGEO_SQL, PGEO_SVC, SLO_RED, plain_log_y, save
@@ -496,8 +496,14 @@ def fig_compat(out: Path) -> str | None:
             ok = c["results"][e] is None
             grid[i, j] = 2 if ok else (1 if e == "pelias" or c["results"]["pelias"] is not None else 0)
     fig, ax = plt.subplots(figsize=(4.6, 0.19 * len(cases) + 0.8))
-    cmap = ListedColormap([SLO_RED, "#bdbdbd", GOOD])
-    ax.imshow(grid, cmap=cmap, vmin=0, vmax=2, aspect="auto")
+    # One patch per result, with gaps: a solid image of 27x3 passes reads as a single green block
+    colours = [SLO_RED, "#bdbdbd", GOOD]
+    for i in range(len(cases)):
+        for j in range(len(engines)):
+            ax.add_patch(Rectangle((j - 0.42, i - 0.38), 0.84, 0.76, facecolor=colours[int(grid[i, j])],
+                                   edgecolor="white", linewidth=0.6))  # fmt: skip
+    ax.set_xlim(-0.6, len(engines) - 0.4)
+    ax.set_ylim(len(cases) - 0.4, -0.6)
     ax.set_yticks(range(len(cases)), [c["case"] for c in cases], fontsize=6.3)
     ax.set_xticks(range(len(engines)), [ENGINE_LABEL.get(e, e).replace(" (PostgREST)", "") for e in engines],
                   fontsize=6.8)  # fmt: skip

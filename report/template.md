@@ -44,6 +44,11 @@ a structured-address endpoint (USPS Publication 28) for the LANCER dispatch appl
 fewest components) pgeo in its pure-SQL form is the better fit; Pelias remains the choice for
 hundreds of concurrent users per vCPU. Section "Conclusions" maps scenarios to tools.
 
+{{callout:key|On the same open data and the same hardware, pgeo answers {{value:acc_pgeo_sql}} of
+{{value:n_cases}} test queries correctly against {{value:acc_pelias}} for Pelias, and it does so in
+about a quarter of the memory. Pelias remains about {{value:ratio_max}} times faster per CPU. For a
+small, self-hosted Maine geocoder, accuracy and memory decide, and both favour pgeo.}}
+
 {{figure:frontier|Capacity against memory budget for every tested configuration of both engines.
 Each point is one configuration; the vertical axis is the most concurrent users for which every
 endpoint stayed within its latency target (log scale). pgeo configurations sit at the left
@@ -110,6 +115,13 @@ pgeo (right) keeps data, parsing, ranking and JSON formatting inside PostgreSQL;
 end is either PostgREST (a stateless gateway, no application code) or a thin FastAPI
 application.}}
 
+{{ref:figure:architecture}} contrasts the two designs, and the contrast explains most of the
+results that follow. Pelias divides the work among six processes in three languages, so each part
+can be scaled or replaced, and Elasticsearch does the text matching in compiled code. pgeo puts
+everything in one process family: the query, the ranking and the JSON all happen inside the
+database. That is why pgeo needs a quarter of the memory and fewer moving parts, and why it costs
+more CPU per request.
+
 **Pelias** was deployed from pinned images (API, libpostal parser, placeholder, point-in-polygon,
 interpolation, Elasticsearch {{value:es_version}}) with the index built on the workstation and
 shipped to VM 120 as an Elasticsearch snapshot. Nginx on the VM serves the demo page and the API
@@ -148,6 +160,11 @@ were weighed as follows (docs/HTTP_OPTIONS.md has the full research and sources)
 {{figure:query_pipeline|The pgeo forward-search pipeline. Each step is SQL; the tuning work in
 Section 2.7 changed steps 1, 3, 4, 5 and 6.}}
 
+{{ref:figure:query_pipeline}} matters for anyone who wants to change the ranking: each step is
+plain SQL in a file under version control, so a change is a pull request and the accuracy gate
+measures it. In Pelias the equivalent logic is spread across the API service's query builders and
+Elasticsearch scoring.
+
 ### 2.2 Data
 
 {{table:sources|Data sources, raw input sizes, and what each engine holds from them. Pelias
@@ -164,6 +181,12 @@ is the same; the index Pelias searches is roughly twice as large for addresses.
 {{figure:inventory|Records by layer in each engine (log scale). The address layer shows the
 build-time deduplication in pgeo; venues differ because pgeo also deduplicates OSM and Overture
 places that share a name and position.}}
+
+{{ref:figure:inventory}} shows where the engines hold the same data differently. The address
+bar is the one to read: Pelias stores {{value:pelias_addresses}} address documents and pgeo
+{{value:pgeo_addresses}}, because the two open sources carry most Maine addresses twice and pgeo
+merges them at build time while Pelias keeps both and filters at query time. The consequence is
+visible later in memory and disk (Section 3.5): pgeo searches a smaller store.
 
 {{table:layers|Records by layer.}}
 
@@ -185,6 +208,10 @@ Hampshire, and the Pelias interpolation builder needing OpenAddresses in its leg
 
 {{figure:data_pipeline|Data flow from the sources to each engine. Both engines read the same
 inputs; small sources pass through a preparation package that clips them to Maine.}}
+
+{{ref:figure:data_pipeline}} is the reproducibility picture: both engines consume the same
+downloaded inputs, and everything is scripted, so a rebuild is one command and a data refresh is
+the same command with newer downloads (docs/REBUILD.md).
 
 The Pelias build (OSM, OpenAddresses, Who's On First, CSV and interpolation importers) takes
 about 15 minutes on the workstation and produces a 435 MB index plus helper databases. The pgeo
@@ -232,6 +259,11 @@ town, because a bare "Mud Pond" has no single right answer. A separate **fuzz se
 
 {{figure:test_harness|Load-test harness. The load generator and the engine under test are pinned
 to different physical cores; each engine service runs with a memory limit and no swap.}}
+
+{{ref:figure:test_harness}} shows why the comparison is fair: one engine at a time, pinned to
+its own physical cores, with the load generator on a separate core, the same corpus and the same
+stopping rules. Readers reproducing this on other hardware should expect different absolute
+numbers but the same ordering.
 
 Each simulated user behaves like a person using the demo page: 60% of sessions type an address
 or place letter by letter (autocomplete requests), 15% run a full search, 10% a structured
@@ -341,9 +373,19 @@ names. pgeo compares whole strings by trigram similarity and treats the queried 
 although the church lies in Eustis, because it is near Stratton. That single change raised venue
 accuracy from 81% to 94%.
 
+{{callout:impact|Two thirds of pgeo's advantage is on input people actually type: misspellings,
+half-remembered venue names and places that do not exist. In a dispatch application this is the
+difference between an address that resolves on the first try and one an operator has to correct by
+hand: on this test set Pelias leaves {{value:n_wrong_pelias}} of {{value:n_cases}} queries wrong or
+unanswered, pgeo {{value:n_wrong_pgeo_sql}}.}}
+
 {{figure:accuracy_quality|Accuracy by query quality. Typos separate the engines most; "miss" means
 the engine correctly returned nothing or only low-confidence results for a place that does not
 exist.}}
+
+{{ref:figure:accuracy_quality}} separates the engines by input quality. On clean input both are
+strong (88% and 98%); the gap opens on the input people actually type. Typos are the extreme case:
+{{value:acc_pelias_typo}} against {{value:acc_pgeo_sql_typo}}.
 
 {{figure:fuzz|Accuracy as queries are progressively corrupted (fuzz levels F0-F5), overall and by
 category. Pelias falls to near zero from two character errors; pgeo degrades gradually.}}
@@ -357,6 +399,12 @@ ones. pgeo's first-result confidence averages {{value:conf_right_pgeo_sql}} when
 
 {{figure:calibration|Distribution of first-result confidence for right and wrong answers
 (misses excluded). pgeo separates the two groups more clearly.}}
+
+{{ref:figure:calibration}} is about trust rather than accuracy: it shows how well each engine's
+confidence separates its right answers from its wrong ones. Pelias reports high confidence for both
+(0.98 and 0.87), so a client cannot use the number to decide anything. pgeo's wrong answers cluster
+low ({{value:conf_wrong_pgeo_sql}} on average against {{value:conf_right_pgeo_sql}} when right), so
+an application such as LANCER can accept matches above a threshold and queue the rest for a human.
 
 **Remaining failures.** {{value:pgeo_failures_total}} of {{value:n_cases}} cases still fail on
 pgeo ({{ref:table:pgeo_failures}}). Eight "misses" are test-set errors (Death Valley in
@@ -372,6 +420,13 @@ the place name and the town.
 {{figure:tuning|Left: pgeo accuracy after each tuning step, with Pelias for reference. Right:
 first-result confidence when right and when wrong; the ambiguity penalty widened the gap.}}
 
+{{ref:figure:tuning}} is the tuning history: nine rounds took pgeo from 80.3% to
+{{value:acc_pgeo_sql}}. Two things stand out. Most of the gain came from understanding how people
+write place names (abbreviations, the town as a location, ties), not from more powerful matching.
+And the calibration panel shows the ambiguity penalty pulling wrong-answer confidence down from 0.90
+to {{value:conf_wrong_pgeo_sql}} while right answers stayed high, which is what makes the confidence
+score usable.
+
 ```table tuning_changes
 | Step | Change | Problem solved | Effect |
 |---|---|---|---|
@@ -386,12 +441,23 @@ first-result confidence when right and when wrong; the ambiguity penalty widened
 | Reverse index | index on the admin join | every reverse request scanned all features | see Section 3.4 |
 ```
 
+{{callout:key|One missing database index (the join from admin polygons to their features) made every
+reverse request scan all 906,101 features. Adding it cut reverse latency from 225-393 ms to 5-18 ms
+and raised capacity on one vCPU from {{value:before_lim_rest_P1}} to {{value:lim_rest_P1}} users: a
+six-fold gain from a single line of DDL, found only because the load tests measured each endpoint
+separately.}}
+
 {{table:tuning_changes|Tuning changes, the problem each solved, and the measured effect.}}
 
 ### 3.3 Latency at the 3-user target
 
 {{figure:latency_3users|p95 latency per endpoint at 3 users for each configuration, against its
 target (dashed). Every configuration of both engines meets every target.}}
+
+{{ref:figure:latency_3users}} answers the question this project started with: at the 3-user
+target every configuration of both engines, down to the smallest, sits well inside every latency
+target. Nothing in the 3-user scenario forces a choice between the engines; the differences appear
+only under heavier load or in accuracy.
 
 {{table:latency3|Median and p95 latency at 3 users (ms).}}
 
@@ -409,6 +475,12 @@ missing admin-join index was added; it now takes 5-18 ms ({{ref:table:reverse_fi
 configuration misses a target; above 5 the run stops. At 1-4 users some endpoints receive only
 a few requests per window, so single points are noisy.}}
 
+{{ref:figure:ramp}} shows how each configuration degrades as users are added: flat while there is
+headroom, then rising steeply once the CPUs saturate. The practical consequence is that these
+services give little warning: a configuration comfortably inside its targets at 24 users can be
+three times over them at 48. Capacity planning should therefore leave a factor of two, not ten
+percent.
+
 {{table:pelias_limits|Pelias capacity by configuration.}}
 
 {{table:pgeo_limits|pgeo capacity by configuration (after the reverse-geocoding index fix).}}
@@ -418,7 +490,17 @@ a few requests per window, so single points are noisy.}}
 {{figure:endpoint_ramp|p95 per endpoint relative to its target on 4 vCPU. The first line to
 cross 1 is the endpoint that limits capacity.}}
 
+{{ref:figure:endpoint_ramp}} shows which endpoint fails first, which is where tuning effort
+belongs. On pgeo it is autocomplete, because it has the tightest target (250 ms) and fires several
+times per typed word; on Pelias the four endpoints rise together because they share one
+Elasticsearch.
+
 {{figure:throughput|Throughput as users are added; the star marks the last step within all targets.}}
+
+{{ref:figure:throughput}} shows throughput still climbing after the latency targets are missed
+(the stars): both engines keep answering, just too slowly. An operator watching only requests per
+second would not notice the service becoming unpleasant, which is why the targets, not throughput,
+define capacity here.
 
 **How each engine scales.** Both engines are CPU-bound under this load, and both scale close to
 linearly with vCPUs as long as their workers can use them: pgeo holds about 24 users per vCPU
@@ -426,6 +508,10 @@ linearly with vCPUs as long as their workers can use them: pgeo holds about 24 u
 and Pelias about 96 ({{value:lim_C1}}, {{value:lim_C2}} and {{value:lim_C4}}). The ratio of four
 is the difference in CPU cost per request: compiled index lookups in Elasticsearch against
 interpreted candidate queries and scoring in PL/pgSQL.
+
+{{callout:impact|Plan capacity as about 24 concurrent users per vCPU for pgeo and about 96 for
+Pelias, then halve it for headroom: both engines go from comfortable to three times over target
+within one doubling of load.}}
 
 **What gives out first.** After the index fix, autocomplete is the first endpoint over its target on
 every pgeo configuration ({{ref:figure:endpoint_ramp}}): it has the tightest target (250 ms) and runs
@@ -453,7 +539,18 @@ only {{value:lim_C4a}}, because a single Node.js worker becomes the bottleneck.
 (~2 GB), the interpolation database and Elasticsearch's heap regardless of load; pgeo's memory
 is mostly the PostgreSQL page cache for a 674 MB database.}}
 
+{{ref:figure:memory}} explains the memory gap in one picture. Pelias pays for the libpostal
+model, the interpolation database and an Elasticsearch heap before it serves a single request;
+pgeo's memory is mostly page cache for a 674 MB database, which is why it still works when the
+budget is cut to a fraction. This is the difference between a $5 and a $48 server (Section 3.5).
+
 {{figure:cpu|Average CPU by service as users are added on 4 vCPU.}}
+
+{{ref:figure:cpu}} shows where the CPU goes. In pgeo almost all of it is the database process
+doing the matching; in Pelias it is split between Elasticsearch and the Node.js API, and the API
+becomes the bottleneck when it runs with too few workers (configuration C4a reached only
+{{value:lim_C4a}} users against {{value:lim_C4}} for C4 with the same CPUs). Anyone deploying Pelias
+should set one API worker per vCPU.
 
 #### Resource requirements
 
@@ -482,6 +579,11 @@ M0 and PM appear in the capacity tables).}}
 
 {{table:ops_requirements|Operating requirements of each platform (Maine data).}}
 
+{{callout:impact|The memory floors put the two platforms in different price classes: pgeo fits the
+cheapest shared-CPU plans most providers sell, while Pelias needs a server roughly ten times the
+price for the same three users. Over a year that is the difference between about $60 and about $580
+at advertised rates.}}
+
 **Build.** Both engines are built on a workstation and shipped to the query host, so the query host
 never needs the raw data or the build tools. {{ref:table:build_resources}} gives the measured
 cost of a full build of each engine.
@@ -489,6 +591,38 @@ cost of a full build of each engine.
 {{table:build_resources|Build resources: a full build of each engine, measured with
 `tests/build/measure_build.py` (wall time, peak memory of all build containers and processes,
 average and peak CPU, disk used by the result).}}
+
+#### What this costs on a shared-CPU VPS
+
+The floors in Section 3.12 are small enough to matter commercially: the difference between the two
+platforms is the difference between the cheapest tier a provider sells and a mid-range server.
+Advertised shared-CPU plans (checked 2026-09-19; verify before ordering, and note that Hetzner
+raised cloud prices in June 2026):
+
+```table vps
+| Provider and plan | vCPU (shared) | RAM | Disk | Price per month | Fits pgeo | Fits Pelias |
+|---|---|---|---|---|---|---|
+| DigitalOcean Basic 512 MB | 1 | 0.5 GB | 10 GB | $4 | no | no |
+| Vultr Cloud Compute 512 MB (IPv4) | 1 | 0.5 GB | 10 GB | $3.50 | no | no |
+| AWS Lightsail nano (IPv6 only) | 2 | 0.5 GB | 20 GB | $3.50 | no | no |
+| Linode (Akamai) Nanode 1 GB | 1 | 1 GB | 25 GB | $5 | tight: see Section 3.12 | no |
+| Vultr Cloud Compute 1 GB | 1 | 1 GB | 25 GB | $5 | tight: see Section 3.12 | no |
+| DigitalOcean Basic 1 GB | 1 | 1 GB | 25 GB | $6 | tight: see Section 3.12 | no |
+| DigitalOcean Basic 2 GB / Linode 2 GB | 1 | 2 GB | 50 GB | $12 | yes | no |
+| Hetzner CX22 | 2 | 4 GB | 40 GB | EUR 3.79 | yes, with room | no |
+| Hetzner CAX11 (Arm) | 2 | 4 GB | 40 GB | EUR 5.99 | yes, with room (Arm images needed) | no |
+| Linode 8 GB / DigitalOcean 8 GB | 4 | 8 GB | 160 GB | $48 | yes | tight: see Section 3.12 |
+| Oracle Cloud Always Free (Arm) | 2 OCPU | 12 GB | 200 GB | free tier (halved in June 2026) | yes | yes |
+```
+
+{{table:vps|Advertised shared-CPU VPS plans and whether each platform's measured floor fits.
+Sources: [Linode/Akamai](https://techdocs.akamai.com/cloud-computing/docs/shared-cpu-compute-instances),
+[DigitalOcean](https://www.digitalocean.com/pricing/droplets),
+[Vultr](https://www.vultr.com/products/regular-performance-compute/),
+[Hetzner](https://www.hetzner.com/cloud/), [AWS Lightsail](https://aws.amazon.com/lightsail/pricing/),
+[Oracle free tier](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm).}}
+
+<!-- PENDING: one sentence mapping the measured floors to these plans, after the VM confirmation -->
 
 **Data volume.** For Pelias, capacity fell from {{value:ds_D1}} users with admin areas only to
 {{value:ds_D5}} with every source (Section 3.6); the index grew to 435 MB. pgeo's database grows with
@@ -502,6 +636,11 @@ same way, so both need more CPU per user as coverage grows.
 {{figure:datavol|Pelias capacity (bars) and document count (line) for cumulative datasets D1-D5
 at fixed resources (2 vCPU, 9.5 GB), and p95 latency at 3 users.}}
 
+{{ref:figure:datavol}} separates data volume from data kind. Adding 780,000 address documents
+cost nothing measurable, while adding OpenStreetMap and Overture places each cost a ramp step: what
+matters is not how many records exist but how many of them a text query can plausibly match. Adding
+New Hampshire should therefore be judged by how many new names it brings, not by gigabytes.
+
 {{table:datavol|Pelias by dataset: D1 Who's On First; D2 + OpenAddresses; D3 + OpenStreetMap; D4 +
 GNIS and ZCTA; D5 + Overture places (full).}}
 
@@ -514,10 +653,18 @@ means more candidates to score per query.
 
 {{figure:qtype|p95 latency at 3 users by query quality (all endpoints together).}}
 
+{{ref:figure:qtype}} shows latency by input quality. Both engines answer misspelled and
+impossible queries about as fast as exact ones, so the accuracy differences in Section 3.1 are not
+bought with slower responses.
+
 ### 3.8 Compatibility
 
 {{figure:compat|Compatibility contract results: each row is a documented Pelias request, each
 column an engine.}}
+
+{{ref:figure:compat}} is the compatibility evidence: every documented Pelias request behaves the
+same on both pgeo front ends. For a reader with existing Pelias clients, this is the row that
+matters: no client changes are needed.
 
 {{table:compat|Compatibility contract cases.}}
 
@@ -571,6 +718,10 @@ year for one state ($1,750 for all), and its licence allows "internal corporate 
 one computer at one location", with no network distribution without a paid amendment (unlimited:
 $24,000) and no use of data older than 105 days. The project decided against it; the address API
 stays on open data and is not a deliverability check (docs/ADDRESS_API.md).
+
+{{callout:impact|For LANCER this endpoint replaces manual address tidying: a dispatcher picks a
+business by name and the system stores a correctly formatted mailing address, the town, the county
+and its FIPS code, with the nearest street address when the place itself has none.}}
 
 The demo page exposes these features: autocomplete with map-centre bias, structured search,
 reverse geocoding by map click, a CSV batch tool, and, where both engines are deployed, an engine
@@ -638,6 +789,10 @@ Pelias was run as published. The fuzz rounds (corruptions of queries the tuning 
 and the source-derived ground truth limit the effect, but part of the 20-point gap may be fit to the
 test set. The decisive check is real queries neither engine was tuned on: running both engines side
 by side on the query host and scoring the first weeks of actual searches (Next steps).
+
+{{callout:caution|pgeo was tuned against the same test set that measures it here, and Pelias was
+not. The fuzz rounds and source-derived ground truth limit the effect, but treat the 20-point gap as
+an upper bound until both engines have been scored on real queries neither has seen.}}
 
 **Threats to validity.**
 

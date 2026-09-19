@@ -17,15 +17,31 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 VALUE = re.compile(r"\{\{value:([A-Za-z0-9_]+)\}\}")
-TOKEN = re.compile(r"\{\{(value|table|figure|ref):([A-Za-z0-9_:]+)(?:\|(.*?))?\}\}", re.S)
+TOKEN = re.compile(r"\{\{(value|table|figure|ref|callout):([A-Za-z0-9_:]+)(?:\|(.*?))?\}\}", re.S)
+# Callouts: coloured boxes in the PDF, block quotes in the Markdown.
+CALLOUT = {"key": ("Key result", "keybox"), "impact": ("What this means", "impactbox"),
+           "caution": ("Caution", "cautionbox")}
+# A callout becomes a raw LaTeX environment, which pandoc passes through untouched, so its text
+# has to be escaped here: an unescaped "%" comments out the rest of the line and "$60 ... $580"
+# would be typeset as mathematics.
+TEX_ESCAPE = {"\\": r"\textbackslash{}", "&": r"\&", "%": r"\%", "$": r"\$", "#": r"\#",
+              "_": r"\_", "{": r"\{", "}": r"\}", "~": r"\textasciitilde{}",
+              "^": r"\textasciicircum{}"}
+
+
+def tex_text(s: str) -> str:
+    out = "".join(TEX_ESCAPE.get(c, c) for c in s)
+    return re.sub(r'"([^"]*)"', r"``\1''", out)  # pandoc does this for the body text
 
 
 class Renderer:
-    def __init__(self, values: dict, tables: dict, figures: dict[str, str | None], fig_dir_rel: str):
+    def __init__(self, values: dict, tables: dict, figures: dict[str, str | None], fig_dir_rel: str,
+                 target: str = "md"):
         self.values = values
         self.tables = tables
         self.figures = figures
         self.fig_dir_rel = fig_dir_rel
+        self.target = target  # "md": block quotes; "pdf": coloured LaTeX boxes
         self.numbers: dict[str, int] = {}
         self.counts = {"table": 0, "figure": 0}
         self.missing: list[str] = []
@@ -46,6 +62,11 @@ class Renderer:
     def _sub(self, m: re.Match) -> str:
         kind, name, caption = m.group(1), m.group(2), (m.group(3) or "").strip()
         caption = " ".join(caption.split())
+        if kind == "callout":
+            label, env = CALLOUT.get(name, CALLOUT["key"])
+            if self.target == "pdf":
+                return f"\n\\begin{{{env}}}\n{tex_text(caption)}\n\\end{{{env}}}\n"
+            return f"\n> **{label}.** {caption}\n"
         if kind == "value":
             if name not in self.values:
                 self.missing.append(f"value:{name}")

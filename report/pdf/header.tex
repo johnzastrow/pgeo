@@ -2,7 +2,18 @@
 % the text width; no automatic figure numbering (the report numbers figures itself).
 \usepackage{etoolbox}
 \renewcommand{\familydefault}{\sfdefault}
-\AtBeginEnvironment{longtable}{\footnotesize}
+% Narrow column padding: the widest tables have nine columns, and pandoc computes each column from
+% (\linewidth - 2n\tabcolsep), so a smaller separation gives the cells the room back.
+\AtBeginEnvironment{longtable}{\footnotesize\setlength{\tabcolsep}{3pt}}
+% Hyphenate the first word of a table cell. TeX never hyphenates a word that starts a paragraph
+% with no preceding glue, so a long single word ("autocomplete") in a narrow column ran past the
+% cell edge; a zero-width space in front of it restores hyphenation.
+\makeatletter
+\let\pandoc@raggedright\raggedright
+\renewcommand{\raggedright}{\pandoc@raggedright\hspace{0pt}}
+\let\pandoc@raggedleft\raggedleft
+\renewcommand{\raggedleft}{\pandoc@raggedleft\hspace{0pt}}
+\makeatother
 \setlength{\LTleft}{0pt}
 \setlength{\LTright}{0pt}
 \usepackage{float}
@@ -23,3 +34,16 @@
 \fancyhead[R]{\small\thepage}
 \renewcommand{\headrulewidth}{0.4pt}
 \setlength{\headheight}{14pt}
+
+% Callout boxes for the statements that matter most (renderer emits \begin{keybox} etc.)
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\newtcolorbox{keybox}{breakable, enhanced, colback=blue!4!white, colframe=blue!45!black,
+  boxrule=0.6pt, left=6pt, right=6pt, top=5pt, bottom=5pt, title=Key result,
+  fonttitle=\bfseries\small, coltitle=white}
+\newtcolorbox{impactbox}{breakable, enhanced, colback=green!4!white, colframe=green!35!black,
+  boxrule=0.6pt, left=6pt, right=6pt, top=5pt, bottom=5pt, title=What this means,
+  fonttitle=\bfseries\small, coltitle=white}
+\newtcolorbox{cautionbox}{breakable, enhanced, colback=orange!6!white, colframe=orange!65!black,
+  boxrule=0.6pt, left=6pt, right=6pt, top=5pt, bottom=5pt, title=Caution,
+  fonttitle=\bfseries\small, coltitle=white}
