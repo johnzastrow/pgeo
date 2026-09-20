@@ -42,7 +42,7 @@ scripts/rebuild_all.sh deploy       # ship to the query host (explicit only)
 | `pelias` | `scripts/build_local.sh setup download prepare import up test`, `scripts/snapshot_local.sh` | ~30 min | Elasticsearch index `pelias` (1,649,644 documents), snapshot `pelias-<date>` |
 | `pgeo` | `scripts/pgeo_setup.sh`, `scripts/pgeo_rebuild.sh` | ~20 min (first image build adds ~10 min) | database `pgeo` (906,101 features), profile applied, accuracy gate passed |
 | `verify` | compatibility contract, pgeo unit tests, browser smoke test | ~3 min | "compat: passed", "OK" |
-| `report` | `scripts/build_report.sh --refresh` | ~1 min | `docs/REPORT.md`, `docs/REPORT.pdf` |
+| `report` | `scripts/build_report.sh --refresh` | ~1 min | `docs/REPORT.md`, `docs/REPORT.pdf`, `docs/REPORT.docx` |
 | `deploy` | `scripts/pgeo_dump.sh`, Ansible `site.yml` | ~15 min | both engines live on the query host |
 
 ## 3. Stage by stage

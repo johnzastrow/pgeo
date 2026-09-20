@@ -8,4 +8,4 @@
 5. A Future Work section, include explanation of the possible value of OpenResty or Omnigres, and say whether they would be worth testing
 6. in the forward-search pipeline graphic we need a little more room between the horizontal boxes
 7. for all Figure and table captions, Bold both the figure/table number AND the short title that follows. The body of the caption remains normal. 
-8. is the data flow pipe diag
+   1. is the data flow pipe diagram, create named vertical swim lanes for the colored boxes, then explain in more detail what is happening in each step named in the colored boxes. Create more diagrams to show more detail on the processing steps.

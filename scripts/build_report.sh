@@ -7,7 +7,8 @@
 #                                              compatibility contract test
 #   scripts/build_report.sh --refresh-accuracy also re-run the accuracy and fuzz sets against
 #                                              Pelias and pgeo (~15 min)
-#   scripts/build_report.sh --no-pdf           Markdown only
+#   scripts/build_report.sh --no-pdf           skip the PDF
+#   scripts/build_report.sh --no-docx          skip the Word document
 #
 # Inputs are listed in report/inputs.toml (load-test run ids, accuracy files). Load tests are
 # separate, multi-hour runs (tests/load/run_matrix*.py); point inputs.toml at new run ids.
@@ -21,6 +22,7 @@ for a in "$@"; do
     --refresh) refresh=1 ;;
     --refresh-accuracy) refresh=1; refresh_acc=1 ;;
     --no-pdf) args+=(--no-pdf) ;;
+    --no-docx) args+=(--no-docx) ;;
     -h|--help) sed -n '2,15p' "$0"; exit 0 ;;
     *) echo "unknown argument: $a" >&2; exit 2 ;;
   esac

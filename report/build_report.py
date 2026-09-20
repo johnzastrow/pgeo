@@ -30,6 +30,7 @@ DOCS = ROOT / "docs"
 FIG_PUBLISH = DOCS / "report_figures"  # PNG (used) + SVG (editable sources)
 OUT_MD = DOCS / "REPORT.md"
 OUT_PDF = DOCS / "REPORT.pdf"
+OUT_DOCX = DOCS / "REPORT.docx"
 PDF_FORMAT = ("markdown+pipe_tables+implicit_figures+raw_tex-yaml_metadata_block"
               "-tex_math_dollars-tex_math_single_backslash")
 STATIC_TABLE = re.compile(r"^```table ([a-z0-9_]+)\n(.*?)\n```\n?", re.S | re.M)
@@ -43,6 +44,7 @@ def git(*args: str) -> str:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-pdf", action="store_true")
+    ap.add_argument("--no-docx", action="store_true")
     ap.add_argument("--collect", action="store_true", help="refresh report/data/snapshot.json from live systems")
     ap.add_argument("--draft", action="store_true", help="build even if the template has PENDING markers")
     a = ap.parse_args()
@@ -127,6 +129,26 @@ def main() -> int:
         over = len([1 for line in (BUILD / "report.log").read_text(errors="ignore").splitlines()
                     if "Overfull \\hbox" in line])  # fmt: skip
         print(f"report: wrote {OUT_PDF.relative_to(ROOT)} ({over} overfull boxes)")
+
+    if not a.no_docx:
+        print("report: docx")
+        # From the Markdown, not the LaTeX: Word wants native tables and images, and the
+        # Markdown target already renders callouts as block quotes.
+        cmd = [
+            "pandoc", str(OUT_MD), "-o", str(OUT_DOCX),
+            "--from", "markdown+pipe_tables",
+            "--resource-path", str(DOCS),
+            "--metadata-file", str(HERE / "pdf" / "metadata.yaml"),
+            "--toc", "--toc-depth=2",
+        ]  # fmt: skip
+        ref = HERE / "pdf" / "reference.docx"
+        if ref.is_file():
+            cmd += ["--reference-doc", str(ref)]
+        res = subprocess.run(cmd, capture_output=True, text=True)  # noqa: S603
+        if res.returncode != 0:
+            print(res.stderr[-2000:], file=sys.stderr)
+            return 1
+        print(f"report: wrote {OUT_DOCX.relative_to(ROOT)}")
     return 0
 
 

@@ -10,7 +10,7 @@ loading runbook (every step with manual commands, checks, and reference counts).
 [docs/REBUILD.md](docs/REBUILD.md) is the authoritative runbook, and
 `scripts/rebuild_all.sh` runs it end to end (`scripts/rebuild_all.sh --help` lists the stages).
 The study that compares the two engines is [docs/REPORT.md](docs/REPORT.md)
-([PDF](docs/REPORT.pdf)). A slide deck covering pgeo's architecture, features, use and limits
+([PDF](docs/REPORT.pdf), [Word](docs/REPORT.docx)). A slide deck covering pgeo's architecture, features, use and limits
 runs from the repository with `scripts/slides.sh` ([slides/README.md](slides/README.md)).
 
 Version: see [VERSION](VERSION) and [CHANGELOG.md](CHANGELOG.md) (semver; pgeo and
