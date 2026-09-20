@@ -24,7 +24,7 @@ report/.venv/
 # report inputs are small and belong in git (the rule above matches every data/ directory)
 !report/data/
 
-# Slidev deck: the sources are slides/slides.md and slides/public; these are build output
+# Slidev deck. slides/dist IS committed: the static build is what gets published, so the deck
+# can be read from the repository (and GitHub Pages) without Node or npm install.
 slides/node_modules/
-slides/dist/
 slides/.slidev/

@@ -36,6 +36,10 @@ edge_rate_autocomplete: 25
 
 # --- pgeo runtime (PostgreSQL/PostGIS geocoder; pure SQL via PostgREST) --------
 # Decision 2026-09-19: deploy next to Pelias; VM 120 resized for it (docs/DEPLOY_PGEO.md).
+# Set false to deploy pgeo alone: the Pelias upstream and routes disappear, pgeo answers on the
+# canonical /v1/* paths so existing clients need no change, and the demo page announces one
+# engine (no switch, no Compare tab). This is the small-VPS deployment the study recommends.
+pelias_enabled: true
 pgeo_enabled: true
 pgeo_user: pgeo
 pgeo_home: /opt/pgeo

@@ -143,6 +143,9 @@ build on a workstation, ship the dump.
 - **Subset builds** — load only the sources you want
 - **It is just a database**: replicas, `pg_dump`, PITR, your existing backup and monitoring all apply
 - **Deployable from a 1 GB VPS to a multi-core VM** without changing anything but the profile
+- **Deployable without Pelias at all**: `pelias_enabled=false` and pgeo answers on the canonical
+  `/v1/*` paths, so an existing Pelias client needs no change and the demo page drops its engine
+  switch and Compare tab by itself
 
 </v-clicks>
 

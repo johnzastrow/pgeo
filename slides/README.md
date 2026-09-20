@@ -51,6 +51,9 @@ and nothing in `slides/` is reachable from the geocoder. The `lodash` advisory n
 attacker-controlled template input and the `image-size` one needs a malicious image handed to
 the PPTX exporter, which this deck never runs.
 
-If that trade is not acceptable for your environment, build the deck once
-(`scripts/slides.sh build`), publish `slides/dist`, and remove `slides/node_modules` — the
-static output has no JavaScript dependencies on any of the above.
+That is why **only the static build is published**: `slides/dist` is committed and
+`slides/node_modules` is not. Reading the deck needs no Node, no npm install and none of the
+packages above — a browser and a static file server are enough. The dependencies are only
+needed to *edit* the deck.
+
+`playwright-chromium` is a dev dependency, used solely by `scripts/slides.sh pdf`.

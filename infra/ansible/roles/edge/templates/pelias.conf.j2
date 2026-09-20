@@ -22,11 +22,18 @@ geo $realip_remote_addr $edge_peer_allowed {
 {% endfor %}
 }
 
+{% set pelias_on = pelias_enabled | default(true) | bool %}
+{% set pgeo_on = pgeo_enabled | default(false) | bool %}
+{# With Pelias absent, pgeo takes the canonical /v1/* paths, so an existing Pelias client needs
+   no change at all; alongside Pelias it stays under /pgeo to leave those paths to Pelias. #}
+{% set pgeo_prefix = '/pgeo' if pelias_on else '' %}
+{% if pelias_on %}
 upstream pelias_api {
     server 127.0.0.1:4000;
     keepalive 16;
 }
-{% if pgeo_enabled | default(false) | bool %}
+{% endif %}
+{% if pgeo_on %}
 
 # pgeo pure-SQL API (PostgREST on 127.0.0.1:4600), served under /pgeo/v1/*. PostgREST keeps only
 # the last segment of dotted parameters, so boundary.circle.lat/lon would collide with
@@ -92,6 +99,7 @@ server {
     proxy_read_timeout 15s;
     proxy_hide_header X-Powered-By;
 
+{% if pelias_on %}
     location = /v1/autocomplete {
         limit_except GET { deny all; }
         limit_req zone=pelias_autocomplete burst=50 nodelay;
@@ -103,32 +111,33 @@ server {
         limit_req zone=pelias_search burst=20 nodelay;
         proxy_pass http://pelias_api;
     }
+{% endif %}
 
-{% if pgeo_enabled | default(false) | bool %}
+{% if pgeo_on %}
     # ---- pgeo (same rate limits as Pelias). A parameter the SQL API does not declare makes
     # PostgREST answer 404; turn it into a Pelias-shaped 400.
-    location = /pgeo/v1/autocomplete {
+    location = {{ pgeo_prefix }}/v1/autocomplete {
         limit_except GET { deny all; }
         limit_req zone=pelias_autocomplete burst=50 nodelay;
         proxy_intercept_errors on;
         error_page 404 = @pgeo_unsupported;
         proxy_pass http://pgeo_rest/rpc/v1_autocomplete?$pgeo_circle_args;
     }
-    location = /pgeo/v1/search {
+    location = {{ pgeo_prefix }}/v1/search {
         limit_except GET { deny all; }
         limit_req zone=pelias_search burst=20 nodelay;
         proxy_intercept_errors on;
         error_page 404 = @pgeo_unsupported;
         proxy_pass http://pgeo_rest/rpc/v1_search?$pgeo_circle_args;
     }
-    location = /pgeo/v1/search/structured {
+    location = {{ pgeo_prefix }}/v1/search/structured {
         limit_except GET { deny all; }
         limit_req zone=pelias_search burst=20 nodelay;
         proxy_intercept_errors on;
         error_page 404 = @pgeo_unsupported;
         proxy_pass http://pgeo_rest/rpc/v1_search_structured?$pgeo_circle_args;
     }
-    location ~ ^/pgeo/v1/(?<pgeo_fn>reverse|place|address)$ {
+    location ~ ^{{ pgeo_prefix }}/v1/(?<pgeo_fn>reverse|place|address)$ {
         limit_except GET { deny all; }
         limit_req zone=pelias_search burst=20 nodelay;
         proxy_intercept_errors on;
@@ -137,15 +146,17 @@ server {
     }
     # Pelias serves the licence page to any client; PostgREST returns the media-type domain
     # verbatim only when asked for it, so the edge asks on the client's behalf.
-    location = /pgeo/v1/attribution {
+    location = {{ pgeo_prefix }}/v1/attribution {
         limit_except GET { deny all; }
         limit_req zone=pelias_search burst=20 nodelay;
         proxy_set_header Accept "text/html";
         proxy_pass http://pgeo_rest/rpc/v1_attribution;
     }
+{% if pelias_on %}
     location /pgeo/ {
         return 404;
     }
+{% endif %}
     location @pgeo_unsupported {
         default_type application/json;
         return 400 '{"geocoding":{"version":"0.2","errors":["unsupported parameter or endpoint: pgeo accepts the documented Pelias parameters"]},"type":"FeatureCollection","features":[]}';
@@ -155,7 +166,11 @@ server {
     location = /engines.json {
         default_type application/json;
         expires 5m;
+{% if pelias_on %}
         return 200 '{"engines":[{"label":"Pelias","base":"","kind":"pelias"},{"label":"pgeo (PostgreSQL)","base":"/pgeo","kind":"pgeo"}]}';
+{% else %}
+        return 200 '{"engines":[{"label":"pgeo (PostgreSQL)","base":"","kind":"pgeo"}]}';
+{% endif %}
     }
 {% endif %}
 
@@ -188,7 +203,7 @@ server {
     location / {
         limit_except GET { deny all; }
         expires 5m;
-{% if pgeo_enabled | default(false) | bool %}
+{% if pgeo_on %}
         # Announce the engine switch to the page (served unmodified when pgeo is disabled).
         sub_filter '</head>' '<meta name="demo-engines" content="/engines.json"></head>';
         sub_filter_once on;

@@ -55,7 +55,19 @@ async function setupEngines() {
   const pg = engines.find((e) => e.kind === 'pgeo');
   pgeoClient = pg ? new PeliasClient({ baseUrl: pg.base }) : null;
   setupExtras();
-  if (engines.length < 2) return;
+  // Point the shared client at the first announced engine before anything else: with a single
+  // engine the switch below never runs, and a pgeo-only deployment serves nothing at /v1/*
+  // unless pgeo is mounted there.
+  client.baseUrl = engines[0].base;
+  $('#engine-note').textContent = engines[0].kind === 'pgeo' ? 'PostgreSQL / PostGIS' : 'Elasticsearch';
+  if (engines.length < 2) {
+    // One engine: no switch to show, but say which one is answering.
+    $('#engine-pick').hidden = false;
+    $('#engine').hidden = true;
+    $('#engine-only').textContent = engines[0].label;
+    $('#engine-only').hidden = false;
+    return;
+  }
   const sel = $('#engine');
   for (const e of engines) {
     const o = document.createElement('option');

@@ -22,8 +22,10 @@
       <p class="kicker">United States &middot; State of Maine</p>
       <h1><span class="t-main">Maine</span> <span class="t-sub">Geocoder</span></h1>
       <p class="edition">Self-hosted &middot; 1,649,644 features &middot; OSM &middot; OA &middot; WOF &middot; GNIS &middot; Overture</p>
-      <!-- Shown when the server announces more than one engine (<meta name="demo-engines">). -->
+      <!-- With two or more announced engines this is a switch; with one it names the engine
+           that is answering, so a pgeo-only deployment still says what it is running. -->
       <label class="select engine" id="engine-pick" hidden>Engine <select id="engine"></select>
+        <span id="engine-only" hidden></span>
         <span class="engine-note" id="engine-note"></span></label>
     </header>
 
