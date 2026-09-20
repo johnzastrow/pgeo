@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shutil
 import subprocess
 import sys
 from datetime import datetime
@@ -29,6 +30,8 @@ DOCS = ROOT / "docs"
 FIG_PUBLISH = DOCS / "report_figures"  # PNG (used) + SVG (editable sources)
 OUT_MD = DOCS / "REPORT.md"
 OUT_PDF = DOCS / "REPORT.pdf"
+PDF_FORMAT = ("markdown+pipe_tables+implicit_figures+raw_tex-yaml_metadata_block"
+              "-tex_math_dollars-tex_math_single_backslash")
 STATIC_TABLE = re.compile(r"^```table ([a-z0-9_]+)\n(.*?)\n```\n?", re.S | re.M)
 
 
@@ -95,21 +98,35 @@ def main() -> int:
         pdf_text = rp.render(template)
         lines = pdf_text.splitlines()
         pdf_md.write_text("\n".join(lines[3:]) if lines[0].startswith("# ") else pdf_text)
+        # Two steps rather than pandoc's own PDF: the tables get grid lines, which means editing
+        # the LaTeX pandoc's writer produces (no filter can reach it).
+        tex = BUILD / "report.tex"
         cmd = [
-            "pandoc", str(pdf_md), "-o", str(OUT_PDF),
-            "--from", "markdown+pipe_tables+implicit_figures+raw_tex-yaml_metadata_block-tex_math_dollars-tex_math_single_backslash",
-            "--pdf-engine", "xelatex",
+            "pandoc", str(pdf_md), "-o", str(tex),
+            "--from", PDF_FORMAT,
             "--metadata-file", str(HERE / "pdf" / "metadata.yaml"),
             "--include-in-header", str(HERE / "pdf" / "header.tex"),
             "--lua-filter", str(HERE / "pdf" / "breakcode.lua"),
-            "--resource-path", str(DOCS),
-            "--toc", "--toc-depth", "2",
+            "--toc", "--toc-depth", "2", "--standalone",
         ]  # fmt: skip
         res = subprocess.run(cmd, capture_output=True, text=True)  # noqa: S603
         if res.returncode != 0:
             print(res.stderr[-3000:], file=sys.stderr)
             return 1
-        print(f"report: wrote {OUT_PDF.relative_to(ROOT)}")
+        subprocess.run([sys.executable, str(HERE / "pdf" / "gridtables.py"), str(tex)], check=True)  # noqa: S603
+        # xelatex runs in docs/ so \includegraphics finds report_figures/; twice for the contents
+        for _ in range(2):
+            res = subprocess.run(  # noqa: S603
+                ["xelatex", "-interaction=nonstopmode", "-halt-on-error",  # noqa: S607
+                 f"-output-directory={BUILD}", str(tex)],
+                cwd=DOCS, capture_output=True, text=True)  # fmt: skip
+        if res.returncode != 0 or not (BUILD / "report.pdf").is_file():
+            print(res.stdout[-3000:], file=sys.stderr)
+            return 1
+        shutil.copy2(BUILD / "report.pdf", OUT_PDF)
+        over = len([1 for line in (BUILD / "report.log").read_text(errors="ignore").splitlines()
+                    if "Overfull \\hbox" in line])  # fmt: skip
+        print(f"report: wrote {OUT_PDF.relative_to(ROOT)} ({over} overfull boxes)")
     return 0
 
 
