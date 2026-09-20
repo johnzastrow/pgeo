@@ -67,7 +67,9 @@ EOF
 
 echo "== deploying $engine"
 roles="base,docker,edge"
-vars=(-e "edge_allowed_sources=['192.0.2.254','$ip']" -e edge_rate_search=2000 -e edge_rate_autocomplete=5000)
+# JSON, not key=value: Ansible reads key=value as a plain string, and the template then
+# iterates its characters and writes "allow [;" into the nginx config.
+vars=(-e "{\"edge_allowed_sources\": [\"192.0.2.254\", \"$ip\"], \"edge_rate_search\": 2000, \"edge_rate_autocomplete\": 5000}")
 if [[ "$engine" == pgeo ]]; then
   roles="$roles,pgeo"; vars+=(-e pgeo_enabled=true)
 else
