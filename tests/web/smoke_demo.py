@@ -37,11 +37,19 @@ def run(base: str, shots: Path) -> list[str]:
                     continue
                 page = browser.new_page(viewport=vp, color_scheme=scheme)
                 errors: list[str] = []
+                # Record where the error came from: a bare "Error" says nothing when a run
+                # fails once and passes on retry (a 429 from the edge looks exactly like that).
                 page.on(
                     "console",
-                    lambda m, e=errors: e.append(m.text) if m.type == "error" else None,
+                    lambda m, e=errors: e.append(f"{m.text} @ {m.location.get('url', '?')}")
+                    if m.type == "error" else None,  # fmt: skip
                 )
-                page.on("pageerror", lambda exc, e=errors: e.append(str(exc)))
+                page.on("pageerror", lambda exc, e=errors: e.append(f"pageerror: {exc}"))
+                page.on(
+                    "response",
+                    lambda r, e=errors: e.append(f"HTTP {r.status} {r.url}")
+                    if r.status >= 400 else None,  # fmt: skip
+                )
                 tag = f"{name}-{scheme}"
 
                 page.goto(base + "/", wait_until="networkidle")
