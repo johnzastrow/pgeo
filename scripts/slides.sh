@@ -18,12 +18,16 @@ cd "$SLIDES"
 command -v npm >/dev/null || { echo "npm is required (Node 20+)" >&2; exit 1; }
 [[ -d node_modules ]] || { echo "== installing (first run)"; npm install; }
 
+# Opened as a file:// page a Vite build loads none of its assets and shows nothing; leave a
+# message in the HTML that appears only in that case (slides/file_hint.py explains why).
+build_deck() { npm run build && python3 file_hint.py dist/index.html; }
+
 case "${1:-dev}" in
   dev)   exec npm run dev ;;
-  build) exec npm run build ;;
+  build) build_deck; exit $? ;;
   pdf)   exec npm run export ;;
   serve)
-    [[ -f dist/index.html ]] || npm run build
+    [[ -f dist/index.html ]] || build_deck
     echo "== http://127.0.0.1:$PORT  (Ctrl-C to stop)"
     exec python3 - "$PORT" <<'PY'
 import sys, functools, http.server, socketserver, pathlib

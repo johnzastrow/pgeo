@@ -14,6 +14,13 @@ scripts/slides.sh pdf        # export to docs/pgeo-slides.pdf
 
 The first run installs dependencies with npm (Node 20+). Nothing else is required.
 
+**Opening `slides/dist/index.html` directly will not work**, and that is a browser rule rather
+than a fault in the build: a page loaded from a `file://` URL has the origin `null`, so the
+browser refuses to fetch its own stylesheets and scripts and you get a blank page. The build
+leaves a message saying so, which disappears as soon as the deck is served over HTTP. Use
+`scripts/slides.sh serve`, or read [`docs/pgeo-slides.pdf`](../docs/pgeo-slides.pdf) if you just
+want to read it.
+
 `serve` exists because a Slidev build is a single-page application: a deep link such as
 `/5` must fall back to `index.html`, which `python3 -m http.server` does not do — the deck
 loads at `/` and then 404s on any direct slide link. The script serves the build with that
