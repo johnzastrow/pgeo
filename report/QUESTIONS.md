@@ -33,4 +33,6 @@ finished report before each release. Status: answered / pending (awaiting a meas
 | 24 | Arguments for and against the external HTTP options (vs Postgres core/contrib only). | 2.1 | answered |
 | 25 | Resources required for building and operating each platform, and which loads and data they support. | 3.5 | answered |
 | 26 | Features each platform provides. | 3.9 | answered |
+| 28 | Deep security assessment of both platforms, with a report section comparing them. | 3.13, docs/SECURITY_DEPLOYMENT.md | answered |
+| 29 | Best-practice deployment scenarios for security, the tensions with lightweight deployment, and the benefits of LAN-only self-hosting. | docs/SECURITY_DEPLOYMENT.md sections 3-5; report 3.13 | answered |
 | 27 | Translate the lowest CPU finding to common shared-CPU VPS sizes (Linode nano, DigitalOcean, Vultr, Hetzner, others). | 3.5 (VPS table), 3.12 | answered (1 GB confirmed on a real VM) |

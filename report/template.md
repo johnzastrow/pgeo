@@ -935,6 +935,67 @@ the Proxmox host could not spare beside the machines already running on it. Its 
 evidence is VM 120 itself (Section 3.11), which runs Pelias in 10 GB and serves
 {{value:vm120_pelias_limit}} users; the floor search is what says how far that could be cut.
 
+### 3.13 Security
+
+The two platforms differ in security the way they differ in everything else: Pelias is more
+software, and pgeo is more of this project's own software. Both statements cut. The controls
+below were measured on the deployed service rather than read off the configuration, and
+`tests/security/test_posture.py` asserts each one on every build and every deploy.
+
+```table security_compare
+| Property | Pelias | pgeo |
+|---|---|---|
+| Processes reachable over HTTP | 6 (API, Elasticsearch, libpostal, placeholder, pip, interpolation) | 2 (PostgREST, PostgreSQL) |
+| Data-store credentials | none: Elasticsearch accepts unauthenticated reads and writes from anything that reaches the port | password, `pg_hba`, and an API role holding `SELECT` only |
+| Effect of a foothold on the host | the whole index: read, modify or delete | whatever `SELECT` allows; the API role has no write path |
+| Attack surface in this project's code | none; the query path is upstream | the ranking SQL, the edge parameter rewriting and `/v1/address` |
+| Components to patch | 6 pinned images | 2 pinned images |
+| Query text in engine logs | not logged | not logged (`log_parameter_max_length = 0`, `log_statement = none`) |
+```
+
+{{table:security_compare|Security properties of each platform as deployed. Measured 2026-09-20.}}
+
+**What the two columns are really saying.** Pelias's data store has no credentials at all: its
+design assumes nothing can reach it, so the loopback binding is the entire access-control story.
+That is a property of its architecture, not a defect in its code, and it is why the single
+cheapest improvement available to a Pelias deployment is enabling Elasticsearch's own
+authentication -- configuration, not another container. pgeo authenticates its data store and
+gives the HTTP layer a role that cannot write, so the same foothold yields less. Set against
+that, pgeo's query path is code written for this project: its ranking SQL and its edge rules have
+one set of eyes on them, where Pelias's have many.
+
+**Shared posture.** Both engines sit behind the same edge, and that is where most of the
+protection lives: every engine port bound to loopback, a firewall that denies inbound by default
+and admits the TLS terminator alone, `GET` only, per-client rate limits, a content security policy
+naming no remote origin, and a demo page that builds every element with `textContent` -- it
+contains no `innerHTML`, `eval` or `document.write` at all, which is what makes the query echoed
+in each response harmless.
+
+{{callout:caution|Neither engine authorizes anything today. Any device that can reach the edge can
+resolve any address, which for the LANCER use case means any device on the LAN can resolve a
+client address. This is the one place where "fewest components" and good security genuinely
+conflict, and the lightest honest answer -- hashed API keys checked at the edge, issued out of
+band -- costs no new component. It is Phase 11 and it is not done.}}
+
+**A finding worth repeating, because of how it hid.** PostgreSQL was deliberately configured not
+to log bind parameters, since a query here is an address someone searched for and for LANCER a
+client address. That control was real. The nginx access log in front of it, however, used the
+default format, which records the whole request line -- so every address searched was written to
+disk in plaintext anyway. A control at one layer was undone by a default at the next, and the
+system-level claim looked satisfied the whole time. The edge now logs the path without its query
+string, verified on the deployed service.
+
+**Why the deployment shape carries so much of the weight.** Both engines serve public open data,
+so a total compromise of the index or the database leaks nothing that is not already downloadable.
+The sensitive material is in the queries, not the corpus, which is why a logging default mattered
+more here than anything about the data store. Self-hosting on a LAN removes rather than mitigates
+whole classes of threat -- no bot traffic, no scraping, no credential stuffing, no exposure to
+internet-wide scanning -- and that is what makes a two-container service on a 1 GB machine a
+defensible posture rather than a reckless one. The cost is that patching becomes the department's
+job: six images or two, and nobody updates them in the background. Deployment scenarios at three
+levels of ambition, and where each control pulls against the fewest-components principle, are in
+`docs/SECURITY_DEPLOYMENT.md`.
+
 ## 4. Discussion
 
 **Why pgeo is more accurate.** The difference is in how text meets data. Elasticsearch matches
@@ -1107,6 +1168,7 @@ answers it in full.
 | What does each platform need to build and to run, and what loads and data can it support? | Sizing guide by load; operating and build requirements | 3.5 |
 | What features does each platform provide? | Feature matrix and parity table | 3.9, 3.10 |
 | How small can a server be for 3 concurrent users, and how many users does it then scale to? | See Section 3.12 | 3.12 |
+| How do the two platforms compare on security, and how should each be deployed? | pgeo authenticates its data store and its API role cannot write; Pelias's Elasticsearch has no credentials, so its loopback binding is the whole control. Neither authorizes callers yet | 3.13, `docs/SECURITY_DEPLOYMENT.md` |
 | What do the measured floors mean in shared-CPU VPS plans (Linode, DigitalOcean, Vultr, Hetzner and others)? | pgeo runs on a 1 GB plan (confirmed on a real VM, 32 users); Pelias needs an 8 GB plan, about ten times the price | 3.5 (Table 24), 3.12 |
 ```
 
