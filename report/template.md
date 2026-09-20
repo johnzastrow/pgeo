@@ -837,7 +837,26 @@ generations newer than the workstation's (Section 1.2), which works the other wa
 is not a cleaner comparison between engines but a check that the service, as deployed, meets the
 targets it was designed for.
 
-<!-- PENDING: interpretation of the VM 120 numbers once the run has been made -->
+Both engines pass the three-user validation with room to spare: the worst endpoint reaches 8% of
+its target on Pelias and 13% on pgeo, with no errors. For the service this project set out to
+build, that is the answer -- either engine, on the hardware already owned, is far inside its
+requirement.
+
+The ramp is more interesting than the validation, because it disagrees with the workstation in a
+useful way. Pelias holds {{value:vm120_pelias_limit}} concurrent users here and pgeo
+{{value:vm120_pgeo_limit}}, a ratio of three rather than the four measured under controlled
+conditions ({{ref:table:parity_capacity}}). Both engines do better on the VM than on the
+workstation, which is expected -- VM 120's cores are two CPU generations newer and the engine does
+not share the machine with the load generator -- but pgeo gains more from the newer core than
+Pelias does. That is consistent with where each spends its time: pgeo runs interpreted PL/pgSQL,
+which a faster core speeds up directly, while Pelias's compiled index lookups were already cheap
+per request.
+
+{{callout:impact|Take the ratio, not the absolute numbers, from this report. The four-to-one
+throughput gap measured under controlled conditions narrows to three-to-one on newer cores, and
+both engines serve far more users on the production VM than on the test workstation. Sizing from
+the tables here will therefore be conservative on comparable hardware, which is the direction an
+operator wants to be wrong in.}}
 
 ### 3.12 The smallest server that works
 

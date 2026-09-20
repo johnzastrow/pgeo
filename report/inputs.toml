@@ -14,7 +14,7 @@ pgeo = ["data/loadtest/20260919-1135-pgeo", "data/loadtest/20260919-1543-pgeo"]
 # temporary Proxmox VMs (tests/load/floor_vm.sh -> run_vm.py), plus the VM 120 validation
 floor = "data/loadtest/20260919-1635-floor"
 floor_vm = []
-vm120 = []
+vm120 = ["data/loadtest/20260919-2019-vm"]
 
 [accuracy]
 # engine key -> result file (tests/accuracy/run_accuracy.py output)
