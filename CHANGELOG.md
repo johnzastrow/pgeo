@@ -38,6 +38,12 @@ commits where each milestone was complete.
   runbook `docs/DEPLOY_PGEO.md`. Not yet deployed.
 
 ### Fixed
+- pgeo on the query host would not start: `postgresql.conf` was written 0640 owned by the host
+  account, and PostgreSQL in the container runs as its own uid, so it could not read the file.
+  It is 0644 now (tuning settings only; credentials stay in `pgeo.secrets`, 0600). The failed
+  first start left a half-initialized cluster - no database, and a `pg_hba.conf` without the
+  entry the image appends on a completed init - which the role now detects and explains
+  instead of failing later with "database does not exist".
 - pgeo load runner mounts a per-run tuning directory (mounting a file inside the read-only
   base directory failed when the file did not exist).
 - Report PDF readability: request strings in the compatibility tables now wrap instead of

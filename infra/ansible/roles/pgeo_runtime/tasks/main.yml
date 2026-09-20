@@ -48,16 +48,53 @@
     group: "{{ pgeo_user }}"
     mode: "0600"
 
-- name: Compose file and PostgreSQL configuration
+# A first start that fails (an unreadable postgresql.conf did this once) leaves initdb half
+# done: a cluster with no pgeo database and a pg_hba.conf without the entry the image appends
+# on a completed init, so nothing can connect and every later run says "skipping
+# initialization". Detect it and say what to do, rather than failing later with "database
+# does not exist".
+- name: Detect a half-initialized cluster
+  block:
+    - name: Look for a cluster without its database
+      ansible.builtin.shell: |
+        set -o pipefail
+        test -f {{ pgeo_data_dir }}/pgdata/PG_VERSION || exit 0
+        grep -qE '^host[[:space:]]+all[[:space:]]+all[[:space:]]+all' {{ pgeo_data_dir }}/pgdata/pg_hba.conf || echo BROKEN
+      args:
+        executable: /bin/bash
+      register: pgeo_cluster_check
+      changed_when: false
+      failed_when: false
+
+    - name: Fail with the repair for a half-initialized cluster
+      ansible.builtin.fail:
+        msg: >-
+          {{ pgeo_data_dir }}/pgdata holds a cluster that was never finished initializing (its
+          pg_hba.conf has no "host all all all" entry, so the container cannot connect).
+          Move it aside and re-run to initialize and restore cleanly:
+          sudo systemctl stop pgeo && sudo mv {{ pgeo_data_dir }}/pgdata {{ pgeo_data_dir }}/pgdata.broken-$(date +%Y%m%d)
+      when: "'BROKEN' in (pgeo_cluster_check.stdout | default(''))"
+  become: true
+
+- name: Compose file
   ansible.builtin.template:
-    src: "{{ item.src }}"
-    dest: "{{ pgeo_home }}/{{ item.dest }}"
+    src: compose.yml.j2
+    dest: "{{ pgeo_home }}/compose.yml"
     owner: "{{ pgeo_user }}"
     group: "{{ pgeo_user }}"
     mode: "0640"
-  loop:
-    - { src: compose.yml.j2, dest: compose.yml }
-    - { src: postgresql.conf.j2, dest: postgresql.conf }
+  notify: Restart pgeo
+
+# World-readable on purpose: PostgreSQL in the container runs as its own uid, which does not
+# match the host account that owns the file, so 0640 made the server fail to start. The file
+# holds tuning settings only; credentials live in pgeo.secrets (0600, passed as env_file).
+- name: PostgreSQL configuration
+  ansible.builtin.template:
+    src: postgresql.conf.j2
+    dest: "{{ pgeo_home }}/postgresql.conf"
+    owner: "{{ pgeo_user }}"
+    group: "{{ pgeo_user }}"
+    mode: "0644"
   notify: Restart pgeo
 
 - name: Systemd unit
