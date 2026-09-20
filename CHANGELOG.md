@@ -23,6 +23,17 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+## [0.12.1] - 2026-09-20
+
+### Fixed
+- The report's feature and parity tables missed two Pelias HTTP surfaces that pgeo does not
+  implement: `/v1/attribution` (the data-licence page) and the `/v1/` API description page.
+  Both are now listed, and Section 3.8 says plainly that this is the one place where "an
+  existing Pelias client cannot tell the difference" does not hold. Implementing
+  `/v1/attribution` is added to the next steps.
+- Demo page attribution named only Pelias as the geocoder and omitted OpenStreetMap from the
+  geocoding sources; it now names both engines and all sources.
+
 ## [0.12.0] - 2026-09-19
 
 ### Added

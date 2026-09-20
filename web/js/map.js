@@ -72,7 +72,7 @@ export function createMap(container, { dark = false } = {}) {
   map.addControl(new maplibregl.AttributionControl({
     compact: true,
     customAttribution:
-      'Geocoding: Pelias &middot; OpenAddresses &middot; Who&#39;s On First &middot; USGS GNIS &middot; US Census &middot; Overture Maps',
+      'Geocoding: Pelias / pgeo &middot; OpenAddresses &middot; OpenStreetMap &middot; Who&#39;s On First &middot; USGS GNIS &middot; US Census &middot; Overture Maps',
   }), 'bottom-right');
   return map;
 }
