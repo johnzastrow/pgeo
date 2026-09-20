@@ -1003,7 +1003,12 @@ the last sentence rather than a footnote: pgeo was tuned against the set that sc
 20-point accuracy gap should be read as an upper bound until both engines meet queries neither has
 seen. The capacity and memory findings carry no such caveat.
 
-<!-- PENDING: one sentence confirming the conclusions against the VM 120 validation -->
+None of this rests on the test bench alone. Both engines were deployed to the machine that will
+actually serve the requests and measured again through the production HTTPS path: both meet the
+three-user target with the worst endpoint at under a seventh of its budget, Pelias holds
+{{value:vm120_pelias_limit}} concurrent users there and pgeo {{value:vm120_pgeo_limit}}, and pgeo
+holds {{value:floorvm_pgeo_limit}} on a 1 GB machine costing about $5 a month. The conclusions
+above are what the deployed service does, not what a benchmark suggested it might.
 
 ## 6. Next steps
 

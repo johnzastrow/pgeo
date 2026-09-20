@@ -23,7 +23,26 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-09-19
+
 ### Added
+- **The study report** (`docs/REPORT.md`, `docs/REPORT.pdf`): the full comparison of the two
+  engines as a paper - abstract, methods, results with 20 figures and 37 numbered tables,
+  discussion, conclusions and next steps. Built from saved results by
+  `scripts/build_report.sh`; every number comes from `report/inputs.toml`, so a rebuild cannot
+  leave a stale figure in the prose.
+- **Minimum server for 3 users** (`tests/load/find_floor.py`): shrinks one resource at a time
+  until the three-user load misses a target. pgeo floors at 0.25 vCPU / 1.40 GB, Pelias at
+  0.25 vCPU / 7.17 GB. `--resume` continues an earlier search after the step list grows.
+- **Confirmation on real machines** (`tests/load/floor_vm.sh`): creates a temporary Proxmox VM
+  of the measured size, deploys one engine, runs the validation and ramp, and destroys it.
+  pgeo runs on 1 vCPU / 1 GB - the cheapest plan providers sell - holding 32 concurrent users.
+- **Production validation** (`tests/load/run_vm.py`): both engines on VM 120 through the real
+  HTTPS path. Pelias 384 concurrent users, pgeo 128; both meet the three-user target with the
+  worst endpoint under a seventh of its budget.
+- **Build resources** (`tests/build/measure_build.py`): Pelias 9 min / 11.5 GB peak / 2.9 cores;
+  pgeo 13 min / 5.5 GB / 1.2 cores. pgeo is built in four times its own runtime floor, so the
+  VPS that can run it cannot build it.
 - `docs/REBUILD.md`: authoritative runbook to rebuild both platforms, the demo, verification,
   deployment and the report; `scripts/rebuild_all.sh` runs it in stages; `scripts/pgeo_setup.sh`
   scripts pgeo's first-time setup (secrets, images, containers, edge), previously manual.
@@ -55,6 +74,22 @@ commits where each milestone was complete.
   as one solid green block.
 - Table captions stay with their tables in the PDF (Table 9's caption had been left at the foot
   of the previous page).
+- Three faults in the temporary-VM tooling, each found by running it end to end for the first
+  time: `create_vm.sh` extracted the guest IP with `grep -oE '[0-9.]+$'` on a line ending in a
+  quote, so it never matched and every VM was torn down as "no IP reported"; `floor_vm.sh` wrote
+  its inventory to a file with no `.yml` suffix, which Ansible would not parse, so the play
+  matched no hosts, exited 0 and the script load-tested an empty machine; and it passed the edge
+  allow-list as `key=value`, which Ansible reads as a string, so the template looped over its
+  characters and wrote `allow [;` into the nginx config. The script now verifies that the host is
+  in the inventory and that `pgeo_db` is running before generating any load.
+- `find_floor.py` logs a trial whose stack never started; such a trial returned before the print
+  and left a gap in the log (libpostal at 1.8 GB).
+
+### Changed
+- Documentation carries the post-index-fix measurements: `docs/TUNING_REPORT.md` section 5,
+  `docs/ENGINE_COMPARISON.md`, and `docs/LOAD_TEST_RESULTS_PGEO.md` regenerated from the
+  post-fix runs. The throughput ratio is four times per CPU under controlled conditions and
+  three on VM 120's newer cores, not the pre-fix "4 to 24".
 
 ## [0.11.0] - 2026-09-19
 

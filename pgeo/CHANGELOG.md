@@ -10,6 +10,13 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-09-19
+
+Note on provenance: the databases measured for the study report were built while this package
+still read 0.7.0, so they stamp `geocode.engine_version() = 0.7.0` and the report records that
+as the measured engine. A database reports 0.8.0 only after the next `pgeo-load build`; the
+version is stamped by the build on purpose, and is not edited in place.
+
 ### Added
 - `pgeo-tune verify` fails when the running database reports engine version `0+unknown`: the
   build stamps `geocode.engine_version()`, and an unstamped database puts that placeholder in
