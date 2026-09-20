@@ -761,7 +761,7 @@ difference" still does not hold.
 | Components | 6 containers | 2-3 containers |
 | Build | importers, ~15 min | one command, ~13 min |
 | Operations tooling | Pelias CLI | tuning profiles, accuracy gate, rebuild script |
-| Security posture here | read-only query services, pinned images, strict CSP | read-only database role, allowlisted tuning, no parameter logging |
+| Security posture here | read-only query services, pinned images, strict CSP; Elasticsearch has no credentials (loopback only) | read-only database role (`SELECT` only), allowlisted tuning, password-authenticated database, no query parameters in the PostgreSQL log |
 ```
 
 {{table:features|Features of each platform as deployed here.}}

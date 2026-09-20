@@ -7,6 +7,11 @@ limit_req_zone $binary_remote_addr zone=pelias_search:10m rate={{ edge_rate_sear
 limit_req_zone $binary_remote_addr zone=pelias_autocomplete:10m rate={{ edge_rate_autocomplete }}r/s;
 limit_req_status 429;
 
+# Access-log format that omits the query string: $uri, not $request. A geocoder's query string
+# is the address someone searched for.
+log_format pathonly '$remote_addr - $remote_user [$time_local] "$request_method $uri" '
+                    '$status $body_bytes_sent "$http_referer" "$http_user_agent"';
+
 # Only the TLS terminator may connect. Checked against the TCP peer
 # ($realip_remote_addr), not $remote_addr: the realip module below rewrites
 # $remote_addr to the end client, which would make allow/deny reject every real user.
@@ -48,6 +53,12 @@ server {
     listen {{ ansible_facts['default_ipv4']['address'] }}:{{ edge_listen_port }};
     server_name {{ edge_server_name }};
     server_tokens off;
+
+    # Geocoder queries are the addresses people search for, and for LANCER those are client
+    # addresses. The default "combined" format logs the whole request line, query string and
+    # all, so every searched address would sit in plaintext on disk. Log the path only.
+    # PostgreSQL is already configured not to log bind parameters (log_parameter_max_length=0).
+    access_log /var/log/nginx/access.log pathonly;
     root {{ edge_demo_root }};
     index index.html;
 

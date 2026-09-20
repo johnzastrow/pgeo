@@ -61,6 +61,8 @@ stage_pgeo() {
 stage_verify() {
   uv run --project pgeo python tests/compat/compat_test.py --json report/data/compat.json
   (cd pgeo && uv run pytest -q)
+  uv run --project report --with pytest pytest report/tests -q     # the report renderer
+  uv run --project pgeo pytest tests/security -q                   # posture of the local stack
   if ! curl -sf -o /dev/null http://127.0.0.1:8088/; then
     (nohup scripts/dev_web.sh > data/logs/dev_web.log 2>&1 &)
     sleep 3
@@ -82,6 +84,9 @@ stage_deploy() {
   (cd infra/ansible && ansible-playbook site.yml -e "pelias_snapshot_name=$snap" -e "pgeo_dump_name=$dump" \
      -e pelias_force_restore=true -e pgeo_force_restore=true)
   python3 tests/web/smoke_demo.py https://geocoder.example.org
+  # the deployed posture, including the host checks that only apply to a real deployment
+  PGEO_EDGE=https://geocoder.example.org/pgeo PELIAS_EDGE=https://geocoder.example.org \
+    PGEO_VM_SSH="${PGEO_VM_SSH:-jcz@192.0.2.20}" uv run --project pgeo pytest tests/security -q
 }
 
 for s in "${stages[@]}"; do
