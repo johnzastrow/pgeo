@@ -109,6 +109,46 @@ product**. That principle motivated building pgeo alongside Pelias and measuring
 4. Can PostgreSQL itself be the API endpoint (G6) without an inferior product?
 5. Can pgeo replace Pelias for existing clients, and what does it add?
 
+### 1.4 Other geocoders that live in PostgreSQL
+
+pgeo is not the first attempt to put geocoding inside the database, and the question of whether it
+was worth building depends on what already exists. A survey of the field in September 2026 found
+three projects that keep their query logic in PostgreSQL, and one that keeps half of it there.
+
+```table related_work
+| Project | Where the logic lives | Data | Interface | Notes |
+|---|---|---|---|---|
+| [PostGIS TIGER Geocoder](https://postgis.net/docs/Extras.html) (`postgis_tiger_geocoder`) | entirely PL/pgSQL, plus `address_standardizer` (PAGC) for parsing | US Census TIGER only | SQL functions; no HTTP | The canonical answer. Released independently of PostGIS since [2025.1](https://postgis.net/2026/06/PostGIS-Tiger-Geocoder-2025.1/) (June 2026), needs PostgreSQL 16+. Exact-match oriented; its own documentation notes speed problems in the `address_standardizer` wrapper for batch work |
+| [osmgeocoder](https://github.com/dunkelstern/osmgeocoder) | "primarily as SQL functions", with Python for orchestration | OpenStreetMap (imposm3), optionally OpenAddresses | Python library plus an optional Flask service | The closest relative: same extensions as pgeo (PostGIS, `pg_trgm`, `fuzzystrmatch`). Multi-country address formatting via OpenCage templates. Without libpostal it degrades to "street names only" |
+| [moofish32/postgis-geocoder](https://github.com/moofish32/postgis-geocoder) | none of its own | TIGER | SQL via `psql` | A Docker packaging of the TIGER geocoder; 12 commits, inactive |
+| [Nominatim](https://nominatim.org/release-docs/latest/develop/overview/) | indexing and address computation in PL/pgSQL triggers; **search in a Python application** | OpenStreetMap | HTTP API | Postgres-centric rather than Postgres-only. Version 5 completed the move from PHP to Python. Planet-scale: ~1 TB of disk and 128 GB-class memory; the [2025 roadmap](https://nominatim.org/2025/07/14/roadmap-nominatim6.html) notes search indexes have grown large enough to slow lookups |
+```
+
+{{table:related_work|Geocoders whose query logic runs inside PostgreSQL, surveyed September 2026.}}
+
+**Where pgeo sits.** Against the TIGER geocoder, pgeo adds sources beyond TIGER (OpenAddresses,
+OpenStreetMap, Who's On First, GNIS, ZCTA, Overture), typo tolerance rather than exact matching,
+and an HTTP API. Against osmgeocoder -- which reaches for the same three extensions, and is the
+nearest thing to a sibling -- pgeo needs no application code at all, answers a documented
+third-party API contract, and returns USPS Publication 28 addresses; osmgeocoder in exchange
+covers many countries where pgeo covers one state, and is the older and more general project.
+Against Nominatim, the difference is architectural: Nominatim computes addresses in the database
+but searches from a Python application, where pgeo's search *is* the database.
+
+The combination this project could not find anywhere: **a geocoder whose entire query path is SQL,
+exposed over HTTP with no application code at all** (PostgREST in front of SQL functions), and
+**speaking an existing geocoder's API** so that clients need no changes. That is a narrow claim
+from a handful of searches rather than an exhaustive review, and the honest reading is that the
+pieces are all well known -- trigram matching, PL/pgSQL, PostgREST -- and that assembling them
+this way is uncommon rather than novel.
+
+{{callout:impact|The interesting comparison is not pgeo against Pelias but pgeo against the
+alternative inside PostgreSQL. The TIGER geocoder is exact-match and US-Census-only; osmgeocoder
+needs libpostal and a Python service to do more than street names. A reader who wants typo
+tolerance, several open data sources and a Pelias-shaped API without an application layer has, as
+far as this survey found, no off-the-shelf option -- which is the gap this project fills, for one
+state.}}
+
 ## 2. Methods
 
 ### 2.1 Systems built

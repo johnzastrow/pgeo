@@ -159,6 +159,34 @@ The flexibility that matters most: no new operational vocabulary. If you run Pos
 
 ---
 
+# The alternatives inside PostgreSQL
+
+pgeo is not the first geocoder in a database. Surveyed September 2026:
+
+| Project | Logic | Data | Interface |
+|---|---|---|---|
+| **PostGIS TIGER Geocoder** | all PL/pgSQL | US Census TIGER only | SQL only, no HTTP |
+| **osmgeocoder** | mostly SQL, Python orchestration | OSM, optionally OpenAddresses | Python library, optional Flask |
+| **Nominatim** | indexing in PL/pgSQL, **search in Python** | OSM | HTTP |
+| **pgeo** | all SQL | OA, OSM, WOF, GNIS, ZCTA, Overture | HTTP, **no application code** |
+
+<v-click>
+
+<div class="mt-4 p-3 border-l-4 border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-sm">
+
+TIGER is exact-match and Census-only. osmgeocoder needs libpostal and a Python service to do more
+than street names. Nominatim computes addresses in the database but searches from an application.
+
+What this survey did not find: a geocoder whose **whole query path is SQL**, served over HTTP with
+**no application code**, speaking **an existing geocoder's API**. Uncommon rather than novel — the
+pieces are all well known.
+
+</div>
+
+</v-click>
+
+---
+
 # Features
 
 <div grid="~ cols-2 gap-6" class="text-sm">
