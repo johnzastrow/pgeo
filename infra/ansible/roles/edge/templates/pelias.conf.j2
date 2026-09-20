@@ -124,6 +124,14 @@ server {
         error_page 404 = @pgeo_unsupported;
         proxy_pass http://pgeo_rest/rpc/v1_$pgeo_fn$is_args$args;
     }
+    # Pelias serves the licence page to any client; PostgREST returns the media-type domain
+    # verbatim only when asked for it, so the edge asks on the client's behalf.
+    location = /pgeo/v1/attribution {
+        limit_except GET { deny all; }
+        limit_req zone=pelias_search burst=20 nodelay;
+        proxy_set_header Accept "text/html";
+        proxy_pass http://pgeo_rest/rpc/v1_attribution;
+    }
     location /pgeo/ {
         return 404;
     }

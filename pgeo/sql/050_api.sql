@@ -430,3 +430,52 @@ EXCEPTION WHEN SQLSTATE '22023' THEN
   RETURN geocode.api_error(jsonb_build_object('ids', ids), SQLERRM);
 END
 $$;
+
+-- ---------------------------------------------------------------------------------------
+-- /v1/attribution: the data licences, as Pelias serves them. HTML rather than GeoJSON,
+-- because a client shows it to a person; PostgREST returns a function whose return type is
+-- a domain named after a media type as that media type, verbatim, when the request asks
+-- for it (the edge sets "Accept: text/html" so every client gets the page, as Pelias does).
+-- No parameters and no user input reach this page; the only interpolated value is the
+-- engine version, which the build writes and validates as X.Y.Z, and it is escaped anyway.
+-- ---------------------------------------------------------------------------------------
+CREATE DOMAIN geocode_api."text/html" AS text;
+
+CREATE OR REPLACE FUNCTION geocode_api.v1_attribution() RETURNS geocode_api."text/html"
+LANGUAGE sql STABLE PARALLEL SAFE AS $fn$
+  SELECT ('<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>pgeo Geocoder</title>
+    <style>html { font-family: system-ui, sans-serif; margin: 2rem; max-width: 46rem; }
+           li { margin: 0.35rem 0; }</style>
+  </head>
+  <body>
+    <h1>pgeo API</h1>
+    <h3>Version: ' || replace(replace(replace(geocode.engine_version(), '&', '&amp;'),
+                              '<', '&lt;'), '>', '&gt;') || '</h3>
+    <h3>Attribution</h3>
+    <p>Geocoding by <a href="https://github.com/">pgeo</a>, a PostgreSQL/PostGIS geocoder,
+       serving the State of Maine. Data from:</p>
+    <ul>
+      <li><a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>
+          &copy; OpenStreetMap contributors, under
+          <a href="https://opendatacommons.org/licenses/odbl/">ODbL 1.0</a>. See also the
+          <a href="https://operations.osmfoundation.org/policies/nominatim/">OSM geocoding
+          guidelines</a> for acceptable use.</li>
+      <li><a href="https://openaddresses.io/">OpenAddresses</a> (Maine E911 and municipal
+          sources), under the licence of each contributing source.</li>
+      <li><a href="https://whosonfirst.org/">Who&#39;s On First</a>, under CC-BY 4.0 with
+          per-record source licences.</li>
+      <li><a href="https://www.usgs.gov/us-board-on-geographic-names">USGS GNIS</a> domestic
+          names: public domain.</li>
+      <li><a href="https://www.census.gov/">US Census Bureau</a> TIGER/Line and the ZCTA
+          gazetteer: public domain.</li>
+      <li><a href="https://overturemaps.org/">Overture Maps</a> places, under
+          CDLA-Permissive-2.0; Overture themes derived from OpenStreetMap under ODbL 1.0.</li>
+    </ul>
+  </body>
+</html>
+')::geocode_api."text/html"
+$fn$;

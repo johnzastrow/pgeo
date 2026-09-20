@@ -16,6 +16,7 @@ itself fails is reported, not counted.
 |------|--------------|---------------|
 | 2026-09-19, before (pgeo 0.6.0) | 11 failures | 17 failures (28 in total) |
 | 2026-09-19, after (pgeo 0.7.0) | 0 | 0 |
+| 2026-09-20 (pgeo 0.9.0, `/v1/attribution` added) | 0 | 0 (28 cases) |
 
 The accuracy gate passes unchanged (95.8%).
 
@@ -23,7 +24,7 @@ The accuracy gate passes unchanged (95.8%).
 
 | Area | Supported |
 |------|-----------|
-| Endpoints | `/v1/search`, `/v1/search/structured`, `/v1/autocomplete`, `/v1/reverse`, `/v1/place` |
+| Endpoints | `/v1/search`, `/v1/search/structured`, `/v1/autocomplete`, `/v1/reverse`, `/v1/place`, `/v1/attribution` (HTML licence page, as Pelias serves it) |
 | Parameters | `text`, `size`, `layers` (incl. `coarse`), `sources` (incl. `oa`, `osm`, `wof`), `focus.point.lat/lon`, `boundary.rect.*`, `boundary.circle.lat/lon/radius`, `boundary.country`, `boundary.gid`, `categories`, structured fields (`address`, `neighbourhood`, `locality`, `county`, `region`, `postalcode`, `country`), `point.lat/lon`, `ids`; `lang`, `api_key` and `debug` are accepted and ignored |
 | Response | GeoJSON FeatureCollection with the Pelias `geocoding` block (`version`, `query`, `engine`, `timestamp`, `errors`), `bbox`, and per feature `gid`, `layer`, `source`, `source_id`, `name`, address parts, `confidence`, `match_type`, `accuracy`, `distance`, `label`, `country`/`country_a`/`country_code`/`country_gid`, `region`/`region_a`/`region_gid`, `county`/`county_a`/`county_gid`, `localadmin`/`localadmin_gid`, `locality`/`locality_gid`, `neighbourhood`/`neighbourhood_gid`, `category`, `addendum` |
 | Hierarchy ids | Same Who's On First ids as Pelias (for example `whosonfirst:locality:85948877` for Portland), recorded at build time by point-in-polygon |
@@ -51,6 +52,7 @@ The accuracy gate passes unchanged (95.8%).
 | Unknown parameters: Pelias ignores them, pgeo pure SQL rejects them (400) | Clients sending undocumented parameters must drop them on the pure-SQL path (FastAPI ignores them) | PostgREST matches functions by argument names |
 | `lang` is ignored | English names only | The Maine data is English |
 | Ranking differs | Different, usually more accurate, first results (95.8% vs 75.5%) | By design; tests/accuracy |
+| No `/v1/` API description page | A client browsing the API root gets pgeo's Pelias-shaped 400 instead of Pelias's HTML index | Informational only; no client geocodes against it |
 | Pelias accepts `focus.point.lat=999`; pgeo returns 400 | Stricter validation | Kept |
 
 ## Found along the way

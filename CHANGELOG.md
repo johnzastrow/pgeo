@@ -23,6 +23,13 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+## [0.12.2] - 2026-09-20
+
+### Added
+- pgeo serves `/v1/attribution` (pgeo 0.9.0), so the only Pelias endpoint it lacked is now the
+  `/v1/` API description page. The compatibility contract grew a case for it - 28 of 28 pass on
+  both front ends - and the contract runner can now check non-JSON responses.
+
 ## [0.12.1] - 2026-09-20
 
 ### Fixed

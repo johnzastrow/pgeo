@@ -18,7 +18,7 @@ from typing import Annotated
 import asyncpg
 import httpx
 from fastapi import FastAPI, Query, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 
 from pgeo.api.parse import Parsed, RuleParser, from_libpostal, merge_rule_fallback
 from pgeo.settings import Settings
@@ -435,6 +435,17 @@ async def place(request: Request, ids: Annotated[str | None, Query()] = None):
     async with request.app.state.pool.acquire() as con:
         rows = await con.fetch("SELECT * FROM geocode.place($1)", gids)
     return envelope({"ids": gids}, rows)
+
+
+@app.get("/v1/attribution", response_class=HTMLResponse)
+async def attribution(request: Request) -> HTMLResponse:
+    """The data licences as an HTML page, as Pelias serves them.
+
+    The page is built in SQL (geocode_api.v1_attribution), so both front ends and the
+    pure-SQL path serve exactly the same text."""
+    async with request.app.state.pool.acquire() as con:
+        html = await con.fetchval("SELECT geocode_api.v1_attribution()")
+    return HTMLResponse(content=html)
 
 
 @app.get("/v1/address")

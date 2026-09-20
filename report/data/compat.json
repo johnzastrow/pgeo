@@ -330,6 +330,17 @@
    }
   },
   {
+   "case": "attribution",
+   "path": "attribution",
+   "params": {},
+   "expect": 200,
+   "results": {
+    "pelias": null,
+    "pgeo-api": null,
+    "pgeo-sql": null
+   }
+  },
+  {
    "case": "error: search without text",
    "path": "search",
    "params": {},

@@ -733,14 +733,13 @@ category taxonomy; and the pure-SQL path rejects parameters it does not know whe
 them. Pelias also names counties "Cumberland County" where pgeo stored "Cumberland"; pgeo now
 appends " County" on output so the two agree.
 
-The contract covers the geocoding API, which is what a client calls. Two informational surfaces
-sit outside it and are Pelias-only: `/v1/attribution`, an HTML page listing the data licences, and
-the `/v1/` page describing the API. pgeo answers both with its Pelias-shaped 400 for an unknown
-endpoint. Nothing that geocodes depends on them, but a deployment that relies on
-`/v1/attribution` to satisfy the OpenStreetMap and Who's On First licence terms would have to
-carry that attribution somewhere else -- the demo page does, in the map's attribution control --
-and it is the one place where "an existing Pelias client cannot tell the difference" is not quite
-true.
+Beyond the geocoding endpoints, Pelias serves two informational HTML pages. `/v1/attribution`
+lists the data licences, and a client may well fetch it to satisfy the OpenStreetMap and Who's On
+First terms, so pgeo implements it: the page is built in SQL and served identically by PostgREST
+and by FastAPI, and it is case {{value:compat_cases}} of the contract. The `/v1/` page that
+describes the API itself remains Pelias-only; pgeo answers it with the Pelias-shaped 400 for an
+unknown endpoint, which is the one place where "an existing Pelias client cannot tell the
+difference" still does not hold.
 
 ### 3.9 Features
 
@@ -748,7 +747,7 @@ true.
 | Capability | Pelias | pgeo |
 |---|---|---|
 | Endpoints | search, structured, autocomplete, reverse, place (+ nearby, beta) | the same five, plus `/v1/address` |
-| Informational endpoints | `/v1/attribution` and a `/v1/` API description page (HTML) | not implemented: both return the Pelias-shaped 400 for an unknown endpoint |
+| Informational endpoints | `/v1/attribution` (data licences) and a `/v1/` API description page, both HTML | `/v1/attribution`, built in SQL and served as HTML by both front ends; no `/v1/` description page |
 | Filters | layers, sources, focus, rectangle, circle, country, gid, categories | the same |
 | Parsing | libpostal (statistical, ~2 GB model) | rule parser in SQL (best measured); libpostal optional |
 | Typo tolerance | limited (term fuzziness) | trigram similarity on whole names and streets |
@@ -804,7 +803,7 @@ yes; in accuracy, pgeo is ahead rather than level; in throughput, Pelias is ahea
 ```table parity_features
 | Area | Both | Only pgeo | Only Pelias |
 |---|---|---|---|
-| Endpoints | search, structured, autocomplete, reverse, place | `/v1/address` (USPS Publication 28, nearest street address) | `/v1/nearby` (beta), `/v1/attribution`, the `/v1/` description page |
+| Endpoints | search, structured, autocomplete, reverse, place, attribution | `/v1/address` (USPS Publication 28, nearest street address) | `/v1/nearby` (beta), the `/v1/` description page |
 | Parameters | text, size, layers, sources, focus, boundary.rect, boundary.circle, boundary.country, boundary.gid, categories, lang and api_key accepted | | multilingual names (`lang` changes the output) |
 | Response | GeoJSON envelope, Pelias properties, hierarchy identifiers (`*_gid`, `county_a`), errors as HTTP 400 with `geocoding.errors` | confidence lowered for ties between distinct places (better calibrated) | |
 | Parsing | US addresses | rule parser tuned for Maine input | libpostal: international address parsing |
@@ -1040,9 +1039,6 @@ above are what the deployed service does, not what a benchmark suggested it migh
   memory.
 - **Authorization** (Phase 11): single sign-on plus hashed API keys at the edge before LANCER uses
   the service; strip query strings from access logs.
-- **`/v1/attribution`**: implement Pelias's attribution endpoint in pgeo. It is the only
-  documented Pelias HTTP surface pgeo does not answer, it is a few lines of SQL, and it is what a
-  client would call to satisfy the data licences.
 - **Continuous checks**: run the accuracy gate and the compatibility contract on every build.
 
 ## Appendix A. Reproducing this study

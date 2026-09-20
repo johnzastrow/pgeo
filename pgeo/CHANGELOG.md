@@ -10,6 +10,16 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-09-20
+
+### Added
+- `/v1/attribution`: the data-licence page Pelias also serves, built in SQL
+  (`geocode_api.v1_attribution`) and returned as HTML by both front ends. PostgREST serves it
+  through a media-type domain (`geocode_api."text/html"`), and the edge sets `Accept: text/html`
+  so every client gets the page as it does from Pelias. It names each source the build loads
+  and its licence. The compatibility contract covers it (case 28 of 28); 17 unit tests cover
+  the page itself.
+
 ## [0.8.0] - 2026-09-19
 
 Note on provenance: the databases measured for the study report were built while this package

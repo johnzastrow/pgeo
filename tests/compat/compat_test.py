@@ -91,13 +91,25 @@ def no_results(d: dict) -> str | None:
     return None if not feats(d) else f"expected none, got {len(feats(d))}"
 
 
+def html_page(*must_contain: str) -> Callable[[object], str | None]:
+    """An HTML page (not GeoJSON): right content type, and it mentions each licence given."""
+    def check(r) -> str | None:
+        ctype = r.headers.get("content-type", "")
+        if "text/html" not in ctype:
+            return f"content-type {ctype!r}, want text/html"
+        missing = [m for m in must_contain if m.lower() not in r.text.lower()]
+        return f"page does not mention {missing}" if missing else None
+
+    return check
+
+
 def pelias_error(d: dict) -> str | None:
     errs = d.get("geocoding", {}).get("errors")
     return None if errs else "no geocoding.errors in the error response"
 
 
 # (name, path, params, expected status, checks)
-CASES: list[tuple[str, str, dict, int, list]] = [
+CASES: list[tuple] = [   # (name, path, params, expected status, checks[, kind])
     ("search basic", "search", {"text": "389 Congress St, Portland, ME"}, 200, [ok_shape, has_results]),
     ("search properties", "search", {"text": "389 Congress St, Portland, ME"}, 200,
      [props_complete(BASE_PROPS | HIER_PROPS)]),
@@ -136,6 +148,8 @@ CASES: list[tuple[str, str, dict, int, list]] = [
     ("reverse country", "reverse", {"point.lat": 43.6568, "point.lon": -70.2626, "boundary.country": "US"}, 200,
      [has_results]),
     ("place", "place", {"ids": PORTLAND_GID}, 200, [ok_shape, has_results]),
+    ("attribution", "attribution", {}, 200,
+     [html_page("openstreetmap", "odbl", "openaddresses", "who", "attribution")], "html"),
     ("error: search without text", "search", {}, 400, [pelias_error]),
     ("error: bad focus", "search", {"text": "x", "focus.point.lat": 999, "focus.point.lon": 0}, 400, [pelias_error]),
     ("error: bad layer", "search", {"text": "x", "layers": "planet"}, 400, [pelias_error]),
@@ -144,14 +158,18 @@ CASES: list[tuple[str, str, dict, int, list]] = [
 ]
 
 
-def run_case(client: httpx.Client, base: str, path: str, params: dict, status: int, checks: list) -> str | None:
+def run_case(client: httpx.Client, base: str, path: str, params: dict, status: int, checks: list,
+             kind: str = "json") -> str | None:  # fmt: skip
+    """kind "json": checks receive the decoded body. kind "html": they receive the response."""
     try:
-        r = client.get(f"{base}/v1/{path}", params=params, timeout=20)
-        d = r.json()
+        r = client.get(f"{base}/v1/{path}", params=params, timeout=20,
+                       headers={"Accept": "text/html"} if kind == "html" else None)  # fmt: skip
+        d = r if kind == "html" else r.json()
     except (httpx.HTTPError, ValueError) as e:
         return f"{type(e).__name__}"
     if r.status_code != status:
-        return f"HTTP {r.status_code} (want {status}): {str(d.get('geocoding', {}).get('errors') or d)[:90]}"
+        detail = r.text[:90] if kind == "html" else str(d.get("geocoding", {}).get("errors") or d)[:90]
+        return f"HTTP {r.status_code} (want {status}): {detail}"
     for check in checks:
         why = check(d)
         if why:
@@ -171,8 +189,10 @@ def main() -> int:
     failures = 0
     with httpx.Client() as client:
         print(f"{'case':30} " + " ".join(f"{e:10}" for e in engines))
-        for name, path, params, status, checks in CASES:
-            res = {e: run_case(client, base, path, params, status, checks) for e, base in engines.items()}
+        for case in CASES:
+            name, path, params, status, checks = case[:5]
+            kind = case[5] if len(case) > 5 else "json"
+            res = {e: run_case(client, base, path, params, status, checks, kind) for e, base in engines.items()}
             matrix.append({"case": name, "path": path, "params": {k: str(v) for k, v in params.items()},
                            "expect": status, "results": res})  # fmt: skip
             cells = []
