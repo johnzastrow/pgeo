@@ -23,3 +23,8 @@ report/build/
 report/.venv/
 # report inputs are small and belong in git (the rule above matches every data/ directory)
 !report/data/
+
+# Slidev deck: the sources are slides/slides.md and slides/public; these are build output
+slides/node_modules/
+slides/dist/
+slides/.slidev/

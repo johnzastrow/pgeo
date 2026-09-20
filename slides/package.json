@@ -1,0 +1,17 @@
+{
+  "name": "pgeo-slides",
+  "private": true,
+  "type": "module",
+  "description": "Slidev deck: pgeo, a geocoder that lives inside PostgreSQL",
+  "scripts": {
+    "dev": "slidev --open",
+    "start": "slidev",
+    "build": "slidev build --base ./",
+    "export": "slidev export --output ../docs/pgeo-slides.pdf"
+  },
+  "dependencies": {
+    "@slidev/cli": "^53.0.0",
+    "@slidev/theme-default": "^0.25.0",
+    "vue": "^3.5.13"
+  }
+}
