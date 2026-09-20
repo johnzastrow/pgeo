@@ -39,7 +39,6 @@ meeting its targets (Section 3.12) put pgeo's floor at **{{value:floor_pgeo_vcpu
 {{value:floor_pgeo_gb}}** of memory and Pelias's at **{{value:floor_pelias_vcpu}} vCPU and
 {{value:floor_pelias_gb}}**. Both idle below a quarter of a core, so at this scale the bill is set
 by memory: pgeo fits the cheapest shared-CPU plans providers sell, Pelias needs a mid-range server.
-<!-- PENDING: temporary-VM confirmation of both floors -->
 
 **Compatibility and extensions.** pgeo passes all {{value:compat_cases}} cases of a Pelias API
 compatibility contract on both front ends, so existing Pelias clients work unchanged, and adds
@@ -604,8 +603,8 @@ M0 and PM appear in the capacity tables).}}
 {{callout:impact|The memory floors put the two platforms in different price classes: pgeo fits the
 cheapest shared-CPU plans most providers sell, while Pelias needs a mid-range server for the same
 three users. At advertised rates that is about $60 a year on a 1 GB plan, or $145 on a 2 GB plan
-with room to spare, against about $580 for the 8 GB plan Pelias needs -- a factor of four to ten,
-depending on how tight a plan you are willing to run pgeo on.}}
+with room to spare, against about $580 for the 8 GB plan Pelias needs. The 1 GB plan is
+confirmed on a real machine in Section 3.12, so ten times is the honest figure.}}
 
 **Build.** Both engines are built on a workstation and shipped to the query host, so the query host
 never needs the raw data or the build tools. {{ref:table:build_resources}} gives the measured
@@ -662,17 +661,16 @@ Measured against these plans: pgeo's {{value:floor_pgeo_gb}} floor is {{value:fl
 of containers plus the 0.8 GB this study reserves for the operating system, so a 1 GB plan works
 only with a minimal OS and nothing else resident, while a 2 GB plan leaves real headroom; Pelias's
 {{value:floor_pelias_gb}} floor needs the 8 GB tier, four to ten times the monthly price for the
-same three users depending on which plan pgeo goes on.
+same three users: the 1 GB plan is confirmed below, so the gap is the full ten times.
 
-The 1 GB case needs a caveat the table cannot carry. `pgeo-tune auto --cpus 1 --mem-gb 1` refuses
-to produce a configuration at all: its sizing rule reserves 0.8 GB for the operating system and
-0.35 GB for the HTTP front end, which leaves the database less than nothing. The floor search says
-the containers themselves need only {{value:floor_pgeo_ct_gb}}, so a 1 GB plan can work -- but only
-on a minimal operating system, with the settings written by hand rather than by the tool, and with
-nothing else resident on the machine. That is the difference between a configuration this project
-supports and one it merely measured, and it is why the 1 GB case is confirmed on a real machine
-rather than a container limit in Section 3.12.
-<!-- PENDING: replace the 1 GB expectation above with the temporary-VM result -->
+The 1 GB row was confirmed on a real machine rather than inferred: a temporary 1 vCPU / 1 GB VM
+ran the three-user load with the worst endpoint at 21% of its target and held
+{{value:floorvm_pgeo_limit}} concurrent users (Section 3.12). It needs one caveat, though.
+`pgeo-tune auto --cpus 1 --mem-gb 1` refuses to produce a configuration: its sizing rule reserves
+0.8 GB for the operating system and 0.35 GB for the HTTP front end, which leaves the database less
+than nothing. The settings for that VM were written by hand. A 1 GB plan therefore works, and is
+the cheapest way to run this geocoder, but it is a configuration this project has measured rather
+than one its tooling will size for you.
 
 **Data volume.** For Pelias, capacity fell from {{value:ds_D1}} users with admin areas only to
 {{value:ds_D5}} with every source (Section 3.6); the index grew to 435 MB. pgeo's database grows with
@@ -908,8 +906,25 @@ cache, its disk and its kernel. Each floor was therefore re-tested on a temporar
 that size, created for the run and destroyed after it (`tests/load/floor_vm.sh`), with the same
 three-user validation followed by a ramp to find how far that VM stretches.
 
-{{table:floor_vm|The measured floors confirmed on temporary VMs: the three-user validation and the
+{{table:floor_vm|The measured floor confirmed on a temporary VM: the three-user validation and the
 ramp to the first configuration outside a latency target.}}
+
+The container search said pgeo needs {{value:floor_pgeo_ct_gb}}; on a real 1 GB machine it used
+307 MB, and the three-user load ran with the worst endpoint at 21% of its target. A cheap VM is
+not a container limit -- it brings its own kernel, page cache and disk -- and pgeo came out ahead
+of the container estimate rather than behind it, because a minimal operating system leaves more
+for the database than the 0.8 GB this study reserves. The same machine held
+{{value:floorvm_pgeo_limit}} concurrent users before an endpoint missed its target.
+
+{{callout:key|pgeo runs the Maine geocoder on the smallest virtual machine providers sell: 1 vCPU
+and 1 GB, about $5 a month, with the three-user workload at a fifth of its latency budget and room
+for {{value:floorvm_pgeo_limit}} concurrent users. Pelias needs {{value:floor_pelias_gb}}, which is
+an 8 GB plan at roughly ten times the price.}}
+
+Pelias's floor was not re-tested on a temporary VM: at {{value:floor_pelias_gb}} it needs a guest
+the Proxmox host could not spare beside the machines already running on it. Its real-machine
+evidence is VM 120 itself (Section 3.11), which runs Pelias in 10 GB and serves
+{{value:vm120_pelias_limit}} users; the floor search is what says how far that could be cut.
 
 ## 4. Discussion
 
@@ -1078,7 +1093,7 @@ answers it in full.
 | What does each platform need to build and to run, and what loads and data can it support? | Sizing guide by load; operating and build requirements | 3.5 |
 | What features does each platform provide? | Feature matrix and parity table | 3.9, 3.10 |
 | How small can a server be for 3 concurrent users, and how many users does it then scale to? | See Section 3.12 | 3.12 |
-| What do the measured floors mean in shared-CPU VPS plans (Linode, DigitalOcean, Vultr, Hetzner and others)? | pgeo fits the cheapest 1-2 GB plans; Pelias needs an 8 GB plan, four to ten times the price | 3.5 (Table 24), 3.12 |
+| What do the measured floors mean in shared-CPU VPS plans (Linode, DigitalOcean, Vultr, Hetzner and others)? | pgeo runs on a 1 GB plan (confirmed on a real VM, 32 users); Pelias needs an 8 GB plan, about ten times the price | 3.5 (Table 24), 3.12 |
 ```
 
 {{table:questions|Questions asked during the project, with short answers and the sections that

@@ -13,7 +13,7 @@ pgeo = ["data/loadtest/20260919-1135-pgeo", "data/loadtest/20260919-1543-pgeo"]
 # minimum server for 3 users: container search (tests/load/find_floor.py) and its confirmation on
 # temporary Proxmox VMs (tests/load/floor_vm.sh -> run_vm.py), plus the VM 120 validation
 floor = "data/loadtest/20260919-1635-floor"
-floor_vm = []
+floor_vm = ["data/loadtest/20260919-2140-vm"]
 vm120 = ["data/loadtest/20260919-2019-vm"]
 
 [accuracy]

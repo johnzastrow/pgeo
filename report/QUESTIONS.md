@@ -26,11 +26,11 @@ finished report before each release. Status: answered / pending (awaiting a meas
 | 17 | Can we use the USPS ZIP+4 data to improve addresses? | 3.9 (address API) | answered |
 | 18 | Newer libpostal (Senzing libpostal-data): does it help with accuracy or speed in the US? | Appendix B, Next steps | open |
 | 19 | (Requirement) When search returns a non-address, reverse geocode to the nearest high-quality street address. | 3.9 (address API) | answered |
-| 20 | Minimum server resources for 3 concurrent users (Maine data)? | 3.12 | pending (floor search, temporary VMs) |
-| 21 | How many users can that minimum server scale to, per platform? | 3.12 | pending |
+| 20 | Minimum server resources for 3 concurrent users (Maine data)? | 3.12 | answered |
+| 21 | How many users can that minimum server scale to, per platform? | 3.12, 3.11 | answered |
 | 22 | Which performs better, and does pgeo perform well enough at the same or lower resources? | Executive summary, 3.4, 3.10, 5 | answered |
 | 23 | How do more data layers affect performance? | 3.6 | answered |
 | 24 | Arguments for and against the external HTTP options (vs Postgres core/contrib only). | 2.1 | answered |
 | 25 | Resources required for building and operating each platform, and which loads and data they support. | 3.5 | answered |
 | 26 | Features each platform provides. | 3.9 | answered |
-| 27 | Translate the lowest CPU finding to common shared-CPU VPS sizes (Linode nano, DigitalOcean, Vultr, Hetzner, others). | 3.5 (VPS table), 3.12 | pending (VM confirmation at 1 GB and 2 GB) |
+| 27 | Translate the lowest CPU finding to common shared-CPU VPS sizes (Linode nano, DigitalOcean, Vultr, Hetzner, others). | 3.5 (VPS table), 3.12 | answered (1 GB confirmed on a real VM) |
