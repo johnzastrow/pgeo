@@ -52,7 +52,7 @@ for _ in $(seq 1 60); do
   sleep 5
 done
 
-inv="$(mktemp)"
+inv="$(mktemp --suffix=.yml)"   # Ansible only parses a YAML inventory if the file ends .yml
 cat > "$inv" <<EOF
 all:
   children:
@@ -74,6 +74,13 @@ else
   roles="$roles,pelias"; vars+=(-e pgeo_enabled=false -e pelias_snapshot_name=pelias-20260918-1715)
 fi
 (cd "$ROOT/infra/ansible" && ansible-playbook -i "$inv" site.yml --tags "$roles" "${vars[@]}" "${extra[@]}")
+# An inventory Ansible cannot parse matches no hosts, prints an empty PLAY RECAP and exits 0,
+# which then looks like a deployed engine that answers nothing. Check the host is really there.
+ansible -i "$inv" pelias --list-hosts 2>/dev/null | grep -q "$name" \
+  || { echo "inventory matched no hosts: nothing was deployed" >&2; exit 1; }
+ssh -o BatchMode=yes "jcz@$ip" "sudo -n docker ps --format '{{.Names}}'" 2>/dev/null | grep -q pgeo_db \
+  || [[ "$engine" == pelias ]] \
+  || { echo "pgeo containers are not running on $ip: deployment did not take" >&2; exit 1; }
 
 echo "== tunnel and load test"
 ssh -o BatchMode=yes -N -L 18080:"$ip":8080 "jcz@$ip" &
