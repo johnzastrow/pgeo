@@ -56,7 +56,8 @@ qm start "$VMID"
 # Wait for the guest agent to report an IPv4 address on the LAN.
 for _ in $(seq 1 60); do
   ip="$(qm guest cmd "$VMID" network-get-interfaces 2>/dev/null \
-        | grep -oE '"ip-address" *: *"192\.168\.[0-9]+\.[0-9]+"' | head -1 | grep -oE '[0-9.]+$' || true)"
+        | grep -oE '"ip-address" *: *"192\.168\.[0-9]+\.[0-9]+"' | head -1 \
+        | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' || true)"   # not [0-9.]+$: the line ends with a quote
   if [[ -n "$ip" ]]; then echo "VM ${VMID} (${NAME}) is up at ${ip}"; exit 0; fi
   sleep 5
 done
