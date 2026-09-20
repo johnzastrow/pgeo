@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from pathlib import Path
+from urllib.parse import quote
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 PGEO_ROOT = REPO_ROOT / "pgeo"
@@ -44,7 +45,9 @@ class Settings:
                 raise RuntimeError("set PGEO_DSN or PGEO_DB_PASSWORD (pgeo/pgeo.secrets)")
             host = env.get("PGEO_DB_HOST", "127.0.0.1")
             port = env.get("PGEO_DB_PORT", "5433")
-            dsn = f"postgresql://pgeo:{pw}@{host}:{port}/pgeo"
+            # Percent-encode: an unencoded "/" or "#" in the password ends the authority, so
+            # the URL would name a different host and the connection would go elsewhere.
+            dsn = f"postgresql://pgeo:{quote(pw, safe='')}@{host}:{port}/pgeo"
         mode = env.get("PGEO_PARSE_MODE", "service")
         if mode not in ("service", "extension", "none"):
             raise RuntimeError(f"PGEO_PARSE_MODE must be service|extension|none, not {mode!r}")

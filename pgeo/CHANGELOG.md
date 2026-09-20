@@ -10,6 +10,17 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+### Fixed
+- The database password is percent-encoded into the DSN. A password containing `/` or `#`
+  ended the URL authority, so the connection named a different host - silently, and only for
+  a hand-set password, since generated ones are alphanumeric. Found by a new test.
+
+### Added
+- Tests for `settings.py` (23): secrets-file parsing, environment precedence, DSN building,
+  URL-reserved characters in the password, parse-mode validation and the frozen dataclass.
+- Tests for the ranking behaviours (28, `tests/test_ranking_sql.py`): one per tuning step, so
+  a regression names the behaviour rather than only moving the accuracy score.
+
 ## [0.9.0] - 2026-09-20
 
 ### Added
