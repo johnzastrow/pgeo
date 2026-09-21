@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 84" width="210" height="84"
+     role="img" aria-label="pgeo wordmark, the o drawn as a map pin">
+  <title>pgeo — wordmark</title>
+  <!-- The "o" is a map pin sized to the x-height, so the word still reads as "pgeo". -->
+  <g font-family="'Noto Sans','DejaVu Sans',system-ui,sans-serif" font-size="64"
+     font-weight="600" fill="#1f5f8b">
+    <text x="6" y="62" letter-spacing="-1">pge</text>
+  </g>
+  <g transform="translate(120 20)">
+    <path d="M17 0C7.6 0 0 7.4 0 16.5 0 28.6 14.8 44.3 16.1 45.7a1.2 1.2 0 0 0 1.8 0
+             C19.2 44.3 34 28.6 34 16.5 34 7.4 26.4 0 17 0z" fill="#c0392b"/>
+    <circle cx="17" cy="16.3" r="6.6" fill="#ffffff"/>
+  </g>
+</svg>

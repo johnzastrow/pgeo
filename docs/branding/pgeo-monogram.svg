@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128"
+     role="img" aria-label="pgeo monogram: the letters pg with a locating dot">
+  <title>pgeo — monogram for an app icon or favicon</title>
+  <rect width="128" height="128" rx="26" fill="#1f5f8b"/>
+  <text x="64" y="84" text-anchor="middle" fill="#ffffff" font-size="62" font-weight="700"
+        font-family="'Noto Sans','DejaVu Sans',system-ui,sans-serif" letter-spacing="-2">pg</text>
+  <circle cx="98" cy="34" r="11" fill="#c0392b"/>
+  <circle cx="98" cy="34" r="4" fill="#ffffff"/>
+</svg>
