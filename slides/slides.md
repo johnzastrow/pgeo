@@ -372,7 +372,7 @@ Served same-origin with a strict CSP: no CDN, no remote script, every value writ
 <v-clicks>
 
 - **Throughput**: 3-4× fewer concurrent users per CPU than Pelias. Plan ~24 users per vCPU, then halve it for headroom
-- **One state, tested**. Maine only. Per-query cost grows with the candidate set, so coverage growth is not free and is **not measured**
+- **One state, tested**. Maine only -- and measured: across Maine's own data range pgeo loses four times its capacity where Pelias loses two, so coverage growth costs pgeo roughly twice as much. Multi-state is still untested
 - **English only** — `lang` is accepted and ignored
 - **US addresses only** for `/v1/address` (USPS Publication 28)
 - **Our own code**: the ranking SQL has one project's eyes on it, where Pelias has many

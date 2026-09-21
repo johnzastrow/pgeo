@@ -29,7 +29,7 @@ finished report before each release. Status: answered / pending (awaiting a meas
 | 20 | Minimum server resources for 3 concurrent users (Maine data)? | 3.12 | answered |
 | 21 | How many users can that minimum server scale to, per platform? | 3.12, 3.11 | answered |
 | 22 | Which performs better, and does pgeo perform well enough at the same or lower resources? | Executive summary, 3.4, 3.10, 5 | answered |
-| 23 | How do more data layers affect performance? | 3.6 | answered |
+| 23 | How do more data layers affect performance? | 3.6, 3.6.1 (both engines measured) | answered |
 | 24 | Arguments for and against the external HTTP options (vs Postgres core/contrib only). | 2.1 | answered |
 | 25 | Resources required for building and operating each platform, and which loads and data they support. | 3.5 | answered |
 | 26 | Features each platform provides. | 3.9 | answered |

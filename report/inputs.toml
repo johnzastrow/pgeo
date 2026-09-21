@@ -12,7 +12,7 @@ pgeo = ["data/loadtest/20260919-1135-pgeo", "data/loadtest/20260919-1543-pgeo"]
 # pgeo given the same memory budget as Pelias at each CPU size (configs E1, E2, E4)
 pgeo_equal = ["data/loadtest/20260920-2017-pgeo"]
 # pgeo capacity against data volume: the same D1-D5 subsets used for Pelias
-pgeo_datasets = []   # set to the -pgeo-datavol run directory when it finishes
+pgeo_datasets = ["data/loadtest/20260920-2133-pgeo-datavol"]
 
 # minimum server for 3 users: container search (tests/load/find_floor.py) and its confirmation on
 # temporary Proxmox VMs (tests/load/floor_vm.sh -> run_vm.py), plus the VM 120 validation

@@ -914,10 +914,11 @@ than one its tooling will size for you.
 
 For Pelias, capacity fell from {{value:ds_D1}} users with admin areas only to
 {{value:ds_D5}} with every source (Section 3.6); the index grew to 435 MB. pgeo's database grows with
-the same sources to 654 MB; capacity against data volume was not measured for pgeo (Next steps).
-Doubling the data (for example adding New Hampshire) roughly doubles both stores; for Pelias the
-extra venues and names cost capacity per query, and for pgeo the trigram candidate sets grow in the
-same way, so both need more CPU per user as coverage grows.
+the same sources to 654 MB, and its capacity falls from {{value:pgds_D1}} users to
+{{value:pgds_D5}} across the same subsets (Section 3.6.1) -- a four-fold loss where Pelias loses
+two. Doubling the data (for example adding New Hampshire) roughly doubles both stores, but not the
+cost per query: what both engines pay for is the number of names a text query can plausibly match,
+and pgeo pays about twice as much per name as Pelias does.
 
 ### 3.6 Data volume
 
@@ -933,6 +934,44 @@ New Hampshire should therefore be judged by how many new names it brings, not by
 
 {{table:datavol|Pelias by dataset: D1 Who's On First; D2 + OpenAddresses; D3 + OpenStreetMap; D4 +
 GNIS and ZCTA; D5 + Overture places (full).}}
+
+#### 3.6.1 The same curve for pgeo
+
+Pelias's curve alone cannot answer the question a reader actually has, which is whether pgeo's
+advantage survives more data. So pgeo was rebuilt from each of the same subsets -- the definitions
+are imported from the Pelias harness rather than restated, so the two curves are comparable by
+construction -- and ramped at a fixed 2 vCPU configuration.
+
+{{table:pgeo_datavol|pgeo capacity against data volume, beside Pelias at the same CPU size for the
+same subsets. pgeo loses four times its capacity across the range where Pelias loses two.}}
+
+Three things follow, and the first is not comfortable for pgeo.
+
+**pgeo is about twice as sensitive to data volume as Pelias.** Across the full range its capacity
+falls four-fold, from {{value:pgds_D1}} users to {{value:pgds_D5}}, where Pelias falls two-fold,
+from {{value:ds_D1}} to {{value:ds_D5}}. That is the expected consequence of the architecture:
+trigram similarity has to score a candidate set that grows with the number of names in the
+database, while Elasticsearch answers from an index whose lookup cost barely moves. Anyone
+extrapolating this study to a much larger region should assume pgeo pays more for the extra data
+than Pelias does.
+
+**But the ratio between them stops widening.** It climbs from {{value:ratio_min}} to four as
+OpenStreetMap arrives and then holds at four for D3, D4 and D5. The gap is not growing without
+bound as data is added; it settles, which is a materially different prospect from a trend that
+keeps getting worse.
+
+**Neither engine cares about records it cannot match.** D4 adds GNIS and ZCTA -- about 20,500
+records -- and costs pgeo nothing at all, exactly as those sources cost Pelias nothing. What both
+engines pay for is *matchable names*: OpenStreetMap's streets and venues halve pgeo's capacity and
+cost Pelias a ramp step, while three quarters of a million address points do comparatively little.
+A second state should therefore be judged by the names it brings, not by its gigabytes -- the same
+conclusion the Pelias curve reached, now confirmed on both engines.
+
+{{callout:caution|pgeo's four-to-one deficit at full Maine data is not a constant: at a tenth of
+the data it is two-to-one, and it reaches four only once OpenStreetMap's names are loaded. The
+honest reading is that pgeo's advantage in memory and accuracy is measured at this data volume,
+and that its capacity will degrade faster than Pelias's as coverage grows. Multi-state deployment
+remains untested, and this is the result that makes testing it necessary rather than optional.}}
 
 Adding 780,000 OpenAddresses documents (D2) changed nothing measurable: exact address terms
 are cheap to match. Adding OpenStreetMap (D3) and Overture places (D5) each cost one ramp step,
@@ -1249,7 +1288,7 @@ candidate queries and scoring steps per request in an interpreted language insid
 
 **Is there still a reason to use Pelias?** Yes, in four situations: (1) many concurrent users per
 server, where Pelias's four-fold throughput per CPU saves hardware once its {{value:floor_pelias_gb}} memory floor is
-paid; (2) coverage beyond one or two states, for which Pelias is designed and pgeo is untested;
+paid; (2) coverage beyond one or two states, for which Pelias is designed and pgeo is untested -- and where the data-volume curve (Section 3.6.1) shows pgeo losing capacity about twice as fast as Pelias as names are added;
 (3) international addresses and multilingual names (libpostal, Pelias language support); (4) when a
 maintained upstream project matters more than accuracy, since pgeo is this project's own code. For
 the deployment studied here (Maine, a handful of users, messy input, LANCER), none of these applies.
@@ -1290,7 +1329,7 @@ Which tool suits which situation, and what the evidence supports saying. The rec
 | Messy input: typos, variants, venues, impossible places | pgeo | 87% vs 30% on typos; misses handled 95% vs 41% |
 | Structured US addresses for another system (LANCER) | pgeo | `/v1/address`; nearest street address for venues |
 | Hundreds of concurrent users per vCPU | Pelias | four times the throughput per CPU |
-| Multi-state or national coverage | Pelias today | built for planet scale; pgeo's per-query cost grows with candidates |
+| Multi-state or national coverage | Pelias today | built for planet scale; measured: pgeo loses four times its capacity across Maine's data range where Pelias loses two (Section 3.6.1) |
 | Fewest components, data in PostgreSQL (G6) | pgeo, pure SQL | database plus a stateless gateway |
 | Existing Pelias clients | either | pgeo passes the compatibility contract |
 ```
