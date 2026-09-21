@@ -459,6 +459,7 @@ warms them up, runs a 3-user validation (3 minutes), then ramps through 1, 2, 3,
 24, 32, 48, 64, 96, 128, 192, 256, 384 and 512 users (15 s warm-up plus 60 s measured at each
 step). A step **passes** when every endpoint's p95 is within target and errors stay below 1%;
 the run stops when errors exceed 5%, any p95 exceeds five times its target, or a service dies.
+
 #### 2.5.1 Caching
 
 No response caching is configured anywhere (nginx, Caddy, the Pelias API and pgeo
@@ -505,6 +506,7 @@ pgeo was tuned in rounds. Each round started from the failing test cases (what c
 was expected, which query step lost the right answer), changed one thing, and re-ran the full
 accuracy set, the fuzz set and a per-category comparison that listed every flipped case. A
 change was kept only if overall accuracy did not drop and no category lost more than noise.
+
 #### 2.7.1 Parallelism
 
 PostgreSQL uses several cores in two ways. Between queries, every connection is

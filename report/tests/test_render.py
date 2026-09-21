@@ -196,6 +196,18 @@ def test_pdf_reserves_space_so_a_caption_is_not_orphaned_from_its_table():
     assert "\\needspace" in out
 
 
+def test_flags_a_heading_glued_to_the_previous_line():
+    """"... a service dies. #### 2.5.1 Caching" reached a published PDF: Markdown needs a blank
+    line before a heading or it is just text."""
+    _, missing = render("Some prose ends here.\n#### 2.5.1 Caching\n\nMore.")
+    assert any("glued" in m for m in missing)
+
+
+def test_a_properly_separated_heading_is_not_flagged():
+    _, missing = render("Some prose ends here.\n\n#### 2.5.1 Caching\n\nMore.")
+    assert not any("glued" in m for m in missing)
+
+
 def test_markdown_has_no_latex_in_it():
     out, _ = render("{{table:cap|C}}\n\n{{callout:key|Text.}}")
     assert "\\needspace" not in out and "\\begin{" not in out

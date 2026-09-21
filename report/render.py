@@ -159,6 +159,10 @@ class Renderer:
             out = out.replace("{{bibliography}}", "\n".join(items) or "_(nothing cited)_")
         if "{{toc}}" in out:
             out = out.replace("{{toc}}", self._toc(out) if self.target == "md" else "\\tableofcontents")
+        # A heading needs a blank line before it or Markdown reads it as text: "... a service
+        # dies. #### 2.5.1 Caching" reached a published PDF that way.
+        for m in re.finditer(r"(?m)^(.*\S.*)\n(#{2,6} .+)$", out):
+            self.missing.append(f"heading glued to the previous line: {m.group(2)[:40]}")
         # "Table Table 3": the template wrote the word before a reference that already includes it
         for dup in re.findall(r"\b(Table Table|Figure Figure) \d+", out):
             self.missing.append(f"doubled word before a reference: {dup}")
