@@ -1,6 +1,9 @@
 % Report styling (pandoc + XeLaTeX). Sans-serif throughout; compact tables; figures sized to
 % the text width; no automatic figure numbering (the report numbers figures itself).
 \usepackage{etoolbox}
+% Bibliography entries are largely URLs. xurl lets \url{} break at any character, so a long
+% reference wraps instead of running into the margin.
+\usepackage{xurl}
 \renewcommand{\familydefault}{\sfdefault}
 % Narrow column padding: the widest tables have nine columns, and pandoc computes each column from
 % (\linewidth - 2n\tabcolsep), so a smaller separation gives the cells the room back.

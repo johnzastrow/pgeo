@@ -23,6 +23,32 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-09-21
+
+### Added
+- Report Section 2.1.1, "What pgeo is made of": an itemised bill of materials separating the
+  run-time components (seven, three of which ship inside PostgreSQL) from the build-time tools,
+  the optional FastAPI front end, and the demo/test software a running geocoder does not need.
+  Each entry carries a version, a licence and a role, and the section states what pgeo does
+  *not* need - no search engine, JVM, Node runtime, message queue or cache tier - and which SQL
+  file covers the work each absent Pelias service would have done.
+- `report/tests/test_bom.py` (24 tests): every line count, pinned dependency version and vendored
+  web library version in that section is checked against the repository, so the inventory cannot
+  drift. A new SQL file that is not listed fails the suite.
+
+### Fixed
+- Bibliography URLs ran up to two inches into the margin: they were plain text, which LaTeX
+  cannot break. The renderer now emits them as autolinks and the header loads `xurl`. Overfull
+  boxes in the PDF: 13 -> 7.
+- The report read "runs on PostgreSQL PostgreSQL 18.6 (Debian 18.6-1.pgdg13+2)" - the value
+  carries the full server string. Added `pg_version_short` for prose and table cells that
+  already say "PostgreSQL".
+- `session_photon.js` declared no `http_req_failed{phase:steady}` or `http_reqs{phase:steady}`
+  threshold. k6 only emits a sub-metric some threshold names, so the Photon run reported
+  throughput as 0.0 and - more seriously - would have reported a clean error rate however the
+  engine behaved. `run_matrix.evaluate()` now records which sub-metrics were absent and refuses
+  to score a pass without them.
+
 ## [0.12.2] - 2026-09-20
 
 ### Added

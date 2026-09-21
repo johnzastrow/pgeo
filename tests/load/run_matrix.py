@@ -386,6 +386,10 @@ def evaluate(summary: dict) -> dict:
             res["qtypes"][qt] = {
                 k: round(d[k], 1) for k in ("med", "p(95)", "p(99)") if k in d
             }
+    # k6 only emits a sub-metric that some threshold names. If a session script forgets the
+    # declaration these reads fall back to 0.0, which looks exactly like a clean, idle run - so
+    # say which ones were absent rather than scoring a pass on defaults.
+    missing = [k for k in ("http_req_failed{phase:steady}", "http_reqs{phase:steady}") if k not in m]
     fail = m.get("http_req_failed{phase:steady}", {})
     err = fail.get("value", fail.get("rate", 0.0))
     reqs = m.get("http_reqs{phase:steady}", {})
@@ -394,10 +398,12 @@ def evaluate(summary: dict) -> dict:
             "error_rate": round(err, 4),
             "req_rate": round(reqs.get("rate", 0.0), 1),
             "worst_p95_ratio": round(worst, 2),
-            "pass": err < ERR_SLO and worst <= 1.0,
+            "pass": not missing and err < ERR_SLO and worst <= 1.0,
             "broken": err > BREAK_ERR or worst > BREAK_FACTOR,
         }
     )
+    if missing:
+        res["missing_metrics"] = missing
     return res
 
 

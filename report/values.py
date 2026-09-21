@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import tomllib
 from collections import defaultdict
 from pathlib import Path
@@ -496,6 +497,10 @@ def build_all(snap: dict) -> tuple[dict, dict]:
     v["host_threads"] = str(host["logical_cpus"])
     v["host_mem"] = f"{host['memory_gb']:.0f} GB"
     v["pg_version"] = snap["pgeo"].get("postgres") or "-"
+    # The server reports "PostgreSQL 18.6 (Debian 18.6-1.pgdg13+2)". Prose and table cells
+    # that already say "PostgreSQL" want the bare number.
+    m = re.match(r"PostgreSQL\s+([\d.]+)", v["pg_version"])
+    v["pg_version_short"] = m.group(1) if m else v["pg_version"]
     v["postgis_version"] = snap["pgeo"].get("postgis") or "-"
     v["es_version"] = snap["pelias"].get("elasticsearch") or "-"
     v["pgeo_version"] = snap["pgeo"].get("engine_version") or "-"

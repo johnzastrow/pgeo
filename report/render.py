@@ -32,6 +32,23 @@ TEX_ESCAPE = {"\\": r"\textbackslash{}", "&": r"\&", "%": r"\%", "$": r"\$", "#"
               "^": r"\textasciicircum{}"}
 
 
+BARE_URL = re.compile(r"https?://\S+")
+
+
+def _linkify(text: str) -> str:
+    """Wrap bare URLs in <> so pandoc emits \\url{}.
+
+    Bibliography entries are mostly URLs, and as plain text LaTeX cannot break them: the longest
+    ran two inches into the margin. As autolinks they become \\url{}, which xurl breaks anywhere.
+    """
+
+    def wrap(m: re.Match[str]) -> str:
+        url = m.group(0).rstrip(".,;")
+        return f"<{url}>{m.group(0)[len(url):]}"
+
+    return BARE_URL.sub(wrap, text)
+
+
 def tex_text(s: str) -> str:
     """Escape prose for a raw LaTeX block, leaving any {{token}} for the reference pass."""
     def esc(part: str) -> str:
@@ -155,7 +172,7 @@ class Renderer:
 
         out = TOKEN.sub(lambda m: ref(m) if m.group(1) == "ref" else m.group(0), first)
         if "{{bibliography}}" in out:
-            items = [f"{i + 1}. {self.references[k]}" for i, k in enumerate(self.cited)]
+            items = [f"{i + 1}. {_linkify(self.references[k])}" for i, k in enumerate(self.cited)]
             out = out.replace("{{bibliography}}", "\n".join(items) or "_(nothing cited)_")
         if "{{toc}}" in out:
             out = out.replace("{{toc}}", self._toc(out) if self.target == "md" else "\\tableofcontents")

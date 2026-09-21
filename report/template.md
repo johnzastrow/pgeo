@@ -365,7 +365,7 @@ interpolation, Elasticsearch {{value:es_version}}) with the index built on the w
 shipped to VM 120 as an Elasticsearch snapshot. Nginx on the VM serves the demo page and the API
 under strict security headers; the wharf Caddy terminates TLS.
 
-**pgeo** runs on PostgreSQL {{value:pg_version}} with PostGIS {{value:postgis_version}} and only
+**pgeo** runs on PostgreSQL {{value:pg_version_short}} with PostGIS {{value:postgis_version}} and only
 core and contrib extensions (`pg_trgm` for trigram similarity, `unaccent`, `fuzzystrmatch`).
 Every query step is a SQL or PL/pgSQL function ({{ref:figure:query_pipeline}} shows the
 forward-search path). The public API is a schema of functions (`geocode_api.v1_search`,
@@ -402,6 +402,128 @@ Section 2.7 changed steps 1, 3, 4, 5 and 6.}}
 plain SQL in a file under version control, so a change is a pull request and the accuracy gate
 measures it. In Pelias the equivalent logic is spread across the API service's query builders and
 Elasticsearch scoring.
+
+#### 2.1.1 What pgeo is made of
+
+The case for pgeo is that it is small, so the claim deserves an itemised bill of materials rather
+than a summary. This section lists every component pgeo is built from, separated by when it is
+needed: at run time (installed on the server that answers queries), at build time (needed once, to
+turn raw data into an index, and never again until the next rebuild), and everything else that is
+convenience rather than requirement. The split matters for a small deployment, because only the
+first list has to fit on the VPS.
+
+**Run time.** Answering a query needs a database, three contrib extensions, PostGIS and one HTTP
+front end. Nothing else runs.
+
+```table pgeo_runtime_bom
+| Component | Version | Licence | Role | Where it runs |
+|---|---|---|---|---|
+| PostgreSQL | {{value:pg_version_short}} | PostgreSQL Licence | Storage, query planning, and - through PL/pgSQL - the parsing, ranking and JSON formatting that other geocoders put in application code | the database process |
+| PostGIS | {{value:postgis_version}} | GPL-2.0-or-later | Geometry type, spatial index (GiST), point-in-polygon admin lookup, distance ranking, reverse geocoding | extension, in the database |
+| `pg_trgm` | ships with PostgreSQL | PostgreSQL Licence | Trigram similarity and the GIN indexes behind fuzzy and type-ahead matching | contrib extension |
+| `fuzzystrmatch` | ships with PostgreSQL | PostgreSQL Licence | Levenshtein distance and double metaphone, used to rescue typos | contrib extension |
+| `unaccent` | ships with PostgreSQL | PostgreSQL Licence | Diacritic folding during normalisation | contrib extension |
+| PostgREST | v16.3 | MIT | The pure-SQL front end: turns `GET /rpc/v1_search` into a function call, with database roles as the authorisation model. No application code | a separate process beside the database |
+| nginx | distribution package | BSD-2-Clause | Maps Pelias paths to RPC paths, applies security headers and rate limits, serves the demo page | a separate process |
+```
+
+{{table:pgeo_runtime_bom|pgeo's run-time components: what must be installed on a server that
+answers queries. The FastAPI front end (below) is an alternative to PostgREST, not an addition.}}
+
+Three of the seven entries ship inside PostgreSQL itself, so a stock `postgis/postgis` image plus
+PostgREST is the whole run-time stack; in the deployed configuration that is two containers, both
+pinned by digest (`postgis/postgis:18-3.6` and `postgrest/postgrest:v16.3`). The one dependency worth naming separately is
+PostGIS, which is GPL-2.0-or-later and by far the largest single component: it is a library loaded
+into the database process rather than distributed software, so it does not affect the licence of
+pgeo's own code, but an organisation with a policy on copyleft should know it is there.
+
+**The optional application front end.** FastAPI was kept as a measured baseline - what an
+application layer adds and costs - and it is the front end to choose if you need a parser or a
+response shape that SQL cannot express conveniently. Choosing it replaces PostgREST and adds a
+Python runtime:
+
+```table pgeo_fastapi_bom
+| Component | Version | Licence | Role |
+|---|---|---|---|
+| Python | 3.12 or newer | PSF | Runtime for the application front end |
+| FastAPI | 0.141.1 | MIT | HTTP routing, request validation, OpenAPI |
+| Uvicorn | 0.53.0 | BSD-3-Clause | ASGI server |
+| asyncpg | 0.31.0 | Apache-2.0 | PostgreSQL driver and connection pool |
+| Pydantic | 2.13.5 | MIT | Request and response models |
+| httpx | 0.28.1 | BSD-3-Clause | Outbound HTTP, used by the loader and tests |
+```
+
+{{table:pgeo_fastapi_bom|The FastAPI front end, an alternative to PostgREST. Pinned exactly in
+`pgeo/pyproject.toml`.}}
+
+**Build time.** Building the index needs two more tools, neither of which is installed on the
+serving machine in the recommended deployment - the build runs elsewhere and ships a dump or a
+data directory:
+
+```table pgeo_build_bom
+| Component | Version | Licence | Role |
+|---|---|---|---|
+| DuckDB | 1.5.5 | MIT | Reads Overture Parquet directly from object storage and the CSV sources, and writes the staging CSVs |
+| GDAL / `ogr2ogr` | distribution package | MIT | Loads the OpenStreetMap PBF extract and the Census shapefiles into staging tables |
+```
+
+{{table:pgeo_build_bom|Build-time tools. Needed to make an index, not to serve one.}}
+
+**Code written for this project.** Everything above is off the shelf. What is new is
+1,921 lines of SQL and PL/pgSQL in eight files, plus
+1,461 lines of Python for loading and the optional front end. The SQL is the
+geocoder; the Python moves data into it and, in the PostgREST configuration, is absent at run
+time entirely.
+
+```table pgeo_own_code
+| File | Lines | What it is |
+|---|---|---|
+| `sql/010_base.sql` | 81 | Extensions, schemas, roles, shared helpers |
+| `sql/020_tables.sql` | 112 | The tables for one build, created in `pgeo_build` |
+| `sql/022_stage.sql` | 32 | Staging tables to admin boundaries and raw features |
+| `sql/025_osm.sql` | 81 | OpenStreetMap rules: named POIs to venues, `addr:*` to addresses, named roads to streets |
+| `sql/030_enrich_index.sql` | 137 | Admin hierarchy by point-in-polygon, normalisation, labels, importance, dedupe, indexes |
+| `sql/040_functions.sql` | 537 | The query pipeline: candidate generation, scoring, ranking |
+| `sql/050_api.sql` | 481 | The Pelias-shaped API: `geocode_api.v1_search`, `v1_autocomplete`, `v1_reverse`, `v1_attribution`, and the PL/pgSQL rule parser |
+| `sql/060_address.sql` | 460 | Structured US addresses in the style of USPS Publication 28 |
+| `src/pgeo/load/` | 390 | The loader: source extraction, build orchestration, atomic schema swap |
+| `src/pgeo/api/` | 603 | The optional FastAPI front end and its rule parser |
+| `src/pgeo/tune.py` | 409 | The tuning harness used in Section 2.7 |
+| `src/pgeo/settings.py` | 59 | Configuration and DSN assembly |
+```
+
+{{table:pgeo_own_code|The code written for this project. The eight SQL files are the geocoder;
+the Python is loading, tuning and the optional front end.}}
+
+**What is not in the list.** pgeo needs no search engine, no JVM, no Node runtime, no message
+queue, no cache tier and no separate parsing, point-in-polygon or interpolation services. The
+functions those services provide in Pelias are covered by PostGIS and by the SQL in
+{{ref:table:pgeo_own_code}} - the admin hierarchy that Pelias's `pip` service supplies is a
+spatial join in `030_enrich_index.sql`, and the address parsing that libpostal supplies is a rule
+parser in `050_api.sql`. That substitution is not free: it is a rule-based parser standing in for
+a statistical one, which Section 3.1 quantifies. It is, however, the reason the
+run-time list is seven entries long and three of them ship with PostgreSQL.
+
+**Demonstration and testing.** Neither list below is required to run a geocoder; they are here so
+the inventory is complete. The demo page is vendored rather than loaded from a CDN, so the strict
+content-security policy in Section 3.13 can forbid third-party origins outright.
+
+```table pgeo_aux_bom
+| Component | Version | Licence | Role | Required? |
+|---|---|---|---|---|
+| MapLibre GL JS | 6.10.0 | BSD-3-Clause | Map rendering on the demo page | demo only |
+| PMTiles | 4.5.0 | BSD-3-Clause | Single-file basemap reader, no tile server | demo only |
+| Protomaps basemaps | 5.7.2 | BSD-3-Clause | Basemap style and assets | demo only |
+| Fraunces, IBM Plex Sans Condensed, IBM Plex Mono | 5.3.0 | SIL OFL 1.1 | Self-hosted fonts | demo only |
+| Docker Engine and Compose | - | Apache-2.0 | Packaging and process supervision | deployment convenience |
+| Ansible | - | GPL-3.0 | Provisioning the VM and the edge | deployment convenience |
+| Caddy | - | Apache-2.0 | TLS termination at the wharf | site-specific |
+| k6 | - | AGPL-3.0 | The load harness in Section 2.5 | testing only |
+| pytest, Ruff | 9.1.1, 0.16.8 | MIT | Tests and linting | development only |
+```
+
+{{table:pgeo_aux_bom|Components that support the demonstration, the deployment and the testing,
+none of which a running geocoder requires.}}
 
 ### 2.2 Data
 
