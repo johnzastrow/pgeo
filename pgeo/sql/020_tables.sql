@@ -92,6 +92,9 @@ CREATE TABLE ac_prefix (
     PRIMARY KEY (prefix, rank)
 );
 
+-- feature_ac, the narrow table autocomplete reads, is created in 030_enrich_index.sql: it has to
+-- be made with CREATE TABLE AS, for the reason given there.
+
 -- Load metadata (sources, counts, timings) for reports and the API's /status.
 CREATE TABLE build_info (
     key   text PRIMARY KEY,

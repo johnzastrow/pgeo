@@ -114,6 +114,26 @@ SELECT prefix, rn, id FROM (
   WHERE f.layer <> 'address' AND length(f.name_norm) >= 1
 ) t WHERE rn <= 25;
 
+-- feature_ac: the narrow copy of the non-address features that autocomplete matches names
+-- against, as street_name is for streets. Ranking reads importance, name_norm, label, geom and
+-- tokens; in "feature" those sit behind some twenty variable-length columns of a 780-byte row,
+-- and PostgreSQL cannot jump to an attribute that follows a variable-length one - it walks them,
+-- for every candidate. Here they come first, in a row a quarter the size, so a prefix with
+-- 12,559 candidates visits 2,912 heap pages instead of 7,809 (docs/PERFORMANCE_OPTIMIZATION.md,
+-- F3). A request that carries filters needs columns this table lacks, and reads "feature".
+--
+-- It MUST be made with CREATE TABLE AS ... ORDER BY ctid, not CREATE TABLE + INSERT. Where
+-- candidates tie - two sources for one pond with the same label and importance, two towns with
+-- the same score - the survivor is decided by the order rows reach the sort, which is physical
+-- order. CREATE TABLE AS bulk-appends, so the copy keeps the big table's order exactly and ties
+-- fall the same way whichever table a query reads. INSERT consults the free-space map and
+-- backfills earlier pages: it left 660 of 203,399 rows out of place, and that alone changed 12
+-- of 4,018 golden autocomplete results. pgeo/tests/test_feature_ac_sql.py guards the order.
+CREATE TABLE feature_ac AS
+SELECT id, importance, geom, layer, label, name_norm, tokens
+FROM feature WHERE layer <> 'address' ORDER BY ctid;
+ALTER TABLE feature_ac ADD PRIMARY KEY (id);
+
 -- Indexes (the tuning log records experiments with alternatives).
 CREATE UNIQUE INDEX feature_gid_idx ON feature (gid);
 CREATE INDEX feature_geom_idx ON feature USING gist (geom);
@@ -131,7 +151,10 @@ CREATE INDEX feature_layer_idx ON feature (layer);
 CREATE INDEX feature_admin_idx ON feature (admin_id) WHERE admin_id IS NOT NULL;
 CREATE INDEX street_name_trgm_idx ON street_name USING gin (street_norm gin_trgm_ops);
 CREATE INDEX street_name_locality_idx ON street_name (locality_norm);
+CREATE INDEX feature_ac_tokens_idx ON feature_ac USING gin (tokens);
+CREATE INDEX feature_ac_name_trgm_idx ON feature_ac USING gin (name_norm gin_trgm_ops);
 
 ANALYZE feature;
 ANALYZE street_name;
 ANALYZE ac_prefix;
+ANALYZE feature_ac;

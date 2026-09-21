@@ -109,6 +109,12 @@ DECLARE
   lim   integer := least(greatest(coalesce(p_size, 10), 1), 40);
   townpt geometry;   -- the queried town's location(s), when the town name is known
   anchor geometry;   -- tie-break point for same-named candidates: focus, else the town
+  -- keep() cannot be inlined and takes the whole row; with no filter set it is pure cost
+  -- (docs/PERFORMANCE_OPTIMIZATION.md, F1), so that case is decided once, here.
+  nofilter boolean := (p_layers IS NULL OR cardinality(p_layers) = 0)
+                  AND (p_sources IS NULL OR cardinality(p_sources) = 0)
+                  AND p_gid IS NULL
+                  AND (p_categories IS NULL OR cardinality(p_categories) = 0);
 BEGIN
   PERFORM set_config('pg_trgm.similarity_threshold', '0.3', true);
   IF loc IS NOT NULL THEN
@@ -214,6 +220,12 @@ BEGIN
              -- ("Portlnd" in Portland, New Portland, Portland Glass): the closest name wins.
              (greatest(similarity(f.name_norm, q.txt), 0.9 * word_similarity(q.txt, f.name_norm))
               + 0.1 * similarity(f.name_norm, q.txt))::double precision AS nsim
+      -- This reads "feature", not the narrow feature_ac, on purpose. Generic names tie in their
+      -- hundreds at one similarity ("Flying Hill": the 60th and 61st candidates both 0.375), and
+      -- which of them survive the cut is decided by the order rows reach the sort - physical
+      -- order, which a second table cannot reproduce: a heap insert backfills earlier pages, so
+      -- even INSERT ... ORDER BY ctid left 660 of 203,399 rows out of place. Tried, and it
+      -- changed the top result of 16 of 5,002 golden queries for a 17% gain on this stage.
       FROM pgeo.feature f
       WHERE f.layer <> 'address' AND f.name_norm % q.txt
       -- ties (hundreds of "Main Street"s) are broken by distance to the focus point, so the
@@ -281,7 +293,7 @@ BEGIN
                        THEN exp(-ST_Distance(f.geom::geography, townpt::geography) / 6000.0) ELSE 0 END)
            END AS agree
     FROM cand c JOIN pgeo.feature f ON f.id = c.id
-    WHERE geocode.keep(f, p_layers, p_sources, rect, p_gid, p_categories)
+    WHERE (nofilter AND rect IS NULL) OR geocode.keep(f, p_layers, p_sources, rect, p_gid, p_categories)
     ORDER BY c.id, c.ihn, c.base DESC
   ),
   final AS (
@@ -297,12 +309,17 @@ BEGIN
            ORDER BY (z.h).score DESC, CASE (z.h).layer WHEN 'locality' THEN 0 ELSE 1 END,
                     CASE (z.h).source WHEN 'whosonfirst' THEN 0 WHEN 'openaddresses' THEN 1 ELSE 2 END) AS dup
   FROM final fi
+  -- The spheroidal distance to the focus, once. It was computed twice per row: for the reported
+  -- distance, and again inside focus_boost(), whose formula - exp(-(metres / 50000)), 0 without
+  -- a focus - is written out below. An interpolated row is measured from its interpolated point.
+  CROSS JOIN LATERAL (
+    SELECT CASE WHEN focus IS NULL THEN NULL
+                ELSE ST_Distance(coalesce(fi.igeom, (fi.f).geom)::geography, focus::geography) END AS dm) g0
+  CROSS JOIN LATERAL (SELECT g0.dm, CASE WHEN g0.dm IS NULL THEN 0 ELSE exp(-(g0.dm / 50000.0)) END AS boost) g
   CROSS JOIN LATERAL (
     SELECT CASE WHEN fi.ihn IS NULL THEN
-      geocode.to_hit(fi.f, fi.conf, fi.mt, fi.acc,
-                     CASE WHEN focus IS NULL THEN NULL
-                          ELSE ST_Distance((fi.f).geom::geography, focus::geography) / 1000 END,
-                     (fi.conf + 0.05 * (fi.f).importance + 0.1 * geocode.focus_boost((fi.f).geom, focus)
+      geocode.to_hit(fi.f, fi.conf, fi.mt, fi.acc, g.dm / 1000,
+                     (fi.conf + 0.05 * (fi.f).importance + 0.1 * g.boost
                       + CASE (fi.f).source WHEN 'openaddresses' THEN 0.01 ELSE 0 END)::real)
     ELSE
       -- interpolated address: synthesize the row at the interpolated position
@@ -312,8 +329,8 @@ BEGIN
           (fi.f).neighbourhood, (fi.f).locality, (fi.f).localadmin, (fi.f).county, (fi.f).region, (fi.f).region_a,
           fi.ihn || ' ' || (fi.f).street || coalesce(', ' || coalesce((fi.f).locality, (fi.f).localadmin), '') || ', ME, USA',
           NULL, NULL, ST_X(fi.igeom), ST_Y(fi.igeom), NULL, fi.conf, 'interpolated', 'point',
-          CASE WHEN focus IS NULL THEN NULL ELSE ST_Distance(fi.igeom::geography, focus::geography) / 1000 END,
-          (fi.conf + 0.05 * (fi.f).importance + 0.1 * geocode.focus_boost(fi.igeom, focus))::real,
+          g.dm / 1000,
+          (fi.conf + 0.05 * (fi.f).importance + 0.1 * g.boost)::real,
           (fi.f).hier)::geocode.hit
     END AS h
   ) z
@@ -373,12 +390,21 @@ DECLARE
   parts text[] := ARRAY[]::text[];
   i     integer;
   aligned boolean;
-  tsq   tsquery;
+  tsq   tsquery;     -- what a row must satisfy
+  tsq_idx tsquery;   -- what the GIN index is asked (see the short-prefix note below)
+  split boolean := false;
   focus geometry := CASE WHEN p_focus_lon IS NOT NULL AND p_focus_lat IS NOT NULL
                          THEN ST_SetSRID(ST_MakePoint(p_focus_lon, p_focus_lat), 4326) END;
   rect  geometry := geocode.search_area(p_rect, p_circle);
   lim   integer := least(greatest(coalesce(p_size, 10), 1), 40);
   found integer := 0;
+  -- No filter at all is the normal request. keep() holds an EXISTS, so it cannot be inlined, and
+  -- it takes the whole 780-byte row: called per candidate it was 63% of the candidate stage while
+  -- filtering nothing (docs/PERFORMANCE_OPTIMIZATION.md, F1). Decide once, here.
+  nofilter boolean := (p_layers IS NULL OR cardinality(p_layers) = 0)
+                  AND (p_sources IS NULL OR cardinality(p_sources) = 0)
+                  AND rect IS NULL AND p_gid IS NULL
+                  AND (p_categories IS NULL OR cardinality(p_categories) = 0);
 BEGIN
   IF n = 0 OR NOT geocode.country_ok(p_country) THEN
     RETURN;
@@ -397,65 +423,125 @@ BEGIN
       ELSE toks[i] || ':*' END;
   END LOOP;
   tsq := to_tsquery('simple', array_to_string(parts, ' & '));
+  -- Short prefix (F4). GIN expands a prefix term to every token that starts with it and unions
+  -- their posting lists: "s:*" includes "street", which is in nearly every address, and the
+  -- selective words in the same query narrow nothing until that union is done ("12 main s":
+  -- 43 ms in the index for 54 rows). So when the word being typed is one or two letters and
+  -- there are complete words to search on, the index is asked for those alone and the prefix is
+  -- tested on the rows that come back. Same rows: tsq implies tsq_idx, and the test runs before
+  -- any sort or limit. It is written ts_match_vq(), not @@, so that the planner does not
+  -- recognise it as an index condition and put it back in the scan.
+  IF n >= 2 AND length(toks[n]) <= 2 THEN
+    split := true;
+    tsq_idx := to_tsquery('simple', array_to_string(parts[1:n-1], ' & '));
+  ELSE
+    tsq_idx := tsq;
+  END IF;
 
+  -- In every branch below the candidates are ranked on a plain expression and only the rows that
+  -- survive the LIMIT are turned into hits (F2): to_hit() builds a 27-field record, it used to
+  -- run for every candidate, and all but "size" of them were thrown away. The distance to the
+  -- focus is computed once and serves both the reported distance and the focus boost, which is
+  -- focus_boost()'s own formula written out: exp(-(metres / 50000)).
   IF n >= 2 AND toks[1] ~ '^\d+[a-z]?$' THEN
     -- Address mode: "389 cong..." -> exact house number, street prefix.
     RETURN QUERY
-    SELECT (z.h).*
-    FROM pgeo.feature f
-    CROSS JOIN LATERAL (SELECT geocode.to_hit(f, NULL, NULL, 'point',
-             CASE WHEN focus IS NULL THEN NULL ELSE ST_Distance(f.geom::geography, focus::geography) / 1000 END,
-             (f.importance + 0.3 * geocode.focus_boost(f.geom, focus))::real) AS h) z
-    WHERE f.layer = 'address' AND f.housenumber = toks[1] AND f.tokens @@ tsq
-      AND geocode.keep(f, p_layers, p_sources, rect, p_gid, p_categories)
-    ORDER BY (z.h).score DESC, f.id
-    LIMIT lim;
+    WITH cand AS (
+      SELECT f.id, f.importance,
+             CASE WHEN focus IS NULL THEN NULL ELSE ST_Distance(f.geom::geography, focus::geography) END AS dm
+      FROM pgeo.feature f
+      WHERE f.layer = 'address' AND f.housenumber = toks[1] AND f.tokens @@ tsq_idx
+        AND (NOT split OR ts_match_vq(f.tokens, tsq))
+        AND (nofilter OR geocode.keep(f, p_layers, p_sources, rect, p_gid, p_categories))),
+    top AS (
+      SELECT c.id, c.dm,
+             (c.importance + 0.3 * CASE WHEN c.dm IS NULL THEN 0 ELSE exp(-(c.dm / 50000.0)) END)::real AS sc
+      FROM cand c ORDER BY sc DESC, c.id LIMIT lim)
+    SELECT (geocode.to_hit(f, NULL, NULL, 'point', t.dm / 1000, t.sc)).*
+    FROM top t JOIN pgeo.feature f ON f.id = t.id
+    ORDER BY t.sc DESC, t.id;
     GET DIAGNOSTICS found = ROW_COUNT;
   ELSIF n = 1 AND length(q) <= 3 THEN
-    -- Very short input: precomputed top features for the prefix.
+    -- Very short input: precomputed top features for the prefix. At most 25 rows, so there is
+    -- nothing to gain by ranking before building.
     RETURN QUERY
     SELECT (z.h).*
     FROM pgeo.ac_prefix p JOIN pgeo.feature f ON f.id = p.feature_id
     CROSS JOIN LATERAL (SELECT geocode.to_hit(f, NULL, NULL, 'centroid', NULL,
              (f.importance + 0.3 * geocode.focus_boost(f.geom, focus))::real) AS h) z
-    WHERE p.prefix = q AND geocode.keep(f, p_layers, p_sources, rect, p_gid, p_categories)
+    WHERE p.prefix = q AND (nofilter OR geocode.keep(f, p_layers, p_sources, rect, p_gid, p_categories))
     ORDER BY (z.h).score DESC
     LIMIT lim;
     GET DIAGNOSTICS found = ROW_COUNT;
   ELSE
+    -- Name mode. Unfiltered requests read the narrow table (F3); filtered ones need columns it
+    -- does not have. Exactly one arm of each UNION ALL runs: the other's first condition is a
+    -- constant false.
     RETURN QUERY
-    SELECT (z.h).*
-    FROM (SELECT DISTINCT ON (y.label) y.* FROM
-            (SELECT * FROM pgeo.feature x WHERE x.tokens @@ tsq AND x.layer <> 'address'
-               AND geocode.keep(x, p_layers, p_sources, rect, p_gid, p_categories)  -- filter before the cut
-             ORDER BY x.importance DESC LIMIT 400) y
-          ORDER BY y.label, y.importance DESC) f
-    CROSS JOIN LATERAL (SELECT geocode.to_hit(f, NULL, NULL, 'centroid',
-             CASE WHEN focus IS NULL THEN NULL ELSE ST_Distance(f.geom::geography, focus::geography) / 1000 END,
-             (f.importance
-              + CASE WHEN f.name_norm LIKE q || '%' THEN 0.25 ELSE 0 END
-              + 0.3 * geocode.focus_boost(f.geom, focus))::real) AS h) z
-    WHERE geocode.keep(f, p_layers, p_sources, rect, p_gid, p_categories)
-    ORDER BY (z.h).score DESC
-    LIMIT lim;
+    WITH cand AS (
+      (SELECT x.id, x.label, x.importance, x.name_norm, x.geom
+       FROM pgeo.feature_ac x
+       WHERE nofilter AND x.tokens @@ tsq_idx AND (NOT split OR ts_match_vq(x.tokens, tsq))
+       ORDER BY x.importance DESC LIMIT 400)
+      UNION ALL
+      (SELECT x.id, x.label, x.importance, x.name_norm, x.geom
+       FROM pgeo.feature x
+       WHERE NOT nofilter AND x.tokens @@ tsq_idx AND (NOT split OR ts_match_vq(x.tokens, tsq))
+         AND x.layer <> 'address'
+         AND geocode.keep(x, p_layers, p_sources, rect, p_gid, p_categories)  -- filter before the cut
+       ORDER BY x.importance DESC LIMIT 400)),
+    ded AS (SELECT DISTINCT ON (c.label) c.* FROM cand c ORDER BY c.label, c.importance DESC),
+    dist AS (SELECT d.*, CASE WHEN focus IS NULL THEN NULL
+                              ELSE ST_Distance(d.geom::geography, focus::geography) END AS dm FROM ded d),
+    top AS (
+      SELECT t.id, t.dm,
+             (t.importance + CASE WHEN t.name_norm LIKE q || '%' THEN 0.25 ELSE 0 END
+              + 0.3 * CASE WHEN t.dm IS NULL THEN 0 ELSE exp(-(t.dm / 50000.0)) END)::real AS sc
+      FROM dist t ORDER BY sc DESC LIMIT lim)
+    SELECT (geocode.to_hit(f, NULL, NULL, 'centroid', t.dm / 1000, t.sc)).*
+    FROM top t JOIN pgeo.feature f ON f.id = t.id
+    ORDER BY t.sc DESC;
     GET DIAGNOSTICS found = ROW_COUNT;
   END IF;
 
   -- Typo tolerance: if prefix matching found too little, fall back to trigram similarity.
+  --
+  -- This is over half of autocomplete's CPU and fires on 69% of keystrokes, because "fewer than
+  -- size" is the normal state of a good query, and much of what it appends is filler. Firing it
+  -- only when the prefix match found nothing was tried, since that is what a typo usually looks
+  -- like - and rejected, because it is not what a typo always looks like. "Walker Ci", one
+  -- character off "Walker Corner", still prefix-matches one wrong row (Walker Heights Circle);
+  -- the right town was fourth, among the "filler". One case of 3,360, and accuracy is the point
+  -- of this engine, so the rule stands as it was (docs/PERFORMANCE_OPTIMIZATION.md, F5).
   IF found < lim AND length(q) >= 4 THEN
     PERFORM set_config('pg_trgm.similarity_threshold', '0.35', true);
     RETURN QUERY
-    SELECT (z.h).*
-    FROM (SELECT DISTINCT ON (x.label) x.* FROM pgeo.feature x   -- one row per label (locality/localadmin)
-          WHERE x.layer <> 'address' AND x.name_norm % q AND NOT (x.tokens @@ tsq)
-          ORDER BY x.label, CASE x.layer WHEN 'locality' THEN 0 ELSE 1 END, x.importance DESC) f
-    CROSS JOIN LATERAL (SELECT geocode.to_hit(f, NULL, 'fallback', 'centroid',
-             CASE WHEN focus IS NULL THEN NULL ELSE ST_Distance(f.geom::geography, focus::geography) / 1000 END,
-             (similarity(f.name_norm, q) + 0.2 * f.importance
-              + 0.2 * geocode.focus_boost(f.geom, focus))::real) AS h) z
-    WHERE geocode.keep(f, p_layers, p_sources, rect, p_gid, p_categories)
-    ORDER BY (z.h).score DESC
-    LIMIT lim - found;
+    WITH cand AS (
+      (SELECT x.id, x.label, x.layer, x.importance, x.name_norm, x.geom
+       FROM pgeo.feature_ac x
+       WHERE nofilter AND x.name_norm % q AND NOT (x.tokens @@ tsq))
+      UNION ALL
+      (SELECT x.id, x.label, x.layer, x.importance, x.name_norm, x.geom
+       FROM pgeo.feature x
+       WHERE NOT nofilter AND x.layer <> 'address' AND x.name_norm % q AND NOT (x.tokens @@ tsq))),
+    ded AS (SELECT DISTINCT ON (c.label) c.* FROM cand c   -- one row per label (locality/localadmin)
+            ORDER BY c.label, CASE c.layer WHEN 'locality' THEN 0 ELSE 1 END, c.importance DESC),
+    -- Filters apply after the one-per-label cut here, not before it as in name mode: a label
+    -- whose best row fails the filter is dropped, not replaced by its runner-up. That is how
+    -- this branch has always behaved, and the order is kept so that its output is unchanged.
+    kept AS (SELECT d.* FROM ded d
+             WHERE nofilter OR EXISTS (SELECT 1 FROM pgeo.feature f WHERE f.id = d.id
+                     AND geocode.keep(f, p_layers, p_sources, rect, p_gid, p_categories))),
+    dist AS (SELECT d.*, CASE WHEN focus IS NULL THEN NULL
+                              ELSE ST_Distance(d.geom::geography, focus::geography) END AS dm FROM kept d),
+    top AS (
+      SELECT t.id, t.dm,
+             (similarity(t.name_norm, q) + 0.2 * t.importance
+              + 0.2 * CASE WHEN t.dm IS NULL THEN 0 ELSE exp(-(t.dm / 50000.0)) END)::real AS sc
+      FROM dist t ORDER BY sc DESC LIMIT lim - found)
+    SELECT (geocode.to_hit(f, NULL, 'fallback', 'centroid', t.dm / 1000, t.sc)).*
+    FROM top t JOIN pgeo.feature f ON f.id = t.id
+    ORDER BY t.sc DESC;
   END IF;
 END
 $$;

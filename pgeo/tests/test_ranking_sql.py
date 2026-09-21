@@ -66,11 +66,15 @@ def first(doc: dict) -> dict:
 
 @pytest.mark.parametrize(
     ("query", "want_in_label"),
-    [("congress st portland", "Congress"), ("congress street portland", "Congress"),
-     ("main rd", "Main"), ("us rte 1", "Route 1")],  # fmt: skip
+    [
+        ("congress st portland", "Congress"),
+        ("congress street portland", "Congress"),
+        ("main rd", "Main"),
+        ("us rte 1", "Route 1"),
+    ],  # fmt: skip
 )
 def test_abbreviations_and_spelled_out_words_reach_the_same_places(query, want_in_label):
-    """"rd" and "road", "st" and "street" must not be different words."""
+    """ "rd" and "road", "st" and "street" must not be different words."""
     assert want_in_label.lower() in first(search(text=query))["label"].lower()
 
 
@@ -80,9 +84,15 @@ def test_abbreviations_and_spelled_out_words_reach_the_same_places(query, want_i
 def test_structured_search_ranks_the_address_above_its_zip_code():
     """Before the towns step this returned the ZIP polygon at rank 1, so structured search
     scored 0%."""
-    doc = json.loads(_fetchval(
-        "SELECT geocode_api.v1_search_structured(address := $1, locality := $2, region := $3, postalcode := $4)",
-        "389 Congress St", "Portland", "ME", "04101"))
+    doc = json.loads(
+        _fetchval(
+            "SELECT geocode_api.v1_search_structured(address := $1, locality := $2, region := $3, postalcode := $4)",
+            "389 Congress St",
+            "Portland",
+            "ME",
+            "04101",
+        )
+    )
     assert first(doc)["layer"] == "address"
 
 
@@ -125,7 +135,7 @@ def test_the_focus_point_decides_between_identically_named_streets():
 
 
 def test_a_named_town_is_a_location_not_only_a_name_to_match():
-    """"Calvary Bible Church, Stratton" is in Eustis, next to Stratton. Matching the town as a
+    """ "Calvary Bible Church, Stratton" is in Eustis, next to Stratton. Matching the town as a
     name finds nothing; treating it as a place finds the church."""
     top = first(search(text="calvary bible church stratton"))
     assert "calvary bible church" in top["label"].lower()
@@ -156,14 +166,14 @@ def test_confidence_grades_exact_above_partial_above_nonsense():
 
 
 def test_a_query_that_embeds_a_real_name_is_marked_as_a_fallback_match():
-    """"Zzyzx Memorial Fountain" does find "Memorial Fountain": the name is really in the data.
+    """ "Zzyzx Memorial Fountain" does find "Memorial Fountain": the name is really in the data.
     match_type is how a client tells that apart from a clean hit."""
     top = first(search(text="Zzyzx Memorial Fountain"))
     assert top["match_type"] == "fallback", top
 
 
 def test_a_famous_name_that_really_exists_in_maine_is_still_found():
-    """"The Eiffel Tower of Paris, Maine" is a real venue in South Paris, and one of the eight
+    """ "The Eiffel Tower of Paris, Maine" is a real venue in South Paris, and one of the eight
     cases the accuracy set wrongly calls a miss. Suppressing famous names to score better on
     misses would break it."""
     assert "eiffel tower" in first(search(text="Eiffel Tower, Maine"))["label"].lower()

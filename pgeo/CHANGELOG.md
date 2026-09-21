@@ -10,6 +10,53 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-09-21
+
+Performance, with output unchanged: **7,380 golden queries (47,962 result rows) return
+byte-identical JSON before and after**, across all four endpoints, with and without filters and
+focus points; 6,720 accuracy and fuzz cases show no change in verdict, distance, confidence or
+result count on either front end. Accuracy stays 95.8%. Detail: docs/PERFORMANCE_OPTIMIZATION.md.
+
+### Changed
+- `geocode.autocomplete` costs 36% less CPU per request (50.3 s -> 32.2 s over a 2,920-keystroke
+  workload), from four changes:
+  - `keep()` is skipped when a request carries no filter. It holds an `EXISTS`, so it cannot be
+    inlined, and takes the whole 780-byte row: it was 63% of the candidate stage while filtering
+    nothing.
+  - Candidates are ranked on a plain expression and hits are built only for the rows that survive
+    the `LIMIT`. A 27-field record used to be built for every candidate, with the spheroidal
+    distance computed twice, and all but `size` discarded.
+  - Unfiltered requests read a new narrow table, `pgeo.feature_ac` (188 bytes a row against 780,
+    hot columns first): 7,809 heap pages become 2,912 for a common prefix.
+  - A one- or two-letter trailing prefix is kept out of the GIN scan and tested on the rows that
+    come back. `s:*` used to be expanded to every token starting with "s" - including "street" -
+    before the selective words could narrow anything: 44.8 ms -> 2.9 ms for the same 54 rows.
+- `geocode.search` skips `keep()` when there is no filter and computes the distance to the focus
+  once rather than twice. Its fuzzy-name stage deliberately still reads `pgeo.feature` (below).
+
+### Added
+- `pgeo.feature_ac`, built by `030_enrich_index.sql`: +60 MB on disk, 1.2 s of build time.
+- `pgeo/tests/test_query_paths_sql.py` (82 tests) and `test_feature_ac_sql.py` (9): the fast and
+  slow routes must agree on every keystroke; address mode is checked against a plain query with no
+  optimization in it; the side table must be a faithful copy in the same physical order.
+
+### Tried and rejected, because accuracy is the point
+- **Firing the typo fallback only when the prefix match found nothing.** It would have made
+  autocomplete 3.3x cheaper, and the 150 autocomplete accuracy cases did not move. The fuzz set
+  found the hole: "Walker Ci", one character off "Walker Corner", still prefix-matches one wrong
+  row, so the fallback was suppressed and the right town - fourth, among the "filler" - was lost.
+  One case in 3,360. Reverted; a test now pins that query.
+- **The narrow table in `search`'s fuzzy-name stage.** Generic names tie in their hundreds at one
+  similarity, and which survive the 60-row cut is decided by physical row order. It changed the
+  top result of 16 of 5,002 golden queries for a 17% gain on that stage. Reverted.
+
+### Fixed
+- `feature_ac` is built with `CREATE TABLE AS ... ORDER BY ctid`, not `CREATE TABLE` + `INSERT`.
+  An `INSERT` consults the free-space map and backfills earlier pages: it left 660 of 203,399
+  rows out of physical order, and because ties between equal candidates are broken by arrival
+  order, that alone changed 12 of 4,018 golden autocomplete results. Caught by the golden diff
+  before release; the accuracy percentage had not moved.
+
 ### Fixed
 - The database password is percent-encoded into the DSN. A password containing `/` or `#`
   ended the URL authority, so the connection named a different host - silently, and only for

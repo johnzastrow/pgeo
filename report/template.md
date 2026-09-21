@@ -497,7 +497,7 @@ data directory:
 {{table:pgeo_build_bom|Build-time tools. Needed to make an index, not to serve one.}}
 
 **Code written for this project.** Everything above is off the shelf. What is new is
-1,921 lines of SQL and PL/pgSQL in eight files, plus
+2,033 lines of SQL and PL/pgSQL in eight files, plus
 1,461 lines of Python for loading and the optional front end. The SQL is the
 geocoder; the Python moves data into it and, in the PostgREST configuration, is absent at run
 time entirely.
@@ -506,11 +506,11 @@ time entirely.
 | File | Lines | What it is |
 |---|---|---|
 | `sql/010_base.sql` | 81 | Extensions, schemas, roles, shared helpers |
-| `sql/020_tables.sql` | 112 | The tables for one build, created in `pgeo_build` |
+| `sql/020_tables.sql` | 115 | The tables for one build, created in `pgeo_build` |
 | `sql/022_stage.sql` | 32 | Staging tables to admin boundaries and raw features |
 | `sql/025_osm.sql` | 81 | OpenStreetMap rules: named POIs to venues, `addr:*` to addresses, named roads to streets |
-| `sql/030_enrich_index.sql` | 137 | Admin hierarchy by point-in-polygon, normalisation, labels, importance, dedupe, indexes |
-| `sql/040_functions.sql` | 537 | The query pipeline: candidate generation, scoring, ranking |
+| `sql/030_enrich_index.sql` | 160 | Admin hierarchy by point-in-polygon, normalisation, labels, importance, dedupe, indexes |
+| `sql/040_functions.sql` | 623 | The query pipeline: candidate generation, scoring, ranking |
 | `sql/050_api.sql` | 481 | The Pelias-shaped API: `geocode_api.v1_search`, `v1_autocomplete`, `v1_reverse`, `v1_attribution`, and the PL/pgSQL rule parser |
 | `sql/060_address.sql` | 460 | Structured US addresses in the style of USPS Publication 28 |
 | `src/pgeo/load/` | 390 | The loader: source extraction, build orchestration, atomic schema swap |
