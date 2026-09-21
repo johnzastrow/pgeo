@@ -4,6 +4,14 @@
 
 Normally run through scripts/build_report.sh, which can also refresh the live inputs first.
 Fails if the template references a value, table or figure that the data does not provide.
+
+Why the PDF goes through LaTeX rather than OpenDocument. Generating ODT first and rendering the
+PDF from it was tried on 2026-09-20 and is worse, not merely different: pandoc's default ODT
+output draws no table borders at all, so that route gives up the grid lines, the row shading and
+the column control this report's dense tables depend on, and it runs six pages longer. Going via
+.docx keeps horizontal rules but no vertical ones and runs nine pages longer. The related
+complaint - that table text in the Word output was too large - was real and was fixed on its own,
+by setting 9pt table styles in pdf/reference.docx; it needed no change of route.
 """
 
 from __future__ import annotations
