@@ -13,6 +13,23 @@ The study that compares the two engines is [docs/REPORT.md](docs/REPORT.md)
 ([PDF](docs/REPORT.pdf), [Word](docs/REPORT.docx)). A slide deck covering pgeo's architecture, features, use and limits
 runs from the repository with `scripts/slides.sh` ([slides/README.md](slides/README.md)).
 
+## Licence and data
+
+The code is [Apache-2.0](LICENSE). The data it loads is not: each source carries its own licence
+and a deployment that redistributes data or derived tiles must comply with them - see [NOTICE](NOTICE)
+and `docs/DATA_PIPELINE.md` section 13. A running service reports the same list at `/v1/attribution`.
+
+## Your own network
+
+Addresses and host names in this repository are documentation placeholders (RFC 5737
+`192.0.2.0/24`, RFC 2606 `example.org`). Put the real ones in two gitignored files, both of which
+have a committed `.example` beside them:
+
+- `infra/ansible/inventory/hosts.yml` - the host to deploy to
+- `infra/ansible/group_vars/pelias/zz-local.yml` - the edge name, the TLS terminator and the SSH
+  allow-list. The `zz-` prefix matters: Ansible reads a `group_vars` directory alphabetically, so
+  the override has to sort after `main.yml`.
+
 Version: see [VERSION](VERSION) and [CHANGELOG.md](CHANGELOG.md) (semver; pgeo and
 pelias-prep are versioned separately in their own changelogs).
 

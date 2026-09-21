@@ -83,10 +83,11 @@ stage_deploy() {
   echo "deploying snapshot $snap and dump $dump"
   (cd infra/ansible && ansible-playbook site.yml -e "pelias_snapshot_name=$snap" -e "pgeo_dump_name=$dump" \
      -e pelias_force_restore=true -e pgeo_force_restore=true)
-  python3 tests/web/smoke_demo.py https://geocoder.example.org
+  site="${GEOCODER_URL:-https://geocoder.example.org}"
+  python3 tests/web/smoke_demo.py "$site"
   # the deployed posture, including the host checks that only apply to a real deployment
-  PGEO_EDGE=https://geocoder.example.org/pgeo PELIAS_EDGE=https://geocoder.example.org \
-    PGEO_VM_SSH="${PGEO_VM_SSH:-jcz@192.0.2.20}" uv run --project pgeo pytest tests/security -q
+  PGEO_EDGE="$site/pgeo" PELIAS_EDGE="$site" \
+    PGEO_VM_SSH="${PGEO_VM_SSH:-}" uv run --project pgeo pytest tests/security -q
 }
 
 for s in "${stages[@]}"; do

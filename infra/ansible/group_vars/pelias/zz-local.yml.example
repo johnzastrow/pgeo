@@ -1,0 +1,8 @@
+# Copy to zz-local.yml (gitignored) and set the real values for your network.
+# Ansible loads every file in this directory; the zz- prefix makes it sort
+# after main.yml, so it wins. (A group_vars directory loads alphabetically, so a file
+# called local.yml would lose to main.yml - which is easy to get wrong.)
+ssh_allowed_sources: ["10.0.0.0/24", "100.64.0.0/10"]
+edge_allowed_sources: ["10.0.0.254"]      # the TLS terminator, and only it
+edge_trusted_proxies: ["10.0.0.254"]
+edge_server_name: geocoder.your-domain.example

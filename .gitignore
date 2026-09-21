@@ -28,3 +28,7 @@ report/.venv/
 # can be read from the repository (and GitHub Pages) without Node or npm install.
 slides/node_modules/
 slides/.slidev/
+
+# Real network details stay out of the published repository (see the .example files)
+infra/ansible/inventory/hosts.yml
+infra/ansible/group_vars/pelias/local.yml

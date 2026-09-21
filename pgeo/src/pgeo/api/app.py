@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import logging
 import math
+import os
 import re
 import time
 from contextlib import asynccontextmanager
@@ -34,7 +35,10 @@ try:
     ENGINE_VERSION = version("pgeo")  # single source: pgeo/pyproject.toml
 except PackageNotFoundError:
     ENGINE_VERSION = "0+unknown"
-ATTRIBUTION = "https://geocoder.example.org/ (pgeo: OSM, OpenAddresses, WOF, USGS GNIS, US Census, Overture)"
+ATTRIBUTION = os.environ.get(
+    "PGEO_ATTRIBUTION",
+    "pgeo: OpenStreetMap, OpenAddresses, Who's On First, USGS GNIS, US Census, Overture Maps",
+)
 
 
 class BadRequest(Exception):

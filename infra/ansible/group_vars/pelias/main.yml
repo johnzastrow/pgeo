@@ -1,3 +1,7 @@
+# Defaults for a fresh deployment. The addresses and names here are documentation
+# placeholders (RFC 5737 192.0.2.0/24, RFC 2606 example.org): put the real ones in
+# group_vars/pelias/local.yml, which is gitignored and loaded after this file.
+# See local.yml.example.
 # --- access -------------------------------------------------------------------
 admin_user: jcz
 # Sources allowed to reach SSH: home LAN and the tailnet (CGNAT range).

@@ -13,7 +13,8 @@
 # path as on VM 120 minus TLS. Results: data/loadtest/<time>-vm/ (tests/load/run_vm.py).
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-PVE="root@192.0.2.10"
+# The Proxmox host. Set PVE_HOST for your own: export PVE_HOST=root@10.0.0.10
+PVE="${PVE_HOST:-root@192.0.2.10}"
 
 engine="${1:?engine}"; vmid="${2:?vmid}"; cores="${3:?cores}"; cpulimit="${4:?cpulimit}"; mem="${5:?memory_mb}"
 shift 5

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Clone the Debian 13 template into the Pelias query VM and start it.
 # Runs ON the Proxmox host. The SSH public key is passed in as SSH_PUBKEY (content, not path):
-#   ssh root@192.0.2.10 "SSH_PUBKEY='$(cat ~/.ssh/id_ed25519.pub)' bash -s" < infra/proxmox/create_vm.sh
+#   ssh root@YOUR-PROXMOX-HOST "SSH_PUBKEY='$(cat ~/.ssh/id_ed25519.pub)' bash -s" < infra/proxmox/create_vm.sh
 set -euo pipefail
 
 TEMPLATE_ID="${TEMPLATE_ID:-9013}"

@@ -1,6 +1,6 @@
 """Production validation: the same k6 session and ramp against VM 120 through the real HTTPS path.
 
-    python3 tests/load/run_vm.py [--engines pelias,pgeo] [--base https://geocoder.example.org]
+    python3 tests/load/run_vm.py [--engines pelias,pgeo] [--base https://your-geocoder.example]
                                  [--ssh jcz@192.0.2.20] [--quick]
 
 Unlike run_matrix*.py this changes nothing on the target: the VM runs as deployed (4 vCPU,

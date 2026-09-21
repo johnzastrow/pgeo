@@ -1,3 +1,4 @@
+# Copy to hosts.yml (gitignored) and set the real address.
 # Fill in ansible_host with the DHCP address reported by infra/proxmox/create_vm.sh
 # (and reserve it on the router). The VPS will be a second host in this group with
 # exposure: public.
@@ -6,7 +7,7 @@ all:
     pelias:
       hosts:
         pelias-maine:
-          # LAN DNS: geocoder.lan.example (DHCP reservation on the router). IP kept here so the
+          # LAN DNS name with a DHCP reservation on the router. The IP is kept here so the
           # recorded SSH host key and connectivity do not depend on local DNS.
           ansible_host: 192.0.2.20
           ansible_user: jcz

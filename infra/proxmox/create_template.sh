@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Create a Debian 13 cloud-init VM template on a Proxmox node.
 # Runs ON the Proxmox host, e.g.:
-#   ssh root@192.0.2.10 'bash -s' < infra/proxmox/create_template.sh
+#   ssh root@YOUR-PROXMOX-HOST 'bash -s' < infra/proxmox/create_template.sh
 # Override defaults with env vars on the remote side:
 #   ssh root@HOST 'TEMPLATE_ID=9013 STORAGE=nvme2tb bash -s' < create_template.sh
 set -euo pipefail

@@ -1,8 +1,8 @@
 """Security posture of a running deployment: the controls the report claims, asserted.
 
     uv run --project pgeo pytest tests/security -q                  # local dev edge (:4700)
-    PGEO_EDGE=https://geocoder.example.org/pgeo \\
-    PELIAS_EDGE=https://geocoder.example.org \\
+    PGEO_EDGE=https://your-geocoder.example/pgeo \\
+    PELIAS_EDGE=https://your-geocoder.example \\
         uv run --project pgeo pytest tests/security -q              # the deployed service
 
 These are properties of a deployment, not of the source, so each test skips when the thing it
@@ -20,7 +20,7 @@ httpx = pytest.importorskip("httpx")
 
 PGEO = os.environ.get("PGEO_EDGE", "http://127.0.0.1:4700")
 PELIAS = os.environ.get("PELIAS_EDGE", "http://127.0.0.1:4000")
-VM = os.environ.get("PGEO_VM_SSH", "")  # e.g. jcz@192.0.2.20; host checks skip without it
+VM = os.environ.get("PGEO_VM_SSH", "")  # e.g. user@10.0.0.20; host checks skip without it
 
 
 def get(base: str, path: str, **kw) -> httpx.Response:
