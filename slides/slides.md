@@ -191,6 +191,34 @@ pieces are all well known.
 
 ---
 
+# The specialist outside PostgreSQL
+
+Autocomplete is pgeo's bottleneck, and Photon is the engine built for autocomplete. So we measured it.
+
+| Two cores, same corpus and ramp | Pelias | Photon | pgeo |
+|---|---|---|---|
+| Concurrent users within targets | **192** | 128 | 48 |
+| Autocomplete p95 at 48 users | 21 ms | **53 ms** | 103-189 ms |
+| Memory under load | 8.4 GB | **1.84 GB** | 2.5 GB |
+| Accuracy, 1,560 cases | 75.5% | 73.7% | **95.8%** |
+| Venues (Overture places) | 60.4% | 19.1% | **94.2%** |
+
+<v-click>
+
+<div class="mt-4 p-3 border-l-4 border-amber-500 bg-amber-50 dark:bg-amber-900/20 text-sm">
+
+Photon is quicker per keystroke than pgeo and the lightest of the three — but **less CPU-efficient
+than Pelias**, so it does not become the harder yardstick. It collapses on venues because a Photon
+index is exported from Nominatim, which imports **OpenStreetMap only**: the E911 address points and
+Overture places are not there to find. It also returns **no confidence score**, so it cannot mark an
+answer it does not believe.
+
+</div>
+
+</v-click>
+
+---
+
 # Features
 
 <div grid="~ cols-2 gap-6" class="text-sm">
@@ -390,7 +418,8 @@ Served same-origin with a strict CSP: no CDN, no remote script, every value writ
 <div class="mt-4 p-3 border-l-4 border-amber-500 bg-amber-50 dark:bg-amber-900/20 text-sm">
 
 **Autocomplete is the bottleneck**, not reverse geocoding — it has the tightest target (250 ms)
-and fires several times per typed word. That is where the next factor of two lives.
+and fires several times per typed word. That is where the next factor of two lives. Measured
+against Photon, the type-ahead specialist: two to three times slower per keystroke.
 
 </div>
 
