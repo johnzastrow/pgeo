@@ -41,3 +41,21 @@ The overall width, the four colours, and the globe are unchanged - the globe is 
 than letterform, so it is moved and scaled to its new counter, not redrawn. To adjust the mark,
 edit the parameters at the top of `build_pgeo_clean.py` and re-run it rather than editing the
 SVG: hand edits are lost on the next build.
+
+## The icon
+
+The wordmark is 3:1 and illegible below about 120px wide, so the icon is a different drawing
+rather than a crop. `build_pgeo_icon.py` produces two, both on a 512 square:
+
+| File | What it is |
+|---|---|
+| `pgeo-icon.svg` | The split ring with a simplified globe. The default: purpose-built for small sizes and still legible at 16px |
+| `pgeo-icon-g.svg` | The `g` and its globe, lifted from the wordmark. More obviously pgeo, but the globe's detail muddies below 48px |
+
+Both take their proportions from the master, so the icon and the wordmark stay visibly related.
+
+Two things the icon does differently, and why. Its globe is redrawn as a sphere, an equator and
+one meridian: the wordmark's globe is nine overlapping paths of continent shapes, which turn to
+mud at icon size. And its two slots are cut separately, stopping at the counter, where the
+wordmark makes both with one rectangle laid across the centre - at icon size that rectangle reads
+as a slash drawn through the mark, which is the "no entry" gesture.
