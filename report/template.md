@@ -118,7 +118,40 @@ product**. That principle motivated building pgeo alongside Pelias and measuring
 4. Can PostgreSQL itself be the API endpoint (G6) without an inferior product?
 5. Can pgeo replace Pelias for existing clients, and what does it add?
 
-### 1.4 Other geocoders that live in PostgreSQL
+### 1.4 What the two platforms do
+
+Before comparing anything it is worth being concrete about what each platform offers, because
+several of the differences that matter later -- structured addresses, typo tolerance, the number
+of moving parts -- are visible here rather than in any measurement.
+
+```table features
+| Capability | Pelias | pgeo |
+|---|---|---|
+| Endpoints | search, structured, autocomplete, reverse, place (+ nearby, beta) | the same five, plus `/v1/address` |
+| Informational endpoints | `/v1/attribution` (data licences) and a `/v1/` API description page, both HTML | `/v1/attribution`, built in SQL and served as HTML by both front ends; no `/v1/` description page |
+| Filters | layers, sources, focus, rectangle, circle, country, gid, categories | the same |
+| Parsing | libpostal (statistical, ~2 GB model) | rule parser in SQL (best measured); libpostal optional |
+| Typo tolerance | limited (term fuzziness) | trigram similarity on whole names and streets |
+| Town handling | exact admin names (placeholder) | town as a location: villages and nearest towns accepted |
+| Interpolation | separate service (TIGER + OA) | SQL, between neighbouring house numbers |
+| Confidence | per result | per result, lowered for ties between distinct places |
+| Structured US addresses | no | USPS Publication 28 components, delivery and last lines, FIPS codes |
+| Nearest street address for a venue | no | yes (`/v1/address`) |
+| HTTP layer | Node.js API | PostgREST (no code) or FastAPI |
+| Data store | Elasticsearch index | PostgreSQL tables |
+| Components | 6 containers | 2-3 containers |
+| Build | importers, ~15 min | one command, ~13 min |
+| Operations tooling | Pelias CLI | tuning profiles, accuracy gate, rebuild script |
+| Security posture here | read-only query services, pinned images, strict CSP; Elasticsearch has no credentials (loopback only) | read-only database role (`SELECT` only), allowlisted tuning, password-authenticated database, no query parameters in the PostgreSQL log |
+```
+
+{{table:features|Features of each platform as deployed here.}}
+
+Two rows carry most of the argument in this report. **Components** is why pgeo fits on a machine
+Pelias cannot use, and **typo tolerance** is why it answers questions Pelias does not. Everything
+in Section 3 is an attempt to put numbers on those two lines.
+
+### 1.5 Other geocoders that live in PostgreSQL
 
 pgeo is not the first attempt to put geocoding inside the database, and the question of whether it
 was worth building depends on what already exists. A survey of the field in September 2026 found
@@ -134,6 +167,27 @@ three projects that keep their query logic in PostgreSQL, and one that keeps hal
 ```
 
 {{table:related_work|Geocoders whose query logic runs inside PostgreSQL, surveyed September 2026.}}
+
+```table related_features
+| Feature | TIGER geocoder | osmgeocoder | Nominatim | pgeo |
+|---|---|---|---|---|
+| Forward search | yes | yes | yes | yes |
+| Reverse geocoding | yes | yes | yes | yes |
+| Autocomplete / type-ahead | no | yes (predictive text) | no (not its strength) | yes |
+| Structured search fields | yes | yes | yes | yes |
+| Typo tolerance | no (exact match) | yes (trigram, metaphone) | limited | yes (trigram + abbreviation expansion) |
+| Data sources | US Census TIGER only | OSM, optionally OpenAddresses | OSM | OA, OSM, WOF, GNIS, ZCTA, Overture |
+| HTTP API | none (SQL only) | Flask service | yes | yes |
+| Runs with no application code | n/a (no HTTP) | no | no | yes (PostgREST) |
+| Speaks another geocoder's API | no | no | its own | yes (Pelias, 28/28) |
+| Structured postal addresses out | partial (normalizer) | formatting templates | no | yes (USPS Publication 28) |
+| Coverage | United States | many countries | planet | one state, tested |
+| External model needed | no | libpostal recommended | no | no (rule parser) |
+```
+
+{{table:related_features|The same feature comparison as {{ref:table:features}}, extended to the
+other geocoders that keep their logic in PostgreSQL. Compiled from project documentation,
+September 2026; not independently benchmarked.}}
 
 **Where pgeo sits.** Against the TIGER geocoder, pgeo adds sources beyond TIGER (OpenAddresses,
 OpenStreetMap, Who's On First, GNIS, ZCTA, Overture), typo tolerance rather than exact matching,
@@ -157,6 +211,44 @@ needs libpostal and a Python service to do more than street names. A reader who 
 tolerance, several open data sources and a Pelias-shaped API without an application layer has, as
 far as this survey found, no off-the-shelf option -- which is the gap this project fills, for one
 state.}}
+
+### 1.6 Terms and acronyms
+
+Geocoding borrows vocabulary from several fields, and this report adds names of its own for the
+configurations it tested. Everything used later is defined here so no term arrives unexplained.
+
+```table glossary
+| Term | Meaning |
+|---|---|
+| **Geocoding** | Turning a typed address or place name into coordinates |
+| **Reverse geocoding** | Turning coordinates into the nearest address or place |
+| **Autocomplete** | Type-ahead search: results after every keystroke, against a much tighter latency budget |
+| **Structured search** | A search whose parts arrive in separate fields (address, locality, region, postal code) rather than one string |
+| **pgeo** | The geocoder built for this project: PostgreSQL and PostGIS, with the query logic in SQL |
+| **Pelias** | The established open-source geocoder used here as the reference and the test oracle: an API service, Elasticsearch and four helper services |
+| **PostGIS** | The PostgreSQL extension that adds geographic types, indexes and functions |
+| **PostgREST** | A gateway that exposes PostgreSQL functions as a REST API, with no application code of its own |
+| **FastAPI** | A Python web framework; pgeo's alternative front end, kept as a baseline |
+| **libpostal** | A statistical address parser (a ~2 GB model) used by Pelias and optionally by pgeo |
+| **Elasticsearch** | The search engine Pelias stores its index in |
+| **k6** | The load-testing tool used throughout: it runs scripted virtual users against an HTTP API and reports latency percentiles and error rates (`tests/load/k6`) |
+| **Virtual user (VU)** | One simulated person in a load test, issuing requests with pauses between them, as a person would |
+| **p95** | The 95th-percentile response time: 95 of 100 requests were at least this fast. Used instead of an average because the slow tail is what a user notices |
+| **SLO** | Service level objective: the latency and error targets a configuration must meet to count as passing ({{ref:table:slo}}) |
+| **Ramp** | Increasing the number of virtual users step by step until a target is missed, to find a configuration's capacity |
+| **Breaking point** | The step at which a configuration exceeds five times a target, produces more than 5% errors, or a service dies |
+| **Trigram** | A three-character slice of a word. Comparing the sets of trigrams in two strings measures similarity, which is how pgeo tolerates typos (`pg_trgm`) |
+| **WOF** | Who's On First, the open gazetteer of administrative places used for towns, counties and neighbourhoods |
+| **OA** | OpenAddresses, the open collection of address points |
+| **GNIS** | The USGS Geographic Names Information System: lakes, summits, streams and populated places |
+| **ZCTA** | ZIP Code Tabulation Area, the US Census approximation of a ZIP code as an area |
+| **gid** | A globally unique identifier for a record in a geocoder's response, for example `whosonfirst:locality:85948877` |
+| **C1, C2, C4, M0** | Names for the Pelias configurations tested: the digit is the vCPU count, M0 is unconstrained ({{ref:table:configs}}) |
+| **Pmin, P1, P2, P4, PM** | The equivalent pgeo configurations: Pmin is the smallest budget tested, PM unconstrained |
+| **E1, E2, E4** | pgeo configurations given the *same memory budget* as the Pelias configuration at that CPU size, for an equal-resources comparison (Section 3.4) |
+```
+
+{{table:glossary|Terms and acronyms used in this report.}}
 
 ## 2. Methods
 
@@ -243,7 +335,9 @@ visible later in memory and disk (Section 3.5): pgeo searches a smaller store.
 
 {{table:layers|Records by layer.}}
 
-**Overture Maps.** Every Overture theme was evaluated for Maine (2026-08-19 release), 203 MB of
+#### 2.2.1 Overture Maps
+
+Every Overture theme was evaluated for Maine (2026-08-19 release), 203 MB of
 Parquet extracts in total, of which only the 16 MB *places* file was loaded. *Places* add
 value and were loaded (76,582 after quality and boundary rules). *Addresses* add nothing for Maine:
 all 772,684 come from the national address database, which is built from the same Maine E911 address
@@ -351,7 +445,9 @@ warms them up, runs a 3-user validation (3 minutes), then ramps through 1, 2, 3,
 24, 32, 48, 64, 96, 128, 192, 256, 384 and 512 users (15 s warm-up plus 60 s measured at each
 step). A step **passes** when every endpoint's p95 is within target and errors stay below 1%;
 the run stops when errors exceed 5%, any p95 exceeds five times its target, or a service dies.
-**Caching.** No response caching is configured anywhere (nginx, Caddy, the Pelias API and pgeo
+#### 2.5.1 Caching
+
+No response caching is configured anywhere (nginx, Caddy, the Pelias API and pgeo
 all answer every request afresh). The caches that do exist are warmed on purpose and are the same for
 both engines: containers are recreated for every configuration (clearing the Elasticsearch query
 cache and PostgreSQL's shared buffers), a fixed warm-up runs before measuring, and warm-up requests
@@ -359,7 +455,9 @@ are excluded from the results. The operating system's page cache survives contai
 All numbers therefore describe a server in continuous use, not a cold start. The query corpus is
 large ({{ref:table:corpus}}) and drawn at random, so exact repeats are rare.
 
-**Scope.** Every test in this section was run on both engines with the same session, corpus, targets
+#### 2.5.2 Scope
+
+Every test in this section was run on both engines with the same session, corpus, targets
 and ramp; pgeo additionally with both of its front ends.
 
 ```table configs
@@ -393,7 +491,9 @@ pgeo was tuned in rounds. Each round started from the failing test cases (what c
 was expected, which query step lost the right answer), changed one thing, and re-ran the full
 accuracy set, the fuzz set and a per-category comparison that listed every flipped case. A
 change was kept only if overall accuracy did not drop and no category lost more than noise.
-**Parallelism.** PostgreSQL uses several cores in two ways. Between queries, every connection is
+#### 2.7.1 Parallelism
+
+PostgreSQL uses several cores in two ways. Between queries, every connection is
 its own backend process, so concurrent users spread across all available cores; pgeo's connection
 pools are sized to about two per core, and capacity grew in proportion to the cores given
 (Section 3.4), which shows the cores are used. Within a single query, PostgreSQL can split large
@@ -453,7 +553,9 @@ category. Pelias falls to near zero from two character errors; pgeo degrades gra
 
 {{table:fuzz_results|Fuzz results (correct, %).}}
 
-**Calibration.** A confidence score is useful only if wrong answers get lower scores than right
+#### 3.1.1 Calibration
+
+A confidence score is useful only if wrong answers get lower scores than right
 ones. pgeo's first-result confidence averages {{value:conf_right_pgeo_sql}} when right and
 {{value:conf_wrong_pgeo_sql}} when wrong; Pelias scores {{value:conf_right_pelias}} and
 {{value:conf_wrong_pelias}}, so a client can use pgeo's confidence to decide when to ask the user.
@@ -467,7 +569,9 @@ confidence separates its right answers from its wrong ones. Pelias reports high 
 low ({{value:conf_wrong_pgeo_sql}} on average against {{value:conf_right_pgeo_sql}} when right), so
 an application such as LANCER can accept matches above a threshold and queue the rest for a human.
 
-**Remaining failures.** {{value:pgeo_failures_total}} of {{value:n_cases}} cases still fail on
+#### 3.1.2 Remaining failures
+
+{{value:pgeo_failures_total}} of {{value:n_cases}} cases still fail on
 pgeo ({{ref:table:pgeo_failures}}). Eight "misses" are test-set errors (Death Valley in
 Minot and "The Eiffel Tower of Paris, Maine" exist); about ten are genuinely ambiguous (chain
 branches, two towns with the same name); short autocomplete prefixes without a focus point
@@ -572,7 +676,9 @@ Elasticsearch.
 second would not notice the service becoming unpleasant, which is why the targets, not throughput,
 define capacity here.
 
-**How each engine scales.** Both engines are CPU-bound under this load, and both scale close to
+#### 3.4.1 How each engine scales
+
+Both engines are CPU-bound under this load, and both scale close to
 linearly with vCPUs as long as their workers can use them: pgeo holds about 24 users per vCPU
 ({{value:lim_rest_P1}}, {{value:lim_rest_P2}} and {{value:lim_rest_P4}} users on 1, 2 and 4 vCPU)
 and Pelias about 96 ({{value:lim_C1}}, {{value:lim_C2}} and {{value:lim_C4}}). The ratio of four
@@ -583,18 +689,24 @@ interpreted candidate queries and scoring in PL/pgSQL.
 Pelias, then halve it for headroom: both engines go from comfortable to three times over target
 within one doubling of load.}}
 
-**What gives out first.** After the index fix, autocomplete is the first endpoint over its target on
+#### 3.4.2 What gives out first
+
+After the index fix, autocomplete is the first endpoint over its target on
 every pgeo configuration ({{ref:figure:endpoint_ramp}}): it has the tightest target (250 ms) and runs
 most often (60% of sessions type ahead, several requests per word). On Pelias the endpoints degrade
 more evenly (which one crosses first varies by configuration), because they share Elasticsearch.
 
-**Memory is not pgeo's limit.** The configuration whose database memory (0.6 GB) is smaller than
+#### 3.4.3 Memory is not pgeo's limit
+
+The configuration whose database memory (0.6 GB) is smaller than
 the data holds as many users as the one with 1.0 GB ({{value:lim_rest_Pmin}} and
 {{value:lim_rest_P1}}): the working set of hot index pages is far smaller than the {{value:pgeo_db}} of tables and indexes.
 Pelias, in contrast, has a memory floor set by its services (libpostal's model, the interpolation
 database, placeholder's in-memory tables) regardless of load.
 
-**Front end.** PostgREST and FastAPI hold the same number of users up to 4 vCPU. Unconstrained,
+#### 3.4.4 Front end
+
+PostgREST and FastAPI hold the same number of users up to 4 vCPU. Unconstrained,
 FastAPI reached {{value:lim_api_PM}} users and PostgREST {{value:lim_rest_PM}}: only at high
 concurrency does the gateway's per-request overhead show.
 
@@ -624,7 +736,9 @@ should set one API worker per vCPU.
 
 #### Resource requirements
 
-**Operation.** {{ref:table:sizing}} turns the capacity results into a sizing guide: for a
+#### 3.5.1 Operation
+
+{{ref:table:sizing}} turns the capacity results into a sizing guide: for a
 target number of concurrent users, the smallest tested configuration of each engine that kept every
 endpoint within its latency target. Budgets include 0.8 GB for the operating system. One "user" is a
 person actively using the search page (a request every 3 to 8 seconds); a service with many
@@ -655,7 +769,9 @@ three users. At advertised rates that is about $60 a year on a 1 GB plan, or $14
 with room to spare, against about $580 for the 8 GB plan Pelias needs. The 1 GB plan is
 confirmed on a real machine in Section 3.12, so ten times is the honest figure.}}
 
-**Build.** Both engines are built on a workstation and shipped to the query host, so the query host
+#### 3.5.2 Build
+
+Both engines are built on a workstation and shipped to the query host, so the query host
 never needs the raw data or the build tools. {{ref:table:build_resources}} gives the measured
 cost of a full build of each engine.
 
@@ -721,7 +837,9 @@ than nothing. The settings for that VM were written by hand. A 1 GB plan therefo
 the cheapest way to run this geocoder, but it is a configuration this project has measured rather
 than one its tooling will size for you.
 
-**Data volume.** For Pelias, capacity fell from {{value:ds_D1}} users with admin areas only to
+#### 3.5.3 Data volume
+
+For Pelias, capacity fell from {{value:ds_D1}} users with admin areas only to
 {{value:ds_D5}} with every source (Section 3.6); the index grew to 435 MB. pgeo's database grows with
 the same sources to 654 MB; capacity against data volume was not measured for pgeo (Next steps).
 Doubling the data (for example adding New Hampshire) roughly doubles both stores; for Pelias the
@@ -790,32 +908,13 @@ describes the API itself remains Pelias-only; pgeo answers it with the Pelias-sh
 unknown endpoint, which is the one place where "an existing Pelias client cannot tell the
 difference" still does not hold.
 
-### 3.9 Features
+### 3.9 Features in practice
 
-```table features
-| Capability | Pelias | pgeo |
-|---|---|---|
-| Endpoints | search, structured, autocomplete, reverse, place (+ nearby, beta) | the same five, plus `/v1/address` |
-| Informational endpoints | `/v1/attribution` (data licences) and a `/v1/` API description page, both HTML | `/v1/attribution`, built in SQL and served as HTML by both front ends; no `/v1/` description page |
-| Filters | layers, sources, focus, rectangle, circle, country, gid, categories | the same |
-| Parsing | libpostal (statistical, ~2 GB model) | rule parser in SQL (best measured); libpostal optional |
-| Typo tolerance | limited (term fuzziness) | trigram similarity on whole names and streets |
-| Town handling | exact admin names (placeholder) | town as a location: villages and nearest towns accepted |
-| Interpolation | separate service (TIGER + OA) | SQL, between neighbouring house numbers |
-| Confidence | per result | per result, lowered for ties between distinct places |
-| Structured US addresses | no | USPS Publication 28 components, delivery and last lines, FIPS codes |
-| Nearest street address for a venue | no | yes (`/v1/address`) |
-| HTTP layer | Node.js API | PostgREST (no code) or FastAPI |
-| Data store | Elasticsearch index | PostgreSQL tables |
-| Components | 6 containers | 2-3 containers |
-| Build | importers, ~15 min | one command, ~13 min |
-| Operations tooling | Pelias CLI | tuning profiles, accuracy gate, rebuild script |
-| Security posture here | read-only query services, pinned images, strict CSP; Elasticsearch has no credentials (loopback only) | read-only database role (`SELECT` only), allowlisted tuning, password-authenticated database, no query parameters in the PostgreSQL log |
-```
+{{ref:table:features}} in Section 1.4 lists what each platform offers. This section covers the two
+features that exist only in pgeo and that the LANCER application needs, and what the demo page
+makes of them.
 
-{{table:features|Features of each platform as deployed here.}}
-
-#### Structured addresses for LANCER
+#### 3.9.1 Structured addresses for LANCER
 
 pgeo's `/v1/address` returns a US address in USPS Publication 28 form (number, directionals,
 street name, standard suffix, unit, city, state, ZIP; the delivery and last lines) with the
@@ -827,7 +926,9 @@ names; the rest have none in Publication 28 terms (Broadway, Rue Principale). Un
 the caller, because search merges a building's per-unit records. Queries carry client addresses, so
 PostgreSQL never logs query parameters.
 
-**ZIP+4.** The USPS ZIP+4 file would add ZIP+4 codes, USPS street spellings and the USPS preferred
+#### 3.9.2 ZIP+4
+
+The USPS ZIP+4 file would add ZIP+4 codes, USPS street spellings and the USPS preferred
 city per ZIP (for example SOUTH PARIS for 04281, where the open data says PARIS). It costs $120 a
 year for one state ($1,750 for all), and its licence allows "internal corporate or personal use on
 one computer at one location", with no network distribution without a paid amendment (unlimited:
@@ -939,7 +1040,9 @@ is the opposite kind: the memory is not a tuning choice but the sum of what five
 before the first request (the libpostal model, the interpolation database, placeholder's in-memory
 tables and the Elasticsearch heap), so the floor barely moves however little traffic it serves.
 
-**Two kinds of limit.** The trials fail in two distinct ways, and the difference explains why the
+#### 3.12.1 Two kinds of limit
+
+The trials fail in two distinct ways, and the difference explains why the
 two engines' floors are so far apart. pgeo's failures are all of the first kind: the service keeps
 answering, just too slowly, so its floor is wherever the operator decides the latency is no longer
 acceptable. Most of Pelias's are of the second: below a threshold the service does not run at all.
@@ -947,7 +1050,9 @@ libpostal cannot even start below 2 GB, because it loads a fixed model before it
 the interpolation service crash-loops at 1.8 GB; Elasticsearch is killed at 0.8 GB. Those are
 properties of the software, not of the load, and no amount of tuning for three users moves them.
 
-**A floor is a pair, not a number.** The two resources are not independent, and the search makes
+#### 3.12.2 A floor is a pair, not a number
+
+The two resources are not independent, and the search makes
 that visible: Pelias's `pip` service was killed at 0.55 GB in this search, although the capacity
 tests had it surviving at 0.4 GB. Nothing regressed -- in the capacity tests each service had a
 whole core, and here it has a quarter of one, so collection and compaction fall behind and the same
@@ -959,7 +1064,9 @@ would fit in less memory, and at less memory they would need more CPU to stay in
 this scale the machine is chosen by memory, not by CPU -- which is why the two platforms land in
 different price classes ({{ref:table:vps}}).}}
 
-**Confirmation on real machines.** A container limit is not a server: it shares the host's page
+#### 3.12.3 Confirmation on real machines
+
+A container limit is not a server: it shares the host's page
 cache, its disk and its kernel. Each floor was therefore re-tested on a temporary Proxmox VM of
 that size, created for the run and destroyed after it (`tests/load/floor_vm.sh`), with the same
 three-user validation followed by a ramp to find how far that VM stretches.
@@ -1004,7 +1111,9 @@ below were measured on the deployed service rather than read off the configurati
 
 {{table:security_compare|Security properties of each platform as deployed. Measured 2026-09-20.}}
 
-**What the two columns are really saying.** Pelias's data store has no credentials at all: its
+#### 3.13.1 What the two columns are really saying
+
+Pelias's data store has no credentials at all: its
 design assumes nothing can reach it, so the loopback binding is the entire access-control story.
 That is a property of its architecture, not a defect in its code, and it is why the single
 cheapest improvement available to a Pelias deployment is enabling Elasticsearch's own
