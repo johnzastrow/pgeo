@@ -1238,27 +1238,64 @@ three-user target with the worst endpoint at under a seventh of its budget, Peli
 holds {{value:floorvm_pgeo_limit}} on a 1 GB machine costing about $5 a month. The conclusions
 above are what the deployed service does, not what a benchmark suggested it might.
 
-## 6. Next steps
+## 6. Future work
 
-- **Autocomplete speed**: with reverse geocoding fixed, autocomplete is the endpoint that decides
-  pgeo's capacity ({{ref:figure:endpoint_ramp}}), and it has the tightest target. Profile the
-  per-request cost in PL/pgSQL: prepared statements, fewer candidate queries, and a GiST trigram
-  index for ordered similarity. This is where another factor of two in capacity would come from.
-- **Scale out for more users**: read replicas behind PostgREST, or caching of frequent queries at
-  the edge; measure against the Pelias curve.
-- **New Hampshire**: build both engines for two states; measure the data-volume effect on pgeo
-  (subset builds) as was done for Pelias.
-- **Category taxonomy**: map source categories to Pelias's taxonomy so `categories=food` works.
-- **Test set**: remove the eight false misses; add real user queries once the service is in use.
-- **Shadow comparison on real traffic**: keep Pelias beside pgeo on the query host for a few weeks,
-  score both on real searches (neither engine tuned on them), then decide whether to retire Pelias
-  (freeing its {{value:floor_pelias_gb}} on the host). This is also the only way to settle the
-  tuning caveat in Section 4.
-- **libpostal model update** (Senzing libpostal-data): re-test the libpostal arm for accuracy and
-  memory.
-- **Authorization** (Phase 11): single sign-on plus hashed API keys at the edge before LANCER uses
-  the service; strip query strings from access logs.
-- **Continuous checks**: run the accuracy gate and the compatibility contract on every build.
+Each item below is given three things a reader needs before deciding to do it: roughly how much
+work it is, how likely it is to pay off, and what the payoff would be worth in practice. The
+estimates are the author's, and the ones marked speculative are the ones to distrust.
+
+```table future_work
+| Work | Effort | Plausibility | What it is worth |
+|---|---|---|---|
+| **Autocomplete speed**: prepared statements, fewer candidate queries, a GiST trigram index for ordered similarity | 2-3 days | High -- autocomplete is measurably the binding endpoint on every configuration ({{ref:figure:endpoint_ramp}}) | The clearest remaining win. A factor of two here roughly doubles users per vCPU and narrows the one axis where Pelias leads |
+| **Authorization** (Phase 11): hashed API keys at the edge, then single sign-on | 1 day for keys; weeks for SSO | Certain -- it is configuration, not research | Blocking. LANCER cannot use the service responsibly until any device on the LAN stops being able to resolve a client address (Section 3.13) |
+| **Atomic online restore**: restore into a second schema and rename, so a data update does not take the service down | 1 day | High -- the build already does exactly this locally | Turns a weekly refresh from an outage into a non-event. The single most useful automation left (Section 7.3) |
+| **Hysteresis test**: ramp past the breaking point, then back down, and measure recovery | Half a day | Certain to produce an answer | Closes the one operational question Section 7.4 cannot answer: whether the service comes back on its own |
+| **Shadow comparison on real traffic**: both engines on the query host for weeks, scored on real searches | 2 days to set up, then waiting | High | The only way to settle the tuning caveat in Section 4. Until then the 20-point accuracy gap is an upper bound |
+| **pgeo data-volume curve**: subset builds (D1-D5) as done for Pelias | 1 day | Certain | Answers whether pgeo's advantage survives more data -- the obvious challenge to a one-state result |
+| **New Hampshire**: build both engines for two states | 2-3 days | Medium -- the pipeline is state-agnostic, but ranking is tuned on Maine | The real test of whether "one state, tested" generalises |
+| **Horizontal scale-out**: a read replica behind a load balancer, same ramp | 1 day | High for throughput, none for latency | Shows whether pgeo answers the "but it does not scale" objection with $5 machines (Section 7.5) |
+| **metaphone fallback** for phonetic misspellings | Half a day | Medium -- it should help at high corruption, and it might help nothing | A few points at fuzz levels F4-F5 (Section 7.1), or a clean negative result |
+| **Category taxonomy**: map source categories onto Pelias's | 1-2 days | High | Closes the last documented API difference, so `categories=food` behaves as a Pelias client expects |
+| **libpostal model update** (Senzing libpostal-data) | 1 day | Low for pgeo, medium for Pelias | pgeo's rule parser already beats current libpostal (95.8% against 94.0%), so this mostly matters to the Pelias arm |
+| **Test set**: remove the eight false misses, add real queries | Half a day | Certain | The eight are known errors inflating pgeo's miss score; removing them makes the headline number defensible |
+| **Continuous checks**: accuracy gate and compatibility contract on every build | Half a day | Certain | Both exist and pass; this is only wiring them into a hook |
+```
+
+{{table:future_work|Work not done, with the effort, the likelihood it pays off and the value of
+finishing it.}}
+
+### 6.1 Would OpenResty or Omnigres be worth trying?
+
+Both were considered and rejected when the HTTP layer was chosen (`docs/HTTP_OPTIONS.md`), and
+the question is whether the results since then change that. They would take the "no application
+code" idea further than PostgREST does, in opposite directions.
+
+**Omnigres (`omni_httpd`)** puts the HTTP server *inside* PostgreSQL: its workers are database
+backends and its route handlers are SQL. It is the literal form of this project's guiding
+principle -- there would be no second container at all, and the memory floor would drop by
+PostgREST's 0.15 GB. Against that: it is a third-party C extension running in the database
+process, which is precisely the risk the project avoided by insisting on core and contrib
+extensions only, and its authors describe HTTPS and HTTP/2 as still maturing. **Worth testing?
+Not for this deployment.** The gain is 0.15 GB on a 1.4 GB floor and one fewer container, against
+putting unvetted C in the same process as the data. It would become interesting if the project
+ever needed to drop below a 1 GB machine, which nothing here suggests it does.
+
+**OpenResty with pgmoon** keeps the gateway outside the database but replaces PostgREST with a few
+dozen lines of Lua in nginx -- and nginx is already on the host as the edge. That is genuinely
+attractive on paper: one fewer process, no PostgREST parameter-naming constraints, and the
+`boundary.circle` rewriting that currently needs chained nginx `map` directives (Section 3.8)
+would become three lines of Lua. Against it: a non-standard nginx build, and Lua that this project
+would own and have to test -- the opposite of the argument that PostgREST needs no code.
+**Worth testing? As an experiment, yes -- and only if PostgREST's URL grammar becomes a real
+obstacle.** It is perhaps two days to a working prototype and a like-for-like ramp. The measurement
+that would justify it is latency: PostgREST added no measurable overhead at or below 4 vCPU
+(Section 3.4), so the honest expectation is that OpenResty would win on elegance and nothing else.
+
+The broader point is that the HTTP layer is not where this system spends its time. Section 3.4
+shows the database is the bottleneck on every configuration, so a faster or lighter gateway moves
+a number that is not currently limiting anything. Both options are worth knowing about; neither is
+worth doing before autocomplete speed and authorization.
 
 ## 7. Questions and answers
 
