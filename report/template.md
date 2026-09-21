@@ -82,6 +82,8 @@ endpoint stayed within its latency target (log scale). pgeo configurations sit a
 
 ## 1. Introduction
 
+Why a geocoder was needed, what was already running, what questions the work set out to answer, and what each platform offers. A reader who only wants the outcome can stop after the executive summary; this section explains why the outcome is worth trusting.
+
 ### 1.1 Motivation
 
 Geocoding (turning a typed address or place name into coordinates) and reverse geocoding
@@ -99,6 +101,8 @@ components, keeping data in PostgreSQL, unless that produces an inferior or over
 product**. That principle motivated building pgeo alongside Pelias and measuring both.
 
 ### 1.2 Starting conditions
+
+Everything below was already in place before the work began. It matters because it bounds the result: the numbers in Section 3 come from this hardware, and a reader on different hardware should expect different absolutes and the same ordering.
 
 | Item | State at the start |
 |---|---|
@@ -252,7 +256,11 @@ configurations it tested. Everything used later is defined here so no term arriv
 
 ## 2. Methods
 
+How both systems were built and how they were measured. The detail here is what makes Section 3 checkable: the same data, the same load generator, the same targets and the same host for both engines, with every departure from that noted.
+
 ### 2.1 Systems built
+
+The two architectures, and the reason the comparison is not simply one product against another: one is an established multi-service geocoder, the other was written for this project to test whether the database alone is enough.
 
 {{figure:architecture|System architecture. Clients reach both engines through the same HTTPS
 edge. Pelias (left) is an API service coordinating four helper services and Elasticsearch.
@@ -312,6 +320,8 @@ Elasticsearch scoring.
 
 ### 2.2 Data
 
+Both engines are loaded from the same open sources, so any difference in results is a difference in engine rather than in data. This section says what those sources are, how large they are and what was dropped.
+
 {{table:sources|Data sources, raw input sizes, and what each engine holds from them. Pelias
 counts are Elasticsearch documents; pgeo counts are rows in its feature table.}}
 
@@ -353,6 +363,8 @@ a pipe-delimited ZCTA gazetteer, an Overture extract that leaked into Portsmouth
 Hampshire, and the Pelias interpolation builder needing OpenAddresses in its legacy CSV form.
 
 ### 2.3 Build pipelines
+
+How raw downloads become a searchable index or database. This matters operationally: the build is the only step that needs a large machine, and it is what a data refresh repeats.
 
 {{figure:data_pipeline|Data flow from the sources to each engine. Both engines read the same
 inputs; small sources pass through a preparation package that clips them to Maine.}}
@@ -409,6 +421,8 @@ town, because a bare "Mud Pond" has no single right answer. A separate **fuzz se
 {{table:fuzz_levels|Fuzz levels. House numbers are never corrupted, so every query stays answerable.}}
 
 ### 2.5 Load and capacity testing
+
+How capacity was measured, and the choices that make the two engines comparable: one engine at a time, pinned to its own cores, with the same corpus, targets and ramp.
 
 {{figure:test_harness|Load-test harness. The load generator and the engine under test are pinned
 to different physical cores; each engine service runs with a memory limit and no swap.}}
@@ -515,7 +529,11 @@ The final state is protected by:
 
 ## 3. Results
 
+What the measurements show, in the order a reader is likely to care: accuracy first, then how each engine behaves under load, how small a machine it needs, and how the two compare feature for feature.
+
 ### 3.1 Accuracy
+
+How often each engine returns the right answer, on a test set whose answers come from the source data rather than from either engine. Accuracy is the axis where the two differ most, and the one a user notices first.
 
 {{table:accuracy_overall|Accuracy on {{value:n_cases}} cases. Correct = right answer at rank 1
 (misses: nothing, or low confidence); Hit@5 = right answer in the top five; confidence columns are
@@ -581,6 +599,8 @@ the place name and the town.
 {{table:pgeo_failures|Remaining pgeo failures by category.}}
 
 ### 3.2 Tuning trajectory
+
+How pgeo got from its first working version to its current accuracy, one measured change at a time. This is included because it shows which ideas paid off and which did not, and because it is the part of the result most at risk of being fitted to the test set.
 
 {{figure:tuning|Left: pgeo accuracy after each tuning step, with Pelias for reference. Right:
 first-result confidence when right and when wrong; the ambiguity penalty widened the gap.}}
@@ -663,6 +683,8 @@ missing admin-join index was added; it now takes 5-18 ms ({{ref:table:reverse_fi
 
 ### 3.4 Capacity under load
 
+How many concurrent users each configuration serves before missing a latency target, and what gives out first. This is the axis where Pelias leads, and the section is where the comparison is made at equal resources as well as at equal cost.
+
 {{figure:ramp|Worst endpoint p95 relative to its target as users are added. Above 1 the
 configuration misses a target; above 5 the run stops. At 1-4 users some endpoints receive only
 a few requests per window, so single points are noisy.}}
@@ -734,6 +756,8 @@ workers on 4 vCPU (C4) it reaches {{value:lim_C4}} users; with one worker on the
 only {{value:lim_C4a}}, because a single Node.js worker becomes the bottleneck.
 
 ### 3.5 Resources
+
+What each platform needs to run and to build. The two are very different numbers, and conflating them is the most common way to size a geocoder wrongly.
 
 {{figure:memory|Peak memory in use by service at 3 users. Pelias carries the libpostal model
 (~2 GB), the interpolation database and Elasticsearch's heap regardless of load; pgeo's memory
@@ -866,6 +890,8 @@ same way, so both need more CPU per user as coverage grows.
 
 ### 3.6 Data volume
 
+Whether the results survive more data. A one-state geocoder that collapses at two states would be a curiosity rather than a tool, so capacity was re-measured against progressively larger datasets.
+
 {{figure:datavol|Pelias capacity (bars) and document count (line) for cumulative datasets D1-D5
 at fixed resources (2 vCPU, 9.5 GB), and p95 latency at 3 users.}}
 
@@ -884,6 +910,8 @@ means more candidates to score per query.
 
 ### 3.7 Query types
 
+Whether either engine pays a latency penalty for difficult input. Accuracy on messy queries is worth little if messy queries are also slow.
+
 {{figure:qtype|p95 latency at 3 users by query quality (all endpoints together).}}
 
 {{ref:figure:qtype}} shows latency by input quality. Both engines answer misspelled and
@@ -891,6 +919,8 @@ impossible queries about as fast as exact ones, so the accuracy differences in S
 bought with slower responses.
 
 ### 3.8 Compatibility
+
+Whether an existing Pelias client can be pointed at pgeo without changes. This decides whether pgeo is a replacement or merely an alternative.
 
 {{figure:compat|Compatibility contract results: each row is a documented Pelias request, each
 column an engine.}}
@@ -1219,6 +1249,8 @@ an upper bound until both engines have been scored on real queries neither has s
   run's restart; it was repeated with a readiness wait.
 
 ## 5. Conclusions
+
+Which tool suits which situation, and what the evidence supports saying. The recommendations below follow from the measurements rather than from a preference for either architecture.
 
 ```table recommendations
 | Scenario | Recommended | Why |
