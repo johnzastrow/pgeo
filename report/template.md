@@ -196,6 +196,43 @@ state, it is ahead by design decisions that this project chose not to make rathe
 match. A fair summary is that pgeo is a specialisation: it trades the generality Pelias was built
 for against a much smaller machine, for one state, for a handful of users.
 
+#### 1.5.1 Is Pelias the right thing to measure against?
+
+Worth asking directly, because the whole study rests on the answer.
+
+**For features and functions, yes, and by some distance.** Pelias is the only open-source geocoder
+that shares pgeo's central premise -- several independent open sources merged into one index.
+Nominatim{{cite:nominatim}} and Photon{{cite:photon}} are OpenStreetMap only; the TIGER
+geocoder{{cite:postgis_tiger}} is US Census only; pgGeocoder{{cite:pggeocoder_jp}} is Japanese
+government data only. Pelias imports OpenStreetMap, OpenAddresses, Who's On First, Geonames,
+polylines and arbitrary CSV, which is exactly the problem pgeo set out to solve. It also has the
+widest API surface of the group: search, structured search, autocomplete, reverse and place.
+
+**For flexibility, yes.** Pelias is the most configurable of the alternatives -- custom importers,
+private datasets, and an explicit goal of working "equally well for a small city and the entire
+planet". Measuring against the most adaptable option is the harder test, which is the right one to
+set.
+
+**For scalability, only partly, and the gap is specific.** Pelias is a fair reference for
+concurrent users on one machine, which is what this project needed. It is not the reference for
+either extreme. At the top end, Nominatim's planet deployment (roughly a terabyte of disk and
+128 GB-class memory) and Photon's prebuilt planet index define what large means. More importantly
+for this study, **Photon exists because Nominatim is weak at type-ahead, and it is optimised for
+autocomplete in tens of milliseconds** -- and autocomplete is precisely the endpoint that limits
+pgeo on every configuration tested ({{ref:figure:endpoint_ramp}}). The comparison that would press
+hardest on pgeo's weakest axis is the one this study does not make.
+
+{{callout:caution|Pelias is the right primary comparison and not a sufficient one. The honest
+limitation is that pgeo's binding endpoint is autocomplete, and the specialist at autocomplete is
+Photon, which was not tested. A reader should treat "four times fewer users per CPU than Pelias"
+as the cost against a general-purpose multi-source geocoder, not as pgeo's standing against the
+fastest available type-ahead engine.}}
+
+Photon would also change the build comparison rather than just the query one: it distributes a
+prebuilt index, so an operator downloads rather than builds, and the 5.5 GB build machine this
+report says pgeo needs (Section 3.5) has no Photon equivalent. That is a different trade from the
+one measured here, and a real one.
+
 ### 1.6 Other geocoders that live in PostgreSQL
 
 pgeo is not the first attempt to put geocoding inside the database, and the question of whether it
@@ -1423,6 +1460,7 @@ estimates are the author's, and the ones marked speculative are the ones to dist
 | **pgeo data-volume curve**: subset builds (D1-D5) as done for Pelias | 1 day | Certain | Answers whether pgeo's advantage survives more data -- the obvious challenge to a one-state result |
 | **New Hampshire**: build both engines for two states | 2-3 days | Medium -- the pipeline is state-agnostic, but ranking is tuned on Maine | The real test of whether "one state, tested" generalises |
 | **Horizontal scale-out**: a read replica behind a load balancer, same ramp | 1 day | High for throughput, none for latency | Shows whether pgeo answers the "but it does not scale" objection with $5 machines (Section 7.5) |
+| **Compare against Photon** on autocomplete | 2-3 days | High -- it is the type-ahead specialist and pgeo's binding endpoint | The missing half of the capacity story (Section 1.5.1). It would either confirm pgeo is competitive at type-ahead or show the gap is larger than 4x on the axis that matters most |
 | **metaphone fallback** for phonetic misspellings | Half a day | Medium -- it should help at high corruption, and it might help nothing | A few points at fuzz levels F4-F5 (Section 7.1), or a clean negative result |
 | **Category taxonomy**: map source categories onto Pelias's | 1-2 days | High | Closes the last documented API difference, so `categories=food` behaves as a Pelias client expects |
 | **libpostal model update** (Senzing libpostal-data) | 1 day | Low for pgeo, medium for Pelias | pgeo's rule parser already beats current libpostal (95.8% against 94.0%), so this mostly matters to the Pelias arm |
