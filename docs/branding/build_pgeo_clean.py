@@ -51,7 +51,9 @@ INK, BLUE, GREEN = "#0264a4", "#298eca", "#62a887"
 
 HERE = Path(__file__).resolve().parent
 SRC = HERE / "pgeo.svg"
-OUT = HERE / "pgeo-clean.svg"
+# pgeo-clean.svg is the hand-finished master and is NOT written by this script:
+# it was generated once, then refined by hand. Re-running would destroy that work.
+OUT = HERE / "pgeo-generated.svg"
 GLOBE_SCALE = 0.80
 SLOT = 21.0                   # width of the two cuts in the 'o'
 A_TERM = 52.0                 # where the 'e' terminates, degrees below east
