@@ -682,3 +682,13 @@ progress::-moz-progress-bar { background: var(--magenta); }
 .cmp-pgeo h3 { border-color: #c0392b; }
 .cmp-col .results li { font-size: 13px; }
 @media (max-width: 720px) { .compare { grid-template-columns: 1fr; } }
+
+/* The pgeo wordmark in the cartouche header. Sized by width so the 3:1 mark keeps its
+   proportions, and dimmed slightly so it sits behind the page title rather than competing. */
+.cartouche .title .brand {
+  display: block;
+  width: 150px;
+  height: auto;
+  margin: 0 0 0.6rem;
+  opacity: 0.92;
+}

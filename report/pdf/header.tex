@@ -4,6 +4,20 @@
 % Bibliography entries are largely URLs. xurl lets \url{} break at any character, so a long
 % reference wraps instead of running into the margin.
 \usepackage{xurl}
+% The wordmark, above the title block. rsvg-convert makes the PDF from
+% docs/branding/pgeo-clean.svg during the build; xelatex cannot read SVG.
+\usepackage{graphicx}
+% The wordmark, at the head of the title block. Both \maketitle and \@maketitle begin with
+% a \newpage, so anything prepended to either lands on the preceding page: drop those, then
+% prepend. The document has only just begun, so the page break was doing nothing anyway.
+\makeatletter
+\patchcmd{\maketitle}{\newpage}{}{}{}
+\patchcmd{\@maketitle}{\newpage}{}{}{}
+\pretocmd{\@maketitle}{%
+  \begin{center}\includegraphics[width=52mm]{report_figures/pgeo-logo.pdf}\end{center}%
+  \vspace{-0.5em}%
+}{}{\PackageError{pgeo}{could not place the wordmark on the title page}{}}
+\makeatother
 \renewcommand{\familydefault}{\sfdefault}
 % Narrow column padding: the widest tables have nine columns, and pandoc computes each column from
 % (\linewidth - 2n\tabcolsep), so a smaller separation gives the cells the room back.

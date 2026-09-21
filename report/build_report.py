@@ -96,6 +96,17 @@ def main() -> int:
 
     if not a.no_pdf:
         print("report: pdf")
+        # xelatex cannot read SVG, so the title-page wordmark is kept as a PDF beside
+        # header.tex. Regenerate it whenever the master changes, or the two drift apart.
+        logo_svg = ROOT / "docs/branding/pgeo-clean.svg"
+        logo_pdf = FIG_PUBLISH / "pgeo-logo.pdf"  # xelatex runs in docs/, so it must sit here
+        if logo_svg.exists() and shutil.which("rsvg-convert") and (
+            not logo_pdf.exists() or logo_svg.stat().st_mtime > logo_pdf.stat().st_mtime
+        ):
+            subprocess.run(  # noqa: S603
+                ["rsvg-convert", "-f", "pdf", "-w", "900",  # noqa: S607
+                 str(logo_svg), "-o", str(logo_pdf)], check=True)  # fmt: skip
+            print(f"report: refreshed {logo_pdf.relative_to(ROOT)}")
         # The PDF takes its title block from pdf/metadata.yaml: drop the Markdown's own title lines
         pdf_md = BUILD / "report_pdf.md"
         rp = Renderer(vals, tabs, figs, fig_dir_rel=FIG_PUBLISH.name, target="pdf", references=refs)

@@ -23,6 +23,48 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-09-21
+
+### Added
+- Report Section 3.15, the Nominatim comparison, closing the OpenStreetMap side of the study.
+  Nominatim is pgeo's closest relative in the survey - both put the work in PostgreSQL - so it is
+  the fairest architectural comparison available.
+  - Capacity on two cores: Nominatim 64 users, pgeo 48. **pgeo is within 1.33x of the reference
+    OpenStreetMap geocoder**, the narrowest gap in the report, against 4x for Pelias and 2.7x for
+    Photon. Throughput saturates near 75 req/s; memory 2.19 GB resident.
+  - Accuracy 61.7% against pgeo's 95.8%, and **8.0% at autocomplete with 75.3% of prefixes
+    returning nothing** - Nominatim has no autocomplete endpoint, which is the clearest evidence
+    in the report for why Photon exists.
+  - A failure mode worth naming: Nominatim's median error on addresses is 0 m. It is exact when
+    it answers and returns nothing for 38.9% of all queries, so its errors are recall, not
+    precision. Its 94.7% on deliberate misses - the joint best - is earned by the same silence.
+  - Section 3.15.4 sets all four engines side by side and says plainly that data sources explain
+    more of the accuracy column than engine quality does.
+- `tests/load/k6/session_nominatim.js`, `tests/load/run_nominatim.py`, and
+  `tests/accuracy/run_accuracy_nominatim.py`. Nominatim has a real structured endpoint (unlike
+  Photon) so it gets one; its `layers=address` equivalent is `zoom=18`; and its house number
+  lives at `properties.address.house_number`, which the adapter lifts to where the scorer reads.
+- `tests/load/run_alt.py` holds the ramp shared by the two non-Pelias-API engines, so
+  `run_photon.py` and `run_nominatim.py` are thin entry points rather than copies.
+- `tests/accuracy/test_adapters.py` (11 tests) pins the translations that silently decide
+  results. A bad mapping does not raise - it reads as the engine being inaccurate.
+- The wordmark is now on the report's title page, the deck's cover, the demo page header and as
+  its favicon, and in the README. `build_report.py` regenerates the title-page PDF from
+  `docs/branding/pgeo-clean.svg` whenever the master is newer, so the two cannot drift.
+- `docs/branding/pgeo-icon.svg` and `pgeo-icon-g.svg`: square icons derived from the wordmark.
+
+### Changed
+- The deck's Photon slide is now a four-engine comparison, with a second slide on why the
+  accuracy column is not the whole story.
+- Section 1.6 no longer only asserts the architectural difference against Nominatim; it gives the
+  measured cost of moving the last of the search into SQL.
+- `docs/PHOTON_COMPARISON.md` is now `docs/OSM_ENGINES.md`, covering both engines, since a Photon
+  index is built from a Nominatim database and the two share their setup.
+
+### Fixed
+- The title-page wordmark landed on the page before the title: both `\maketitle` and
+  `\@maketitle` begin with a `\newpage`, so anything prepended to either misses the title block.
+
 ## [0.14.0] - 2026-09-21
 
 ### Added
@@ -43,7 +85,7 @@ commits where each milestone was complete.
   answers in GeoJSON with `properties.housenumber`. Maps `layers=address` to Photon's
   `layer=house`, without which reverse cases fail a housenumber check they were never asked to
   satisfy.
-- `docs/PHOTON_COMPARISON.md`: how to build the Nominatim database and Photon index, run both
+- `docs/OSM_ENGINES.md` (renamed from PHOTON_COMPARISON.md in 0.15.0): how to build the Nominatim database and Photon index, run both
   measurements, and the four ways the comparison is not like for like.
 
 ### Changed

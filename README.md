@@ -1,3 +1,5 @@
+<img src="docs/branding/pgeo-clean.svg" alt="pgeo" width="260">
+
 # pgeo
 
 A geocoder that lives inside PostgreSQL, built and measured against Pelias on open data for the

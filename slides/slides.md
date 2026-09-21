@@ -10,7 +10,7 @@ transition: slide-left
 mdc: true
 ---
 
-# pgeo
+<img src="/pgeo.svg" class="h-32 mx-auto mb-6" alt="pgeo" />
 
 A geocoder that lives **inside PostgreSQL**
 
@@ -191,27 +191,55 @@ pieces are all well known.
 
 ---
 
-# The specialist outside PostgreSQL
+# Measured against three other engines
 
-Autocomplete is pgeo's bottleneck, and Photon is the engine built for autocomplete. So we measured it.
+Same machine, same two cores, same corpus, ramp, targets and 1,560 accuracy cases.
 
-| Two cores, same corpus and ramp | Pelias | Photon | pgeo |
-|---|---|---|---|
-| Concurrent users within targets | **192** | 128 | 48 |
-| Autocomplete p95 at 48 users | 21 ms | **53 ms** | 103-189 ms |
-| Memory under load | 8.4 GB | **1.84 GB** | 2.5 GB |
-| Accuracy, 1,560 cases | 75.5% | 73.7% | **95.8%** |
-| Venues (Overture places) | 60.4% | 19.1% | **94.2%** |
+| Two cores | Pelias | Photon | Nominatim | pgeo |
+|---|---|---|---|---|
+| Concurrent users | **192** | 128 | 64 | 48 |
+| Autocomplete p95 at 48 users | **21 ms** | 53 ms | 85 ms | 103-189 ms |
+| Memory under load | 8.4 GB | **1.84 GB** | 2.19 GB | 2.5 GB |
+| Accuracy, 1,560 cases | 75.5% | 73.7% | 61.7% | **95.8%** |
+| Autocomplete accuracy | 86.7% | 58.0% | 8.0% | **95.3%** |
+| Data sources | 6 | OSM only | OSM only | 6 |
+
+<v-click>
+
+<div class="mt-3 p-3 border-l-4 border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-sm">
+
+**The cost of putting the query path in SQL**: 4x Pelias per CPU, 2.7x Photon, **1.33x Nominatim**.
+Against the engine closest to its own architecture — Nominatim also does the work in PostgreSQL,
+but searches from a Python application — pgeo gives up a third.
+
+</div>
+
+</v-click>
+
+---
+
+# Why the accuracy column is not the whole story
+
+<v-clicks>
+
+- **Photon and Nominatim index OpenStreetMap only.** They structurally cannot hold the 780,260
+  OpenAddresses E911 points or the 76,582 Overture places the test set is built from — Photon
+  scores 19% on venues, Nominatim 9%, because those places are not there to find
+- **Nominatim scores 8% at autocomplete** with 75% of prefixes returning nothing. It has no
+  autocomplete endpoint — which is precisely why Photon exists
+- **Nominatim is exact when it answers**: median error 0 m on addresses. Its failure mode is
+  recall, not precision — it returns nothing for 39% of all queries
+- **Neither expresses uncertainty.** No confidence score, so neither can say "here is a result,
+  but I do not believe it" — disqualifying for dispatch, independent of speed
+
+</v-clicks>
 
 <v-click>
 
 <div class="mt-4 p-3 border-l-4 border-amber-500 bg-amber-50 dark:bg-amber-900/20 text-sm">
 
-Photon is quicker per keystroke than pgeo and the lightest of the three — but **less CPU-efficient
-than Pelias**, so it does not become the harder yardstick. It collapses on venues because a Photon
-index is exported from Nominatim, which imports **OpenStreetMap only**: the E911 address points and
-Overture places are not there to find. It also returns **no confidence score**, so it cannot mark an
-answer it does not believe.
+What pgeo can honestly claim against the OpenStreetMap engines is **not that it searches better,
+but that it can hold data they cannot**. What survives regardless of data is the capacity result.
 
 </div>
 
