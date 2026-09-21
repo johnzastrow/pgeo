@@ -1,0 +1,44 @@
+{
+ "id": "vm-pgeo-floor-1c-1-1024mb",
+ "engine": "pgeo",
+ "base_config": "floor-1c-1-1024mb",
+ "dataset": null,
+ "config": {
+  "cpus": 1,
+  "cpulimit": 1.0,
+  "memory_gb": 1.0,
+  "host": "temporary VM 190 (floor-pgeo)"
+ },
+ "budget_gb": 1.0,
+ "runs": {
+  "validate": {
+   "endpoints": {},
+   "qtypes": {},
+   "error_rate": 1,
+   "req_rate": 4.1,
+   "worst_p95_ratio": 0.0,
+   "pass": false,
+   "broken": true,
+   "resources": {},
+   "health": {},
+   "died": false
+  },
+  "ramp": [
+   {
+    "endpoints": {},
+    "qtypes": {},
+    "error_rate": 1,
+    "req_rate": 1.2,
+    "worst_p95_ratio": 0.0,
+    "pass": false,
+    "broken": true,
+    "vus": 1,
+    "resources": {},
+    "health": {},
+    "died": false
+   }
+  ]
+ },
+ "limit_users": 0,
+ "breaking_users": 1
+}

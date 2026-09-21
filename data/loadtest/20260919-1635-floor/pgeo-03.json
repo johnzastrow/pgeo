@@ -1,0 +1,105 @@
+{
+ "id": "pgeo-03",
+ "engine": "pgeo",
+ "config": {
+  "cpus": 0.25,
+  "db": 0.45,
+  "rest": 0.25
+ },
+ "total_gb": 1.5,
+ "pass": true,
+ "why": "ok",
+ "validate": {
+  "endpoints": {
+   "autocomplete": {
+    "med": 18.0,
+    "p(95)": 205.4,
+    "p(99)": 552.6,
+    "max": 994.7
+   },
+   "search": {
+    "med": 99.6,
+    "p(95)": 546.3,
+    "p(99)": 740.5,
+    "max": 790.9
+   },
+   "structured": {
+    "med": 287.5,
+    "p(95)": 396.1,
+    "p(99)": 416.4,
+    "max": 421.5
+   },
+   "reverse": {
+    "med": 12.9,
+    "p(95)": 16.1,
+    "p(99)": 18.1,
+    "max": 18.6
+   }
+  },
+  "qtypes": {
+   "exact": {
+    "med": 18.3,
+    "p(95)": 276.9,
+    "p(99)": 563.1
+   },
+   "typo": {
+    "med": 18.5,
+    "p(95)": 203.5,
+    "p(99)": 499.4
+   },
+   "variant": {
+    "med": 20.4,
+    "p(95)": 302.4,
+    "p(99)": 473.0
+   },
+   "miss": {
+    "med": 11.0,
+    "p(95)": 351.7,
+    "p(99)": 538.4
+   }
+  },
+  "error_rate": 0,
+  "req_rate": 4.0,
+  "worst_p95_ratio": 0.82,
+  "pass": true,
+  "broken": false,
+  "resources": {
+   "db": {
+    "cpu_avg": 9.5,
+    "cpu_p95": 19.9,
+    "mem_max_mb": 246
+   },
+   "rest": {
+    "cpu_avg": 0.4,
+    "cpu_p95": 0.7,
+    "mem_max_mb": 11
+   },
+   "rest_edge": {
+    "cpu_avg": 0.2,
+    "cpu_p95": 0.3,
+    "mem_max_mb": 5
+   },
+   "_stack": {
+    "cpu_avg": 10.1,
+    "cpu_p95": 20.8
+   }
+  },
+  "health": {
+   "db": {
+    "status": "running",
+    "oom": false,
+    "restarts": 0
+   },
+   "rest": {
+    "status": "running",
+    "oom": false,
+    "restarts": 0
+   },
+   "rest_edge": {
+    "status": "running",
+    "oom": false,
+    "restarts": 0
+   }
+  }
+ }
+}

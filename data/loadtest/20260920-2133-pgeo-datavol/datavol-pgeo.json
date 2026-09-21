@@ -1,0 +1,64 @@
+[
+ {
+  "dataset": "D1",
+  "sources": [
+   "whosonfirst"
+  ],
+  "features": 3289,
+  "config": "P2",
+  "limit_users": 192,
+  "breaking_users": 384
+ },
+ {
+  "dataset": "D2",
+  "sources": [
+   "whosonfirst",
+   "openaddresses"
+  ],
+  "features": 680518,
+  "config": "P2",
+  "limit_users": 128,
+  "breaking_users": 256
+ },
+ {
+  "dataset": "D3",
+  "sources": [
+   "whosonfirst",
+   "openaddresses",
+   "openstreetmap"
+  ],
+  "features": 808989,
+  "config": "P2",
+  "limit_users": 64,
+  "breaking_users": 128
+ },
+ {
+  "dataset": "D4",
+  "sources": [
+   "whosonfirst",
+   "openaddresses",
+   "openstreetmap",
+   "gnis",
+   "zcta"
+  ],
+  "features": 829519,
+  "config": "P2",
+  "limit_users": 64,
+  "breaking_users": 128
+ },
+ {
+  "dataset": "D5",
+  "sources": [
+   "whosonfirst",
+   "openaddresses",
+   "openstreetmap",
+   "gnis",
+   "zcta",
+   "overture"
+  ],
+  "features": 906101,
+  "config": "P2",
+  "limit_users": 48,
+  "breaking_users": 96
+ }
+]

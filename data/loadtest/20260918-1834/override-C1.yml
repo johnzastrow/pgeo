@@ -1,0 +1,31 @@
+services:
+  elasticsearch:
+    cpuset: "0"
+    mem_limit: 1536m
+    memswap_limit: 1536m
+    environment:
+      - "ES_JAVA_OPTS=-Xms768m -Xmx768m"
+      - "path.repo=/usr/share/elasticsearch/snapshots"
+  libpostal:
+    cpuset: "0"
+    mem_limit: 2048m
+    memswap_limit: 2048m
+  placeholder:
+    cpuset: "0"
+    mem_limit: 409m
+    memswap_limit: 409m
+  pip:
+    cpuset: "0"
+    mem_limit: 716m
+    memswap_limit: 716m
+  interpolation:
+    cpuset: "0"
+    mem_limit: 2150m
+    memswap_limit: 2150m
+  api:
+    cpuset: "0"
+    mem_limit: 430m
+    memswap_limit: 430m
+    environment:
+      - "PORT=4000"
+      - "CPUS=1"

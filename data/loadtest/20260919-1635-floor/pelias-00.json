@@ -1,0 +1,139 @@
+{
+ "id": "pelias-00",
+ "engine": "pelias",
+ "config": {
+  "cpus": 1.0,
+  "es": 1.5,
+  "api": 0.42,
+  "libpostal": 2.0,
+  "interpolation": 2.1,
+  "pip": 0.7,
+  "placeholder": 0.8
+ },
+ "total_gb": 8.32,
+ "pass": true,
+ "why": "ok",
+ "validate": {
+  "endpoints": {
+   "autocomplete": {
+    "med": 13.8,
+    "p(95)": 34.3,
+    "p(99)": 51.4,
+    "max": 101.8
+   },
+   "search": {
+    "med": 23.7,
+    "p(95)": 47.0,
+    "p(99)": 56.5,
+    "max": 65.4
+   },
+   "structured": {
+    "med": 34.1,
+    "p(95)": 67.5,
+    "p(99)": 80.8,
+    "max": 84.2
+   },
+   "reverse": {
+    "med": 20.9,
+    "p(95)": 46.0,
+    "p(99)": 80.6,
+    "max": 89.3
+   }
+  },
+  "qtypes": {
+   "exact": {
+    "med": 15.1,
+    "p(95)": 35.8,
+    "p(99)": 55.5
+   },
+   "typo": {
+    "med": 8.6,
+    "p(95)": 33.2,
+    "p(99)": 38.2
+   },
+   "variant": {
+    "med": 15.7,
+    "p(95)": 39.7,
+    "p(99)": 72.0
+   },
+   "miss": {
+    "med": 6.6,
+    "p(95)": 24.3,
+    "p(99)": 28.0
+   }
+  },
+  "error_rate": 0,
+  "req_rate": 4.1,
+  "worst_p95_ratio": 0.14,
+  "pass": true,
+  "broken": false,
+  "resources": {
+   "elasticsearch": {
+    "cpu_avg": 4.4,
+    "cpu_p95": 13.8,
+    "mem_max_mb": 1416
+   },
+   "libpostal": {
+    "cpu_avg": 0.0,
+    "cpu_p95": 0.0,
+    "mem_max_mb": 1947
+   },
+   "placeholder": {
+    "cpu_avg": 0.7,
+    "cpu_p95": 1.9,
+    "mem_max_mb": 349
+   },
+   "pip": {
+    "cpu_avg": 0.1,
+    "cpu_p95": 0.0,
+    "mem_max_mb": 440
+   },
+   "interpolation": {
+    "cpu_avg": 0.0,
+    "cpu_p95": 0.0,
+    "mem_max_mb": 1973
+   },
+   "api": {
+    "cpu_avg": 3.4,
+    "cpu_p95": 8.2,
+    "mem_max_mb": 102
+   },
+   "_stack": {
+    "cpu_avg": 8.6,
+    "cpu_p95": 20.7
+   }
+  },
+  "health": {
+   "elasticsearch": {
+    "status": "running",
+    "oom": false,
+    "restarts": 0
+   },
+   "libpostal": {
+    "status": "running",
+    "oom": false,
+    "restarts": 0
+   },
+   "placeholder": {
+    "status": "running",
+    "oom": false,
+    "restarts": 0
+   },
+   "pip": {
+    "status": "running",
+    "oom": false,
+    "restarts": 0
+   },
+   "interpolation": {
+    "status": "running",
+    "oom": false,
+    "restarts": 0
+   },
+   "api": {
+    "status": "running",
+    "oom": false,
+    "restarts": 0
+   }
+  }
+ }
+}

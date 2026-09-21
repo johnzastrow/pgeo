@@ -1,0 +1,1435 @@
+{
+ "id": "api-P4",
+ "engine": "pgeo-api",
+ "base_config": "P4",
+ "dataset": null,
+ "docs": 906101,
+ "index_mb": 674,
+ "config": {
+  "cpus": 4,
+  "db_gb": 2.0,
+  "sb": "512MB",
+  "ecs": "1536MB",
+  "wm": "16MB",
+  "conns": 10,
+  "engine": "api"
+ },
+ "budget_gb": 3.3,
+ "runs": {
+  "validate": {
+   "endpoints": {
+    "autocomplete": {
+     "med": 13.7,
+     "p(95)": 41.4,
+     "p(99)": 82.8,
+     "max": 96.8
+    },
+    "search": {
+     "med": 48.9,
+     "p(95)": 115.7,
+     "p(99)": 124.7,
+     "max": 125.0
+    },
+    "structured": {
+     "med": 89.1,
+     "p(95)": 98.7,
+     "p(99)": 99.2,
+     "max": 99.3
+    },
+    "reverse": {
+     "med": 198.7,
+     "p(95)": 223.5,
+     "p(99)": 223.8,
+     "max": 223.8
+    }
+   },
+   "qtypes": {
+    "exact": {
+     "med": 15.3,
+     "p(95)": 60.9,
+     "p(99)": 123.6
+    },
+    "typo": {
+     "med": 14.1,
+     "p(95)": 61.7,
+     "p(99)": 95.5
+    },
+    "variant": {
+     "med": 15.9,
+     "p(95)": 59.7,
+     "p(99)": 100.9
+    },
+    "miss": {
+     "med": 6.2,
+     "p(95)": 28.7,
+     "p(99)": 47.9
+    }
+   },
+   "error_rate": 0,
+   "req_rate": 3.9,
+   "worst_p95_ratio": 0.56,
+   "pass": true,
+   "broken": false,
+   "resources": {
+    "db": {
+     "cpu_avg": 11.0,
+     "cpu_p95": 32.4,
+     "mem_max_mb": 603
+    },
+    "api": {
+     "cpu_avg": 1.2,
+     "cpu_p95": 2.2,
+     "mem_max_mb": 188
+    },
+    "_stack": {
+     "cpu_avg": 12.2,
+     "cpu_p95": 34.8
+    }
+   },
+   "health": {
+    "db": {
+     "status": "running",
+     "oom": false,
+     "restarts": 0
+    },
+    "api": {
+     "status": "running",
+     "oom": false,
+     "restarts": 0
+    }
+   },
+   "died": false
+  },
+  "ramp": [
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 15.8,
+      "p(95)": 36.6,
+      "p(99)": 43.3,
+      "max": 57.2
+     },
+     "search": {
+      "med": 64.3,
+      "p(95)": 64.3,
+      "p(99)": 64.3,
+      "max": 64.3
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 16.2,
+      "p(95)": 38.1,
+      "p(99)": 54.3
+     },
+     "variant": {
+      "med": 12.7,
+      "p(95)": 29.2,
+      "p(99)": 32.2
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 1.8,
+    "worst_p95_ratio": 0.15,
+    "pass": true,
+    "broken": false,
+    "vus": 1,
+    "resources": {
+     "db": {
+      "cpu_avg": 4.3,
+      "cpu_p95": 13.6,
+      "mem_max_mb": 610
+     },
+     "api": {
+      "cpu_avg": 0.8,
+      "cpu_p95": 1.3,
+      "mem_max_mb": 189
+     },
+     "_stack": {
+      "cpu_avg": 5.1,
+      "cpu_p95": 14.7
+     }
+    },
+    "health": {
+     "db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 13.8,
+      "p(95)": 39.6,
+      "p(99)": 52.9,
+      "max": 68.5
+     },
+     "search": {
+      "med": 29.2,
+      "p(95)": 113.6,
+      "p(99)": 125.1,
+      "max": 127.9
+     },
+     "structured": {
+      "med": 81.9,
+      "p(95)": 96.8,
+      "p(99)": 98.1,
+      "max": 98.4
+     },
+     "reverse": {
+      "med": 216.4,
+      "p(95)": 222.3,
+      "p(99)": 222.4,
+      "max": 222.4
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 12.1,
+      "p(95)": 86.2,
+      "p(99)": 221.2
+     },
+     "typo": {
+      "med": 13.0,
+      "p(95)": 13.0,
+      "p(99)": 13.0
+     },
+     "variant": {
+      "med": 24.2,
+      "p(95)": 57.0,
+      "p(99)": 105.4
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 2.0,
+    "worst_p95_ratio": 0.56,
+    "pass": true,
+    "broken": false,
+    "vus": 2,
+    "resources": {
+     "db": {
+      "cpu_avg": 6.3,
+      "cpu_p95": 19.3,
+      "mem_max_mb": 649
+     },
+     "api": {
+      "cpu_avg": 0.9,
+      "cpu_p95": 1.8,
+      "mem_max_mb": 189
+     },
+     "_stack": {
+      "cpu_avg": 7.3,
+      "cpu_p95": 20.6
+     }
+    },
+    "health": {
+     "db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 14.5,
+      "p(95)": 44.1,
+      "p(99)": 71.9,
+      "max": 81.8
+     },
+     "search": {
+      "med": 36.7,
+      "p(95)": 95.8,
+      "p(99)": 104.1,
+      "max": 106.1
+     },
+     "reverse": {
+      "med": 234.8,
+      "p(95)": 256.8,
+      "p(99)": 259.7,
+      "max": 260.5
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 16.6,
+      "p(95)": 72.4,
+      "p(99)": 233.1
+     },
+     "typo": {
+      "med": 15.1,
+      "p(95)": 70.4,
+      "p(99)": 72.0
+     },
+     "variant": {
+      "med": 14.1,
+      "p(95)": 28.7,
+      "p(99)": 29.6
+     },
+     "miss": {
+      "med": 7.8,
+      "p(95)": 16.7,
+      "p(99)": 20.3
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 4.2,
+    "worst_p95_ratio": 0.64,
+    "pass": true,
+    "broken": false,
+    "vus": 3,
+    "resources": {
+     "db": {
+      "cpu_avg": 13.0,
+      "cpu_p95": 28.0,
+      "mem_max_mb": 666
+     },
+     "api": {
+      "cpu_avg": 1.4,
+      "cpu_p95": 2.3,
+      "mem_max_mb": 190
+     },
+     "_stack": {
+      "cpu_avg": 14.4,
+      "cpu_p95": 29.6
+     }
+    },
+    "health": {
+     "db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 15.7,
+      "p(95)": 44.1,
+      "p(99)": 69.0,
+      "max": 72.2
+     },
+     "search": {
+      "med": 59.4,
+      "p(95)": 80.6,
+      "p(99)": 88.6,
+      "max": 90.6
+     },
+     "structured": {
+      "med": 91.3,
+      "p(95)": 115.1,
+      "p(99)": 117.1,
+      "max": 117.6
+     },
+     "reverse": {
+      "med": 215.8,
+      "p(95)": 227.6,
+      "p(99)": 228.3,
+      "max": 228.5
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 17.2,
+      "p(95)": 62.2,
+      "p(99)": 205.7
+     },
+     "typo": {
+      "med": 13.7,
+      "p(95)": 41.3,
+      "p(99)": 62.0
+     },
+     "variant": {
+      "med": 18.4,
+      "p(95)": 68.4,
+      "p(99)": 69.7
+     },
+     "miss": {
+      "med": 20.1,
+      "p(95)": 20.1,
+      "p(99)": 20.1
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 4.7,
+    "worst_p95_ratio": 0.57,
+    "pass": true,
+    "broken": false,
+    "vus": 4,
+    "resources": {
+     "db": {
+      "cpu_avg": 13.5,
+      "cpu_p95": 27.6,
+      "mem_max_mb": 728
+     },
+     "api": {
+      "cpu_avg": 1.6,
+      "cpu_p95": 2.5,
+      "mem_max_mb": 190
+     },
+     "_stack": {
+      "cpu_avg": 15.1,
+      "cpu_p95": 28.7
+     }
+    },
+    "health": {
+     "db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 16.1,
+      "p(95)": 37.3,
+      "p(99)": 62.9,
+      "max": 71.7
+     },
+     "search": {
+      "med": 38.4,
+      "p(95)": 118.7,
+      "p(99)": 127.7,
+      "max": 128.9
+     },
+     "structured": {
+      "med": 32.4,
+      "p(95)": 72.5,
+      "p(99)": 81.2,
+      "max": 83.4
+     },
+     "reverse": {
+      "med": 214.2,
+      "p(95)": 218.8,
+      "p(99)": 219.6,
+      "max": 219.8
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 19.0,
+      "p(95)": 56.4,
+      "p(99)": 209.5
+     },
+     "typo": {
+      "med": 11.0,
+      "p(95)": 27.7,
+      "p(99)": 53.9
+     },
+     "variant": {
+      "med": 13.3,
+      "p(95)": 30.4,
+      "p(99)": 51.2
+     },
+     "miss": {
+      "med": 10.6,
+      "p(95)": 37.9,
+      "p(99)": 38.9
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 7.3,
+    "worst_p95_ratio": 0.55,
+    "pass": true,
+    "broken": false,
+    "vus": 6,
+    "resources": {
+     "db": {
+      "cpu_avg": 20.0,
+      "cpu_p95": 41.6,
+      "mem_max_mb": 740
+     },
+     "api": {
+      "cpu_avg": 2.1,
+      "cpu_p95": 3.5,
+      "mem_max_mb": 191
+     },
+     "_stack": {
+      "cpu_avg": 22.1,
+      "cpu_p95": 44.5
+     }
+    },
+    "health": {
+     "db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 16.0,
+      "p(95)": 42.2,
+      "p(99)": 65.5,
+      "max": 93.4
+     },
+     "search": {
+      "med": 45.4,
+      "p(95)": 103.3,
+      "p(99)": 116.1,
+      "max": 120.1
+     },
+     "structured": {
+      "med": 93.4,
+      "p(95)": 122.2,
+      "p(99)": 124.2,
+      "max": 124.6
+     },
+     "reverse": {
+      "med": 209.0,
+      "p(95)": 222.9,
+      "p(99)": 232.3,
+      "max": 234.6
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 16.9,
+      "p(95)": 90.6,
+      "p(99)": 212.9
+     },
+     "typo": {
+      "med": 13.9,
+      "p(95)": 57.3,
+      "p(99)": 92.0
+     },
+     "variant": {
+      "med": 20.0,
+      "p(95)": 36.7,
+      "p(99)": 94.1
+     },
+     "miss": {
+      "med": 7.1,
+      "p(95)": 21.9,
+      "p(99)": 25.8
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 9.5,
+    "worst_p95_ratio": 0.56,
+    "pass": true,
+    "broken": false,
+    "vus": 8,
+    "resources": {
+     "db": {
+      "cpu_avg": 23.0,
+      "cpu_p95": 53.9,
+      "mem_max_mb": 751
+     },
+     "api": {
+      "cpu_avg": 2.2,
+      "cpu_p95": 4.3,
+      "mem_max_mb": 191
+     },
+     "_stack": {
+      "cpu_avg": 25.3,
+      "cpu_p95": 58.1
+     }
+    },
+    "health": {
+     "db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 13.5,
+      "p(95)": 36.5,
+      "p(99)": 64.1,
+      "max": 96.0
+     },
+     "search": {
+      "med": 26.4,
+      "p(95)": 109.7,
+      "p(99)": 112.2,
+      "max": 112.4
+     },
+     "structured": {
+      "med": 57.8,
+      "p(95)": 106.6,
+      "p(99)": 119.0,
+      "max": 122.1
+     },
+     "reverse": {
+      "med": 210.1,
+      "p(95)": 234.2,
+      "p(99)": 255.3,
+      "max": 260.5
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 15.8,
+      "p(95)": 59.2,
+      "p(99)": 209.0
+     },
+     "typo": {
+      "med": 12.6,
+      "p(95)": 33.7,
+      "p(99)": 73.4
+     },
+     "variant": {
+      "med": 15.4,
+      "p(95)": 67.9,
+      "p(99)": 89.4
+     },
+     "miss": {
+      "med": 6.9,
+      "p(95)": 35.8,
+      "p(99)": 65.6
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 12.6,
+    "worst_p95_ratio": 0.59,
+    "pass": true,
+    "broken": false,
+    "vus": 12,
+    "resources": {
+     "db": {
+      "cpu_avg": 26.8,
+      "cpu_p95": 54.8,
+      "mem_max_mb": 764
+     },
+     "api": {
+      "cpu_avg": 3.1,
+      "cpu_p95": 4.7,
+      "mem_max_mb": 192
+     },
+     "_stack": {
+      "cpu_avg": 29.9,
+      "cpu_p95": 59.5
+     }
+    },
+    "health": {
+     "db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 14.1,
+      "p(95)": 37.0,
+      "p(99)": 64.8,
+      "max": 127.7
+     },
+     "search": {
+      "med": 31.0,
+      "p(95)": 110.3,
+      "p(99)": 120.0,
+      "max": 122.8
+     },
+     "structured": {
+      "med": 68.7,
+      "p(95)": 95.2,
+      "p(99)": 96.8,
+      "max": 97.2
+     },
+     "reverse": {
+      "med": 211.0,
+      "p(95)": 220.3,
+      "p(99)": 221.5,
+      "max": 221.7
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 15.3,
+      "p(95)": 51.1,
+      "p(99)": 209.3
+     },
+     "typo": {
+      "med": 13.2,
+      "p(95)": 33.6,
+      "p(99)": 84.9
+     },
+     "variant": {
+      "med": 11.8,
+      "p(95)": 32.9,
+      "p(99)": 55.8
+     },
+     "miss": {
+      "med": 7.1,
+      "p(95)": 49.3,
+      "p(99)": 69.6
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 19.4,
+    "worst_p95_ratio": 0.55,
+    "pass": true,
+    "broken": false,
+    "vus": 16,
+    "resources": {
+     "db": {
+      "cpu_avg": 39.9,
+      "cpu_p95": 74.0,
+      "mem_max_mb": 772
+     },
+     "api": {
+      "cpu_avg": 4.0,
+      "cpu_p95": 5.9,
+      "mem_max_mb": 193
+     },
+     "_stack": {
+      "cpu_avg": 43.9,
+      "cpu_p95": 78.8
+     }
+    },
+    "health": {
+     "db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 15.2,
+      "p(95)": 38.7,
+      "p(99)": 54.9,
+      "max": 92.7
+     },
+     "search": {
+      "med": 39.5,
+      "p(95)": 113.0,
+      "p(99)": 136.9,
+      "max": 169.7
+     },
+     "structured": {
+      "med": 92.9,
+      "p(95)": 112.9,
+      "p(99)": 115.2,
+      "max": 115.8
+     },
+     "reverse": {
+      "med": 214.2,
+      "p(95)": 223.8,
+      "p(99)": 257.6,
+      "max": 271.4
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 16.4,
+      "p(95)": 50.0,
+      "p(99)": 213.2
+     },
+     "typo": {
+      "med": 12.4,
+      "p(95)": 38.7,
+      "p(99)": 88.0
+     },
+     "variant": {
+      "med": 17.3,
+      "p(95)": 51.8,
+      "p(99)": 92.7
+     },
+     "miss": {
+      "med": 10.8,
+      "p(95)": 27.6,
+      "p(99)": 34.0
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 27.3,
+    "worst_p95_ratio": 0.56,
+    "pass": true,
+    "broken": false,
+    "vus": 24,
+    "resources": {
+     "db": {
+      "cpu_avg": 66.9,
+      "cpu_p95": 111.7,
+      "mem_max_mb": 785
+     },
+     "api": {
+      "cpu_avg": 5.6,
+      "cpu_p95": 8.5,
+      "mem_max_mb": 193
+     },
+     "_stack": {
+      "cpu_avg": 72.5,
+      "cpu_p95": 120.5
+     }
+    },
+    "health": {
+     "db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 14.7,
+      "p(95)": 44.5,
+      "p(99)": 66.8,
+      "max": 174.0
+     },
+     "search": {
+      "med": 39.6,
+      "p(95)": 116.7,
+      "p(99)": 138.2,
+      "max": 140.7
+     },
+     "structured": {
+      "med": 89.4,
+      "p(95)": 114.8,
+      "p(99)": 114.8,
+      "max": 114.9
+     },
+     "reverse": {
+      "med": 215.5,
+      "p(95)": 227.8,
+      "p(99)": 236.2,
+      "max": 238.1
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 16.2,
+      "p(95)": 64.5,
+      "p(99)": 212.9
+     },
+     "typo": {
+      "med": 15.5,
+      "p(95)": 41.4,
+      "p(99)": 64.5
+     },
+     "variant": {
+      "med": 15.8,
+      "p(95)": 57.6,
+      "p(99)": 92.6
+     },
+     "miss": {
+      "med": 7.4,
+      "p(95)": 31.8,
+      "p(99)": 62.3
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 37.8,
+    "worst_p95_ratio": 0.57,
+    "pass": true,
+    "broken": false,
+    "vus": 32,
+    "resources": {
+     "db": {
+      "cpu_avg": 94.3,
+      "cpu_p95": 138.8,
+      "mem_max_mb": 797
+     },
+     "api": {
+      "cpu_avg": 8.0,
+      "cpu_p95": 9.8,
+      "mem_max_mb": 193
+     },
+     "_stack": {
+      "cpu_avg": 102.2,
+      "cpu_p95": 146.9
+     }
+    },
+    "health": {
+     "db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 18.1,
+      "p(95)": 58.9,
+      "p(99)": 104.8,
+      "max": 201.2
+     },
+     "search": {
+      "med": 40.3,
+      "p(95)": 123.2,
+      "p(99)": 150.5,
+      "max": 269.1
+     },
+     "structured": {
+      "med": 89.7,
+      "p(95)": 121.5,
+      "p(99)": 131.6,
+      "max": 135.8
+     },
+     "reverse": {
+      "med": 221.2,
+      "p(95)": 244.0,
+      "p(99)": 255.0,
+      "max": 258.0
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 19.5,
+      "p(95)": 81.7,
+      "p(99)": 213.2
+     },
+     "typo": {
+      "med": 15.0,
+      "p(95)": 56.5,
+      "p(99)": 99.5
+     },
+     "variant": {
+      "med": 19.7,
+      "p(95)": 60.1,
+      "p(99)": 111.1
+     },
+     "miss": {
+      "med": 10.1,
+      "p(95)": 46.1,
+      "p(99)": 68.4
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 58.6,
+    "worst_p95_ratio": 0.61,
+    "pass": true,
+    "broken": false,
+    "vus": 48,
+    "resources": {
+     "db": {
+      "cpu_avg": 139.2,
+      "cpu_p95": 210.9,
+      "mem_max_mb": 813
+     },
+     "api": {
+      "cpu_avg": 11.1,
+      "cpu_p95": 14.6,
+      "mem_max_mb": 194
+     },
+     "_stack": {
+      "cpu_avg": 150.3,
+      "cpu_p95": 228.5
+     }
+    },
+    "health": {
+     "db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 20.2,
+      "p(95)": 74.3,
+      "p(99)": 129.0,
+      "max": 225.2
+     },
+     "search": {
+      "med": 46.9,
+      "p(95)": 132.3,
+      "p(99)": 164.7,
+      "max": 219.0
+     },
+     "structured": {
+      "med": 95.9,
+      "p(95)": 136.3,
+      "p(99)": 217.9,
+      "max": 259.0
+     },
+     "reverse": {
+      "med": 227.9,
+      "p(95)": 256.1,
+      "p(99)": 313.5,
+      "max": 386.5
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 21.8,
+      "p(95)": 100.5,
+      "p(99)": 225.3
+     },
+     "typo": {
+      "med": 19.1,
+      "p(95)": 80.0,
+      "p(99)": 134.4
+     },
+     "variant": {
+      "med": 22.4,
+      "p(95)": 80.2,
+      "p(99)": 141.5
+     },
+     "miss": {
+      "med": 13.8,
+      "p(95)": 62.4,
+      "p(99)": 93.4
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 71.7,
+    "worst_p95_ratio": 0.64,
+    "pass": true,
+    "broken": false,
+    "vus": 64,
+    "resources": {
+     "db": {
+      "cpu_avg": 164.8,
+      "cpu_p95": 218.8,
+      "mem_max_mb": 822
+     },
+     "api": {
+      "cpu_avg": 14.4,
+      "cpu_p95": 17.9,
+      "mem_max_mb": 194
+     },
+     "_stack": {
+      "cpu_avg": 179.2,
+      "cpu_p95": 235.6
+     }
+    },
+    "health": {
+     "db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 28.7,
+      "p(95)": 139.8,
+      "p(99)": 234.4,
+      "max": 365.6
+     },
+     "search": {
+      "med": 76.5,
+      "p(95)": 181.5,
+      "p(99)": 221.3,
+      "max": 323.0
+     },
+     "structured": {
+      "med": 101.2,
+      "p(95)": 210.4,
+      "p(99)": 307.9,
+      "max": 385.5
+     },
+     "reverse": {
+      "med": 257.9,
+      "p(95)": 372.6,
+      "p(99)": 430.9,
+      "max": 471.2
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 32.1,
+      "p(95)": 171.1,
+      "p(99)": 275.9
+     },
+     "typo": {
+      "med": 25.4,
+      "p(95)": 124.1,
+      "p(99)": 228.9
+     },
+     "variant": {
+      "med": 31.5,
+      "p(95)": 141.5,
+      "p(99)": 234.0
+     },
+     "miss": {
+      "med": 20.8,
+      "p(95)": 129.1,
+      "p(99)": 218.5
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 108.5,
+    "worst_p95_ratio": 0.93,
+    "pass": true,
+    "broken": false,
+    "vus": 96,
+    "resources": {
+     "db": {
+      "cpu_avg": 262.2,
+      "cpu_p95": 338.1,
+      "mem_max_mb": 821
+     },
+     "api": {
+      "cpu_avg": 20.1,
+      "cpu_p95": 25.8,
+      "mem_max_mb": 196
+     },
+     "_stack": {
+      "cpu_avg": 282.4,
+      "cpu_p95": 369.8
+     }
+    },
+    "health": {
+     "db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 52.0,
+      "p(95)": 247.4,
+      "p(99)": 391.4,
+      "max": 666.7
+     },
+     "search": {
+      "med": 104.6,
+      "p(95)": 308.3,
+      "p(99)": 445.7,
+      "max": 587.8
+     },
+     "structured": {
+      "med": 158.8,
+      "p(95)": 316.9,
+      "p(99)": 449.2,
+      "max": 579.9
+     },
+     "reverse": {
+      "med": 326.3,
+      "p(95)": 595.1,
+      "p(99)": 719.6,
+      "max": 764.8
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 55.1,
+      "p(95)": 275.5,
+      "p(99)": 425.8
+     },
+     "typo": {
+      "med": 49.6,
+      "p(95)": 263.6,
+      "p(99)": 406.0
+     },
+     "variant": {
+      "med": 57.1,
+      "p(95)": 249.6,
+      "p(99)": 382.6
+     },
+     "miss": {
+      "med": 48.4,
+      "p(95)": 229.9,
+      "p(99)": 325.2
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 136.7,
+    "worst_p95_ratio": 1.49,
+    "pass": false,
+    "broken": false,
+    "vus": 128,
+    "resources": {
+     "db": {
+      "cpu_avg": 320.5,
+      "cpu_p95": 376.2,
+      "mem_max_mb": 824
+     },
+     "api": {
+      "cpu_avg": 25.8,
+      "cpu_p95": 31.4,
+      "mem_max_mb": 196
+     },
+     "_stack": {
+      "cpu_avg": 346.3,
+      "cpu_p95": 399.9
+     }
+    },
+    "health": {
+     "db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 255.8,
+      "p(95)": 1110.0,
+      "p(99)": 1563.7,
+      "max": 1834.4
+     },
+     "search": {
+      "med": 301.6,
+      "p(95)": 1025.7,
+      "p(99)": 1492.2,
+      "max": 1748.8
+     },
+     "structured": {
+      "med": 333.3,
+      "p(95)": 1397.6,
+      "p(99)": 1625.1,
+      "max": 1666.6
+     },
+     "reverse": {
+      "med": 669.3,
+      "p(95)": 1638.3,
+      "p(99)": 1909.9,
+      "max": 1923.0
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 265.0,
+      "p(95)": 1142.1,
+      "p(99)": 1591.0
+     },
+     "typo": {
+      "med": 246.1,
+      "p(95)": 1012.3,
+      "p(99)": 1481.3
+     },
+     "variant": {
+      "med": 252.6,
+      "p(95)": 1014.9,
+      "p(99)": 1535.9
+     },
+     "miss": {
+      "med": 308.7,
+      "p(95)": 1154.5,
+      "p(99)": 1558.5
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 146.5,
+    "worst_p95_ratio": 4.44,
+    "pass": false,
+    "broken": false,
+    "vus": 192,
+    "resources": {
+     "db": {
+      "cpu_avg": 359.0,
+      "cpu_p95": 375.6,
+      "mem_max_mb": 825
+     },
+     "api": {
+      "cpu_avg": 28.0,
+      "cpu_p95": 31.8,
+      "mem_max_mb": 199
+     },
+     "_stack": {
+      "cpu_avg": 386.9,
+      "cpu_p95": 404.2
+     }
+    },
+    "health": {
+     "db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 571.9,
+      "p(95)": 1894.0,
+      "p(99)": 2217.4,
+      "max": 3957.2
+     },
+     "search": {
+      "med": 592.8,
+      "p(95)": 1923.2,
+      "p(99)": 2282.0,
+      "max": 2377.8
+     },
+     "structured": {
+      "med": 713.7,
+      "p(95)": 1838.9,
+      "p(99)": 2218.0,
+      "max": 2267.8
+     },
+     "reverse": {
+      "med": 1006.1,
+      "p(95)": 2323.3,
+      "p(99)": 2834.5,
+      "max": 2862.0
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 568.7,
+      "p(95)": 1909.4,
+      "p(99)": 2248.1
+     },
+     "typo": {
+      "med": 599.8,
+      "p(95)": 1876.5,
+      "p(99)": 2180.9
+     },
+     "variant": {
+      "med": 495.0,
+      "p(95)": 1724.9,
+      "p(99)": 2157.2
+     },
+     "miss": {
+      "med": 729.8,
+      "p(95)": 1975.4,
+      "p(99)": 2330.2
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 148.8,
+    "worst_p95_ratio": 7.58,
+    "pass": false,
+    "broken": true,
+    "vus": 256,
+    "resources": {
+     "db": {
+      "cpu_avg": 362.0,
+      "cpu_p95": 375.1,
+      "mem_max_mb": 828
+     },
+     "api": {
+      "cpu_avg": 28.2,
+      "cpu_p95": 33.2,
+      "mem_max_mb": 201
+     },
+     "_stack": {
+      "cpu_avg": 390.2,
+      "cpu_p95": 406.2
+     }
+    },
+    "health": {
+     "db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   }
+  ]
+ },
+ "limit_users": 96,
+ "breaking_users": 256
+}

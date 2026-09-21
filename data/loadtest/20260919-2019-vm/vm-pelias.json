@@ -1,0 +1,2372 @@
+{
+ "id": "vm-pelias",
+ "engine": "pelias",
+ "base_config": "VM120",
+ "dataset": null,
+ "config": {
+  "cpus": 4,
+  "cpulimit": 4,
+  "memory_gb": 14,
+  "host": "VM 120"
+ },
+ "budget_gb": 14,
+ "runs": {
+  "validate": {
+   "endpoints": {
+    "autocomplete": {
+     "med": 8.0,
+     "p(95)": 19.4,
+     "p(99)": 22.4,
+     "max": 34.1
+    },
+    "search": {
+     "med": 15.8,
+     "p(95)": 22.1,
+     "p(99)": 27.0,
+     "max": 28.6
+    },
+    "structured": {
+     "med": 18.7,
+     "p(95)": 24.2,
+     "p(99)": 24.7,
+     "max": 24.8
+    },
+    "reverse": {
+     "med": 9.4,
+     "p(95)": 10.4,
+     "p(99)": 10.5,
+     "max": 10.5
+    }
+   },
+   "qtypes": {
+    "exact": {
+     "med": 8.5,
+     "p(95)": 19.7,
+     "p(99)": 22.3
+    },
+    "typo": {
+     "med": 6.6,
+     "p(95)": 20.0,
+     "p(99)": 22.7
+    },
+    "variant": {
+     "med": 10.0,
+     "p(95)": 19.8,
+     "p(99)": 27.2
+    },
+    "miss": {
+     "med": 6.0,
+     "p(95)": 17.5,
+     "p(99)": 20.5
+    }
+   },
+   "error_rate": 0,
+   "req_rate": 3.7,
+   "worst_p95_ratio": 0.08,
+   "pass": true,
+   "broken": false,
+   "resources": {
+    "maine_api": {
+     "cpu_avg": 2.6,
+     "cpu_p95": 7.1,
+     "mem_max_mb": 136
+    },
+    "maine_elasticsearch": {
+     "cpu_avg": 4.0,
+     "cpu_p95": 9.3,
+     "mem_max_mb": 2789
+    },
+    "maine_interpolation": {
+     "cpu_avg": 0.0,
+     "cpu_p95": 0.0,
+     "mem_max_mb": 1995
+    },
+    "maine_libpostal": {
+     "cpu_avg": 0.0,
+     "cpu_p95": 0.1,
+     "mem_max_mb": 1963
+    },
+    "maine_pip": {
+     "cpu_avg": 0.0,
+     "cpu_p95": 0.0,
+     "mem_max_mb": 456
+    },
+    "maine_placeholder": {
+     "cpu_avg": 0.5,
+     "cpu_p95": 1.4,
+     "mem_max_mb": 153
+    },
+    "_stack": {
+     "cpu_avg": 7.2,
+     "cpu_p95": 21.6
+    }
+   },
+   "health": {
+    "/pelias_maine_elasticsearch": {
+     "status": "running",
+     "oom": false,
+     "restarts": 0
+    },
+    "/pelias_maine_api": {
+     "status": "running",
+     "oom": false,
+     "restarts": 0
+    },
+    "/pelias_maine_libpostal": {
+     "status": "running",
+     "oom": false,
+     "restarts": 0
+    },
+    "/pelias_maine_placeholder": {
+     "status": "running",
+     "oom": false,
+     "restarts": 0
+    },
+    "/pelias_maine_pip": {
+     "status": "running",
+     "oom": false,
+     "restarts": 0
+    },
+    "/pelias_maine_interpolation": {
+     "status": "running",
+     "oom": false,
+     "restarts": 0
+    }
+   },
+   "died": false
+  },
+  "ramp": [
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 7.4,
+      "p(95)": 19.4,
+      "p(99)": 20.7,
+      "max": 21.2
+     },
+     "search": {
+      "med": 20.0,
+      "p(95)": 21.6,
+      "p(99)": 21.7,
+      "max": 21.8
+     },
+     "reverse": {
+      "med": 7.9,
+      "p(95)": 7.9,
+      "p(99)": 7.9,
+      "max": 7.9
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 7.2,
+      "p(95)": 20.5,
+      "p(99)": 20.9
+     },
+     "variant": {
+      "med": 7.4,
+      "p(95)": 17.2,
+      "p(99)": 20.3
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 1.4,
+    "worst_p95_ratio": 0.08,
+    "pass": true,
+    "broken": false,
+    "vus": 1,
+    "resources": {
+     "maine_api": {
+      "cpu_avg": 1.0,
+      "cpu_p95": 3.0,
+      "mem_max_mb": 137
+     },
+     "maine_elasticsearch": {
+      "cpu_avg": 1.6,
+      "cpu_p95": 7.3,
+      "mem_max_mb": 2790
+     },
+     "maine_interpolation": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.0,
+      "mem_max_mb": 1995
+     },
+     "maine_libpostal": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.0,
+      "mem_max_mb": 1963
+     },
+     "maine_pip": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.0,
+      "mem_max_mb": 456
+     },
+     "maine_placeholder": {
+      "cpu_avg": 0.2,
+      "cpu_p95": 0.6,
+      "mem_max_mb": 155
+     },
+     "_stack": {
+      "cpu_avg": 2.7,
+      "cpu_p95": 10.2
+     }
+    },
+    "health": {
+     "/pelias_maine_elasticsearch": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_libpostal": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_placeholder": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_pip": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_interpolation": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 7.5,
+      "p(95)": 18.1,
+      "p(99)": 19.9,
+      "max": 26.2
+     },
+     "search": {
+      "med": 20.8,
+      "p(95)": 23.2,
+      "p(99)": 23.8,
+      "max": 23.9
+     },
+     "structured": {
+      "med": 20.8,
+      "p(95)": 20.8,
+      "p(99)": 20.8,
+      "max": 20.8
+     },
+     "reverse": {
+      "med": 9.1,
+      "p(95)": 9.1,
+      "p(99)": 9.1,
+      "max": 9.1
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 8.8,
+      "p(95)": 19.7,
+      "p(99)": 23.0
+     },
+     "typo": {
+      "med": 5.0,
+      "p(95)": 10.1,
+      "p(99)": 17.3
+     },
+     "miss": {
+      "med": 4.9,
+      "p(95)": 9.3,
+      "p(99)": 16.7
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 2.6,
+    "worst_p95_ratio": 0.07,
+    "pass": true,
+    "broken": false,
+    "vus": 2,
+    "resources": {
+     "maine_api": {
+      "cpu_avg": 1.6,
+      "cpu_p95": 4.7,
+      "mem_max_mb": 138
+     },
+     "maine_elasticsearch": {
+      "cpu_avg": 1.4,
+      "cpu_p95": 3.3,
+      "mem_max_mb": 2791
+     },
+     "maine_interpolation": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.0,
+      "mem_max_mb": 1996
+     },
+     "maine_libpostal": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.1,
+      "mem_max_mb": 1963
+     },
+     "maine_pip": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.0,
+      "mem_max_mb": 456
+     },
+     "maine_placeholder": {
+      "cpu_avg": 0.3,
+      "cpu_p95": 1.0,
+      "mem_max_mb": 158
+     },
+     "_stack": {
+      "cpu_avg": 3.2,
+      "cpu_p95": 9.4
+     }
+    },
+    "health": {
+     "/pelias_maine_elasticsearch": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_libpostal": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_placeholder": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_pip": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_interpolation": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 7.0,
+      "p(95)": 16.5,
+      "p(99)": 18.9,
+      "max": 20.8
+     },
+     "search": {
+      "med": 14.5,
+      "p(95)": 30.1,
+      "p(99)": 33.8,
+      "max": 34.7
+     },
+     "structured": {
+      "med": 17.6,
+      "p(95)": 17.8,
+      "p(99)": 17.8,
+      "max": 17.8
+     },
+     "reverse": {
+      "med": 7.2,
+      "p(95)": 10.3,
+      "p(99)": 10.7,
+      "max": 10.8
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 7.1,
+      "p(95)": 17.1,
+      "p(99)": 18.5
+     },
+     "typo": {
+      "med": 6.6,
+      "p(95)": 18.9,
+      "p(99)": 27.6
+     },
+     "variant": {
+      "med": 7.9,
+      "p(95)": 15.2,
+      "p(99)": 16.9
+     },
+     "miss": {
+      "med": 4.9,
+      "p(95)": 18.4,
+      "p(99)": 20.1
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 3.3,
+    "worst_p95_ratio": 0.07,
+    "pass": true,
+    "broken": false,
+    "vus": 3,
+    "resources": {
+     "maine_api": {
+      "cpu_avg": 2.0,
+      "cpu_p95": 7.3,
+      "mem_max_mb": 138
+     },
+     "maine_elasticsearch": {
+      "cpu_avg": 2.6,
+      "cpu_p95": 12.0,
+      "mem_max_mb": 2794
+     },
+     "maine_interpolation": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.0,
+      "mem_max_mb": 2001
+     },
+     "maine_libpostal": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.1,
+      "mem_max_mb": 1963
+     },
+     "maine_pip": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.0,
+      "mem_max_mb": 456
+     },
+     "maine_placeholder": {
+      "cpu_avg": 0.3,
+      "cpu_p95": 0.9,
+      "mem_max_mb": 166
+     },
+     "_stack": {
+      "cpu_avg": 5.0,
+      "cpu_p95": 13.2
+     }
+    },
+    "health": {
+     "/pelias_maine_elasticsearch": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_libpostal": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_placeholder": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_pip": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_interpolation": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 7.2,
+      "p(95)": 17.3,
+      "p(99)": 19.5,
+      "max": 46.6
+     },
+     "search": {
+      "med": 17.0,
+      "p(95)": 26.0,
+      "p(99)": 27.2,
+      "max": 27.5
+     },
+     "structured": {
+      "med": 17.3,
+      "p(95)": 17.8,
+      "p(99)": 17.9,
+      "max": 17.9
+     },
+     "reverse": {
+      "med": 8.5,
+      "p(95)": 13.7,
+      "p(99)": 14.3,
+      "max": 14.5
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 7.7,
+      "p(95)": 17.5,
+      "p(99)": 19.7
+     },
+     "typo": {
+      "med": 6.3,
+      "p(95)": 19.4,
+      "p(99)": 30.9
+     },
+     "variant": {
+      "med": 6.3,
+      "p(95)": 21.2,
+      "p(99)": 25.2
+     },
+     "miss": {
+      "med": 4.7,
+      "p(95)": 9.5,
+      "p(99)": 10.6
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 4.9,
+    "worst_p95_ratio": 0.07,
+    "pass": true,
+    "broken": false,
+    "vus": 4,
+    "resources": {
+     "maine_api": {
+      "cpu_avg": 2.8,
+      "cpu_p95": 5.2,
+      "mem_max_mb": 137
+     },
+     "maine_elasticsearch": {
+      "cpu_avg": 2.0,
+      "cpu_p95": 4.0,
+      "mem_max_mb": 2796
+     },
+     "maine_interpolation": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.0,
+      "mem_max_mb": 2001
+     },
+     "maine_libpostal": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.1,
+      "mem_max_mb": 1964
+     },
+     "maine_pip": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.0,
+      "mem_max_mb": 456
+     },
+     "maine_placeholder": {
+      "cpu_avg": 0.6,
+      "cpu_p95": 1.0,
+      "mem_max_mb": 168
+     },
+     "_stack": {
+      "cpu_avg": 5.4,
+      "cpu_p95": 9.0
+     }
+    },
+    "health": {
+     "/pelias_maine_elasticsearch": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_libpostal": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_placeholder": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_pip": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_interpolation": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 6.8,
+      "p(95)": 15.0,
+      "p(99)": 20.5,
+      "max": 22.4
+     },
+     "search": {
+      "med": 11.2,
+      "p(95)": 22.2,
+      "p(99)": 22.7,
+      "max": 22.8
+     },
+     "structured": {
+      "med": 13.4,
+      "p(95)": 22.1,
+      "p(99)": 23.5,
+      "max": 23.8
+     },
+     "reverse": {
+      "med": 8.8,
+      "p(95)": 18.4,
+      "p(99)": 20.0,
+      "max": 20.4
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 7.2,
+      "p(95)": 17.2,
+      "p(99)": 21.7
+     },
+     "typo": {
+      "med": 6.1,
+      "p(95)": 15.4,
+      "p(99)": 21.5
+     },
+     "variant": {
+      "med": 6.1,
+      "p(95)": 17.8,
+      "p(99)": 21.4
+     },
+     "miss": {
+      "med": 5.0,
+      "p(95)": 8.6,
+      "p(99)": 14.1
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 7.2,
+    "worst_p95_ratio": 0.06,
+    "pass": true,
+    "broken": false,
+    "vus": 6,
+    "resources": {
+     "maine_api": {
+      "cpu_avg": 3.9,
+      "cpu_p95": 9.6,
+      "mem_max_mb": 140
+     },
+     "maine_elasticsearch": {
+      "cpu_avg": 2.2,
+      "cpu_p95": 4.2,
+      "mem_max_mb": 2798
+     },
+     "maine_interpolation": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.0,
+      "mem_max_mb": 2004
+     },
+     "maine_libpostal": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.1,
+      "mem_max_mb": 1964
+     },
+     "maine_pip": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.0,
+      "mem_max_mb": 457
+     },
+     "maine_placeholder": {
+      "cpu_avg": 1.0,
+      "cpu_p95": 1.9,
+      "mem_max_mb": 176
+     },
+     "_stack": {
+      "cpu_avg": 7.0,
+      "cpu_p95": 15.3
+     }
+    },
+    "health": {
+     "/pelias_maine_elasticsearch": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_libpostal": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_placeholder": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_pip": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_interpolation": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 6.2,
+      "p(95)": 12.4,
+      "p(99)": 18.3,
+      "max": 19.5
+     },
+     "search": {
+      "med": 11.9,
+      "p(95)": 28.4,
+      "p(99)": 35.8,
+      "max": 38.9
+     },
+     "structured": {
+      "med": 14.4,
+      "p(95)": 17.4,
+      "p(99)": 17.5,
+      "max": 17.6
+     },
+     "reverse": {
+      "med": 7.2,
+      "p(95)": 8.7,
+      "p(99)": 8.9,
+      "max": 9.0
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 6.7,
+      "p(95)": 15.9,
+      "p(99)": 18.9
+     },
+     "typo": {
+      "med": 4.8,
+      "p(95)": 15.7,
+      "p(99)": 18.7
+     },
+     "variant": {
+      "med": 6.3,
+      "p(95)": 15.9,
+      "p(99)": 20.9
+     },
+     "miss": {
+      "med": 4.4,
+      "p(95)": 9.0,
+      "p(99)": 17.1
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 10.3,
+    "worst_p95_ratio": 0.05,
+    "pass": true,
+    "broken": false,
+    "vus": 8,
+    "resources": {
+     "maine_api": {
+      "cpu_avg": 4.4,
+      "cpu_p95": 10.2,
+      "mem_max_mb": 140
+     },
+     "maine_elasticsearch": {
+      "cpu_avg": 2.2,
+      "cpu_p95": 3.9,
+      "mem_max_mb": 2800
+     },
+     "maine_interpolation": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.0,
+      "mem_max_mb": 2012
+     },
+     "maine_libpostal": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.1,
+      "mem_max_mb": 1964
+     },
+     "maine_pip": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.0,
+      "mem_max_mb": 457
+     },
+     "maine_placeholder": {
+      "cpu_avg": 0.9,
+      "cpu_p95": 2.2,
+      "mem_max_mb": 185
+     },
+     "_stack": {
+      "cpu_avg": 7.5,
+      "cpu_p95": 15.0
+     }
+    },
+    "health": {
+     "/pelias_maine_elasticsearch": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_libpostal": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_placeholder": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_pip": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_interpolation": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 5.5,
+      "p(95)": 11.8,
+      "p(99)": 17.4,
+      "max": 23.5
+     },
+     "search": {
+      "med": 9.3,
+      "p(95)": 18.9,
+      "p(99)": 22.8,
+      "max": 23.5
+     },
+     "structured": {
+      "med": 8.0,
+      "p(95)": 19.1,
+      "p(99)": 19.8,
+      "max": 19.9
+     },
+     "reverse": {
+      "med": 6.0,
+      "p(95)": 8.1,
+      "p(99)": 8.3,
+      "max": 8.3
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 6.1,
+      "p(95)": 13.2,
+      "p(99)": 17.8
+     },
+     "typo": {
+      "med": 4.5,
+      "p(95)": 11.4,
+      "p(99)": 17.6
+     },
+     "variant": {
+      "med": 5.4,
+      "p(95)": 14.8,
+      "p(99)": 18.6
+     },
+     "miss": {
+      "med": 4.1,
+      "p(95)": 9.5,
+      "p(99)": 15.4
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 14.0,
+    "worst_p95_ratio": 0.05,
+    "pass": true,
+    "broken": false,
+    "vus": 12,
+    "resources": {
+     "maine_api": {
+      "cpu_avg": 5.5,
+      "cpu_p95": 10.0,
+      "mem_max_mb": 140
+     },
+     "maine_elasticsearch": {
+      "cpu_avg": 5.4,
+      "cpu_p95": 14.1,
+      "mem_max_mb": 2802
+     },
+     "maine_interpolation": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.0,
+      "mem_max_mb": 2013
+     },
+     "maine_libpostal": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.1,
+      "mem_max_mb": 1966
+     },
+     "maine_pip": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.0,
+      "mem_max_mb": 458
+     },
+     "maine_placeholder": {
+      "cpu_avg": 1.6,
+      "cpu_p95": 3.0,
+      "mem_max_mb": 193
+     },
+     "_stack": {
+      "cpu_avg": 12.6,
+      "cpu_p95": 24.8
+     }
+    },
+    "health": {
+     "/pelias_maine_elasticsearch": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_libpostal": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_placeholder": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_pip": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_interpolation": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 5.5,
+      "p(95)": 11.4,
+      "p(99)": 16.6,
+      "max": 22.0
+     },
+     "search": {
+      "med": 9.5,
+      "p(95)": 19.7,
+      "p(99)": 26.7,
+      "max": 32.8
+     },
+     "structured": {
+      "med": 14.2,
+      "p(95)": 16.5,
+      "p(99)": 16.7,
+      "max": 16.8
+     },
+     "reverse": {
+      "med": 6.3,
+      "p(95)": 14.1,
+      "p(99)": 15.8,
+      "max": 16.0
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 5.8,
+      "p(95)": 12.0,
+      "p(99)": 16.9
+     },
+     "typo": {
+      "med": 3.7,
+      "p(95)": 8.2,
+      "p(99)": 11.0
+     },
+     "variant": {
+      "med": 7.9,
+      "p(95)": 13.7,
+      "p(99)": 18.0
+     },
+     "miss": {
+      "med": 3.5,
+      "p(95)": 10.9,
+      "p(99)": 16.4
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 17.4,
+    "worst_p95_ratio": 0.05,
+    "pass": true,
+    "broken": false,
+    "vus": 16,
+    "resources": {
+     "maine_api": {
+      "cpu_avg": 7.1,
+      "cpu_p95": 12.7,
+      "mem_max_mb": 142
+     },
+     "maine_elasticsearch": {
+      "cpu_avg": 4.8,
+      "cpu_p95": 17.0,
+      "mem_max_mb": 2803
+     },
+     "maine_interpolation": {
+      "cpu_avg": 0.1,
+      "cpu_p95": 0.0,
+      "mem_max_mb": 2021
+     },
+     "maine_libpostal": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.1,
+      "mem_max_mb": 1966
+     },
+     "maine_pip": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.3,
+      "mem_max_mb": 459
+     },
+     "maine_placeholder": {
+      "cpu_avg": 2.3,
+      "cpu_p95": 6.3,
+      "mem_max_mb": 225
+     },
+     "_stack": {
+      "cpu_avg": 14.4,
+      "cpu_p95": 27.1
+     }
+    },
+    "health": {
+     "/pelias_maine_elasticsearch": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_libpostal": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_placeholder": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_pip": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_interpolation": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 4.4,
+      "p(95)": 9.9,
+      "p(99)": 16.3,
+      "max": 22.0
+     },
+     "search": {
+      "med": 6.7,
+      "p(95)": 17.1,
+      "p(99)": 20.4,
+      "max": 25.3
+     },
+     "structured": {
+      "med": 5.7,
+      "p(95)": 10.6,
+      "p(99)": 14.0,
+      "max": 14.8
+     },
+     "reverse": {
+      "med": 5.3,
+      "p(95)": 13.8,
+      "p(99)": 14.4,
+      "max": 14.6
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 4.7,
+      "p(95)": 10.7,
+      "p(99)": 16.4
+     },
+     "typo": {
+      "med": 3.2,
+      "p(95)": 8.9,
+      "p(99)": 16.9
+     },
+     "variant": {
+      "med": 5.6,
+      "p(95)": 10.7,
+      "p(99)": 15.8
+     },
+     "miss": {
+      "med": 2.9,
+      "p(95)": 7.2,
+      "p(99)": 18.8
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 27.0,
+    "worst_p95_ratio": 0.04,
+    "pass": true,
+    "broken": false,
+    "vus": 24,
+    "resources": {
+     "maine_api": {
+      "cpu_avg": 10.8,
+      "cpu_p95": 19.0,
+      "mem_max_mb": 152
+     },
+     "maine_elasticsearch": {
+      "cpu_avg": 4.8,
+      "cpu_p95": 10.7,
+      "mem_max_mb": 2806
+     },
+     "maine_interpolation": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.0,
+      "mem_max_mb": 2033
+     },
+     "maine_libpostal": {
+      "cpu_avg": 0.1,
+      "cpu_p95": 0.1,
+      "mem_max_mb": 1966
+     },
+     "maine_pip": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.2,
+      "mem_max_mb": 460
+     },
+     "maine_placeholder": {
+      "cpu_avg": 3.1,
+      "cpu_p95": 7.6,
+      "mem_max_mb": 246
+     },
+     "_stack": {
+      "cpu_avg": 18.7,
+      "cpu_p95": 33.6
+     }
+    },
+    "health": {
+     "/pelias_maine_elasticsearch": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_libpostal": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_placeholder": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_pip": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_interpolation": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 4.7,
+      "p(95)": 9.6,
+      "p(99)": 15.1,
+      "max": 28.3
+     },
+     "search": {
+      "med": 7.2,
+      "p(95)": 15.8,
+      "p(99)": 18.4,
+      "max": 19.0
+     },
+     "structured": {
+      "med": 5.8,
+      "p(95)": 13.9,
+      "p(99)": 14.2,
+      "max": 14.3
+     },
+     "reverse": {
+      "med": 5.4,
+      "p(95)": 7.6,
+      "p(99)": 9.3,
+      "max": 9.8
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 5.3,
+      "p(95)": 10.0,
+      "p(99)": 15.6
+     },
+     "typo": {
+      "med": 4.0,
+      "p(95)": 9.0,
+      "p(99)": 12.1
+     },
+     "variant": {
+      "med": 4.6,
+      "p(95)": 10.4,
+      "p(99)": 16.8
+     },
+     "miss": {
+      "med": 2.8,
+      "p(95)": 9.4,
+      "p(99)": 15.7
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 38.5,
+    "worst_p95_ratio": 0.04,
+    "pass": true,
+    "broken": false,
+    "vus": 32,
+    "resources": {
+     "maine_api": {
+      "cpu_avg": 12.7,
+      "cpu_p95": 19.1,
+      "mem_max_mb": 158
+     },
+     "maine_elasticsearch": {
+      "cpu_avg": 5.5,
+      "cpu_p95": 7.9,
+      "mem_max_mb": 2807
+     },
+     "maine_interpolation": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.0,
+      "mem_max_mb": 2035
+     },
+     "maine_libpostal": {
+      "cpu_avg": 0.1,
+      "cpu_p95": 0.2,
+      "mem_max_mb": 1967
+     },
+     "maine_pip": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.2,
+      "mem_max_mb": 460
+     },
+     "maine_placeholder": {
+      "cpu_avg": 3.8,
+      "cpu_p95": 6.1,
+      "mem_max_mb": 256
+     },
+     "_stack": {
+      "cpu_avg": 22.1,
+      "cpu_p95": 32.5
+     }
+    },
+    "health": {
+     "/pelias_maine_elasticsearch": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_libpostal": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_placeholder": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_pip": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_interpolation": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 4.9,
+      "p(95)": 11.0,
+      "p(99)": 16.3,
+      "max": 34.5
+     },
+     "search": {
+      "med": 8.1,
+      "p(95)": 18.1,
+      "p(99)": 25.5,
+      "max": 34.1
+     },
+     "structured": {
+      "med": 5.2,
+      "p(95)": 6.4,
+      "p(99)": 6.7,
+      "max": 6.9
+     },
+     "reverse": {
+      "med": 5.4,
+      "p(95)": 12.6,
+      "p(99)": 16.7,
+      "max": 18.9
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 5.3,
+      "p(95)": 11.7,
+      "p(99)": 17.6
+     },
+     "typo": {
+      "med": 3.8,
+      "p(95)": 10.1,
+      "p(99)": 15.8
+     },
+     "variant": {
+      "med": 5.2,
+      "p(95)": 12.5,
+      "p(99)": 17.3
+     },
+     "miss": {
+      "med": 2.8,
+      "p(95)": 10.0,
+      "p(99)": 16.0
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 58.7,
+    "worst_p95_ratio": 0.04,
+    "pass": true,
+    "broken": false,
+    "vus": 48,
+    "resources": {
+     "maine_api": {
+      "cpu_avg": 19.4,
+      "cpu_p95": 30.8,
+      "mem_max_mb": 326
+     },
+     "maine_elasticsearch": {
+      "cpu_avg": 8.5,
+      "cpu_p95": 11.8,
+      "mem_max_mb": 2816
+     },
+     "maine_interpolation": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.2,
+      "mem_max_mb": 2042
+     },
+     "maine_libpostal": {
+      "cpu_avg": 0.1,
+      "cpu_p95": 0.3,
+      "mem_max_mb": 1967
+     },
+     "maine_pip": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.3,
+      "mem_max_mb": 460
+     },
+     "maine_placeholder": {
+      "cpu_avg": 5.6,
+      "cpu_p95": 9.3,
+      "mem_max_mb": 261
+     },
+     "_stack": {
+      "cpu_avg": 33.7,
+      "cpu_p95": 52.0
+     }
+    },
+    "health": {
+     "/pelias_maine_elasticsearch": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_libpostal": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_placeholder": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_pip": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_interpolation": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 4.7,
+      "p(95)": 10.8,
+      "p(99)": 14.8,
+      "max": 21.2
+     },
+     "search": {
+      "med": 7.2,
+      "p(95)": 16.7,
+      "p(99)": 27.2,
+      "max": 36.2
+     },
+     "structured": {
+      "med": 5.1,
+      "p(95)": 9.2,
+      "p(99)": 10.9,
+      "max": 11.7
+     },
+     "reverse": {
+      "med": 5.5,
+      "p(95)": 11.3,
+      "p(99)": 15.1,
+      "max": 15.4
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 5.1,
+      "p(95)": 10.8,
+      "p(99)": 15.1
+     },
+     "typo": {
+      "med": 3.6,
+      "p(95)": 10.6,
+      "p(99)": 13.3
+     },
+     "variant": {
+      "med": 5.6,
+      "p(95)": 12.4,
+      "p(99)": 15.9
+     },
+     "miss": {
+      "med": 2.8,
+      "p(95)": 10.6,
+      "p(99)": 17.5
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 76.5,
+    "worst_p95_ratio": 0.04,
+    "pass": true,
+    "broken": false,
+    "vus": 64,
+    "resources": {
+     "maine_api": {
+      "cpu_avg": 21.4,
+      "cpu_p95": 32.7,
+      "mem_max_mb": 178
+     },
+     "maine_elasticsearch": {
+      "cpu_avg": 9.2,
+      "cpu_p95": 18.6,
+      "mem_max_mb": 2816
+     },
+     "maine_interpolation": {
+      "cpu_avg": 0.1,
+      "cpu_p95": 0.3,
+      "mem_max_mb": 2050
+     },
+     "maine_libpostal": {
+      "cpu_avg": 0.2,
+      "cpu_p95": 0.3,
+      "mem_max_mb": 1967
+     },
+     "maine_pip": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.3,
+      "mem_max_mb": 462
+     },
+     "maine_placeholder": {
+      "cpu_avg": 6.6,
+      "cpu_p95": 9.8,
+      "mem_max_mb": 287
+     },
+     "_stack": {
+      "cpu_avg": 37.5,
+      "cpu_p95": 54.1
+     }
+    },
+    "health": {
+     "/pelias_maine_elasticsearch": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_libpostal": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_placeholder": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_pip": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_interpolation": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 5.2,
+      "p(95)": 11.7,
+      "p(99)": 16.6,
+      "max": 33.7
+     },
+     "search": {
+      "med": 7.5,
+      "p(95)": 16.5,
+      "p(99)": 23.8,
+      "max": 32.7
+     },
+     "structured": {
+      "med": 5.8,
+      "p(95)": 13.0,
+      "p(99)": 19.0,
+      "max": 20.1
+     },
+     "reverse": {
+      "med": 5.5,
+      "p(95)": 13.2,
+      "p(99)": 16.0,
+      "max": 26.8
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 5.7,
+      "p(95)": 12.3,
+      "p(99)": 17.4
+     },
+     "typo": {
+      "med": 4.0,
+      "p(95)": 11.2,
+      "p(99)": 14.9
+     },
+     "variant": {
+      "med": 5.4,
+      "p(95)": 12.2,
+      "p(99)": 17.4
+     },
+     "miss": {
+      "med": 3.0,
+      "p(95)": 10.0,
+      "p(99)": 16.2
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 111.1,
+    "worst_p95_ratio": 0.05,
+    "pass": true,
+    "broken": false,
+    "vus": 96,
+    "resources": {
+     "maine_api": {
+      "cpu_avg": 34.3,
+      "cpu_p95": 50.3,
+      "mem_max_mb": 319
+     },
+     "maine_elasticsearch": {
+      "cpu_avg": 14.4,
+      "cpu_p95": 19.0,
+      "mem_max_mb": 2823
+     },
+     "maine_interpolation": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.2,
+      "mem_max_mb": 2057
+     },
+     "maine_libpostal": {
+      "cpu_avg": 0.3,
+      "cpu_p95": 0.4,
+      "mem_max_mb": 1970
+     },
+     "maine_pip": {
+      "cpu_avg": 0.1,
+      "cpu_p95": 0.5,
+      "mem_max_mb": 463
+     },
+     "maine_placeholder": {
+      "cpu_avg": 9.7,
+      "cpu_p95": 16.1,
+      "mem_max_mb": 300
+     },
+     "_stack": {
+      "cpu_avg": 58.8,
+      "cpu_p95": 84.0
+     }
+    },
+    "health": {
+     "/pelias_maine_elasticsearch": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_libpostal": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_placeholder": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_pip": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_interpolation": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 6.1,
+      "p(95)": 13.2,
+      "p(99)": 17.4,
+      "max": 34.7
+     },
+     "search": {
+      "med": 8.0,
+      "p(95)": 20.2,
+      "p(99)": 25.3,
+      "max": 37.7
+     },
+     "structured": {
+      "med": 5.9,
+      "p(95)": 14.3,
+      "p(99)": 24.6,
+      "max": 25.6
+     },
+     "reverse": {
+      "med": 5.6,
+      "p(95)": 13.1,
+      "p(99)": 16.1,
+      "max": 16.8
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 6.4,
+      "p(95)": 13.7,
+      "p(99)": 18.3
+     },
+     "typo": {
+      "med": 4.7,
+      "p(95)": 11.4,
+      "p(99)": 17.4
+     },
+     "variant": {
+      "med": 6.2,
+      "p(95)": 13.6,
+      "p(99)": 19.7
+     },
+     "miss": {
+      "med": 3.5,
+      "p(95)": 11.7,
+      "p(99)": 17.3
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 153.9,
+    "worst_p95_ratio": 0.05,
+    "pass": true,
+    "broken": false,
+    "vus": 128,
+    "resources": {
+     "maine_api": {
+      "cpu_avg": 42.2,
+      "cpu_p95": 54.6,
+      "mem_max_mb": 339
+     },
+     "maine_elasticsearch": {
+      "cpu_avg": 19.1,
+      "cpu_p95": 24.1,
+      "mem_max_mb": 2829
+     },
+     "maine_interpolation": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.1,
+      "mem_max_mb": 2062
+     },
+     "maine_libpostal": {
+      "cpu_avg": 0.3,
+      "cpu_p95": 0.5,
+      "mem_max_mb": 1970
+     },
+     "maine_pip": {
+      "cpu_avg": 0.1,
+      "cpu_p95": 0.4,
+      "mem_max_mb": 465
+     },
+     "maine_placeholder": {
+      "cpu_avg": 12.1,
+      "cpu_p95": 15.4,
+      "mem_max_mb": 306
+     },
+     "_stack": {
+      "cpu_avg": 73.7,
+      "cpu_p95": 92.8
+     }
+    },
+    "health": {
+     "/pelias_maine_elasticsearch": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_libpostal": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_placeholder": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_pip": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_interpolation": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 7.4,
+      "p(95)": 16.5,
+      "p(99)": 23.6,
+      "max": 80.3
+     },
+     "search": {
+      "med": 10.6,
+      "p(95)": 24.4,
+      "p(99)": 33.4,
+      "max": 48.3
+     },
+     "structured": {
+      "med": 8.1,
+      "p(95)": 19.9,
+      "p(99)": 34.1,
+      "max": 44.9
+     },
+     "reverse": {
+      "med": 7.8,
+      "p(95)": 16.9,
+      "p(99)": 21.8,
+      "max": 25.8
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 7.8,
+      "p(95)": 17.2,
+      "p(99)": 24.5
+     },
+     "typo": {
+      "med": 6.6,
+      "p(95)": 15.7,
+      "p(99)": 23.5
+     },
+     "variant": {
+      "med": 7.8,
+      "p(95)": 17.8,
+      "p(99)": 27.6
+     },
+     "miss": {
+      "med": 5.1,
+      "p(95)": 14.3,
+      "p(99)": 22.9
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 230.6,
+    "worst_p95_ratio": 0.07,
+    "pass": true,
+    "broken": false,
+    "vus": 192,
+    "resources": {
+     "maine_api": {
+      "cpu_avg": 62.2,
+      "cpu_p95": 78.7,
+      "mem_max_mb": 339
+     },
+     "maine_elasticsearch": {
+      "cpu_avg": 27.1,
+      "cpu_p95": 36.8,
+      "mem_max_mb": 2836
+     },
+     "maine_interpolation": {
+      "cpu_avg": 0.1,
+      "cpu_p95": 0.5,
+      "mem_max_mb": 2073
+     },
+     "maine_libpostal": {
+      "cpu_avg": 0.5,
+      "cpu_p95": 0.7,
+      "mem_max_mb": 1970
+     },
+     "maine_pip": {
+      "cpu_avg": 0.2,
+      "cpu_p95": 0.6,
+      "mem_max_mb": 467
+     },
+     "maine_placeholder": {
+      "cpu_avg": 18.2,
+      "cpu_p95": 22.9,
+      "mem_max_mb": 314
+     },
+     "_stack": {
+      "cpu_avg": 108.3,
+      "cpu_p95": 133.8
+     }
+    },
+    "health": {
+     "/pelias_maine_elasticsearch": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_libpostal": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_placeholder": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_pip": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_interpolation": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 9.7,
+      "p(95)": 26.4,
+      "p(99)": 44.1,
+      "max": 258.1
+     },
+     "search": {
+      "med": 13.7,
+      "p(95)": 41.6,
+      "p(99)": 72.4,
+      "max": 114.0
+     },
+     "structured": {
+      "med": 13.4,
+      "p(95)": 42.1,
+      "p(99)": 50.1,
+      "max": 55.9
+     },
+     "reverse": {
+      "med": 10.6,
+      "p(95)": 28.0,
+      "p(99)": 37.0,
+      "max": 75.0
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 10.2,
+      "p(95)": 27.8,
+      "p(99)": 47.3
+     },
+     "typo": {
+      "med": 8.2,
+      "p(95)": 23.8,
+      "p(99)": 41.1
+     },
+     "variant": {
+      "med": 9.9,
+      "p(95)": 27.3,
+      "p(99)": 43.0
+     },
+     "miss": {
+      "med": 7.6,
+      "p(95)": 24.5,
+      "p(99)": 42.3
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 295.5,
+    "worst_p95_ratio": 0.11,
+    "pass": true,
+    "broken": false,
+    "vus": 256,
+    "resources": {
+     "maine_api": {
+      "cpu_avg": 78.4,
+      "cpu_p95": 104.1,
+      "mem_max_mb": 354
+     },
+     "maine_elasticsearch": {
+      "cpu_avg": 34.5,
+      "cpu_p95": 47.3,
+      "mem_max_mb": 2842
+     },
+     "maine_interpolation": {
+      "cpu_avg": 0.0,
+      "cpu_p95": 0.3,
+      "mem_max_mb": 2082
+     },
+     "maine_libpostal": {
+      "cpu_avg": 0.6,
+      "cpu_p95": 0.9,
+      "mem_max_mb": 1971
+     },
+     "maine_pip": {
+      "cpu_avg": 0.3,
+      "cpu_p95": 0.7,
+      "mem_max_mb": 452
+     },
+     "maine_placeholder": {
+      "cpu_avg": 23.0,
+      "cpu_p95": 31.3,
+      "mem_max_mb": 313
+     },
+     "_stack": {
+      "cpu_avg": 136.9,
+      "cpu_p95": 189.8
+     }
+    },
+    "health": {
+     "/pelias_maine_elasticsearch": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_libpostal": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_placeholder": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_pip": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_interpolation": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 128.3,
+      "p(95)": 194.2,
+      "p(99)": 324.3,
+      "max": 1522.3
+     },
+     "search": {
+      "med": 204.7,
+      "p(95)": 337.9,
+      "p(99)": 481.0,
+      "max": 1089.1
+     },
+     "structured": {
+      "med": 190.2,
+      "p(95)": 271.8,
+      "p(99)": 392.8,
+      "max": 719.3
+     },
+     "reverse": {
+      "med": 145.9,
+      "p(95)": 225.5,
+      "p(99)": 403.4,
+      "max": 904.5
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 134.3,
+      "p(95)": 209.6,
+      "p(99)": 346.3
+     },
+     "typo": {
+      "med": 114.1,
+      "p(95)": 197.7,
+      "p(99)": 361.6
+     },
+     "variant": {
+      "med": 131.6,
+      "p(95)": 204.6,
+      "p(99)": 355.4
+     },
+     "miss": {
+      "med": 107.4,
+      "p(95)": 204.7,
+      "p(99)": 416.5
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 379.7,
+    "worst_p95_ratio": 0.78,
+    "pass": true,
+    "broken": false,
+    "vus": 384,
+    "resources": {
+     "maine_api": {
+      "cpu_avg": 99.1,
+      "cpu_p95": 113.3,
+      "mem_max_mb": 366
+     },
+     "maine_elasticsearch": {
+      "cpu_avg": 41.3,
+      "cpu_p95": 47.8,
+      "mem_max_mb": 2856
+     },
+     "maine_interpolation": {
+      "cpu_avg": 0.3,
+      "cpu_p95": 1.0,
+      "mem_max_mb": 2093
+     },
+     "maine_libpostal": {
+      "cpu_avg": 0.7,
+      "cpu_p95": 1.1,
+      "mem_max_mb": 1971
+     },
+     "maine_pip": {
+      "cpu_avg": 0.3,
+      "cpu_p95": 0.8,
+      "mem_max_mb": 455
+     },
+     "maine_placeholder": {
+      "cpu_avg": 28.8,
+      "cpu_p95": 34.9,
+      "mem_max_mb": 322
+     },
+     "_stack": {
+      "cpu_avg": 170.4,
+      "cpu_p95": 193.1
+     }
+    },
+    "health": {
+     "/pelias_maine_elasticsearch": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_libpostal": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_placeholder": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_pip": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_interpolation": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 166.3,
+      "p(95)": 263.3,
+      "p(99)": 7962.7,
+      "max": 10391.4
+     },
+     "search": {
+      "med": 272.4,
+      "p(95)": 454.5,
+      "p(99)": 7720.5,
+      "max": 10149.3
+     },
+     "structured": {
+      "med": 251.0,
+      "p(95)": 369.8,
+      "p(99)": 7542.2,
+      "max": 8999.4
+     },
+     "reverse": {
+      "med": 191.2,
+      "p(95)": 389.2,
+      "p(99)": 8143.8,
+      "max": 10343.8
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 173.2,
+      "p(95)": 290.7,
+      "p(99)": 7869.3
+     },
+     "typo": {
+      "med": 147.7,
+      "p(95)": 290.8,
+      "p(99)": 8161.6
+     },
+     "variant": {
+      "med": 170.2,
+      "p(95)": 293.7,
+      "p(99)": 7771.0
+     },
+     "miss": {
+      "med": 145.3,
+      "p(95)": 391.5,
+      "p(99)": 8527.5
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 389.3,
+    "worst_p95_ratio": 1.05,
+    "pass": false,
+    "broken": false,
+    "vus": 512,
+    "resources": {
+     "maine_api": {
+      "cpu_avg": 100.3,
+      "cpu_p95": 108.3,
+      "mem_max_mb": 368
+     },
+     "maine_elasticsearch": {
+      "cpu_avg": 39.7,
+      "cpu_p95": 46.3,
+      "mem_max_mb": 2870
+     },
+     "maine_interpolation": {
+      "cpu_avg": 0.1,
+      "cpu_p95": 0.3,
+      "mem_max_mb": 2103
+     },
+     "maine_libpostal": {
+      "cpu_avg": 0.8,
+      "cpu_p95": 1.1,
+      "mem_max_mb": 1971
+     },
+     "maine_pip": {
+      "cpu_avg": 0.4,
+      "cpu_p95": 1.1,
+      "mem_max_mb": 462
+     },
+     "maine_placeholder": {
+      "cpu_avg": 29.5,
+      "cpu_p95": 33.3,
+      "mem_max_mb": 324
+     },
+     "_stack": {
+      "cpu_avg": 170.8,
+      "cpu_p95": 186.5
+     }
+    },
+    "health": {
+     "/pelias_maine_elasticsearch": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_api": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_libpostal": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_placeholder": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_pip": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pelias_maine_interpolation": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   }
+  ]
+ },
+ "limit_users": 384,
+ "breaking_users": null
+}

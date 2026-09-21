@@ -1,0 +1,85 @@
+{
+ "engine": "pgeo",
+ "minutes": 5,
+ "result": {
+  "config": {
+   "cpus": 0.25,
+   "db": 0.45,
+   "rest": 0.15
+  },
+  "vcpu": 0.25,
+  "memory_gb": 1.4
+ },
+ "path": [
+  {
+   "config": {
+    "cpus": 1.0,
+    "db": 0.6,
+    "rest": 0.25
+   },
+   "total_gb": 1.65,
+   "pass": true,
+   "why": "ok"
+  },
+  {
+   "config": {
+    "cpus": 0.5,
+    "db": 0.6,
+    "rest": 0.25
+   },
+   "total_gb": 1.65,
+   "pass": true,
+   "why": "ok"
+  },
+  {
+   "config": {
+    "cpus": 0.25,
+    "db": 0.6,
+    "rest": 0.25
+   },
+   "total_gb": 1.65,
+   "pass": true,
+   "why": "ok"
+  },
+  {
+   "config": {
+    "cpus": 0.25,
+    "db": 0.45,
+    "rest": 0.25
+   },
+   "total_gb": 1.5,
+   "pass": true,
+   "why": "ok"
+  },
+  {
+   "config": {
+    "cpus": 0.25,
+    "db": 0.35,
+    "rest": 0.25
+   },
+   "total_gb": 1.4,
+   "pass": false,
+   "why": "over target (worst 1.07x, errors 0)"
+  },
+  {
+   "config": {
+    "cpus": 0.25,
+    "db": 0.45,
+    "rest": 0.15
+   },
+   "total_gb": 1.4,
+   "pass": true,
+   "why": "ok"
+  },
+  {
+   "config": {
+    "cpus": 0.25,
+    "db": 0.45,
+    "rest": 0.1
+   },
+   "total_gb": 1.35,
+   "pass": false,
+   "why": "over target (worst 1.13x, errors 0)"
+  }
+ ]
+}

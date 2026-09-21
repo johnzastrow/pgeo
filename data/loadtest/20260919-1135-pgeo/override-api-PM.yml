@@ -1,0 +1,9 @@
+services:
+  db:
+    volumes:
+      - "/home/jcz/Forge/pelia_maine/data/loadtest/20260919-1135-pgeo/tuning-PM:/etc/postgresql/tuning:ro"
+  api:
+    environment:
+      PGEO_PARSE_MODE: "none"
+      PGEO_WORKERS: "4"
+      PGEO_POOL_MAX: "4"

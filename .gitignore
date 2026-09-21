@@ -24,6 +24,18 @@ report/.venv/
 # report inputs are small and belong in git (the rule above matches every data/ directory)
 !report/data/
 
+# The study's measurement results belong in git: they are what the report's numbers are
+# computed from, and the engines that produced them (a Nominatim database, a Photon index,
+# a tuned Elasticsearch) are not reproducible from this repository alone. Checked before
+# committing: these hold case ids, hit/miss flags, distances and timings - no query text, so
+# no searched addresses. Raw inputs, indexes and database directories stay ignored.
+!data/
+data/*
+!data/accuracy/
+!data/accuracy/**
+!data/loadtest/
+!data/loadtest/**
+
 # Slidev deck. slides/dist IS committed: the static build is what gets published, so the deck
 # can be read from the repository (and GitHub Pages) without Node or npm install.
 slides/node_modules/

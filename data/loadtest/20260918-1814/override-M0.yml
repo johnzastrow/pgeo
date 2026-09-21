@@ -1,0 +1,13 @@
+services:
+  elasticsearch:
+    environment:
+      - "ES_JAVA_OPTS=-Xms4g -Xmx4g"
+      - "path.repo=/usr/share/elasticsearch/snapshots"
+  libpostal:
+  placeholder:
+  pip:
+  interpolation:
+  api:
+    environment:
+      - "PORT=4000"
+      - "CPUS=1"

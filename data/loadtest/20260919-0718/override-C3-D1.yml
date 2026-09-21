@@ -1,0 +1,33 @@
+services:
+  elasticsearch:
+    cpuset: "0,1"
+    mem_limit: 2048m
+    memswap_limit: 2048m
+    environment:
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - "path.repo=/usr/share/elasticsearch/snapshots"
+  libpostal:
+    cpuset: "0,1"
+    mem_limit: 2252m
+    memswap_limit: 2252m
+  placeholder:
+    cpuset: "0,1"
+    mem_limit: 819m
+    memswap_limit: 819m
+  pip:
+    cpuset: "0,1"
+    mem_limit: 921m
+    memswap_limit: 921m
+  interpolation:
+    cpuset: "0,1"
+    mem_limit: 2355m
+    memswap_limit: 2355m
+  api:
+    cpuset: "0,1"
+    mem_limit: 552m
+    memswap_limit: 552m
+    volumes:
+      - "/home/jcz/Forge/pelia_maine/data/loadtest/20260919-0718/pelias-D1.json:/code/pelias.json:ro"
+    environment:
+      - "PORT=4000"
+      - "CPUS=2"

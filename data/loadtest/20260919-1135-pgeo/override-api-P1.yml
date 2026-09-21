@@ -1,0 +1,15 @@
+services:
+  db:
+    cpuset: "0"
+    volumes:
+      - "/home/jcz/Forge/pelia_maine/data/loadtest/20260919-1135-pgeo/tuning-P1:/etc/postgresql/tuning:ro"
+    mem_limit: 1024m
+    memswap_limit: 1024m
+  api:
+    cpuset: "0"
+    mem_limit: 256m
+    memswap_limit: 256m
+    environment:
+      PGEO_PARSE_MODE: "none"
+      PGEO_WORKERS: "1"
+      PGEO_POOL_MAX: "4"

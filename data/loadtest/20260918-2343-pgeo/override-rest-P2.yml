@@ -1,0 +1,13 @@
+services:
+  db:
+    cpuset: "0,1"
+    volumes:
+      - "/home/jcz/Forge/pelia_maine/data/loadtest/20260918-2343-pgeo/tuning-P2.conf:/etc/postgresql/tuning/active.conf:ro"
+    mem_limit: 1536m
+    memswap_limit: 1536m
+  rest:
+    cpuset: "0,1"
+    mem_limit: 256m
+    memswap_limit: 256m
+    environment:
+      PGRST_DB_POOL: "6"

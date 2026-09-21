@@ -1,0 +1,215 @@
+{
+ "engine": "pelias",
+ "minutes": 5,
+ "result": {
+  "config": {
+   "cpus": 0.25,
+   "es": 1.0,
+   "api": 0.22,
+   "libpostal": 2.0,
+   "interpolation": 2.1,
+   "pip": 0.7,
+   "placeholder": 0.35
+  },
+  "vcpu": 0.25,
+  "memory_gb": 7.17
+ },
+ "path": [
+  {
+   "config": {
+    "cpus": 1.0,
+    "es": 1.5,
+    "api": 0.42,
+    "libpostal": 2.0,
+    "interpolation": 2.1,
+    "pip": 0.7,
+    "placeholder": 0.8
+   },
+   "total_gb": 8.32,
+   "pass": true,
+   "why": "ok"
+  },
+  {
+   "config": {
+    "cpus": 0.5,
+    "es": 1.5,
+    "api": 0.42,
+    "libpostal": 2.0,
+    "interpolation": 2.1,
+    "pip": 0.7,
+    "placeholder": 0.8
+   },
+   "total_gb": 8.32,
+   "pass": true,
+   "why": "ok"
+  },
+  {
+   "config": {
+    "cpus": 0.25,
+    "es": 1.5,
+    "api": 0.42,
+    "libpostal": 2.0,
+    "interpolation": 2.1,
+    "pip": 0.7,
+    "placeholder": 0.8
+   },
+   "total_gb": 8.32,
+   "pass": true,
+   "why": "ok"
+  },
+  {
+   "config": {
+    "cpus": 0.25,
+    "es": 1.2,
+    "api": 0.42,
+    "libpostal": 2.0,
+    "interpolation": 2.1,
+    "pip": 0.7,
+    "placeholder": 0.8
+   },
+   "total_gb": 8.02,
+   "pass": true,
+   "why": "ok"
+  },
+  {
+   "config": {
+    "cpus": 0.25,
+    "es": 1.0,
+    "api": 0.42,
+    "libpostal": 2.0,
+    "interpolation": 2.1,
+    "pip": 0.7,
+    "placeholder": 0.8
+   },
+   "total_gb": 7.82,
+   "pass": true,
+   "why": "ok"
+  },
+  {
+   "config": {
+    "cpus": 0.25,
+    "es": 0.8,
+    "api": 0.42,
+    "libpostal": 2.0,
+    "interpolation": 2.1,
+    "pip": 0.7,
+    "placeholder": 0.8
+   },
+   "total_gb": 7.62,
+   "pass": false,
+   "why": "died or OOM"
+  },
+  {
+   "config": {
+    "cpus": 0.25,
+    "es": 1.0,
+    "api": 0.42,
+    "libpostal": 2.0,
+    "interpolation": 2.1,
+    "pip": 0.7,
+    "placeholder": 0.6
+   },
+   "total_gb": 7.62,
+   "pass": true,
+   "why": "ok"
+  },
+  {
+   "config": {
+    "cpus": 0.25,
+    "es": 1.0,
+    "api": 0.42,
+    "libpostal": 2.0,
+    "interpolation": 2.1,
+    "pip": 0.7,
+    "placeholder": 0.45
+   },
+   "total_gb": 7.47,
+   "pass": true,
+   "why": "ok"
+  },
+  {
+   "config": {
+    "cpus": 0.25,
+    "es": 1.0,
+    "api": 0.42,
+    "libpostal": 2.0,
+    "interpolation": 2.1,
+    "pip": 0.7,
+    "placeholder": 0.35
+   },
+   "total_gb": 7.37,
+   "pass": true,
+   "why": "ok"
+  },
+  {
+   "config": {
+    "cpus": 0.25,
+    "es": 1.0,
+    "api": 0.42,
+    "libpostal": 2.0,
+    "interpolation": 2.1,
+    "pip": 0.55,
+    "placeholder": 0.35
+   },
+   "total_gb": 7.22,
+   "pass": false,
+   "why": "died or OOM"
+  },
+  {
+   "config": {
+    "cpus": 0.25,
+    "es": 1.0,
+    "api": 0.42,
+    "libpostal": 2.0,
+    "interpolation": 1.8,
+    "pip": 0.7,
+    "placeholder": 0.35
+   },
+   "total_gb": 7.07,
+   "pass": false,
+   "why": "died or OOM"
+  },
+  {
+   "config": {
+    "cpus": 0.25,
+    "es": 1.0,
+    "api": 0.42,
+    "libpostal": 1.8,
+    "interpolation": 2.1,
+    "pip": 0.7,
+    "placeholder": 0.35
+   },
+   "total_gb": null,
+   "pass": false,
+   "why": "did not start: RuntimeError"
+  },
+  {
+   "config": {
+    "cpus": 0.25,
+    "es": 1.0,
+    "api": 0.3,
+    "libpostal": 2.0,
+    "interpolation": 2.1,
+    "pip": 0.7,
+    "placeholder": 0.35
+   },
+   "total_gb": 7.25,
+   "pass": true,
+   "why": "ok"
+  },
+  {
+   "config": {
+    "cpus": 0.25,
+    "es": 1.0,
+    "api": 0.22,
+    "libpostal": 2.0,
+    "interpolation": 2.1,
+    "pip": 0.7,
+    "placeholder": 0.35
+   },
+   "total_gb": 7.17,
+   "pass": true,
+   "why": "ok"
+  }
+ ]
+}

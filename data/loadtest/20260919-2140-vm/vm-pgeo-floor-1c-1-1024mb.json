@@ -1,0 +1,1176 @@
+{
+ "id": "vm-pgeo-floor-1c-1-1024mb",
+ "engine": "pgeo",
+ "base_config": "floor-1c-1-1024mb",
+ "dataset": null,
+ "config": {
+  "cpus": 1,
+  "cpulimit": 1.0,
+  "memory_gb": 1.0,
+  "host": "temporary VM 190 (floor-pgeo)"
+ },
+ "budget_gb": 1.0,
+ "runs": {
+  "validate": {
+   "endpoints": {
+    "autocomplete": {
+     "med": 16.8,
+     "p(95)": 52.7,
+     "p(99)": 90.7,
+     "max": 188.0
+    },
+    "search": {
+     "med": 37.7,
+     "p(95)": 99.0,
+     "p(99)": 153.3,
+     "max": 176.5
+    },
+    "structured": {
+     "med": 64.3,
+     "p(95)": 83.0,
+     "p(99)": 86.2,
+     "max": 87.0
+    },
+    "reverse": {
+     "med": 15.3,
+     "p(95)": 17.6,
+     "p(99)": 18.9,
+     "max": 19.2
+    }
+   },
+   "qtypes": {
+    "exact": {
+     "med": 19.7,
+     "p(95)": 64.0,
+     "p(99)": 92.7
+    },
+    "typo": {
+     "med": 17.2,
+     "p(95)": 38.2,
+     "p(99)": 73.3
+    },
+    "variant": {
+     "med": 13.2,
+     "p(95)": 67.9,
+     "p(99)": 160.8
+    },
+    "miss": {
+     "med": 12.7,
+     "p(95)": 29.5,
+     "p(99)": 42.3
+    }
+   },
+   "error_rate": 0,
+   "req_rate": 3.3,
+   "worst_p95_ratio": 0.21,
+   "pass": true,
+   "broken": false,
+   "resources": {
+    "pgeo_db": {
+     "cpu_avg": 6.6,
+     "cpu_p95": 17.4,
+     "mem_max_mb": 296
+    },
+    "pgeo_rest": {
+     "cpu_avg": 0.3,
+     "cpu_p95": 0.6,
+     "mem_max_mb": 11
+    },
+    "_stack": {
+     "cpu_avg": 6.9,
+     "cpu_p95": 17.8
+    }
+   },
+   "health": {
+    "/pgeo_db": {
+     "status": "running",
+     "oom": false,
+     "restarts": 0
+    },
+    "/pgeo_rest": {
+     "status": "running",
+     "oom": false,
+     "restarts": 0
+    }
+   },
+   "died": false
+  },
+  "ramp": [
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 16.9,
+      "p(95)": 37.2,
+      "p(99)": 62.4,
+      "max": 74.6
+     },
+     "search": {
+      "med": 33.2,
+      "p(95)": 62.2,
+      "p(99)": 64.8,
+      "max": 65.5
+     },
+     "reverse": {
+      "med": 17.3,
+      "p(95)": 17.3,
+      "p(99)": 17.3,
+      "max": 17.3
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 17.0,
+      "p(95)": 34.3,
+      "p(99)": 56.9
+     },
+     "variant": {
+      "med": 17.1,
+      "p(95)": 43.6,
+      "p(99)": 65.5
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 1.7,
+    "worst_p95_ratio": 0.15,
+    "pass": true,
+    "broken": false,
+    "vus": 1,
+    "resources": {
+     "pgeo_db": {
+      "cpu_avg": 3.7,
+      "cpu_p95": 10.7,
+      "mem_max_mb": 297
+     },
+     "pgeo_rest": {
+      "cpu_avg": 0.2,
+      "cpu_p95": 0.4,
+      "mem_max_mb": 11
+     },
+     "_stack": {
+      "cpu_avg": 3.9,
+      "cpu_p95": 10.8
+     }
+    },
+    "health": {
+     "/pgeo_db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pgeo_rest": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 19.7,
+      "p(95)": 51.0,
+      "p(99)": 82.9,
+      "max": 120.4
+     },
+     "search": {
+      "med": 44.7,
+      "p(95)": 72.9,
+      "p(99)": 76.8,
+      "max": 77.8
+     },
+     "reverse": {
+      "med": 15.8,
+      "p(95)": 17.3,
+      "p(99)": 17.6,
+      "max": 17.7
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 22.0,
+      "p(95)": 56.5,
+      "p(99)": 91.9
+     },
+     "typo": {
+      "med": 17.9,
+      "p(95)": 48.0,
+      "p(99)": 60.0
+     },
+     "miss": {
+      "med": 13.3,
+      "p(95)": 50.6,
+      "p(99)": 72.3
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 2.0,
+    "worst_p95_ratio": 0.2,
+    "pass": true,
+    "broken": false,
+    "vus": 2,
+    "resources": {
+     "pgeo_db": {
+      "cpu_avg": 5.0,
+      "cpu_p95": 12.2,
+      "mem_max_mb": 297
+     },
+     "pgeo_rest": {
+      "cpu_avg": 0.3,
+      "cpu_p95": 0.5,
+      "mem_max_mb": 11
+     },
+     "_stack": {
+      "cpu_avg": 5.2,
+      "cpu_p95": 12.5
+     }
+    },
+    "health": {
+     "/pgeo_db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pgeo_rest": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 16.3,
+      "p(95)": 59.1,
+      "p(99)": 100.2,
+      "max": 254.8
+     },
+     "search": {
+      "med": 28.1,
+      "p(95)": 80.4,
+      "p(99)": 84.2,
+      "max": 85.2
+     },
+     "structured": {
+      "med": 41.6,
+      "p(95)": 52.4,
+      "p(99)": 53.4,
+      "max": 53.6
+     },
+     "reverse": {
+      "med": 8.0,
+      "p(95)": 15.1,
+      "p(99)": 15.7,
+      "max": 15.9
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 17.6,
+      "p(95)": 67.9,
+      "p(99)": 88.0
+     },
+     "variant": {
+      "med": 19.0,
+      "p(95)": 52.2,
+      "p(99)": 136.4
+     },
+     "miss": {
+      "med": 12.8,
+      "p(95)": 32.8,
+      "p(99)": 40.9
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 4.1,
+    "worst_p95_ratio": 0.24,
+    "pass": true,
+    "broken": false,
+    "vus": 3,
+    "resources": {
+     "pgeo_db": {
+      "cpu_avg": 8.8,
+      "cpu_p95": 18.8,
+      "mem_max_mb": 304
+     },
+     "pgeo_rest": {
+      "cpu_avg": 0.3,
+      "cpu_p95": 0.6,
+      "mem_max_mb": 12
+     },
+     "_stack": {
+      "cpu_avg": 9.1,
+      "cpu_p95": 19.4
+     }
+    },
+    "health": {
+     "/pgeo_db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pgeo_rest": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 15.8,
+      "p(95)": 55.0,
+      "p(99)": 132.6,
+      "max": 176.9
+     },
+     "search": {
+      "med": 53.6,
+      "p(95)": 89.5,
+      "p(99)": 94.9,
+      "max": 96.3
+     },
+     "structured": {
+      "med": 91.4,
+      "p(95)": 91.4,
+      "p(99)": 91.4,
+      "max": 91.4
+     },
+     "reverse": {
+      "med": 12.4,
+      "p(95)": 14.4,
+      "p(99)": 14.5,
+      "max": 14.5
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 16.7,
+      "p(95)": 58.6,
+      "p(99)": 143.3
+     },
+     "typo": {
+      "med": 9.5,
+      "p(95)": 31.1,
+      "p(99)": 48.9
+     },
+     "variant": {
+      "med": 29.1,
+      "p(95)": 115.1,
+      "p(99)": 127.4
+     },
+     "miss": {
+      "med": 47.0,
+      "p(95)": 77.9,
+      "p(99)": 80.6
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 5.0,
+    "worst_p95_ratio": 0.22,
+    "pass": true,
+    "broken": false,
+    "vus": 4,
+    "resources": {
+     "pgeo_db": {
+      "cpu_avg": 9.0,
+      "cpu_p95": 22.9,
+      "mem_max_mb": 295
+     },
+     "pgeo_rest": {
+      "cpu_avg": 0.4,
+      "cpu_p95": 0.6,
+      "mem_max_mb": 12
+     },
+     "_stack": {
+      "cpu_avg": 9.4,
+      "cpu_p95": 23.4
+     }
+    },
+    "health": {
+     "/pgeo_db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pgeo_rest": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 16.7,
+      "p(95)": 53.7,
+      "p(99)": 92.6,
+      "max": 126.4
+     },
+     "search": {
+      "med": 43.8,
+      "p(95)": 90.6,
+      "p(99)": 104.2,
+      "max": 107.8
+     },
+     "structured": {
+      "med": 74.7,
+      "p(95)": 105.7,
+      "p(99)": 108.7,
+      "max": 109.5
+     },
+     "reverse": {
+      "med": 14.5,
+      "p(95)": 18.1,
+      "p(99)": 18.6,
+      "max": 18.7
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 17.9,
+      "p(95)": 61.5,
+      "p(99)": 98.6
+     },
+     "typo": {
+      "med": 18.0,
+      "p(95)": 43.2,
+      "p(99)": 65.0
+     },
+     "variant": {
+      "med": 13.7,
+      "p(95)": 61.1,
+      "p(99)": 84.0
+     },
+     "miss": {
+      "med": 7.1,
+      "p(95)": 34.4,
+      "p(99)": 39.3
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 6.0,
+    "worst_p95_ratio": 0.21,
+    "pass": true,
+    "broken": false,
+    "vus": 6,
+    "resources": {
+     "pgeo_db": {
+      "cpu_avg": 11.2,
+      "cpu_p95": 19.1,
+      "mem_max_mb": 295
+     },
+     "pgeo_rest": {
+      "cpu_avg": 0.5,
+      "cpu_p95": 0.7,
+      "mem_max_mb": 12
+     },
+     "_stack": {
+      "cpu_avg": 11.7,
+      "cpu_p95": 19.6
+     }
+    },
+    "health": {
+     "/pgeo_db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pgeo_rest": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 15.2,
+      "p(95)": 47.0,
+      "p(99)": 84.7,
+      "max": 247.1
+     },
+     "search": {
+      "med": 36.3,
+      "p(95)": 78.6,
+      "p(99)": 86.6,
+      "max": 88.8
+     },
+     "structured": {
+      "med": 94.8,
+      "p(95)": 123.4,
+      "p(99)": 126.8,
+      "max": 127.7
+     },
+     "reverse": {
+      "med": 9.6,
+      "p(95)": 18.4,
+      "p(99)": 19.9,
+      "max": 20.2
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 16.3,
+      "p(95)": 57.0,
+      "p(99)": 99.7
+     },
+     "typo": {
+      "med": 16.7,
+      "p(95)": 41.6,
+      "p(99)": 77.8
+     },
+     "variant": {
+      "med": 13.4,
+      "p(95)": 47.4,
+      "p(99)": 100.6
+     },
+     "miss": {
+      "med": 7.5,
+      "p(95)": 32.7,
+      "p(99)": 57.5
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 9.1,
+    "worst_p95_ratio": 0.19,
+    "pass": true,
+    "broken": false,
+    "vus": 8,
+    "resources": {
+     "pgeo_db": {
+      "cpu_avg": 15.1,
+      "cpu_p95": 27.1,
+      "mem_max_mb": 295
+     },
+     "pgeo_rest": {
+      "cpu_avg": 0.6,
+      "cpu_p95": 0.9,
+      "mem_max_mb": 12
+     },
+     "_stack": {
+      "cpu_avg": 15.7,
+      "cpu_p95": 28.0
+     }
+    },
+    "health": {
+     "/pgeo_db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pgeo_rest": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 18.1,
+      "p(95)": 68.6,
+      "p(99)": 125.0,
+      "max": 240.3
+     },
+     "search": {
+      "med": 60.3,
+      "p(95)": 114.9,
+      "p(99)": 144.8,
+      "max": 153.7
+     },
+     "structured": {
+      "med": 64.0,
+      "p(95)": 172.0,
+      "p(99)": 210.3,
+      "max": 219.8
+     },
+     "reverse": {
+      "med": 7.6,
+      "p(95)": 18.0,
+      "p(99)": 20.1,
+      "max": 20.6
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 18.4,
+      "p(95)": 77.3,
+      "p(99)": 144.8
+     },
+     "typo": {
+      "med": 17.4,
+      "p(95)": 70.4,
+      "p(99)": 158.2
+     },
+     "variant": {
+      "med": 21.6,
+      "p(95)": 69.7,
+      "p(99)": 103.3
+     },
+     "miss": {
+      "med": 7.4,
+      "p(95)": 42.5,
+      "p(99)": 49.5
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 15.0,
+    "worst_p95_ratio": 0.27,
+    "pass": true,
+    "broken": false,
+    "vus": 12,
+    "resources": {
+     "pgeo_db": {
+      "cpu_avg": 25.9,
+      "cpu_p95": 50.1,
+      "mem_max_mb": 297
+     },
+     "pgeo_rest": {
+      "cpu_avg": 0.8,
+      "cpu_p95": 1.3,
+      "mem_max_mb": 12
+     },
+     "_stack": {
+      "cpu_avg": 26.7,
+      "cpu_p95": 51.1
+     }
+    },
+    "health": {
+     "/pgeo_db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pgeo_rest": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 16.9,
+      "p(95)": 80.1,
+      "p(99)": 144.9,
+      "max": 428.3
+     },
+     "search": {
+      "med": 57.0,
+      "p(95)": 114.3,
+      "p(99)": 169.2,
+      "max": 202.9
+     },
+     "structured": {
+      "med": 66.4,
+      "p(95)": 187.1,
+      "p(99)": 264.8,
+      "max": 284.2
+     },
+     "reverse": {
+      "med": 11.2,
+      "p(95)": 26.5,
+      "p(99)": 28.0,
+      "max": 28.4
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 17.7,
+      "p(95)": 91.6,
+      "p(99)": 145.7
+     },
+     "typo": {
+      "med": 18.7,
+      "p(95)": 82.2,
+      "p(99)": 164.2
+     },
+     "variant": {
+      "med": 22.3,
+      "p(95)": 92.3,
+      "p(99)": 150.2
+     },
+     "miss": {
+      "med": 10.0,
+      "p(95)": 63.1,
+      "p(99)": 92.2
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 16.4,
+    "worst_p95_ratio": 0.32,
+    "pass": true,
+    "broken": false,
+    "vus": 16,
+    "resources": {
+     "pgeo_db": {
+      "cpu_avg": 29.3,
+      "cpu_p95": 63.6,
+      "mem_max_mb": 309
+     },
+     "pgeo_rest": {
+      "cpu_avg": 1.0,
+      "cpu_p95": 1.6,
+      "mem_max_mb": 14
+     },
+     "_stack": {
+      "cpu_avg": 30.4,
+      "cpu_p95": 65.2
+     }
+    },
+    "health": {
+     "/pgeo_db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pgeo_rest": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 20.8,
+      "p(95)": 94.4,
+      "p(99)": 167.9,
+      "max": 319.7
+     },
+     "search": {
+      "med": 59.2,
+      "p(95)": 172.3,
+      "p(99)": 207.7,
+      "max": 275.2
+     },
+     "structured": {
+      "med": 96.8,
+      "p(95)": 226.4,
+      "p(99)": 247.0,
+      "max": 252.1
+     },
+     "reverse": {
+      "med": 8.8,
+      "p(95)": 27.8,
+      "p(99)": 28.5,
+      "max": 28.7
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 21.7,
+      "p(95)": 104.6,
+      "p(99)": 178.7
+     },
+     "typo": {
+      "med": 21.2,
+      "p(95)": 83.4,
+      "p(99)": 147.4
+     },
+     "variant": {
+      "med": 24.4,
+      "p(95)": 98.9,
+      "p(99)": 173.1
+     },
+     "miss": {
+      "med": 12.3,
+      "p(95)": 112.9,
+      "p(99)": 174.9
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 28.3,
+    "worst_p95_ratio": 0.38,
+    "pass": true,
+    "broken": false,
+    "vus": 24,
+    "resources": {
+     "pgeo_db": {
+      "cpu_avg": 47.2,
+      "cpu_p95": 70.9,
+      "mem_max_mb": 310
+     },
+     "pgeo_rest": {
+      "cpu_avg": 1.4,
+      "cpu_p95": 2.0,
+      "mem_max_mb": 14
+     },
+     "_stack": {
+      "cpu_avg": 48.5,
+      "cpu_p95": 73.0
+     }
+    },
+    "health": {
+     "/pgeo_db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pgeo_rest": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 33.7,
+      "p(95)": 156.7,
+      "p(99)": 274.4,
+      "max": 559.0
+     },
+     "search": {
+      "med": 92.9,
+      "p(95)": 272.9,
+      "p(99)": 361.2,
+      "max": 479.4
+     },
+     "structured": {
+      "med": 114.5,
+      "p(95)": 245.1,
+      "p(99)": 329.6,
+      "max": 353.2
+     },
+     "reverse": {
+      "med": 10.3,
+      "p(95)": 128.5,
+      "p(99)": 184.3,
+      "max": 190.2
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 35.7,
+      "p(95)": 168.1,
+      "p(99)": 266.0
+     },
+     "typo": {
+      "med": 33.5,
+      "p(95)": 168.1,
+      "p(99)": 338.4
+     },
+     "variant": {
+      "med": 41.1,
+      "p(95)": 214.1,
+      "p(99)": 284.9
+     },
+     "miss": {
+      "med": 21.8,
+      "p(95)": 128.0,
+      "p(99)": 269.6
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 36.4,
+    "worst_p95_ratio": 0.63,
+    "pass": true,
+    "broken": false,
+    "vus": 32,
+    "resources": {
+     "pgeo_db": {
+      "cpu_avg": 63.3,
+      "cpu_p95": 89.0,
+      "mem_max_mb": 315
+     },
+     "pgeo_rest": {
+      "cpu_avg": 1.7,
+      "cpu_p95": 2.2,
+      "mem_max_mb": 15
+     },
+     "_stack": {
+      "cpu_avg": 65.0,
+      "cpu_p95": 91.2
+     }
+    },
+    "health": {
+     "/pgeo_db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pgeo_rest": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 209.8,
+      "p(95)": 709.7,
+      "p(99)": 1223.3,
+      "max": 1576.6
+     },
+     "search": {
+      "med": 261.2,
+      "p(95)": 720.3,
+      "p(99)": 1220.9,
+      "max": 1341.6
+     },
+     "structured": {
+      "med": 288.3,
+      "p(95)": 1339.8,
+      "p(99)": 1360.2,
+      "max": 1366.1
+     },
+     "reverse": {
+      "med": 200.2,
+      "p(95)": 961.4,
+      "p(99)": 1057.5,
+      "max": 1082.1
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 218.9,
+      "p(95)": 730.3,
+      "p(99)": 1223.4
+     },
+     "typo": {
+      "med": 192.7,
+      "p(95)": 655.8,
+      "p(99)": 1210.3
+     },
+     "variant": {
+      "med": 249.3,
+      "p(95)": 772.2,
+      "p(99)": 1146.5
+     },
+     "miss": {
+      "med": 165.0,
+      "p(95)": 670.1,
+      "p(99)": 1276.5
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 41.3,
+    "worst_p95_ratio": 2.84,
+    "pass": false,
+    "broken": false,
+    "vus": 48,
+    "resources": {
+     "pgeo_db": {
+      "cpu_avg": 83.7,
+      "cpu_p95": 94.2,
+      "mem_max_mb": 320
+     },
+     "pgeo_rest": {
+      "cpu_avg": 2.7,
+      "cpu_p95": 3.5,
+      "mem_max_mb": 16
+     },
+     "_stack": {
+      "cpu_avg": 86.5,
+      "cpu_p95": 96.6
+     }
+    },
+    "health": {
+     "/pgeo_db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pgeo_rest": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 564.1,
+      "p(95)": 894.8,
+      "p(99)": 1152.2,
+      "max": 1702.7
+     },
+     "search": {
+      "med": 664.3,
+      "p(95)": 987.6,
+      "p(99)": 1190.2,
+      "max": 1629.2
+     },
+     "structured": {
+      "med": 663.6,
+      "p(95)": 1005.7,
+      "p(99)": 1203.6,
+      "max": 1294.8
+     },
+     "reverse": {
+      "med": 608.1,
+      "p(95)": 866.6,
+      "p(99)": 954.8,
+      "max": 984.0
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 564.8,
+      "p(95)": 911.9,
+      "p(99)": 1215.8
+     },
+     "typo": {
+      "med": 550.7,
+      "p(95)": 863.1,
+      "p(99)": 1018.8
+     },
+     "variant": {
+      "med": 606.7,
+      "p(95)": 889.0,
+      "p(99)": 1097.3
+     },
+     "miss": {
+      "med": 586.5,
+      "p(95)": 906.3,
+      "p(99)": 1079.1
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 40.9,
+    "worst_p95_ratio": 3.58,
+    "pass": false,
+    "broken": false,
+    "vus": 64,
+    "resources": {
+     "pgeo_db": {
+      "cpu_avg": 88.8,
+      "cpu_p95": 93.0,
+      "mem_max_mb": 308
+     },
+     "pgeo_rest": {
+      "cpu_avg": 3.2,
+      "cpu_p95": 3.8,
+      "mem_max_mb": 18
+     },
+     "_stack": {
+      "cpu_avg": 92.0,
+      "cpu_p95": 96.7
+     }
+    },
+    "health": {
+     "/pgeo_db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pgeo_rest": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   },
+   {
+    "endpoints": {
+     "autocomplete": {
+      "med": 1334.0,
+      "p(95)": 2286.9,
+      "p(99)": 3233.8,
+      "max": 3932.6
+     },
+     "search": {
+      "med": 1311.9,
+      "p(95)": 2414.7,
+      "p(99)": 2554.2,
+      "max": 2782.5
+     },
+     "structured": {
+      "med": 1513.4,
+      "p(95)": 2275.7,
+      "p(99)": 2318.0,
+      "max": 2328.6
+     },
+     "reverse": {
+      "med": 1189.7,
+      "p(95)": 2252.1,
+      "p(99)": 2410.4,
+      "max": 2431.1
+     }
+    },
+    "qtypes": {
+     "exact": {
+      "med": 1352.6,
+      "p(95)": 2294.7,
+      "p(99)": 3105.9
+     },
+     "typo": {
+      "med": 1298.5,
+      "p(95)": 2255.3,
+      "p(99)": 3092.5
+     },
+     "variant": {
+      "med": 1243.4,
+      "p(95)": 2229.4,
+      "p(99)": 2964.2
+     },
+     "miss": {
+      "med": 1262.5,
+      "p(95)": 2286.8,
+      "p(99)": 3187.8
+     }
+    },
+    "error_rate": 0,
+    "req_rate": 38.0,
+    "worst_p95_ratio": 9.15,
+    "pass": false,
+    "broken": true,
+    "vus": 96,
+    "resources": {
+     "pgeo_db": {
+      "cpu_avg": 89.6,
+      "cpu_p95": 92.8,
+      "mem_max_mb": 312
+     },
+     "pgeo_rest": {
+      "cpu_avg": 3.4,
+      "cpu_p95": 4.2,
+      "mem_max_mb": 23
+     },
+     "_stack": {
+      "cpu_avg": 93.0,
+      "cpu_p95": 96.5
+     }
+    },
+    "health": {
+     "/pgeo_db": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     },
+     "/pgeo_rest": {
+      "status": "running",
+      "oom": false,
+      "restarts": 0
+     }
+    },
+    "died": false
+   }
+  ]
+ },
+ "limit_users": 32,
+ "breaking_users": 96
+}
