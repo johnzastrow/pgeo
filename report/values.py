@@ -378,6 +378,33 @@ def resource_values(v: dict, t: dict) -> None:
                                      "Disk after build", "Measured"], rows, "lrrrrl")  # fmt: skip
 
 
+def pgeo_datavol_values(v: dict, t: dict) -> None:
+    """pgeo capacity against data volume, beside the Pelias curve for the same subsets."""
+    import json as _json
+
+    dirs = INPUTS["load"].get("pgeo_datasets", [])
+    summary = []
+    for d in dirs:
+        f = ROOT / d / "datavol-pgeo.json"
+        if f.is_file():
+            summary += _json.loads(f.read_text())
+    if not summary:
+        return
+    pel = {r["dataset"]: r for r in F.dataset_runs().values()}
+    rows = []
+    for r in sorted(summary, key=lambda x: x["dataset"]):
+        p = pel.get(r["dataset"])
+        rows.append([r["dataset"], ", ".join(r["sources"]),
+                     f"{r['features']:,}" if r.get("features") else "-",
+                     str(r.get("limit_users")),
+                     str(p["limit_users"]) if p else "-",
+                     f"{p['limit_users'] / r['limit_users']:.1f}x" if p and r.get("limit_users") else "-"])
+        v[f"pgds_{r['dataset']}"] = str(r.get("limit_users"))
+    t["pgeo_datavol"] = md_table(
+        ["Dataset", "Sources", "pgeo features", "pgeo users", "Pelias users", "Pelias / pgeo"],
+        rows, "llrrrr")
+
+
 def equal_memory_values(v: dict, t: dict) -> None:
     """pgeo run at Pelias's memory budget: does the throughput gap come from memory or CPU?"""
     pel = F.pelias_runs()
@@ -462,6 +489,7 @@ def build_all(snap: dict) -> tuple[dict, dict]:
     compat_values(v, t)
     resource_values(v, t)
     equal_memory_values(v, t)
+    pgeo_datavol_values(v, t)
     floor_values(v, t)
     host = snap["host"]
     v["host_cpu"] = host["cpu"]
