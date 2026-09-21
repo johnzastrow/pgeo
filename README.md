@@ -1,4 +1,7 @@
-# pelias_maine
+# pgeo
+
+A geocoder that lives inside PostgreSQL, built and measured against Pelias on open data for the
+State of Maine.
 
 Self-hosted Pelias geocoder for Maine, built from every applicable open data source, plus
 (Phase 10) a PostGIS-native geocoder tuned against it. See [PLAN.md](PLAN.md) for the

@@ -402,7 +402,7 @@ wheels = [
 ]
 
 [[package]]
-name = "pelias-maine-report"
+name = "pgeo-report"
 version = "1.0.0"
 source = { virtual = "." }
 dependencies = [

@@ -1,7 +1,7 @@
 [project]
-name = "pelias-maine-report"
+name = "pgeo-report"
 version = "1.0.0"
-description = "Builds the Pelias Maine / pgeo study report (Markdown + PDF) from saved results"
+description = "Builds the pgeo study report (Markdown, PDF and Word) from saved results"
 requires-python = ">=3.12"
 dependencies = [
     "matplotlib==3.11.2",
