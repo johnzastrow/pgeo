@@ -90,11 +90,11 @@ def simple_globe(cx: float, cy: float, rad: float) -> list[str]:
     lw = rad * 0.16
     return [
         f'<circle cx="{cx:.3f}" cy="{cy:.3f}" r="{rad:.3f}" fill="{BLUE}"/>',
-        f'<path d="M {f(cx - rad, cy)} L {f(cx + rad, cy)}" fill="none" stroke="#ffffff" '
-        f'stroke-width="{lw:.2f}" stroke-linecap="round"/>',
-        f'<path d="M {f(cx, cy - rad)} A {f(band, rad)} 0 0 0 {f(cx, cy + rad)} '
-        f'A {f(band, rad)} 0 0 0 {f(cx, cy - rad)} Z" fill="none" stroke="#ffffff" '
-        f'stroke-width="{lw:.2f}"/>',
+        (f'<path d="M {f(cx - rad, cy)} L {f(cx + rad, cy)}" fill="none" stroke="#ffffff" '
+         f'stroke-width="{lw:.2f}" stroke-linecap="round"/>'),
+        (f'<path d="M {f(cx, cy - rad)} A {f(band, rad)} 0 0 0 {f(cx, cy + rad)} '
+         f'A {f(band, rad)} 0 0 0 {f(cx, cy - rad)} Z" fill="none" stroke="#ffffff" '
+         f'stroke-width="{lw:.2f}"/>'),
     ]
 
 
