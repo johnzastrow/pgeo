@@ -23,6 +23,33 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-09-21
+
+### Added
+- Report Section 3.14, the Photon comparison - the open question Section 1.5.1 flagged as this
+  study's biggest exposure, now measured rather than caveated. Same corpus, session mix, ramp,
+  targets and accuracy cases as the other two engines.
+  - Capacity on two cores: Photon 128 users, against Pelias 192 and pgeo 48. Photon carries 2.7x
+    pgeo but is *less* CPU-efficient than Pelias, so "four times fewer users than Pelias" remains
+    the binding figure for pgeo.
+  - Autocomplete p95 at 48 users: Photon 53 ms, Pelias 21 ms, pgeo 103-189 ms.
+  - Memory: 1.84 GB resident under full load, the lightest engine measured.
+  - Accuracy: 73.7% overall, and 19.1% on venues against pgeo's 94.2%. A Photon index is exported
+    from Nominatim, which imports OpenStreetMap only, so the OpenAddresses E911 points and the
+    Overture places both other engines carry cannot be in it. Photon also returns no confidence
+    score, so it cannot mark an answer it does not believe.
+- `tests/accuracy/run_accuracy_photon.py`: the 1,560-case set against Photon, scored by
+  `run_accuracy.score` so the numbers are comparable. Translates the request only; Photon already
+  answers in GeoJSON with `properties.housenumber`. Maps `layers=address` to Photon's
+  `layer=house`, without which reverse cases fail a housenumber check they were never asked to
+  satisfy.
+- `docs/PHOTON_COMPARISON.md`: how to build the Nominatim database and Photon index, run both
+  measurements, and the four ways the comparison is not like for like.
+
+### Changed
+- Section 1.5.1 no longer says Photon "was not tested"; its caution callout now states what the
+  measurement changed and what it did not. The Section 6 future-work item is marked done.
+
 ## [0.13.0] - 2026-09-21
 
 ### Added

@@ -219,19 +219,27 @@ either extreme. At the top end, Nominatim's planet deployment (roughly a terabyt
 128 GB-class memory) and Photon's prebuilt planet index define what large means. More importantly
 for this study, **Photon exists because Nominatim is weak at type-ahead, and it is optimised for
 autocomplete in tens of milliseconds** -- and autocomplete is precisely the endpoint that limits
-pgeo on every configuration tested ({{ref:figure:endpoint_ramp}}). The comparison that would press
-hardest on pgeo's weakest axis is the one this study does not make.
+pgeo on every configuration tested ({{ref:figure:endpoint_ramp}}). That made Photon the comparison
+most likely to embarrass pgeo, so it was built and measured rather than left as a caveat;
+Section 3.14 reports the result. In summary: Photon is about twice as fast per autocomplete
+request as pgeo and holds 2.7 times as many concurrent users on the same two cores, but it is
+*less* CPU-efficient than Pelias, not more, so the four-times figure below remains the binding
+one. The reason is that Photon's index is OpenSearch, like Pelias's Elasticsearch, rather than
+anything special about type-ahead.
 
-{{callout:caution|Pelias is the right primary comparison and not a sufficient one. The honest
-limitation is that pgeo's binding endpoint is autocomplete, and the specialist at autocomplete is
-Photon, which was not tested. A reader should treat "four times fewer users per CPU than Pelias"
-as the cost against a general-purpose multi-source geocoder, not as pgeo's standing against the
-fastest available type-ahead engine.}}
+{{callout:note|Photon has now been measured (Section 3.14), and it changes the caveat rather than
+removing it. On equal CPU Photon holds fewer concurrent users than Pelias, so "four times fewer
+users per CPU than Pelias" is still the widest honest gap for pgeo. What Photon does show is a
+real per-request advantage at type-ahead, on a fraction of the memory -- and a Maine index that is
+missing most of the data this project cares about, because it can only be built from
+OpenStreetMap.}}
 
-Photon would also change the build comparison rather than just the query one: it distributes a
+Photon also changes the build comparison rather than just the query one: it distributes a
 prebuilt index, so an operator downloads rather than builds, and the 5.5 GB build machine this
 report says pgeo needs (Section 3.5) has no Photon equivalent. That is a different trade from the
-one measured here, and a real one.
+one measured here, and a real one. It comes with a constraint that Section 3.14 quantifies: a
+Photon index is built from a Nominatim database, and Nominatim imports OpenStreetMap, so the
+OpenAddresses E911 points and the Overture places that both other engines carry cannot be in it.
 
 ### 1.6 Other geocoders that live in PostgreSQL
 
@@ -1479,6 +1487,139 @@ job: six images or two, and nobody updates them in the background. Deployment sc
 levels of ambition, and where each control pulls against the fewest-components principle, are in
 `docs/SECURITY_DEPLOYMENT.md`.
 
+### 3.14 Photon, the type-ahead specialist
+
+Section 1.5.1 named the comparison this study was most exposed to: pgeo is limited by autocomplete
+on every configuration, and Photon{{cite:photon}} is the engine built specifically to do
+autocomplete quickly. This section measures it, on the same machine, with the same corpus, the
+same session mix, the same keystroke pattern, the same think times, the same ramp and the same
+latency targets as the other two engines. Only the URL shape differs, because Photon does not
+speak the Pelias API (`tests/load/k6/session_photon.js`).
+
+The result is not the one the caveat anticipated. Photon is faster per request than pgeo at
+type-ahead, as expected -- but it is *less* CPU-efficient than Pelias, so it does not become the
+harsher yardstick for capacity. What it does expose is a data limitation that matters more than
+either.
+
+#### 3.14.1 How Photon was built
+
+A Photon index is not built from source data directly: it is exported from a Nominatim
+database{{cite:nominatim}}. The Maine OpenStreetMap extract was imported into Nominatim 4.5
+(about eight minutes), and Photon's importer then produced its own index in **39 seconds --
+791,593 documents, 203 MB on disk**. That is by far the fastest index build in this report, and
+the comparison is not quite like for like: the eight-minute Nominatim import is a prerequisite,
+and for a planet deployment Photon distributes a prebuilt index that an operator downloads rather
+than builds at all.
+
+The import path is also the constraint. Nominatim imports OpenStreetMap, so a Photon index
+contains OpenStreetMap and nothing else. The OpenAddresses E911 address points (780,260
+documents in Pelias) and the Overture places (76,582) that both other engines carry cannot be in
+it. {{ref:table:photon_accuracy_kind}} shows what that costs.
+
+#### 3.14.2 Capacity
+
+```table photon_capacity
+| Configuration | vCPU | Users within targets | Broke at | Throughput at the limit | Memory under load |
+|---|---|---|---|---|---|
+| Pelias C2 | 2 | 192 | 384 | 209 req/s | 8.4 GB budget |
+| Photon (pinned) | 2 | 128 | 256 | 127 req/s | 1.84 GB resident |
+| pgeo rest-P2 | 2 | 48 | 96 | 53 req/s | 2.5 GB budget |
+| Pelias M0 | all 12 | 192 | 384 | 215 req/s | - |
+| Photon (unpinned) | all 12 | 384 | 512 | 404 req/s | 1.84 GB resident |
+| pgeo rest-PM | all 12 | 128 | 256 | 144 req/s | - |
+```
+
+{{table:photon_capacity|Concurrent users each engine holds inside the latency targets, on two
+cores and unconstrained. Photon sits between the other two on capacity and below both on memory.}}
+
+On two cores Photon holds 128 concurrent users to Pelias's 192 and pgeo's 48. Two things follow.
+Photon carries **2.7 times** as many users as pgeo on the same CPU -- a real gap, and a smaller
+one than the four times pgeo gives up to Pelias. And Photon is **not** the CPU-efficiency leader:
+Pelias holds half again as many users on the same two cores. Unconstrained, Photon reaches 384
+users, which is what Pelias reaches on four cores; Pelias's own unconstrained figure is held down
+to 192 by its single API worker rather than by Elasticsearch.
+
+The memory column is where Photon is unambiguously strong: 1.84 GB resident under full load,
+against the 8.4 GB budget Pelias needs for its 192 users. Per gigabyte, Photon is the most
+efficient engine measured here.
+
+#### 3.14.3 Latency at type-ahead
+
+```table photon_autocomplete
+| Concurrent users | Pelias C2 | Photon (2 cores) | pgeo rest-P2 |
+|---|---|---|---|
+| 48 | 21 ms | 53 ms | 103 / 189 ms |
+| 96 | 36 ms | 92 ms | 1,211 / 1,453 ms |
+| 128 | 43 ms | 228 ms | past its limit |
+| 192 | 174 ms | 770 ms | past its limit |
+```
+
+{{table:photon_autocomplete|Autocomplete p95 on two cores. The 250 ms target is the binding one
+for pgeo. Two figures are given for pgeo where two runs were recorded.}}
+
+At 48 users -- pgeo's ceiling -- Photon answers a keystroke in 53 ms against pgeo's 103 to 189 ms
+and Pelias's 21 ms. So the specialist is about two to three times quicker per keystroke than
+pgeo, and about two and a half times slower than Pelias's dedicated autocomplete endpoint. The
+caveat in Section 1.5.1 was right that pgeo is the slowest of the three at type-ahead and wrong
+that Photon would prove the harshest comparison.
+
+#### 3.14.4 Accuracy, and why the speed is not the whole story
+
+The same 1,560 accuracy cases were run against Photon, scored identically -- same ground truth,
+same 60 to 150 m radius, same housenumber check (`tests/accuracy/run_accuracy_photon.py`).
+
+```table photon_accuracy
+| Endpoint | Cases | Pelias | pgeo | Photon | Photon returns nothing |
+|---|---|---|---|---|---|
+| Search | 1,060 | 66.3% | 94.6% | 71.3% | 19.7% |
+| Autocomplete | 150 | 86.7% | 95.3% | 58.0% | 9.3% |
+| Structured | 150 | 96.7% | 100.0% | 88.7% | 3.3% |
+| Reverse | 200 | 100.0% | 99.5% | 87.0% | 0.5% |
+| **All** | **1,560** | **75.5%** | **95.8%** | **73.7%** | **14.7%** |
+```
+
+{{table:photon_accuracy|Accuracy on the Maine test set. Photon's 58% at autocomplete is the
+endpoint it is built for, which is the clue that the cause is data rather than engine.}}
+
+Photon scores 58% on autocomplete -- the endpoint it exists to serve -- and that number is the
+signal that something other than query quality is being measured. Breaking the same results down
+by what was being searched for makes the cause plain:
+
+```table photon_accuracy_kind
+| What was searched for | Cases | Source of the ground truth | Pelias | pgeo | Photon |
+|---|---|---|---|---|---|
+| Venues | 225 | Overture Maps places | 60.4% | 94.2% | 19.1% |
+| Lakes and summits | 150 | USGS GNIS | 36.7% | 86.7% | 74.0% |
+| Addresses | 550 | OpenAddresses E911 | 87.8% | 97.8% | 83.6% |
+| Reverse addresses | 200 | OpenAddresses E911 | 100.0% | 99.5% | 87.0% |
+| Towns | 225 | Who's On First | 80.9% | 95.6% | 89.3% |
+| ZIP codes | 60 | Census ZCTA | 100.0% | 98.3% | 95.0% |
+| Deliberate misses | 150 | none -- should not match | 41.3% | 94.7% | 69.3% |
+```
+
+{{table:photon_accuracy_kind|Accuracy by feature kind. Photon collapses on venues because
+Overture places cannot enter an OpenStreetMap-only index, not because it ranks them badly.}}
+
+Venues are the collapse: 19.1%, against 94.2% for pgeo. The venue ground truth is Overture Maps
+places, and Photon's index is built from Nominatim, which imports OpenStreetMap only -- those
+businesses and landmarks are simply not in it to be found. The same mechanism, more weakly,
+explains the address and GNIS gaps. This is a statement about what a Photon index *can contain*
+for Maine, not about how well Photon searches what it holds.
+
+The deliberate misses are a different limitation and an architectural one. A miss counts as
+correct when an engine returns nothing or scores its best guess below 0.8 confidence. Photon
+returns no confidence score at all, so it can only ever satisfy the first condition: it has no way
+to tell a client "here is a result, but I do not believe it". For LANCER, where a wrong address
+dispatched confidently is the failure that matters (Section 3.9.1), that is a
+disqualifying property independent of speed.
+
+{{callout:caution|Photon is quick and remarkably light on memory, and on OpenStreetMap data it is
+a capable geocoder. It is not a candidate for this project: its index cannot contain the E911
+address points or the Overture places that Maine dispatch depends on, and it cannot express
+uncertainty. The measurement resolves the open question from Section 1.5.1 -- pgeo's type-ahead
+is two to three times slower per request than the specialist's -- without changing the
+recommendation.}}
+
 ## 4. Discussion
 
 **Why pgeo is more accurate.** The difference is in how text meets data. Elasticsearch matches
@@ -1582,7 +1723,7 @@ estimates are the author's, and the ones marked speculative are the ones to dist
 | **pgeo data-volume curve**: subset builds (D1-D5) as done for Pelias | 1 day | Certain | Answers whether pgeo's advantage survives more data -- the obvious challenge to a one-state result |
 | **New Hampshire**: build both engines for two states | 2-3 days | Medium -- the pipeline is state-agnostic, but ranking is tuned on Maine | The real test of whether "one state, tested" generalises |
 | **Horizontal scale-out**: a read replica behind a load balancer, same ramp | 1 day | High for throughput, none for latency | Shows whether pgeo answers the "but it does not scale" objection with $5 machines (Section 7.5) |
-| **Compare against Photon** on autocomplete | 2-3 days | High -- it is the type-ahead specialist and pgeo's binding endpoint | The missing half of the capacity story (Section 1.5.1). It would either confirm pgeo is competitive at type-ahead or show the gap is larger than 4x on the axis that matters most |
+| ~~Compare against Photon~~ **(done, Section 3.14)** | - | - | Measured: Photon holds 2.7x as many users as pgeo on the same two cores and answers a keystroke in 53 ms against pgeo's 103-189 ms, but holds fewer users than Pelias, so the 4x figure stands. Its index is OpenStreetMap-only and it returns no confidence score |
 | **metaphone fallback** for phonetic misspellings | Half a day | Medium -- it should help at high corruption, and it might help nothing | A few points at fuzz levels F4-F5 (Section 7.1), or a clean negative result |
 | **Category taxonomy**: map source categories onto Pelias's | 1-2 days | High | Closes the last documented API difference, so `categories=food` behaves as a Pelias client expects |
 | **libpostal model update** (Senzing libpostal-data) | 1 day | Low for pgeo, medium for Pelias | pgeo's rule parser already beats current libpostal (95.8% against 94.0%), so this mostly matters to the Pelias arm |
