@@ -19,7 +19,7 @@ in `report/inputs.toml`.
 ## Executive summary
 
 This study built and compared two self-hosted geocoders for the State of Maine on the same
-open data: **Pelias**, the established open-source geocoder (Elasticsearch plus five Node.js and
+open data: **Pelias**{{cite:pelias}}, the established open-source geocoder (Elasticsearch{{cite:elasticsearch}} plus five Node.js and
 C++ services), and **pgeo**, a geocoder written for this project that runs entirely inside
 PostgreSQL 18 with PostGIS, served either by a thin FastAPI application or, with no application
 code at all, by PostgREST ("pure SQL"). Pelias served as the reference and as the test oracle
@@ -160,10 +160,10 @@ three projects that keep their query logic in PostgreSQL, and one that keeps hal
 ```table related_work
 | Project | Where the logic lives | Data | Interface | Notes |
 |---|---|---|---|---|
-| [PostGIS TIGER Geocoder](https://postgis.net/docs/Extras.html) (`postgis_tiger_geocoder`) | entirely PL/pgSQL, plus `address_standardizer` (PAGC) for parsing | US Census TIGER only | SQL functions; no HTTP | The canonical answer. Released independently of PostGIS since [2025.1](https://postgis.net/2026/06/PostGIS-Tiger-Geocoder-2025.1/) (June 2026), needs PostgreSQL 16+. Exact-match oriented; its own documentation notes speed problems in the `address_standardizer` wrapper for batch work |
-| [osmgeocoder](https://github.com/dunkelstern/osmgeocoder) | "primarily as SQL functions", with Python for orchestration | OpenStreetMap (imposm3), optionally OpenAddresses | Python library plus an optional Flask service | The closest relative: same extensions as pgeo (PostGIS, `pg_trgm`, `fuzzystrmatch`). Multi-country address formatting via OpenCage templates. Without libpostal it degrades to "street names only" |
-| [moofish32/postgis-geocoder](https://github.com/moofish32/postgis-geocoder) | none of its own | TIGER | SQL via `psql` | A Docker packaging of the TIGER geocoder; 12 commits, inactive |
-| [Nominatim](https://nominatim.org/release-docs/latest/develop/overview/) | indexing and address computation in PL/pgSQL triggers; **search in a Python application** | OpenStreetMap | HTTP API | Postgres-centric rather than Postgres-only. Version 5 completed the move from PHP to Python. Planet-scale: ~1 TB of disk and 128 GB-class memory; the [2025 roadmap](https://nominatim.org/2025/07/14/roadmap-nominatim6.html) notes search indexes have grown large enough to slow lookups |
+| PostGIS TIGER Geocoder{{cite:postgis_tiger}} (`postgis_tiger_geocoder`) | entirely PL/pgSQL, plus `address_standardizer` (PAGC) for parsing | US Census TIGER only | SQL functions; no HTTP | The canonical answer. Released independently of PostGIS since 2025.1 (June 2026){{cite:postgis_tiger_2025}}, needs PostgreSQL 16+. Exact-match oriented; its own documentation notes speed problems in the `address_standardizer`{{cite:address_standardizer}} wrapper for batch work |
+| osmgeocoder{{cite:osmgeocoder}} | "primarily as SQL functions", with Python for orchestration | OpenStreetMap (imposm3), optionally OpenAddresses | Python library plus an optional Flask service | The closest relative: same extensions as pgeo (PostGIS, `pg_trgm`, `fuzzystrmatch`{{cite:fuzzystrmatch}}). Multi-country address formatting via OpenCage templates. Without libpostal it degrades to "street names only" |
+| moofish32/postgis-geocoder{{cite:postgis_geocoder_docker}} | none of its own | TIGER | SQL via `psql` | A Docker packaging of the TIGER geocoder; 12 commits, inactive |
+| Nominatim{{cite:nominatim}} | indexing and address computation in PL/pgSQL triggers; **search in a Python application** | OpenStreetMap | HTTP API | Postgres-centric rather than Postgres-only. Version 5 completed the move from PHP to Python. Planet-scale: ~1 TB of disk and 128 GB-class memory; the 2025 roadmap{{cite:nominatim_roadmap}} notes search indexes have grown large enough to slow lookups |
 ```
 
 {{table:related_work|Geocoders whose query logic runs inside PostgreSQL, surveyed September 2026.}}
@@ -229,19 +229,19 @@ configurations it tested. Everything used later is defined here so no term arriv
 | **PostGIS** | The PostgreSQL extension that adds geographic types, indexes and functions |
 | **PostgREST** | A gateway that exposes PostgreSQL functions as a REST API, with no application code of its own |
 | **FastAPI** | A Python web framework; pgeo's alternative front end, kept as a baseline |
-| **libpostal** | A statistical address parser (a ~2 GB model) used by Pelias and optionally by pgeo |
+| **libpostal**{{cite:libpostal}} | A statistical address parser (a ~2 GB model) used by Pelias and optionally by pgeo |
 | **Elasticsearch** | The search engine Pelias stores its index in |
-| **k6** | The load-testing tool used throughout: it runs scripted virtual users against an HTTP API and reports latency percentiles and error rates (`tests/load/k6`) |
+| **k6**{{cite:k6}} | The load-testing tool used throughout: it runs scripted virtual users against an HTTP API and reports latency percentiles and error rates (`tests/load/k6`) |
 | **Virtual user (VU)** | One simulated person in a load test, issuing requests with pauses between them, as a person would |
 | **p95** | The 95th-percentile response time: 95 of 100 requests were at least this fast. Used instead of an average because the slow tail is what a user notices |
 | **SLO** | Service level objective: the latency and error targets a configuration must meet to count as passing ({{ref:table:slo}}) |
 | **Ramp** | Increasing the number of virtual users step by step until a target is missed, to find a configuration's capacity |
 | **Breaking point** | The step at which a configuration exceeds five times a target, produces more than 5% errors, or a service dies |
-| **Trigram** | A three-character slice of a word. Comparing the sets of trigrams in two strings measures similarity, which is how pgeo tolerates typos (`pg_trgm`) |
-| **WOF** | Who's On First, the open gazetteer of administrative places used for towns, counties and neighbourhoods |
-| **OA** | OpenAddresses, the open collection of address points |
-| **GNIS** | The USGS Geographic Names Information System: lakes, summits, streams and populated places |
-| **ZCTA** | ZIP Code Tabulation Area, the US Census approximation of a ZIP code as an area |
+| **Trigram** | A three-character slice of a word{{cite:pg_trgm}}. Comparing the sets of trigrams in two strings measures similarity, which is how pgeo tolerates typos (`pg_trgm`) |
+| **WOF** | Who's On First{{cite:whosonfirst}}, the open gazetteer of administrative places used for towns, counties and neighbourhoods |
+| **OA** | OpenAddresses{{cite:openaddresses}}, the open collection of address points |
+| **GNIS** | The USGS Geographic Names Information System{{cite:gnis}}: lakes, summits, streams and populated places |
+| **ZCTA** | ZIP Code Tabulation Area{{cite:census_zcta}}, the US Census approximation of a ZIP code as an area |
 | **gid** | A globally unique identifier for a record in a geocoder's response, for example `whosonfirst:locality:85948877` |
 | **C1, C2, C4, M0** | Names for the Pelias configurations tested: the digit is the vCPU count, M0 is unconstrained ({{ref:table:configs}}) |
 | **Pmin, P1, P2, P4, PM** | The equivalent pgeo configurations: Pmin is the smallest budget tested, PM unconstrained |
@@ -364,7 +364,7 @@ the same command with newer downloads (docs/REBUILD.md).
 The Pelias build (OSM, OpenAddresses, Who's On First, CSV and interpolation importers) takes
 about 9 minutes on the workstation once the inputs are downloaded, and produces a 435 MB index
 plus helper databases. The pgeo
-build (`pgeo-load build`) loads the same inputs with DuckDB, ogr2ogr and COPY, assigns each
+build (`pgeo-load build`) loads the same inputs with DuckDB{{cite:duckdb}}, ogr2ogr{{cite:gdal}} and COPY, assigns each
 point its admin hierarchy by point-in-polygon, deduplicates, indexes, and swaps the new schema
 in atomically; it took {{value:pgeo_build_min}} in the latest run on one core.
 
@@ -625,6 +625,26 @@ tests measured each endpoint separately.}}
 
 ### 3.3 Latency at the 3-user target
 
+This section answers the question the project was commissioned to answer -- is either engine fast
+enough for three people? -- and the answer turns out not to separate them, which is why every
+later section is about load, memory and accuracy instead.
+
+The configurations named in this section and the next are:
+
+- **C1, C2, C4** -- Pelias on one, two and four vCPU; **C1s, C3, C4a** are variants of those with
+  a different memory profile or worker count; **M0** is Pelias unconstrained.
+- **Pmin, P1, P2, P4** -- pgeo on one, one, two and four vCPU with budgets from 1.6 to 3.3 GB;
+  **PM** is pgeo unconstrained.
+- **E1, E2, E4** -- pgeo given the *same memory as Pelias* at each CPU size, for the equal-resources
+  comparison in Section 3.4.
+- Each pgeo configuration is prefixed by its front end: **rest-** is the pure-SQL path through
+  PostgREST, **api-** is FastAPI with the rule parser, and **api-svc-** is FastAPI with the
+  libpostal service. So `api-P4` is FastAPI on four vCPU.
+
+Full details of every configuration are in {{ref:table:configs}}.
+
+{{table:latency3|Median and p95 latency at 3 users (ms).}}
+
 {{figure:latency_3users|p95 latency per endpoint at 3 users for each configuration, against its
 target (dashed). Every configuration of both engines meets every target.}}
 
@@ -632,8 +652,6 @@ target (dashed). Every configuration of both engines meets every target.}}
 target every configuration of both engines, down to the smallest, sits well inside every latency
 target. Nothing in the 3-user scenario forces a choice between the engines; the differences appear
 only under heavier load or in accuracy.
-
-{{table:latency3|Median and p95 latency at 3 users (ms).}}
 
 At 3 users every configuration of both engines meets every target with a wide margin, so the
 3-user goal is not what separates them. Pelias answers in 20-50 ms at the 95th percentile on every
@@ -916,7 +934,7 @@ makes of them.
 
 #### 3.9.1 Structured addresses for LANCER
 
-pgeo's `/v1/address` returns a US address in USPS Publication 28 form (number, directionals,
+pgeo's `/v1/address` returns a US address in USPS Publication 28{{cite:usps_pub28}} form (number, directionals,
 street name, standard suffix, unit, city, state, ZIP; the delivery and last lines) with the
 municipality, county and FIPS codes, for a selected search result, a typed address or a map
 position. When the selected result is not an address (a business or landmark, for example "Just in
@@ -928,7 +946,7 @@ PostgreSQL never logs query parameters.
 
 #### 3.9.2 ZIP+4
 
-The USPS ZIP+4 file would add ZIP+4 codes, USPS street spellings and the USPS preferred
+The USPS ZIP+4 file{{cite:usps_zip4}} would add ZIP+4 codes, USPS street spellings and the USPS preferred
 city per ZIP (for example SOUTH PARIS for 04281, where the open data says PARIS). It costs $120 a
 year for one state ($1,750 for all), and its licence allows "internal corporate or personal use on
 one computer at one location", with no network distribution without a paid amendment (unlimited:
@@ -1449,6 +1467,14 @@ The limit worth noting is that this buys throughput, not latency. Section 3.4 sh
 CPU-bound per request, so replicas multiply the users served without making any single query
 faster. The work to prove it -- one replica, a load balancer, and the same ramp -- is about a day,
 and it is the natural follow-on to the capacity results.
+
+## References
+
+Numbered in order of first citation. Everything external to this project that the report asserts
+is listed here; measurements are the project's own and are reproducible from the repository
+(Appendix A).
+
+{{bibliography}}
 
 ## Appendix A. Reproducing this study
 

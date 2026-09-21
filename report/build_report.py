@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import tomllib
 import shutil
 import subprocess
 import sys
@@ -80,7 +81,8 @@ def main() -> int:
     if "<!-- PENDING" in template and not a.draft:
         print("report: template still has PENDING markers (use --draft to build anyway)", file=sys.stderr)
         return 1
-    r = Renderer(vals, tabs, figs, fig_dir_rel=FIG_PUBLISH.name, target="md")
+    refs = tomllib.loads((HERE / "references.toml").read_text())
+    r = Renderer(vals, tabs, figs, fig_dir_rel=FIG_PUBLISH.name, target="md", references=refs)
     md = r.render(template)
     if r.missing:
         # a draft may reference results that a running experiment has not produced yet
@@ -96,7 +98,7 @@ def main() -> int:
         print("report: pdf")
         # The PDF takes its title block from pdf/metadata.yaml: drop the Markdown's own title lines
         pdf_md = BUILD / "report_pdf.md"
-        rp = Renderer(vals, tabs, figs, fig_dir_rel=FIG_PUBLISH.name, target="pdf")
+        rp = Renderer(vals, tabs, figs, fig_dir_rel=FIG_PUBLISH.name, target="pdf", references=refs)
         pdf_text = rp.render(template)
         # The PDF and the Word document take their title block and contents from
         # pdf/metadata.yaml and pandoc's --toc, so drop the Markdown's own front matter.

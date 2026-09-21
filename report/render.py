@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 VALUE = re.compile(r"\{\{value:([A-Za-z0-9_]+)\}\}")
 # The argument may itself contain a token (a {{ref:...}} inside a callout or caption), so it
 # is matched as "text or a nested token", not as anything up to the first "}}".
-TOKEN = re.compile(r"\{\{(value|table|figure|ref|callout):([A-Za-z0-9_:]+)"
+TOKEN = re.compile(r"\{\{(value|table|figure|ref|callout|cite):([A-Za-z0-9_:]+)"
                    r"(?:\|((?:[^{}]|\{\{[^{}]*\}\})*?))?\}\}", re.S)
 # Callouts: coloured boxes in the PDF, block quotes in the Markdown.
 CALLOUT = {"key": ("Key result", "keybox"), "impact": ("What this means", "impactbox"),
@@ -43,12 +43,14 @@ def tex_text(s: str) -> str:
 
 class Renderer:
     def __init__(self, values: dict, tables: dict, figures: dict[str, str | None], fig_dir_rel: str,
-                 target: str = "md"):
+                 target: str = "md", references: dict[str, str] | None = None):
         self.values = values
         self.tables = tables
         self.figures = figures
         self.fig_dir_rel = fig_dir_rel
         self.target = target  # "md": block quotes; "pdf": coloured LaTeX boxes
+        self.references = references or {}
+        self.cited: list[str] = []          # citation keys, in order of first appearance
         self.numbers: dict[str, int] = {}
         self.counts = {"table": 0, "figure": 0}
         self.missing: list[str] = []
@@ -84,6 +86,16 @@ class Renderer:
             if self.target == "pdf":
                 return f"\n\\begin{{{env}}}\n{tex_text(caption)}\n\\end{{{env}}}\n"
             return f"\n> **{label}.** {caption}\n"
+        if kind == "cite":
+            nums = []
+            for k in [x for x in name.split(":") if x]:
+                if k not in self.references:
+                    self.missing.append(f"cite:{k}")
+                    continue
+                if k not in self.cited:
+                    self.cited.append(k)
+                nums.append(str(self.cited.index(k) + 1))
+            return f"[{', '.join(nums)}]" if nums else "[?]"
         if kind == "value":
             if name not in self.values:
                 self.missing.append(f"value:{name}")
@@ -95,6 +107,12 @@ class Renderer:
             if body is None:
                 self.missing.append(f"table:{name}")
                 body = "_(table not available)_"
+            else:
+                # A static ```table``` block is lifted out of the template before the token pass
+                # and inserted here, so its own {{value}} and {{cite}} tokens have not been seen
+                # yet. Resolve them now; {{ref}} still waits for the numbering pass.
+                body = VALUE.sub(lambda mm: self._value(mm.group(1)), body)
+                body = TOKEN.sub(lambda mm: self._sub(mm) if mm.group(1) == "cite" else mm.group(0), body)
             # enough for the caption, the header row and two rows: a table that starts lower
             # than this gets pushed, rather than printing its header twice at the break
             head = "\\needspace{11\\baselineskip}\n\n" if self.target == "pdf" else ""
@@ -136,6 +154,9 @@ class Renderer:
             return f"{kind.capitalize()} {self.numbers[key]}"
 
         out = TOKEN.sub(lambda m: ref(m) if m.group(1) == "ref" else m.group(0), first)
+        if "{{bibliography}}" in out:
+            items = [f"{i + 1}. {self.references[k]}" for i, k in enumerate(self.cited)]
+            out = out.replace("{{bibliography}}", "\n".join(items) or "_(nothing cited)_")
         if "{{toc}}" in out:
             out = out.replace("{{toc}}", self._toc(out) if self.target == "md" else "\\tableofcontents")
         # "Table Table 3": the template wrote the word before a reference that already includes it
