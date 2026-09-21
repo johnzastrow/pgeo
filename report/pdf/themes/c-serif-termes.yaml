@@ -1,0 +1,17 @@
+lang: en-US
+documentclass: article
+papersize: letter
+geometry: "margin=2.4cm"
+colorlinks: true
+linkcolor: "black"
+urlcolor: "blue"
+toc-title: "Contents"
+title: "pgeo: a geocoder inside PostgreSQL"
+subtitle: "Theme sample -- TeX Gyre Termes 10.5pt, a Times-like journal look"
+author: "John Zastrow"
+fontsize: 10pt
+mainfont: "TeX Gyre Termes"
+sansfont: "TeX Gyre Heros"
+monofont: "DejaVu Sans Mono"
+monofontoptions: "Scale=0.80"
+linestretch: 1.15

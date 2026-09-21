@@ -1,0 +1,17 @@
+lang: en-US
+documentclass: article
+papersize: letter
+geometry: "margin=1.8cm"
+colorlinks: true
+linkcolor: "black"
+urlcolor: "blue"
+toc-title: "Contents"
+title: "pgeo: a geocoder inside PostgreSQL"
+subtitle: "Theme sample -- Noto Sans 9pt, tighter leading and margins - more on a page"
+author: "John Zastrow"
+fontsize: 9pt
+mainfont: "Noto Sans"
+sansfont: "Noto Sans"
+monofont: "DejaVu Sans Mono"
+monofontoptions: "Scale=0.85"
+linestretch: 1.05

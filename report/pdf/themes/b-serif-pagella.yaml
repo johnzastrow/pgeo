@@ -1,0 +1,17 @@
+lang: en-US
+documentclass: article
+papersize: letter
+geometry: "margin=2.2cm"
+colorlinks: true
+linkcolor: "black"
+urlcolor: "blue"
+toc-title: "Contents"
+title: "pgeo: a geocoder inside PostgreSQL"
+subtitle: "Theme sample -- TeX Gyre Pagella 10pt, sans headings"
+author: "John Zastrow"
+fontsize: 10pt
+mainfont: "TeX Gyre Pagella"
+sansfont: "TeX Gyre Heros"
+monofont: "DejaVu Sans Mono"
+monofontoptions: "Scale=0.82"
+linestretch: 1.10
