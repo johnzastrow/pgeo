@@ -100,6 +100,12 @@ in logs. Second, a guiding principle (G6) asked for **the stack with the fewest 
 components, keeping data in PostgreSQL, unless that produces an inferior or overly complex
 product**. That principle motivated building pgeo alongside Pelias and measuring both.
 
+**The name.** *pgeo* is `pg`, the conventional prefix for PostgreSQL's own tools and extensions
+(`psql`, `pg_dump`, `pg_trgm`), joined to *geo* for geocoding: a geocoder that is PostgreSQL. It
+is pronounced "pee-geo". The name is this project's own and carries no affiliation with the
+PostgreSQL project; it is close enough to `pgeocode`, an unrelated Python library for postal-code
+lookups, to be worth stating that they share nothing but a few letters.
+
 ### 1.2 Starting conditions
 
 Everything below was already in place before the work began. It matters because it bounds the result: the numbers in Section 3 come from this hardware, and a reader on different hardware should expect different absolutes and the same ordering.
@@ -166,27 +172,28 @@ three projects that keep their query logic in PostgreSQL, and one that keeps hal
 |---|---|---|---|---|
 | PostGIS TIGER Geocoder{{cite:postgis_tiger}} (`postgis_tiger_geocoder`) | entirely PL/pgSQL, plus `address_standardizer` (PAGC) for parsing | US Census TIGER only | SQL functions; no HTTP | The canonical answer. Released independently of PostGIS since 2025.1 (June 2026){{cite:postgis_tiger_2025}}, needs PostgreSQL 16+. Exact-match oriented; its own documentation notes speed problems in the `address_standardizer`{{cite:address_standardizer}} wrapper for batch work |
 | osmgeocoder{{cite:osmgeocoder}} | "primarily as SQL functions", with Python for orchestration | OpenStreetMap (imposm3), optionally OpenAddresses | Python library plus an optional Flask service | The closest relative: same extensions as pgeo (PostGIS, `pg_trgm`, `fuzzystrmatch`{{cite:fuzzystrmatch}}). Multi-country address formatting via OpenCage templates. Without libpostal it degrades to "street names only" |
-| moofish32/postgis-geocoder{{cite:postgis_geocoder_docker}} | none of its own | TIGER | SQL via `psql` | A Docker packaging of the TIGER geocoder; 12 commits, inactive |
+| pgGeocoder{{cite:pggeocoder_jp}} | entirely PostgreSQL functions | Japanese government address datasets (ISJ, KSJ) | SQL only: `geocoder('...')` and `reverse_geocoder(lon, lat)` | The closest architectural sibling found: all logic in the database, forward and reverse, PostGIS only. Japan-only, and no HTTP layer |
+| TIGER packagings{{cite:postgis_geocoder_docker:postgis_geocoder_py}} | none of their own | TIGER | `psql`; one adds a Python API and Docker | Two of them, both wrapping the PostGIS TIGER geocoder rather than adding matching; both quiet since 2022 |
 | Nominatim{{cite:nominatim}} | indexing and address computation in PL/pgSQL triggers; **search in a Python application** | OpenStreetMap | HTTP API | Postgres-centric rather than Postgres-only. Version 5 completed the move from PHP to Python. Planet-scale: ~1 TB of disk and 128 GB-class memory; the 2025 roadmap{{cite:nominatim_roadmap}} notes search indexes have grown large enough to slow lookups |
 ```
 
 {{table:related_work|Geocoders whose query logic runs inside PostgreSQL, surveyed September 2026.}}
 
 ```table related_features
-| Feature | TIGER geocoder | osmgeocoder | Nominatim | pgeo |
-|---|---|---|---|---|
-| Forward search | yes | yes | yes | yes |
-| Reverse geocoding | yes | yes | yes | yes |
-| Autocomplete / type-ahead | no | yes (predictive text) | no (not its strength) | yes |
-| Structured search fields | yes | yes | yes | yes |
-| Typo tolerance | no (exact match) | yes (trigram, metaphone) | limited | yes (trigram + abbreviation expansion) |
-| Data sources | US Census TIGER only | OSM, optionally OpenAddresses | OSM | OA, OSM, WOF, GNIS, ZCTA, Overture |
-| HTTP API | none (SQL only) | Flask service | yes | yes |
-| Runs with no application code | n/a (no HTTP) | no | no | yes (PostgREST) |
-| Speaks another geocoder's API | no | no | its own | yes (Pelias, 28/28) |
-| Structured postal addresses out | partial (normalizer) | formatting templates | no | yes (USPS Publication 28) |
-| Coverage | United States | many countries | planet | one state, tested |
-| External model needed | no | libpostal recommended | no | no (rule parser) |
+| Feature | TIGER geocoder | pgGeocoder | osmgeocoder | Nominatim | pgeo |
+|---|---|---|---|---|---|
+| Forward search | yes | yes | yes | yes | yes |
+| Reverse geocoding | yes | yes | yes | yes | yes |
+| Autocomplete / type-ahead | no | no | yes (predictive text) | no (not its strength) | yes |
+| Structured search fields | yes | yes | yes | yes | yes |
+| Typo tolerance | no (exact match) | no (exact match) | yes (trigram, metaphone) | limited | yes (trigram + abbreviation expansion) |
+| Data sources | US Census TIGER only | Japanese government datasets | OSM, optionally OpenAddresses | OSM | OA, OSM, WOF, GNIS, ZCTA, Overture |
+| HTTP API | none (SQL only) | none (SQL only) | Flask service | yes | yes |
+| Runs with no application code | n/a (no HTTP) | n/a (no HTTP) | no | no | yes (PostgREST) |
+| Speaks another geocoder's API | no | no | no | its own | yes (Pelias, 28/28) |
+| Structured postal addresses out | partial (normalizer) | Japanese address parts | formatting templates | no | yes (USPS Publication 28) |
+| Coverage | United States | Japan | many countries | planet | one state, tested |
+| External model needed | no | no | libpostal recommended | no | no (rule parser) |
 ```
 
 {{table:related_features|The same feature comparison as {{ref:table:features}}, extended to the
@@ -202,12 +209,18 @@ covers many countries where pgeo covers one state, and is the older and more gen
 Against Nominatim, the difference is architectural: Nominatim computes addresses in the database
 but searches from a Python application, where pgeo's search *is* the database.
 
-The combination this project could not find anywhere: **a geocoder whose entire query path is SQL,
-exposed over HTTP with no application code at all** (PostgREST in front of SQL functions), and
-**speaking an existing geocoder's API** so that clients need no changes. That is a narrow claim
-from a handful of searches rather than an exhaustive review, and the honest reading is that the
-pieces are all well known -- trigram matching, PL/pgSQL, PostgREST -- and that assembling them
-this way is uncommon rather than novel.
+pgeo is therefore not the first geocoder whose query path is entirely SQL: the TIGER geocoder and
+pgGeocoder both are, and pgGeocoder in particular does forward and reverse geocoding from
+PostgreSQL functions with nothing else running. What none of them has is an **HTTP interface with
+no application code** -- both are SQL-only, so a client needs a database connection rather than a
+URL -- or an API another geocoder's clients already speak. That is the narrower claim this project
+can make, and it is narrow: the pieces are all well known -- trigram matching, PL/pgSQL, PostgREST
+-- and assembling them this way is uncommon rather than novel.
+
+One nearby category is worth distinguishing, because it is easy to confuse. A foreign data wrapper
+such as OpenCage's{{cite:opencage_fdw}} also lets you geocode "from SQL", but by calling a remote
+service: the query leaves the building and the privacy argument in Section 1.1 disappears. Nothing
+in this survey treats that as self-hosted geocoding.
 
 {{callout:impact|The interesting comparison is not pgeo against Pelias but pgeo against the
 alternative inside PostgreSQL. The TIGER geocoder is exact-match and US-Census-only; osmgeocoder
@@ -228,7 +241,7 @@ configurations it tested. Everything used later is defined here so no term arriv
 | **Reverse geocoding** | Turning coordinates into the nearest address or place |
 | **Autocomplete** | Type-ahead search: results after every keystroke, against a much tighter latency budget |
 | **Structured search** | A search whose parts arrive in separate fields (address, locality, region, postal code) rather than one string |
-| **pgeo** | The geocoder built for this project: PostgreSQL and PostGIS, with the query logic in SQL |
+| **pgeo** | The geocoder built for this project: PostgreSQL and PostGIS, with the query logic in SQL. From `pg` (PostgreSQL's conventional prefix) and *geo*; said "pee-geo" |
 | **Pelias** | The established open-source geocoder used here as the reference and the test oracle: an API service, Elasticsearch and four helper services |
 | **PostGIS** | The PostgreSQL extension that adds geographic types, indexes and functions |
 | **PostgREST** | A gateway that exposes PostgreSQL functions as a REST API, with no application code of its own |

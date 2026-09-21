@@ -19,6 +19,10 @@ Search, autocomplete and reverse geocoding for the State of Maine<br>
 PostgreSQL 18 · PostGIS · core and contrib extensions only
 </div>
 
+<div class="opacity-50 mt-6 text-sm">
+<code>pg</code> + <em>geo</em> — said "pee-geo"
+</div>
+
 <div class="abs-bl m-6 text-sm opacity-60">
 Measured against Pelias on the same data · full study in <code>docs/REPORT.md</code>
 </div>

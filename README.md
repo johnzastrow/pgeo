@@ -3,6 +3,9 @@
 A geocoder that lives inside PostgreSQL, built and measured against Pelias on open data for the
 State of Maine.
 
+The name is `pg` (PostgreSQL's usual prefix, as in `psql` and `pg_dump`) plus *geo*, said
+"pee-geo". It is unrelated to `pgeocode`, a Python postal-code library.
+
 Self-hosted Pelias geocoder for Maine, built from every applicable open data source, plus
 (Phase 10) a PostGIS-native geocoder tuned against it. See [PLAN.md](PLAN.md) for the
 full plan, decisions, and security baseline, and

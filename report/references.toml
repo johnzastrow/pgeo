@@ -52,3 +52,6 @@ oracle_free = "Oracle Cloud Always Free resources, checked 2026-09-19. https://d
 odbl = "Open Database License (ODbL) v1.0. Open Data Commons. https://opendatacommons.org/licenses/odbl/1-0/"
 cc_by = "Creative Commons Attribution 4.0 International (CC BY 4.0). https://creativecommons.org/licenses/by/4.0/"
 cdla_permissive = "Community Data License Agreement - Permissive, Version 2.0. https://cdla.dev/permissive-2-0/"
+pggeocoder_jp = "pgGeocoder: a Japanese geocoder implemented entirely in PostgreSQL functions. https://github.com/mbasa/pgGeocoder"
+postgis_geocoder_py = "MattTriano/postgis_geocoder: a Docker and Python packaging of the PostGIS TIGER geocoder. https://github.com/MattTriano/postgis_geocoder"
+opencage_fdw = "OpenCage geocoding foreign data wrapper for PostgreSQL (calls a remote API from SQL). https://blog.opencagedata.com/post/geocoding-in-postgresql"
