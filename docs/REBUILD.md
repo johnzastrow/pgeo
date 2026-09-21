@@ -156,6 +156,15 @@ Inputs are listed in `report/inputs.toml`; point it at new load-test run ids aft
 | `python3 tests/build/measure_build.py --engine <e> -- <build command>` | build time, CPU, memory, disk | 15-30 min | `data/buildstats/` |
 | `uv run --project pgeo python tests/accuracy/run_accuracy.py ...` | accuracy (1,560 cases) or fuzz (1,800 cases) | 3-5 min | `data/accuracy/` |
 
+**After any load-test run, restart the engines it stopped.** `run_matrix_pgeo.py` and
+`run_datavol_pgeo.py` bring up only the front end under test, so the other one is left down and
+the compatibility contract will report every case against it as a failure:
+
+```bash
+docker compose --env-file pgeo/pgeo.secrets --env-file pgeo/tuning/active.vars \
+  -f pgeo/compose.yml up -d db api rest
+```
+
 Method, targets and caching: [LOAD_TEST_PLAN.md](LOAD_TEST_PLAN.md) and
 [TESTING_GUIDE.md](TESTING_GUIDE.md). Load tests pin the engine and the load generator to separate
 physical cores; do not run other heavy work on the same machine meanwhile.
