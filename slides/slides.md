@@ -476,6 +476,12 @@ results — is in the repository.
 
 </div>
 
-<div class="mt-10 opacity-60 text-sm">
+<div class="mt-8 text-sm opacity-80">
+Measured against <strong>Pelias</strong>, built at Mapzen from 2013 and maintained since 2018 by
+Geocode Earth under the MIT licence. It supplied the API pgeo implements and the reference answers
+that defined "correct". Where pgeo comes out ahead, it is ahead on a problem Pelias defined.
+</div>
+
+<div class="mt-6 opacity-60 text-sm">
 Built on open data: OpenStreetMap (ODbL) · OpenAddresses · Who's On First · USGS GNIS · US Census · Overture Maps
 </div>

@@ -161,7 +161,42 @@ Two rows carry most of the argument in this report. **Components** is why pgeo f
 Pelias cannot use, and **typo tolerance** is why it answers questions Pelias does not. Everything
 in Section 3 is an attempt to put numbers on those two lines.
 
-### 1.5 Other geocoders that live in PostgreSQL
+### 1.5 Pelias, and what this project owes it
+
+pgeo exists because Pelias existed first. Every measurement in this report is made against it,
+the API pgeo implements is its API, and the test oracle that decided what a correct answer looks
+like was Pelias itself. That debt deserves stating properly rather than in a footnote.
+
+Pelias{{cite:pelias}} began at Mapzen in 2013-2014 as an open-source geocoder built on
+Elasticsearch, and was released as the hosted Mapzen Search in 2015. When Mapzen shut down in
+January 2018{{cite:mapzen_shutdown}}, the hosted services went with it -- but the code did not:
+members of the same team founded Geocode Earth that month and have maintained the project
+since{{cite:geocode_earth:geocode_earth_history}}. It remains actively developed in 2026, under
+the MIT licence{{cite:pelias_license}}, with a community of business and individual contributors.
+
+Three of its design decisions shaped this project directly:
+
+- **Modularity.** Pelias is five services around Elasticsearch -- API, placeholder, point-in-polygon,
+  libpostal and interpolation -- explicitly so that "you don't need to be an expert in everything
+  to make changes". That is the architecture this report measures the cost of, and the cost is
+  real; but the same decomposition is why a reader can understand what each part does, and why
+  Section 3.12 can say exactly which service sets the memory floor.
+- **A documented, stable HTTP API.** Pelias published an API worth copying: coherent, GeoJSON,
+  with a `geocoding` block that carries query, engine and errors. pgeo did not design an interface;
+  it implemented this one, which is why an existing client can be repointed without changes.
+- **Open data as a first-class input.** Pelias's importers for OpenAddresses, OpenStreetMap, Who's
+  On First and CSV are what make a multi-source geocoder tractable at all. pgeo reads the same
+  sources, and in two cases reads them *through* Pelias's own tooling: the interpolation database
+  and the OpenAddresses conversion.
+
+Where this report finds pgeo ahead -- accuracy on messy input, memory footprint, component count
+-- it is ahead on a problem Pelias defined, measured with a test set whose correct answers were
+agreed by running Pelias. Where Pelias is ahead, on throughput per CPU and on coverage beyond one
+state, it is ahead by design decisions that this project chose not to make rather than failed to
+match. A fair summary is that pgeo is a specialisation: it trades the generality Pelias was built
+for against a much smaller machine, for one state, for a handful of users.
+
+### 1.6 Other geocoders that live in PostgreSQL
 
 pgeo is not the first attempt to put geocoding inside the database, and the question of whether it
 was worth building depends on what already exists. A survey of the field in September 2026 found
@@ -229,7 +264,7 @@ tolerance, several open data sources and a Pelias-shaped API without an applicat
 far as this survey found, no off-the-shelf option -- which is the gap this project fills, for one
 state.}}
 
-### 1.6 Terms and acronyms
+### 1.7 Terms and acronyms
 
 Geocoding borrows vocabulary from several fields, and this report adds names of its own for the
 configurations it tested. Everything used later is defined here so no term arrives unexplained.
@@ -1582,6 +1617,19 @@ The limit worth noting is that this buys throughput, not latency. Section 3.4 sh
 CPU-bound per request, so replicas multiply the users served without making any single query
 faster. The work to prove it -- one replica, a load balancer, and the same ramp -- is about a day,
 and it is the natural follow-on to the capacity results.
+
+## Acknowledgements
+
+This study measures pgeo against **Pelias**, and would not exist without it. Pelias was built at
+Mapzen from 2013 and has been maintained since January 2018 by Geocode Earth, under the MIT
+licence, with a community of contributors. It supplied the API pgeo implements, the tooling that
+prepares two of the data sources, and the reference answers that decided what "correct" means in
+Section 3.1. Where this report shows pgeo ahead, it is ahead on a problem Pelias defined
+(Section 1.5).
+
+The open data this work depends on is maintained by the OpenStreetMap contributors, the
+OpenAddresses project, Who's On First, the USGS, the US Census Bureau and the Overture Maps
+Foundation. Each carries its own licence; see NOTICE in the repository.
 
 ## References
 

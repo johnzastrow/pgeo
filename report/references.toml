@@ -55,3 +55,7 @@ cdla_permissive = "Community Data License Agreement - Permissive, Version 2.0. h
 pggeocoder_jp = "pgGeocoder: a Japanese geocoder implemented entirely in PostgreSQL functions. https://github.com/mbasa/pgGeocoder"
 postgis_geocoder_py = "MattTriano/postgis_geocoder: a Docker and Python packaging of the PostGIS TIGER geocoder. https://github.com/MattTriano/postgis_geocoder"
 opencage_fdw = "OpenCage geocoding foreign data wrapper for PostgreSQL (calls a remote API from SQL). https://blog.opencagedata.com/post/geocoding-in-postgresql"
+pelias_license = "Pelias is released under the MIT License. https://github.com/pelias/pelias/blob/master/LICENSE"
+mapzen_shutdown = "Pelias open-source project update, 2 January 2018 (the Mapzen shutdown announcement). https://pelias.io/announcements/2018-01-02-pelias-update/"
+geocode_earth = "Geocode Earth: the company founded in January 2018 by former Mapzen staff, which maintains Pelias. https://geocode.earth/opensource/"
+geocode_earth_history = "A trip down memory lane, Geocode Earth, 2020. https://geocode.earth/blog/2020/memory-lane/"
