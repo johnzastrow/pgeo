@@ -23,6 +23,26 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-09-21
+
+### Added
+- The report now *concludes* from the Photon and Nominatim measurements rather than only
+  reporting them. Sections 3.14 and 3.15 had the results, but the executive summary, discussion
+  and conclusions did not mention either engine, so a reader of the summary would not have known
+  two more engines were measured at all.
+  - Executive summary: a paragraph giving the four-engine capacity ladder (Pelias 192, Photon
+    128, Nominatim 64, pgeo 48 on two cores) and saying plainly that the accuracy gap against the
+    OpenStreetMap engines is mostly data rather than engine. The opening sentence no longer says
+    the study compared two geocoders.
+  - Discussion: what the other two engines say about the SQL question - against Nominatim, which
+    differs from pgeo only in that its search runs in Python rather than SQL, the cost is a third
+    rather than four times, which locates the expense: most of the gap to Pelias is the inverted
+    index, not the SQL. Plus why the accuracy column flatters pgeo against OSM-only engines.
+  - Conclusions: two rows in the recommendations table (when Photon or Nominatim is the right
+    tool), and a sentence putting the four-times figure in proportion.
+- A publication version and date on the report's cover page, driven from `VERSION` and the clock
+  so it cannot go stale, and passed to both the PDF and the Word output.
+
 ## [0.15.0] - 2026-09-21
 
 ### Added

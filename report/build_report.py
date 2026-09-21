@@ -77,6 +77,10 @@ def main() -> int:
         "load_runs": ", ".join(Path(d).name for k in ("pelias", "pelias_datasets", "pgeo") for d in values.INPUTS["load"][k]),
         "snapshot_date": snap.get("pgeo", {}).get("captured", "-")[:10],
     }
+    # The cover's version and date line. Driven from VERSION and the clock so it cannot go stale,
+    # and passed to pandoc as the document date, which is where the title block expects it.
+    cover_date = (f"Version {vals['project_version']}"
+                  f" \u00b7 {datetime.now().strftime('%-d %B %Y')}")  # fmt: skip
 
     print("report: markdown")
     template = (HERE / "template.md").read_text()
@@ -131,6 +135,7 @@ def main() -> int:
             "pandoc", str(pdf_md), "-o", str(tex),
             "--from", PDF_FORMAT,
             "--metadata-file", str(HERE / "pdf" / "metadata.yaml"),
+            "--metadata", f"date={cover_date}",
             "--include-in-header", str(HERE / "pdf" / "header.tex"),
             "--lua-filter", str(HERE / "pdf" / "breakcode.lua"),
             "--toc", "--toc-depth", "2", "--standalone",
@@ -163,6 +168,7 @@ def main() -> int:
             "--from", "markdown+pipe_tables",
             "--resource-path", str(DOCS),
             "--metadata-file", str(HERE / "pdf" / "metadata.yaml"),
+            "--metadata", f"date={cover_date}",
             "--toc", "--toc-depth=2",
         ]  # fmt: skip
         ref = HERE / "pdf" / "reference.docx"

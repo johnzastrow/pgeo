@@ -23,7 +23,9 @@ open data: **Pelias**{{cite:pelias}}, the established open-source geocoder (Elas
 C++ services), and **pgeo**, a geocoder written for this project that runs entirely inside
 PostgreSQL 18 with PostGIS, served either by a thin FastAPI application or, with no application
 code at all, by PostgREST ("pure SQL"). Pelias served as the reference and as the test oracle
-for pgeo's API.
+for pgeo's API. Two further engines -- **Photon**{{cite:photon}} and
+**Nominatim**{{cite:nominatim}} -- were built and measured afterwards on the same bench, to test
+whether Pelias was a hard enough comparison (Sections 3.14 and 3.15).
 
 **Accuracy.** On {{value:n_cases}} engine-independent test cases whose answers come from the
 source data, pgeo answers **{{value:acc_pgeo_sql}}** correctly against **{{value:acc_pelias}}**
@@ -48,6 +50,20 @@ meeting its targets (Section 3.12) put pgeo's floor at **{{value:floor_pgeo_vcpu
 {{value:floor_pgeo_gb}}** of memory and Pelias's at **{{value:floor_pelias_vcpu}} vCPU and
 {{value:floor_pelias_gb}}**. Both idle below a quarter of a core, so at this scale the bill is set
 by memory: pgeo fits the cheapest shared-CPU plans providers sell, Pelias needs a mid-range server.
+
+**Two more engines, and what they change.** Pelias is a fair reference but not a sufficient one:
+pgeo is limited by autocomplete, and the specialist at autocomplete is Photon. Both it and
+Nominatim were therefore built and measured the same way. On two cores Pelias holds 192
+concurrent users, **Photon 128, Nominatim 64 and pgeo 48** -- so the cost of putting the whole
+query path in SQL is four times against Pelias, 2.7 times against Photon, and **1.33 times
+against Nominatim**, the engine closest to pgeo's own architecture. Photon did not turn out to be
+the harsher yardstick: it is quicker per keystroke than pgeo and the lightest engine measured
+(1.84 GB), but less CPU-efficient than Pelias. On accuracy the two score 73.7% and 61.7% against
+pgeo's {{value:acc_pgeo_sql}}, and that gap is mostly data rather than engine -- both index
+OpenStreetMap alone and so cannot hold the E911 address points and Overture places the test set
+is built from. Two differences are architectural rather than editorial: Nominatim has no
+autocomplete endpoint (8.0% correct, three-quarters of prefixes returning nothing), and neither
+engine returns a confidence score, so neither can mark an answer it does not believe.
 
 **Compatibility and extensions.** pgeo passes all {{value:compat_cases}} cases of a Pelias API
 compatibility contract on both front ends, so existing Pelias clients work unchanged, and adds
@@ -1799,6 +1815,33 @@ paid; (2) coverage beyond one or two states, for which Pelias is designed and pg
 maintained upstream project matters more than accuracy, since pgeo is this project's own code. For
 the deployment studied here (Maine, a handful of users, messy input, LANCER), none of these applies.
 
+**What the other two engines say about the SQL question.** The point of building Photon and
+Nominatim was to find out whether Pelias flattered pgeo, and the answer is: on capacity, no, and
+in an unexpected direction. Photon is the engine built for the endpoint pgeo is worst at, and it
+does answer a keystroke two to three times quicker than pgeo -- but it holds fewer concurrent
+users per core than Pelias, so it does not replace Pelias as the yardstick. Nominatim, the engine
+whose architecture is nearest to pgeo's, comes closest of all: 64 users to pgeo's 48. That
+comparison is the most informative one in the study, because Nominatim and pgeo differ in one
+thing only. Both compute and index inside PostgreSQL; Nominatim's *search* is a Python
+application issuing queries, pgeo's search is the query. Moving that last step into SQL costs a
+third of the capacity. Set against the four times pgeo gives up to Pelias, this locates the
+expense precisely: most of it is not "SQL instead of compiled code", it is "a general-purpose
+relational engine instead of an inverted index". The remaining third is the price of the last
+step, and it is the part this project chose to pay for G6.
+
+**Why the accuracy column flatters pgeo against the OpenStreetMap engines.** pgeo answers
+{{value:acc_pgeo_sql}} where Photon answers 73.7% and Nominatim 61.7%, and it would be wrong to
+read that as three engines ranked by quality. Photon and Nominatim index OpenStreetMap and
+nothing else -- Photon's index is exported from a Nominatim database, and Nominatim imports OSM
+-- so neither can hold the 780,260 OpenAddresses E911 points or the 76,582 Overture places that
+most of the test set is drawn from. Venue accuracy tells the story plainly: 94.2% for pgeo,
+19.1% for Photon, 8.9% for Nominatim, because those venues are not in their indexes to be found.
+Nominatim's median positional error on the addresses it does return is zero metres. What pgeo
+can honestly claim against these two is not that it searches better, but that it can carry data
+they cannot. Two of the differences are real engine properties rather than data: Nominatim has no
+autocomplete endpoint, and neither engine expresses uncertainty, which for a dispatch application
+is disqualifying independent of speed.
+
 **The tuning caveat.** pgeo was tuned in rounds that started from this test set's failing cases;
 Pelias was run as published. The fuzz rounds (corruptions of queries the tuning never saw as such)
 and the source-derived ground truth limit the effect, but part of the 20-point gap may be fit to the
@@ -1838,6 +1881,8 @@ Which tool suits which situation, and what the evidence supports saying. The rec
 | Multi-state or national coverage | Pelias today | built for planet scale; measured: pgeo loses four times its capacity across Maine's data range where Pelias loses two (Section 3.6.1) |
 | Fewest components, data in PostgreSQL (G6) | pgeo, pure SQL | database plus a stateless gateway |
 | Existing Pelias clients | either | pgeo passes the compatibility contract |
+| Type-ahead above all, OpenStreetMap data sufficient | Photon | 53 ms per keystroke on two cores and 1.84 GB resident, the lightest measured; but no confidence score, and no OpenAddresses or Overture (Section 3.14) |
+| A general OpenStreetMap geocoder, no type-ahead needed | Nominatim | exact when it answers (0 m median on addresses); but silent on 39% of queries and 8% correct at autocomplete, having no such endpoint (Section 3.15) |
 ```
 
 {{table:recommendations|Which tool for which scenario.}}
@@ -1852,7 +1897,11 @@ memory, where Pelias needs six containers and {{value:floor_pelias_gb}}, which i
 between the cheapest plan a provider sells and a mid-range server. And it speaks the Pelias API
 closely enough that an existing client cannot tell the difference ({{value:compat_cases}} of
 {{value:compat_cases}} contract cases). What it gives up is throughput -- a quarter of Pelias's
-users per CPU -- and planet scale, neither of which this deployment needs. One caveat belongs in
+users per CPU -- and planet scale, neither of which this deployment needs. Measuring two
+further engines put that price in proportion: against Nominatim, whose architecture differs
+from pgeo's only in that its search runs in Python rather than in SQL, the cost is not four
+times but a third (64 users to 48). Most of the gap to Pelias is the inverted index, not the
+SQL. One caveat belongs in
 the last sentence rather than a footnote: pgeo was tuned against the set that scores it, so the
 20-point accuracy gap should be read as an upper bound until both engines meet queries neither has
 seen. The capacity and memory findings carry no such caveat.
