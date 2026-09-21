@@ -34,6 +34,8 @@ parameters, which also puts them on a common baseline and x-height.
 | `p` counter | 3.1 units below its bowl | concentric |
 | Letter gaps | 20.0, 12.8, 8.6 | 16.2, even |
 | Counters | painted near-white, so white-only | real holes, any background |
+| `o` slots | radial, so wedge-shaped | parallel sides, 21 units wide |
+| `e` aperture | tapering sliver, lower counter sealed | open bay, terminal at 52 degrees |
 
 The overall width, the four colours, and the globe are unchanged - the globe is artwork rather
 than letterform, so it is moved and scaled to its new counter, not redrawn. To adjust the mark,

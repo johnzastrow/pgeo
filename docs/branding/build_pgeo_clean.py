@@ -53,6 +53,8 @@ HERE = Path(__file__).resolve().parent
 SRC = HERE / "pgeo.svg"
 OUT = HERE / "pgeo-clean.svg"
 GLOBE_SCALE = 0.80
+SLOT = 21.0                   # width of the two cuts in the 'o'
+A_TERM = 52.0                 # where the 'e' terminates, degrees below east
 
 NS = 'xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"'
 
@@ -126,55 +128,72 @@ def e_parts() -> tuple[list[tuple[str, str]], tuple[str, str]]:
     """
     hb = W / 2
     bar_x = math.sqrt(R * R - hb * hb)         # the bar meets the outer circle here
-    a_bar = math.degrees(math.asin(hb / R))    # 12.51 degrees
     bar = rect(CX_E - bar_x, CY - hb, CX_E + bar_x, CY + hb)
-    # The aperture begins where the bar leaves the ring, so the bar keeps a square terminal, and
-    # reaches past the outer circle so the cut leaves no sliver behind.
-    ap = band(CX_E, CY, R + 40, r + 1, a_bar, 52)
+    # The aperture is the wedge between the bar's underside and the terminal ray: bounded above by
+    # y = CY + hb and below by the ray at A_TERM, opening outwards from where those two cross.
+    # A radial band would have cut into the bar, and stopping it at the inner circle left a
+    # one-unit wall that sealed the lower counter - which is what made the 'e' read as a circle.
+    t = math.radians(A_TERM)
+    apex = (CX_E + hb / math.tan(t), CY + hb)
+    far = R + 140
+    ap = (f"M {f(*apex)} L {f(CX_E + far, CY + hb)} "
+          f"L {f(CX_E + far * math.cos(t), CY + far * math.sin(t))} Z")  # fmt: skip
     return [("e_ring", annulus(CX_E, CY, R, r)), ("e_bar", bar)], ("e_ap", ap)
 
 
-def o_path() -> str:
-    """A split ring: two equal arcs, with radial cuts centred on the two diagonals."""
-    d = 4.5                                     # half the gap, in degrees
-    return (band(CX_O, CY, R, r, -45 + d, 135 - d) + " "
-            + band(CX_O, CY, R, r, 135 + d, 315 - d))  # fmt: skip
+def o_parts() -> tuple[list[tuple[str, str]], tuple[str, str]]:
+    """A split ring, cut by one slot of constant width laid across the centre on the diagonal.
+
+    A radial cut makes a wedge - wider at the outer edge than the inner. One rectangle through
+    the centre gives both slots at once, with parallel sides and the same width all the way
+    across, which is what a slot should look like.
+    """
+    a = math.radians(-45)
+    ux, uy = math.cos(a), math.sin(a)           # along the slot
+    nx, ny = -uy, ux                            # across it
+    half_len, half_w = R + 40, SLOT / 2
+    pts = [(CX_O + half_len * ux + half_w * nx, CY + half_len * uy + half_w * ny),
+           (CX_O + half_len * ux - half_w * nx, CY + half_len * uy - half_w * ny),
+           (CX_O - half_len * ux - half_w * nx, CY - half_len * uy - half_w * ny),
+           (CX_O - half_len * ux + half_w * nx, CY - half_len * uy + half_w * ny)]  # fmt: skip
+    slot = "M " + " L ".join(f(x, y) for x, y in pts) + " Z"
+    return [("o_ring", annulus(CX_O, CY, R, r))], ("o_slot", slot)
 
 
 # ---- booleans, via Inkscape ----------------------------------------------------------------------
 
 
-def inkscape(parts: list[tuple[str, str]], actions: str) -> str:
-    """Run Inkscape actions over a scratch document and return the surviving path's d."""
+def _run(ds_in: list[str], op: str) -> str:
+    """One boolean over exactly the given paths, in document order, via select-all.
+
+    Addressing the operands by id looked tidier but was wrong: a union adopts one operand's id,
+    and which one is not something to rely on, so the follow-up difference silently subtracted
+    from the wrong object. select-all over a document holding exactly the intended operands
+    leaves nothing to guess - for a difference that means two paths, the cut on top.
+    """
     with tempfile.TemporaryDirectory() as td:
         src, dst = Path(td) / "in.svg", Path(td) / "out.svg"
-        body = "\n".join(
-            f'<path id="{pid}" d="{d}" fill="#000" fill-rule="evenodd"/>' for pid, d in parts
-        )
+        body = "\n".join(f'<path d="{d}" fill="#000" fill-rule="evenodd"/>' for d in ds_in)
         src.write_text(f'<svg {NS} viewBox="0 0 1536 1024">{body}</svg>')
         cmd = ["inkscape", str(src),
-               f"--actions={actions};export-filename:{dst};export-plain-svg;export-do"]  # fmt: skip
+               f"--actions=select-all;{op};export-filename:{dst};export-plain-svg;export-do"]  # fmt: skip
         res = subprocess.run(cmd, capture_output=True, text=True, check=False)
         if not dst.exists():
             sys.exit(f"inkscape produced nothing\n{res.stdout}\n{res.stderr}")
-        ds = re.findall(r'\bd="([^"]+)"', dst.read_text())
-    if not ds:
-        sys.exit("inkscape returned no path")
-    return max(ds, key=len)
+        out = dst.read_text()
+    ds = re.findall(r'\bd="([^"]+)"', out)
+    if len(ds) != 1:
+        sys.exit(f"{op} left {len(ds)} paths, expected 1")
+    return ds[0]
 
 
 def union(parts: list[tuple[str, str]]) -> str:
-    ids = ",".join(pid for pid, _ in parts)
-    return inkscape(parts, f"select-by-id:{ids};path-union")
+    return _run([d for _, d in parts], "path-union")
 
 
 def union_then_difference(parts: list[tuple[str, str]], cut: tuple[str, str]) -> str:
-    """Union the parts, then subtract `cut`: Inkscape subtracts the topmost object."""
-    ids = ",".join(pid for pid, _ in parts)
-    return inkscape(
-        [*parts, cut],
-        f"select-by-id:{ids};path-union;select-by-id:{parts[0][0]},{cut[0]};path-difference",
-    )
+    """Union the parts, then subtract the cut, as two separate unambiguous operations."""
+    return _run([union(parts), cut[1]], "path-difference")
 
 
 # ---- the globe, carried over ----------------------------------------------------------------------
@@ -212,7 +231,9 @@ def globe() -> str:
 def main() -> None:
     e_base, e_cut = e_parts()
     p_d, g_d = union(p_parts()), union(g_parts())
-    e_d, o_d = union_then_difference(e_base, e_cut), o_path()
+    o_base, o_cut = o_parts()
+    e_d = union_then_difference(e_base, e_cut)
+    o_d = union_then_difference(o_base, o_cut)
     body = "\n  ".join([
         f'<path fill="{INK}" fill-rule="evenodd" d="{p_d}"/>',
         f'<path fill="{INK}" fill-rule="evenodd" d="{g_d}"/>',
