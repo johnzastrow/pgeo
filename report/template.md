@@ -716,7 +716,36 @@ Elasticsearch.
 second would not notice the service becoming unpleasant, which is why the targets, not throughput,
 define capacity here.
 
-#### 3.4.1 How each engine scales
+#### 3.4.1 The same memory for both engines
+
+Every comparison so far gave pgeo a smaller budget than Pelias, because that is what each engine
+needs. It is a fair way to compare cost and an unfair way to compare engines: a reader is entitled
+to ask whether Pelias only leads because it was handed five times the memory. So pgeo was re-run
+at exactly Pelias's budget -- 8.3, 8.4 and 10.8 GB at one, two and four vCPU (configurations E1,
+E2 and E4).
+
+{{table:equal_memory|The same benchmark with the memory budgets equalised. pgeo holds the same
+number of users at Pelias's budget as at its own, so the throughput difference is not a memory
+artefact.}}
+
+**pgeo answers exactly the same number of users at 8.3 GB as at 1.6 GB.** Not approximately -- the
+same number, at every CPU size. The reason is in {{ref:figure:memory}}: the whole database is
+{{value:pgeo_db}}, so at 1.6 GB it already had room for the entire working set, and the extra
+6.7 GB has nothing to cache that was not cached before.
+
+{{callout:key|The four-to-one throughput gap is a CPU difference, not a memory difference. Giving
+pgeo Pelias's full memory budget changes its capacity by nothing at all. That also means the
+earlier comparisons were not flattering pgeo by starving Pelias: the two engines were already
+being compared at the only resource that binds either of them.}}
+
+This cuts both ways, and the second direction matters more for an operator. Pelias cannot give its
+memory back -- its floor is {{value:floor_pelias_gb}} because five services load fixed data before
+serving anything (Section 3.12) -- whereas pgeo cannot use the memory if you give it. So the fair
+statement is not "pgeo is cheaper" or "Pelias is faster" but this: **at equal memory Pelias serves
+four times the users; at equal throughput pgeo needs a fifth of the memory; and neither engine can
+trade one for the other.**
+
+#### 3.4.2 How each engine scales
 
 Both engines are CPU-bound under this load, and both scale close to
 linearly with vCPUs as long as their workers can use them: pgeo holds about 24 users per vCPU
@@ -729,14 +758,14 @@ interpreted candidate queries and scoring in PL/pgSQL.
 Pelias, then halve it for headroom: both engines go from comfortable to three times over target
 within one doubling of load.}}
 
-#### 3.4.2 What gives out first
+#### 3.4.3 What gives out first
 
 After the index fix, autocomplete is the first endpoint over its target on
 every pgeo configuration ({{ref:figure:endpoint_ramp}}): it has the tightest target (250 ms) and runs
 most often (60% of sessions type ahead, several requests per word). On Pelias the endpoints degrade
 more evenly (which one crosses first varies by configuration), because they share Elasticsearch.
 
-#### 3.4.3 Memory is not pgeo's limit
+#### 3.4.4 Memory is not pgeo's limit
 
 The configuration whose database memory (0.6 GB) is smaller than
 the data holds as many users as the one with 1.0 GB ({{value:lim_rest_Pmin}} and
@@ -744,7 +773,7 @@ the data holds as many users as the one with 1.0 GB ({{value:lim_rest_Pmin}} and
 Pelias, in contrast, has a memory floor set by its services (libpostal's model, the interpolation
 database, placeholder's in-memory tables) regardless of load.
 
-#### 3.4.4 Front end
+#### 3.4.5 Front end
 
 PostgREST and FastAPI hold the same number of users up to 4 vCPU. Unconstrained,
 FastAPI reached {{value:lim_api_PM}} users and PostgREST {{value:lim_rest_PM}}: only at high

@@ -378,6 +378,28 @@ def resource_values(v: dict, t: dict) -> None:
                                      "Disk after build", "Measured"], rows, "lrrrrl")  # fmt: skip
 
 
+def equal_memory_values(v: dict, t: dict) -> None:
+    """pgeo run at Pelias's memory budget: does the throughput gap come from memory or CPU?"""
+    pel = F.pelias_runs()
+    eq = F.load_runs(INPUTS["load"].get("pgeo_equal", []))
+    pg = F.pgeo_runs()
+    rows = []
+    for size, p_id, small, big in ((1, "C1", "rest-P1", "rest-E1"), (2, "C2", "rest-P2", "rest-E2"),
+                                   (4, "C4", "rest-P4", "rest-E4")):  # fmt: skip
+        e = next((r for k, r in eq.items() if k.startswith(big)), None)
+        if p_id not in pel or small not in pg or e is None:
+            continue
+        rows.append([f"{size} vCPU",
+                     f"{pg[small]['limit_users']} ({pg[small]['budget_gb']} GB)",
+                     f"{e['limit_users']} ({e['budget_gb']} GB)",
+                     f"{pel[p_id]['limit_users']} ({pel[p_id]['budget_gb']} GB)"])
+        v[f"equal_pgeo_{size}"] = str(e["limit_users"])
+    if rows:
+        t["equal_memory"] = md_table(
+            ["CPU", "pgeo, its own budget", "pgeo, Pelias's budget", "Pelias"], rows, "lrrr")
+        v["equal_same"] = ("yes" if all(r[1].split()[0] == r[2].split()[0] for r in rows) else "no")
+
+
 def floor_values(v: dict, t: dict) -> None:
     """Minimum server for 3 users: the search path, the floor per engine, and its VM confirmation."""
     ld = INPUTS["load"]
@@ -439,6 +461,7 @@ def build_all(snap: dict) -> tuple[dict, dict]:
     load_values(v, t)
     compat_values(v, t)
     resource_values(v, t)
+    equal_memory_values(v, t)
     floor_values(v, t)
     host = snap["host"]
     v["host_cpu"] = host["cpu"]
