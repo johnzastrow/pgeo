@@ -91,6 +91,9 @@ def convert(tex: str) -> tuple[str, int]:
             out.append(tex[i:])
             break
         out.append(tex[i:a])
+        # Alternate the body rows. \rowcolors counts from the first row of this table, and the
+        # header is row 1, so shading starts at row 2.
+        out.append("\\rowcolors{2}{}{black!7}\n")
         out.append(START + rule_columns(tex[spec_start:spec_end - 1]) + "}")
         out.append(grid_one(tex[spec_end:body_end]))
         out.append(END)

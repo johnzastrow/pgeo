@@ -98,8 +98,11 @@ def main() -> int:
         pdf_md = BUILD / "report_pdf.md"
         rp = Renderer(vals, tabs, figs, fig_dir_rel=FIG_PUBLISH.name, target="pdf")
         pdf_text = rp.render(template)
-        lines = pdf_text.splitlines()
-        pdf_md.write_text("\n".join(lines[3:]) if lines[0].startswith("# ") else pdf_text)
+        # The PDF and the Word document take their title block and contents from
+        # pdf/metadata.yaml and pandoc's --toc, so drop the Markdown's own front matter.
+        pdf_text = re.sub(r"<!-- front-matter-md-only -->.*?<!-- /front-matter-md-only -->\n?",
+                          "", pdf_text, flags=re.S)  # fmt: skip
+        pdf_md.write_text(pdf_text.lstrip())
         # Two steps rather than pandoc's own PDF: the tables get grid lines, which means editing
         # the LaTeX pandoc's writer produces (no filter can reach it).
         tex = BUILD / "report.tex"
@@ -135,7 +138,7 @@ def main() -> int:
         # From the Markdown, not the LaTeX: Word wants native tables and images, and the
         # Markdown target already renders callouts as block quotes.
         cmd = [
-            "pandoc", str(OUT_MD), "-o", str(OUT_DOCX),
+            "pandoc", str(BUILD / "report_pdf.md"), "-o", str(OUT_DOCX),
             "--from", "markdown+pipe_tables",
             "--resource-path", str(DOCS),
             "--metadata-file", str(HERE / "pdf" / "metadata.yaml"),

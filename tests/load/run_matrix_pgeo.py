@@ -56,6 +56,13 @@ CONFIGS = {
     "P1": {"cpus": 1, "db_gb": 1.0, "sb": "256MB", "ecs": "768MB", "wm": "16MB", "conns": 4},
     "P2": {"cpus": 2, "db_gb": 1.5, "sb": "384MB", "ecs": "1GB", "wm": "16MB", "conns": 6},
     "P4": {"cpus": 4, "db_gb": 2.0, "sb": "512MB", "ecs": "1536MB", "wm": "16MB", "conns": 10},
+    # Equal-memory configurations: the same total budget as the Pelias configuration at each CPU
+    # size (C1 8.3 GB, C2 8.4 GB, C4 10.8 GB), so the comparison is not "pgeo small against Pelias
+    # large". shared_buffers is 25% of the database limit and effective_cache_size 75%, the rule
+    # pgeo-tune uses. Review item 11.
+    "E1": {"cpus": 1, "db_gb": 7.25, "sb": "1856MB", "ecs": "5568MB", "wm": "16MB", "conns": 4},
+    "E2": {"cpus": 2, "db_gb": 7.35, "sb": "1880MB", "ecs": "5645MB", "wm": "16MB", "conns": 6},
+    "E4": {"cpus": 4, "db_gb": 9.75, "sb": "2496MB", "ecs": "7488MB", "wm": "16MB", "conns": 10},
 }
 LIBPOSTAL_GB = 2.0  # same as the Pelias floor profile
 

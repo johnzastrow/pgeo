@@ -45,9 +45,9 @@ def test_reports_an_unknown_value_instead_of_failing_silently():
 
 def test_numbers_tables_and_figures_in_order_of_appearance():
     out, _ = render("{{figure:ramp|First}}\n\n{{table:cap|Second}}\n\n{{figure:ramp|Again}}")
-    assert "**Figure 1.** First" in out
-    assert "**Table 1.** Second" in out
-    assert "**Figure 1.** Again" in out, "the same figure keeps its number"
+    assert "**Figure 1. First**" in out
+    assert "**Table 1. Second**" in out
+    assert "**Figure 1. Again**" in out, "the same figure keeps its number"
 
 
 def test_a_reference_resolves_to_the_number_assigned_later():
@@ -159,7 +159,7 @@ def test_md_table_row_widths_match_the_header():
 def test_a_figure_renders_an_image_and_a_numbered_caption():
     out, _ = render("{{figure:ramp|Users over time.}}")
     assert "![](figs/fig_ramp.png)" in out
-    assert "**Figure 1.** Users over time." in out
+    assert "**Figure 1. Users over time.**" in out
 
 
 def test_a_figure_with_no_file_is_reported_not_silently_dropped():
@@ -176,7 +176,18 @@ def test_a_table_with_no_data_is_reported():
 
 def test_captions_collapse_whitespace_so_wrapped_source_reads_as_one_line():
     out, _ = render("{{table:cap|A caption\n    wrapped over lines.}}")
-    assert "**Table 1.** A caption wrapped over lines." in out
+    assert "**Table 1. A caption wrapped over lines.**" in out
+
+
+def test_a_caption_bolds_its_number_and_short_title_only():
+    """"**Figure 1. Short title.** The explanation stays normal weight."""
+    out, _ = render("{{figure:ramp|Users over time. The ramp stops when a target is missed.}}")
+    assert "**Figure 1. Users over time.** The ramp stops when a target is missed." in out
+
+
+def test_a_caption_with_no_sentence_break_is_bolded_whole():
+    out, _ = render("{{table:cap|Records by layer}}")
+    assert "**Table 1. Records by layer**" in out
 
 
 def test_pdf_reserves_space_so_a_caption_is_not_orphaned_from_its_table():

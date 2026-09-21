@@ -6,7 +6,7 @@
 % (\linewidth - 2n\tabcolsep), so a smaller separation gives the cells the room back.
 % Grid lines are added to the generated LaTeX (report/pdf/gridtables.py); these give the
 % cells room to breathe inside them: taller rows, and a little more space either side.
-\AtBeginEnvironment{longtable}{\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.28}}
+\AtBeginEnvironment{longtable}{\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.35}}
 \setlength{\arrayrulewidth}{0.3pt}
 \usepackage[table]{xcolor}
 \arrayrulecolor{black!35}
@@ -38,7 +38,7 @@
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\small Self-Hosted Geocoding for Maine}
+\fancyhead[L]{\small pgeo: a geocoder inside PostgreSQL}
 \fancyhead[R]{\small\thepage}
 \renewcommand{\headrulewidth}{0.4pt}
 \setlength{\headheight}{14pt}

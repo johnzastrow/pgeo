@@ -66,6 +66,16 @@ class Renderer:
             return f"[missing value {name}]"
         return str(self.values[name])
 
+    @staticmethod
+    def _caption(label: str, caption: str) -> str:
+        """"**Figure 3. Short title.** The rest, in normal weight." The short title is the
+        caption's first sentence, which is how every caption in this report is written."""
+        m = re.match(r"(.+?[.:?])(\s+)(.*)", caption, re.S)
+        if not m:
+            return f"**{label} {caption}**" if caption else f"**{label}**"
+        title, _, body = m.groups()
+        return f"**{label} {title}** {body}".rstrip()
+
     def _sub(self, m: re.Match) -> str:
         kind, name, caption = m.group(1), m.group(2), (m.group(3) or "").strip()
         caption = " ".join(caption.split())
@@ -85,8 +95,10 @@ class Renderer:
             if body is None:
                 self.missing.append(f"table:{name}")
                 body = "_(table not available)_"
-            head = "\\needspace{6\\baselineskip}\n\n" if self.target == "pdf" else ""
-            return f"{head}**Table {n}.** {caption}\n\n{body}\n"
+            # enough for the caption, the header row and two rows: a table that starts lower
+            # than this gets pushed, rather than printing its header twice at the break
+            head = "\\needspace{11\\baselineskip}\n\n" if self.target == "pdf" else ""
+            return f"{head}{self._caption(f'Table {n}.', caption)}\n\n{body}\n"
         if kind == "figure":
             n = self._number("figure", name)
             fig = self.figures.get(name)
@@ -94,8 +106,21 @@ class Renderer:
                 self.missing.append(f"figure:{name}")
                 return f"_(Figure {n} not available: {caption})_\n"
             # empty alt text: pandoc then adds no automatic caption, so our numbering is the only one
-            return f"![]({self.fig_dir_rel}/{fig}.png)\n\n**Figure {n}.** {caption}\n"
+            return f"![]({self.fig_dir_rel}/{fig}.png)\n\n{self._caption(f'Figure {n}.', caption)}\n"
         return m.group(0)  # refs: second pass
+
+    @staticmethod
+    def _toc(text: str) -> str:
+        """Contents for the Markdown output; the PDF and the Word document get pandoc's own."""
+        out = []
+        for line in text.split("\n"):
+            m = re.match(r"^(#{2,3}) (.+)$", line)
+            if not m or m.group(2).startswith("Contents"):
+                continue
+            depth, title = len(m.group(1)) - 2, m.group(2).strip()
+            anchor = re.sub(r"[^a-z0-9 -]", "", title.lower()).replace(" ", "-")
+            out.append(f"{'  ' * depth}- [{title}](#{anchor})")
+        return "\n".join(out)
 
     def render(self, template: str) -> str:
         # values first, so captions of tables and figures may contain numbers
@@ -111,6 +136,8 @@ class Renderer:
             return f"{kind.capitalize()} {self.numbers[key]}"
 
         out = TOKEN.sub(lambda m: ref(m) if m.group(1) == "ref" else m.group(0), first)
+        if "{{toc}}" in out:
+            out = out.replace("{{toc}}", self._toc(out) if self.target == "md" else "\\tableofcontents")
         # "Table Table 3": the template wrote the word before a reference that already includes it
         for dup in re.findall(r"\b(Table Table|Figure Figure) \d+", out):
             self.missing.append(f"doubled word before a reference: {dup}")
