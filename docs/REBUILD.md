@@ -107,9 +107,12 @@ Locally the page offers three engines (Pelias, pgeo pure SQL, pgeo FastAPI), the
 ### 3.5 Verification
 
 ```bash
-uv run --project pgeo python tests/compat/compat_test.py     # Pelias API contract, 27 cases
+uv run --project pgeo python tests/compat/compat_test.py     # Pelias API contract, 28 cases
 (cd pgeo && uv run pytest -q)                               # parser, tuning tools, SQL address functions
 python3 tests/web/smoke_demo.py                              # browser test, every tab and engine
+uv run --project report --with pytest pytest report/tests -q # the report renderer (37)
+uv run --project pgeo pytest tests/security -q               # deployment posture (30 deployed)
+uv run --project pgeo --with jinja2 pytest tests/web/test_engine_modes.py -q  # one engine or two
 uv run --project pgeo python tests/accuracy/run_accuracy.py --engine pgeo --base http://127.0.0.1:4700 --label check
 uv run --project pgeo python tests/accuracy/gate.py data/accuracy/pgeo-check.json
 ```
@@ -144,6 +147,8 @@ Inputs are listed in `report/inputs.toml`; point it at new load-test run ids aft
 |--------|------|------|--------|
 | `python3 tests/load/run_matrix.py [--configs C1,..] [--datasets D1,..]` | Pelias capacity matrix; data-volume subsets | 2-4 h | `data/loadtest/<run>/` |
 | `python3 tests/load/run_matrix_pgeo.py --engines rest,api --configs Pmin,P1,P2,P4,PM` | pgeo capacity matrix | 5-7 h | `data/loadtest/<run>-pgeo/` |
+| `python3 tests/load/run_matrix_pgeo.py --engines rest --configs E1,E2,E4` | pgeo at Pelias's memory budget, for the equal-resources comparison | 3-4 h | `data/loadtest/<run>-pgeo/` |
+| `python3 tests/load/run_datavol_pgeo.py --configs P2` | pgeo capacity against data volume: rebuilds from each D1-D5 subset and ramps | 4-6 h | `data/loadtest/<run>-pgeo-datavol/` |
 | `python3 tests/load/find_floor.py --engines pgeo,pelias` | smallest configuration that serves 3 users | 1-2 h | `data/loadtest/<run>-floor/` |
 | `python3 tests/load/find_floor.py --resume data/loadtest/<run>-floor --only cpus` | continue an earlier floor search after adding smaller steps | 30-60 min | `data/loadtest/<run>-floor/` |
 | `tests/load/floor_vm.sh <engine> <vmid 190-199> <cores> <cpulimit> <mb> ...` | the found minimum on a temporary Proxmox VM (created, tested, destroyed) | 30-60 min | `data/loadtest/<run>-vm/` |

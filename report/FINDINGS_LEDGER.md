@@ -64,6 +64,13 @@ and observations made during the work (marked "session").
 - [ ] Dataset run failed first time: Elasticsearch not ready after the previous run's restore; fixed with a readiness wait.
 - [ ] Caching: warm-up excluded; caches warm by design (LOAD_TEST_PLAN caching section).
 
+- [ ] Equal memory: pgeo at Pelias's budget (8.3/8.4/10.8 GB) holds 24/48/96 users, identical to
+      its own budget. The 4x throughput gap is CPU, not memory.
+- [ ] Data volume (pgeo): D1 Who's On First alone, 3,289 features, 192 users against Pelias's 384.
+- [ ] The nginx access log recorded every address searched until 2026-09-20 (default combined
+      format); PostgreSQL never logged parameters. Fixed and tested.
+- [ ] A hand-set database password containing / or # produced a DSN naming a different host.
+
 ## Architecture and design decisions
 
 - [ ] G6: fewest components / data stays in Postgres unless the product suffers.
