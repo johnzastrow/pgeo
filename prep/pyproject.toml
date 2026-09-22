@@ -1,7 +1,7 @@
 [project]
 name = "pelias-prep"
-version = "0.1.0"
-description = "Convert Maine open datasets (GNIS, Census ZCTA, Overture Places) into Pelias CSV-importer files"
+version = "0.2.0"
+description = "Convert open datasets (GNIS, Census ZCTA, Overture Places) into Pelias CSV-importer files, for any US state"
 requires-python = ">=3.12"
 dependencies = [
     "duckdb==1.5.5",

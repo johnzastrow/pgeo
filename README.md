@@ -2,113 +2,120 @@
 
 # pgeo
 
-PGEO is a feature-rich geocoder that can live entirely inside PostgreSQL. It's a personal, petite PostgreSQL Geocoder (hence the short name PGEO) for when you need just enough geocoding and a simple deployment. It is fast, resource-efficient, easy to deploy, and feature-rich. With 1 CPU and 2 GB RAM, PGEO can easily serve 10-15 concurrent users with answers in 100 ms (most return sub-25 ms), even for complex queries using rich data for the full State of Maine. However, it does not scale horizontally as well as other options like Pelias. We measured it against Pelias and other popular geocoders to assess accuracy, speed, and scalability. Read the full [docs/REPORT.pdf](report).
+PGEO is a feature-rich geocoder that can live entirely inside PostgreSQL. It's a personal, petite
+PostgreSQL Geocoder (hence the short name PGEO) for when you need just enough geocoding and a
+simple deployment. It is fast, resource-efficient, easy to deploy, and feature-rich. With 1 CPU
+and 1 GB of RAM it served 32 concurrent users with a median answer in 40 ms and most autocomplete
+keystrokes under 35 ms, using rich data for the whole State of Maine. It does not scale
+horizontally the way Pelias does. We measured it against Pelias, Photon and Nominatim for
+accuracy, speed and scalability: [docs/REPORT.pdf](docs/REPORT.pdf).
 
 This project is unrelated to pgeocode, a Python postal-code library.
 
-PGEO also includes a collection of useful utilities alongside the core geocoding/reverse geocoding service.
+**[Getting started](GETTING_STARTED.md)** goes from nothing to a geocoder answering on a public
+URL, for any US state.
 
-* Docker images for the server and pre-processing data (pre-processing needs more memory and compute than serving the service)
-* An HTML page that demonstrates connecting to PGEO and optionally Pelias to show off features
-* A rich test suite to prove performance and accuracy
-* Scripts and documentation to get it running
+## Why pgeo
 
-Links to other useful documents here are the following:
+- **It is more accurate on the same data.** On 1,560 ground-truth cases for Maine, pgeo answered
+  95.8% correctly against Pelias's 75.5%, with the identical inputs. Photon managed 73.7% and
+  Nominatim 61.7%, both on OpenStreetMap alone.
+- **It fits on a small server.** One core, one gigabyte, one Postgres. No Elasticsearch, no JVM,
+  no six-container stack to keep alive.
+- **It is Pelias-compatible.** The same `/v1/search`, `/v1/autocomplete`, `/v1/reverse` and
+  `/v1/place` with the same query parameters and the same GeoJSON, so existing Pelias clients
+  work unchanged.
+- **The data is richer than OSM alone.** OpenAddresses, OpenStreetMap, Who's on First, USGS GNIS,
+  Census ZCTAs and Overture Places, conflated into one table.
+- **It can be pure SQL.** Serve it with PostgREST and there is no application code in the request
+  path at all - or use the FastAPI front end if you want libpostal parsing.
+- **You can host it yourself, entirely.** Every source is downloaded straight from its publisher;
+  nothing phones home, and no query leaves your network.
 
-* Quick Start deployment guide
-* 
+## When to use which
 
+| Use | Why |
+|---|---|
+| **pgeo** | One state or a handful; modest hardware; you already run PostgreSQL; you need address accuracy and autocomplete more than global coverage |
+| **[Pelias](https://pelias.io)** | Many countries or the planet; you want to scale out across machines; you have the operational appetite for Elasticsearch |
+| **[Photon](https://photon.komoot.io)** | OSM is enough; you want good typo tolerance and a simple single service; venues and addresses are not the priority |
+| **[Nominatim](https://nominatim.org)** | OSM is enough; you need detailed reverse geocoding and administrative polygons; you do not need autocomplete |
+
+pgeo's limits are real and measured: it is a single database, so capacity grows by making the
+machine bigger rather than by adding machines, and the report's section 4 says where it stops.
+
+## What is in the box
+
+* A PostgreSQL 18 / PostGIS geocoder with a Pelias-compatible HTTP API, served by PostgREST
+  (no application code) or FastAPI
+* A build pipeline that turns six open datasets into one table, for any US state or combination
+  of states
+* A demo web page - map, autocomplete, structured search, reverse geocoding, a batch CSV tool,
+  and four tabs that show off confidence, boundary search, nearby search and form filling
+* Ansible roles that take a bare Debian host to a hardened, rate-limited, API-key-protected
+  service
+* A test suite that measures accuracy against independent ground truth, not against itself
+* Docker images for the pre-processor and the server are designed but not yet published
+  ([DOCKER-DEPLOY.md](DOCKER-DEPLOY.md), [docs/DOCKER_IMAGES.md](docs/DOCKER_IMAGES.md))
+
+## Documentation
+
+**Start here**
+
+| Document | What it covers |
+|---|---|
+| [GETTING_STARTED.md](GETTING_STARTED.md) | Zero to a hosted geocoder, mostly commands |
+| [docs/REPORT.md](docs/REPORT.md) / [REPORT.pdf](docs/REPORT.pdf) | The study: four engines, accuracy, capacity, cost |
+| [DOCKER-DEPLOY.md](DOCKER-DEPLOY.md) | The container route (designed; images not yet published) |
+| [TODO.md](TODO.md) | What is not done, and what was decided about it |
+
+**Running it**
+
+| Document | What it covers |
+|---|---|
+| [docs/DATA_PIPELINE.md](docs/DATA_PIPELINE.md) | Every source, where it comes from, how it is converted |
+| [docs/REBUILD.md](docs/REBUILD.md) | Rebuild everything from scratch, and what each step proves |
+| [docs/DEPLOY_PGEO.md](docs/DEPLOY_PGEO.md) | The query host in detail |
+| [docs/SECURITY_DEPLOYMENT.md](docs/SECURITY_DEPLOYMENT.md) | The hardening the Ansible roles apply |
+| [docs/API_KEYS.md](docs/API_KEYS.md) | Issuing, using and revoking keys at the edge |
+| [docs/PGEO_TUNING.md](docs/PGEO_TUNING.md) / [TUNING_REPORT.md](docs/TUNING_REPORT.md) | The tuning profiles and how they were measured |
+
+**Using the API**
+
+| Document | What it covers |
+|---|---|
+| [docs/PELIAS_COMPATIBILITY.md](docs/PELIAS_COMPATIBILITY.md) | What matches Pelias, and where it deliberately does not |
+| [docs/ADDRESS_API.md](docs/ADDRESS_API.md) | `/v1/address`, the structured extension |
+| [docs/HTTP_OPTIONS.md](docs/HTTP_OPTIONS.md) | PostgREST or FastAPI, and why you might pick each |
+
+**How it works, and how it was checked**
+
+| Document | What it covers |
+|---|---|
+| [docs/PGEO_DESIGN.md](docs/PGEO_DESIGN.md) | The schema, the query pipeline, the ranking |
+| [docs/PERFORMANCE_OPTIMIZATION.md](docs/PERFORMANCE_OPTIMIZATION.md) | The 0.10.0 optimisation work, including what did not help |
+| [docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md) | What the tests do, in plain language |
+| [docs/ACCURACY_RESULTS.md](docs/ACCURACY_RESULTS.md) / [ENGINE_COMPARISON.md](docs/ENGINE_COMPARISON.md) | The measurements |
+| [docs/PROJECT_LOG.md](docs/PROJECT_LOG.md) | Goals, questions, decisions, findings, in order |
+
+## Layout
+
+| Path | Purpose |
+|------|---------|
+| `pgeo/` | The geocoder: SQL, loader, FastAPI app, tuning profiles |
+| `regions/` | `regions.json`: the per-state facts every build step reads |
+| `prep/` | Python (uv) package `pelias-prep`: GNIS, Census ZCTA, Overture Places -> CSV |
+| `scripts/` | Fetch data, build, snapshot, issue API keys, serve the page locally |
+| `web/` | Demo page (MapLibre + self-hosted Protomaps basemap) and a reusable search element |
+| `infra/ansible/` | Host config for any Debian host: hardening, Docker, query stack, nginx edge |
+| `infra/proxmox/`, `infra/wharf/` | VM creation, and a reference TLS front end |
+| `tests/` | Accuracy, load, compatibility, security and browser tests |
+| `projects/pelias_maine/` | The Pelias stack pgeo was measured against |
+| `report/`, `slides/`, `docs/` | The study, the deck, and the documentation above |
+| `data/` | Downloads and build artefacts (gitignored, except the measurements) |
 
 ## Licence and data
 
 The code is [Apache-2.0](LICENSE). The data it loads is not: each source carries its own licence
 and a deployment that redistributes data or derived tiles must comply with them - see [NOTICE](NOTICE)
 and `docs/DATA_PIPELINE.md` section 13. A running service reports the same list at `/v1/attribution`.
-
-## Layout
-
-| Path | Purpose |
-|------|---------|
-| `projects/pelias_maine/` | Pelias project: compose file (pinned images), `pelias.template.json`, synonyms, test cases |
-| `prep/` | Python (uv) package `pelias-prep`: GNIS, Census ZCTA, Overture Places -> Pelias CSV |
-| `pgeo/` | PostgreSQL 18/PostGIS geocoder with a Pelias-compatible API (FastAPI, or pure SQL via PostgREST); `pgeo/tuning/profiles/` holds the measured tuning profiles |
-| `scripts/` | Fetch raw data, vendor the pelias CLI, render config, build, snapshot |
-| `infra/proxmox/` | Debian 13 cloud-init template + VM creation (run on the Proxmox host) |
-| `infra/wharf/` | Reference copy of the wharf Caddy site block |
-| `infra/ansible/` | Host config for any Debian host (Proxmox VM or VPS): base hardening, Docker, query stack, nginx edge |
-| `web/` | Demo page (MapLibre + self-hosted Protomaps basemap), reusable `pelias-client.js` and `<pelias-search>` element; `web/vendor/` holds pinned third-party assets |
-| `tests/web/` | Browser smoke test (Playwright) for the demo page |
-| `tests/accuracy/`, `tests/load/` | Accuracy set (1,560 cases), fuzz rounds, regression gate; capacity tests (k6) for both engines |
-| `docs/` | `DATA_PIPELINE.md` (runbook), `PROJECT_LOG.md` (goals, questions, decisions, findings), `TESTING_GUIDE.md` (how the tests work, in plain language), `LOAD_TEST_PLAN.md`, `PGEO_DESIGN.md`, `REBUILD.md` (rebuild everything), `REPORT.md`/`REPORT.pdf` (the study), `TUNING_REPORT.md` (all tuning and how to re-apply it), `DEPLOY_PGEO.md`, `PELIAS_COMPATIBILITY.md`, `ADDRESS_API.md`, `ENGINE_COMPARISON.md`, `PGEO_TUNING.md` (change log), `ACCURACY_RESULTS.md`, `HTTP_OPTIONS.md` |
-| `data/` | Raw downloads, processed CSVs, Pelias data dir (gitignored) |
-
-## Build on the workstation
-
-```bash
-scripts/bootstrap.sh                          # vendor pelias/docker CLI at a pinned commit
-scripts/fetch_data.sh all                     # GNIS, ZCTA, boundary, Overture, basemap, OSM
-(cd prep && uv sync && uv run pelias-prep all && uv run pytest -q)
-cp projects/pelias_maine/.env.example projects/pelias_maine/.env        # set DATA_DIR, ES_HEAP
-cp projects/pelias_maine/secrets.env.example projects/pelias_maine/secrets.env  # optional OA token
-chmod 600 projects/pelias_maine/.env projects/pelias_maine/secrets.env
-scripts/build_local.sh                        # setup download prepare import up test
-curl 'http://127.0.0.1:4000/v1/search?text=portland,%20maine'
-scripts/snapshot_local.sh                     # ES snapshot for shipping to the VM
-```
-
-## Deploy (query-only host)
-
-```bash
-ssh root@192.0.2.10 'bash -s' < infra/proxmox/create_template.sh
-ssh root@192.0.2.10 "SSH_PUBKEY='$(cat ~/.ssh/id_ed25519.pub)' bash -s" < infra/proxmox/create_vm.sh
-# put the reported IP in infra/ansible/inventory/hosts.yml, then:
-cd infra/ansible && ansible-playbook site.yml -e pelias_snapshot_name=<snapshot>
-```
-
-Then add the `geocoder.example.org` site on the wharf Caddy, reverse-proxying to
-`<vm-ip>:8080`.
-
-## pgeo: set up, then rebuild with all tuning applied
-
-```bash
-scripts/pgeo_setup.sh                      # once: secrets, images, containers, local edge
-scripts/pgeo_rebuild.sh --profile medium   # build, tuning profile, known-answer checks, accuracy gate
-uv run --project pgeo pgeo-tune list       # profiles (tiny, small, medium, large, workstation)
-```
-
-Details: [docs/TUNING_REPORT.md](docs/TUNING_REPORT.md), section 7.
-
-## Demo page
-
-Live at https://geocoder.example.org/ : autocomplete with map-center bias and
-viewport restriction, layer/source filters, structured search, click (or right-click) to
-reverse geocode, and a small CSV batch tool (forward or reverse, 250 rows, 4 req/s).
-
-```bash
-scripts/vendor_web.sh                 # re-vendor pinned libs/fonts/glyphs/sprites (integrity-checked)
-scripts/dev_web.sh                    # local preview at http://127.0.0.1:8088 (same CSP as prod)
-python3 tests/web/smoke_demo.py       # browser test (or pass https://geocoder.example.org)
-# The local preview adds an engine switch (Pelias / pgeo SQL / pgeo FastAPI); production has none.
-cd infra/ansible && ansible-playbook site.yml -e pelias_snapshot_name=<snapshot>   # deploy
-```
-
-Reusing the search box elsewhere:
-
-```html
-<script type="module">
-  import { PeliasClient } from './js/pelias-client.js';
-  import './js/pelias-search.js';
-  const el = document.querySelector('pelias-search');
-  el.client = new PeliasClient({ baseUrl: 'https://geocoder.example.org' });
-  el.addEventListener('pelias-select', (e) => console.log(e.detail.feature));
-</script>
-<pelias-search placeholder="Search Maine"></pelias-search>
-```
-
-A different origin needs a CORS allowlist entry on the edge first (none today).
-
-## Secrets
-
-- `projects/pelias_maine/secrets.env` holds `OA_TOKEN` (optional). It is read only by
-  `scripts/render_config.sh`, which writes the gitignored, mode-600 `pelias.json`.
-- `.env` holds non-secret compose settings. Neither file is committed.

@@ -23,6 +23,50 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+## [0.20.0] - 2026-09-22
+
+### Added
+- Builds are parameterised by region. A *build* is one or more US states named in
+  `regions/regions.json`, which `scripts/gen_regions.py` fills from the Census boundary file, the
+  Who's on First distribution and the OpenAddresses source listing (50 states plus DC). Every
+  step takes `--build`: `scripts/fetch_data.sh`, `pelias-prep`, `pgeo-load`, `scripts/pgeo_setup.sh`,
+  `scripts/pgeo_rebuild.sh`, `scripts/pgeo_dump.sh`, `scripts/dev_web.sh` and the Ansible
+  `pgeo_build` variable. A build other than the default gets its own stack, database and ports,
+  so several run side by side on one workstation. Proven by building New York beside Maine.
+- `GETTING_STARTED.md`: nothing to a geocoder answering on a public URL, mostly commands,
+  written against the New York run.
+- OpenAddresses and Who's on First are downloaded straight from their publishers
+  (`results.openaddresses.io`, `data.geocode.earth`), so a pgeo build no longer needs the Pelias
+  CLI for anything. The Pelias stack is still built the Pelias way.
+- The demo page reads `/region.json` for its map extent, basemap, feature count and its own
+  title, so one page serves any build. The edge role writes it; `scripts/gen_region_json.py`
+  does the same locally.
+- `tests/accuracy/build_cases.py --build` builds a case set for any region, with the
+  "somewhere else" misses filtered against that region's own states and towns.
+
+### Changed
+- Data layout: per-build inputs in `data/raw/<build>/`, national ones in `data/raw/shared/`,
+  outputs in `data/processed/<build>/csv/`. Existing Maine files were moved, not rebuilt.
+- ZCTAs are assigned to states by Census land area (the ZCTA-to-county relationship file) rather
+  than by ZIP prefix. Maine gains 03579, which has 846 km2 of land in Oxford County against 611
+  in Coos County, New Hampshire. Deciding by geometry instead was tried and rejected: the
+  cartographic state polygon generalises away Peaks Island, Cliff Island, the Cranberry Isles and
+  five other coastal ZCTAs.
+- Postcodes in source data are validated against the ZIP prefixes a build has to itself, which
+  reproduces Maine's old 039-049 range exactly and does not leak across a border - New York holds
+  06390 on Fishers Island, so a plain prefix test there would have admitted Connecticut's 063xx.
+- The demo page no longer asks for an API key on load, only when the edge answers 401: a
+  deployment may sit behind a proxy that presents the key itself. `infra/wharf/pelias.caddy`
+  shows that arrangement for the public host.
+- README rewritten: what pgeo is, why to use it, when to use something else, and an index of the
+  documentation. The procedure moved to `GETTING_STARTED.md`.
+- The Pelias role in `infra/ansible/site.yml` is now conditional on `pelias_enabled`, so a
+  pgeo-only host skips it instead of installing a stack it will not run.
+
+### Fixed
+- The Maine Overture and GNIS outputs are reproduced byte for byte by the parameterised
+  converters; only the ZCTA set changes, by the one row above.
+
 ### Security
 - `infra/ansible/group_vars/pelias/zz-local.yml` was tracked by git from 2026-09-21 to
   2026-09-22: the ignore rule named the file's previous name. It holds the TLS terminator's LAN

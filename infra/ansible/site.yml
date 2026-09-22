@@ -8,6 +8,7 @@
       tags: [docker]
     - role: pelias_runtime
       tags: [pelias]
+      when: pelias_enabled | bool
     - role: pgeo_runtime
       tags: [pgeo]
       when: pgeo_enabled | bool

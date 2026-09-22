@@ -1,5 +1,8 @@
 """OpenAddresses GeoJSON -> the CSV layout pelias/interpolation still expects.
 
+Only the Pelias path needs this. A pgeo build downloads the OpenAddresses run archives, which
+already carry that CSV layout (scripts/fetch_data.sh oa), so it converts nothing.
+
 OpenAddresses now publishes newline-delimited GeoJSON, which the Pelias OA importer reads,
 but the interpolation builder (script/concat_oa.sh) only globs `*.csv` with the legacy
 header LON,LAT,NUMBER,STREET,UNIT,CITY,DISTRICT,REGION,POSTCODE,ID,HASH. Without this
@@ -14,7 +17,7 @@ from pathlib import Path
 
 import duckdb
 
-from .common import MAINE_BBOX
+from .common import Region
 
 SQL = """
 SELECT
@@ -48,10 +51,12 @@ class OaFileResult:
     outside_bbox: int
 
 
-def convert_file(con: duckdb.DuckDBPyConnection, src: Path, out: Path) -> OaFileResult:
+def convert_file(
+    con: duckdb.DuckDBPyConnection, src: Path, out: Path, reg: Region
+) -> OaFileResult:
     out.parent.mkdir(parents=True, exist_ok=True)
     con.execute(f"CREATE OR REPLACE TEMP TABLE _oa AS {SQL}", [str(src)])
-    lon_min, lat_min, lon_max, lat_max = MAINE_BBOX
+    lon_min, lat_min, lon_max, lat_max = reg.bbox
     rows, outside = con.execute(
         "SELECT count(*), count(*) FILTER (WHERE LAT NOT BETWEEN ? AND ? "
         "OR LON NOT BETWEEN ? AND ?) FROM _oa",
@@ -63,12 +68,14 @@ def convert_file(con: duckdb.DuckDBPyConnection, src: Path, out: Path) -> OaFile
     return OaFileResult(path=out, rows=rows, outside_bbox=outside)
 
 
-def convert_tree(con: duckdb.DuckDBPyConnection, oa_dir: Path, out_dir: Path) -> list[OaFileResult]:
+def convert_tree(
+    con: duckdb.DuckDBPyConnection, oa_dir: Path, out_dir: Path, reg: Region
+) -> list[OaFileResult]:
     sources = sorted(oa_dir.rglob("*.geojson"))
     if not sources:
         raise FileNotFoundError(f"no .geojson files under {oa_dir} (run `pelias download oa`)")
     results = []
     for src in sources:
         rel = src.relative_to(oa_dir).with_suffix(".csv")
-        results.append(convert_file(con, src, out_dir / rel))
+        results.append(convert_file(con, src, out_dir / rel, reg))
     return results

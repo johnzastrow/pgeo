@@ -1,8 +1,11 @@
 """pgeo-load: build the geocoder database from the raw inputs in data/.
 
-    uv run pgeo-load build [--sources whosonfirst,openaddresses,openstreetmap,gnis,zcta,overture]
+    uv run pgeo-load build [--build ny] [--sources whosonfirst,openaddresses,openstreetmap,...]
     uv run pgeo-load functions        # re-apply sql/040_functions.sql only
     uv run pgeo-load info             # show the current build's metadata
+
+--build names the states to load (regions/regions.json); it defaults to $PGEO_BUILD, else "me".
+One database holds one build.
 
 The build runs in schema pgeo_build and is swapped into pgeo atomically (together with the
 query functions, which depend on the table types), so the API never sees a partial build.
@@ -22,11 +25,11 @@ from urllib.parse import urlparse
 import asyncpg
 
 from pgeo.load import sources
+from pgeo.regions import Region, region
 from pgeo.settings import DATA_DIR, SECRETS_FILE, SQL_DIR, Settings, _read_env_file
 
 ALL_SOURCES = ["whosonfirst", "openaddresses", "openstreetmap", "gnis", "zcta", "overture"]
 STAGE_DIR = DATA_DIR / "pgeo" / "stage"
-PBF = DATA_DIR / "pelias" / "openstreetmap" / "maine-latest.osm.pbf"
 
 
 def log(msg: str) -> None:
@@ -74,8 +77,9 @@ async def ensure_api_role(con: asyncpg.Connection) -> None:
     await con.execute(f"{verb} ROLE pgeo_api LOGIN PASSWORD '{pw}'")  # noqa: S608
 
 
-async def build(settings: Settings, selected: list[str]) -> None:
+async def build(settings: Settings, selected: list[str], reg: Region) -> None:
     STAGE_DIR.mkdir(parents=True, exist_ok=True)
+    log(f"build {reg.build}: {', '.join(reg.states)}")
     timings: dict[str, float] = {}
     counts: dict[str, int] = {}
     con = await asyncpg.connect(settings.dsn, timeout=30)
@@ -89,12 +93,13 @@ async def build(settings: Settings, selected: list[str]) -> None:
         # Who's On First is always loaded: it provides the admin hierarchy.
         step = time.time()
         f = STAGE_DIR / "wof_admin.csv"
-        counts["whosonfirst"] = sources.wof_admin(f)
+        counts["whosonfirst"] = sources.wof_admin(f, reg)
         await copy_csv(con, "stage_admin", sources.STAGE_ADMIN_COLS, f)
         for name in ("openaddresses", "gnis", "zcta", "overture"):
             if name in selected:
                 f = STAGE_DIR / f"{name}.csv"
-                counts[name] = sources.openaddresses(f) if name == "openaddresses" else sources.csv_source(name, f)
+                counts[name] = (sources.openaddresses(f, reg) if name == "openaddresses"
+                                else sources.csv_source(name, f, reg))
                 await copy_csv(con, "stage_point", sources.STAGE_POINT_COLS, f)
                 log(f"staged {name}: {counts[name]:,}")
         await run_sql(con, "022_stage.sql")
@@ -103,7 +108,8 @@ async def build(settings: Settings, selected: list[str]) -> None:
         if "openstreetmap" in selected:
             step = time.time()
             pw = urlparse(settings.dsn).password or ""
-            await asyncio.to_thread(sources.osm_to_postgis, PBF, pg_conn_string(settings.dsn), "pgeo_build", pw)
+            await asyncio.to_thread(sources.osm_to_postgis, reg.pbfs(),
+                                    pg_conn_string(settings.dsn), "pgeo_build", pw, log)
             await run_sql(con, "025_osm.sql")
             timings["osm"] = time.time() - step
             log("loaded openstreetmap")
@@ -119,6 +125,8 @@ async def build(settings: Settings, selected: list[str]) -> None:
 
         stats = await con.fetch("SELECT layer, count(*) AS n FROM feature GROUP BY layer ORDER BY 2 DESC")
         info = {
+            "build": reg.build,
+            "states": list(reg.states),
             "sources": selected,
             "raw_counts": counts,
             "features_by_layer": {r["layer"]: r["n"] for r in stats},
@@ -195,6 +203,8 @@ def main(argv: list[str] | None = None) -> int:
     sub = ap.add_subparsers(dest="cmd", required=True)
     b = sub.add_parser("build")
     b.add_argument("--sources", default=",".join(ALL_SOURCES))
+    b.add_argument("--build", dest="build_name", default=None,
+                   help="build name or state list (default: $PGEO_BUILD, else me)")
     sub.add_parser("functions")
     sub.add_parser("info")
     args = ap.parse_args(argv)
@@ -206,7 +216,7 @@ def main(argv: list[str] | None = None) -> int:
             ap.error(f"unknown sources: {bad}")
         if "whosonfirst" not in selected:
             selected.insert(0, "whosonfirst")
-        asyncio.run(build(settings, selected))
+        asyncio.run(build(settings, selected, region(args.build_name)))
     elif args.cmd == "functions":
         asyncio.run(functions_only(settings))
     else:

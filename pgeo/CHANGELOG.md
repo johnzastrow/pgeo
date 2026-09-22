@@ -10,6 +10,26 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-09-22
+
+### Added
+- `pgeo.regions`: the states a build covers, read from `regions/regions.json`. `pgeo-load build
+  --build ny` (or `--build me,nh,vt`, or `$PGEO_BUILD`) selects the Who's on First region ids,
+  the OpenAddresses files, the processed CSVs and the OSM extracts. The build metadata records
+  the build and its states.
+- Several OSM extracts per build: the first creates the tables, the rest append.
+
+### Changed
+- OpenAddresses is read from `data/raw/<build>/oa/**/*.csv` - the archives OpenAddresses
+  publishes - instead of the tree the Pelias interpolation step produced.
+- `compose.yml` takes the stack name, database name and ports from the environment. The defaults
+  are the original values, so the existing stack is unchanged.
+
+### Fixed
+- The OpenAddresses CSV dialect is stated rather than sniffed. DuckDB sampled 20,480 rows of New
+  York's statewide file, saw no quote character, chose `quote=''`, and then failed on line 90,718
+  at a unit field reading `"BLDG 16, Boys Girls Club Room"`.
+
 ## [0.10.0] - 2026-09-21
 
 Performance, with output unchanged: **7,380 golden queries (47,962 result rows) return

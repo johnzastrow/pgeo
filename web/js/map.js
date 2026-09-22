@@ -4,7 +4,30 @@
 import * as maplibregl from '../vendor/maplibre-gl/maplibre-gl.mjs';
 
 const ORIGIN = window.location.origin;
-export const MAINE_BOUNDS = [[-71.2, 42.9], [-66.8, 47.5]];
+
+// The region this deployment covers. The server states it in /region.json (the edge role writes
+// it from regions/regions.json); a server that predates that file is a Maine one, so those are
+// the fallback values. The bounds double as pan limits, so no untiled area is ever shown.
+export const DEFAULT_REGION = {
+  build: 'me',
+  name: 'Maine',
+  bounds: [[-71.2, 42.9], [-66.8, 47.5]],
+  tiles: '/tiles/maine.pmtiles',
+};
+
+export async function loadRegion() {
+  try {
+    const res = await fetch('/region.json', { headers: { Accept: 'application/json' } });
+    if (!res.ok) return DEFAULT_REGION;
+    const r = await res.json();
+    const ok = Array.isArray(r?.bounds) && r.bounds.length === 2 && typeof r.tiles === 'string';
+    return ok ? { build: r.build || '', name: r.name || '', bounds: r.bounds,
+                  tiles: r.tiles, features: r.features || 0 }
+              : DEFAULT_REGION;
+  } catch {
+    return DEFAULT_REGION;
+  }
+}
 
 // "Chart paper" flavor: buff land, chart-blue water, magenta boundaries, ink labels.
 function chartFlavor() {
@@ -30,7 +53,7 @@ function chartFlavor() {
   };
 }
 
-export function createMap(container) {
+export function createMap(container, region = DEFAULT_REGION) {
   const protocol = new window.pmtiles.Protocol();
   maplibregl.addProtocol('pmtiles', protocol.tile);
 
@@ -41,7 +64,7 @@ export function createMap(container) {
     sources: {
       protomaps: {
         type: 'vector',
-        url: `pmtiles://${ORIGIN}/tiles/maine.pmtiles`,
+        url: `pmtiles://${ORIGIN}${region.tiles}`,
         attribution:
           '<a href="https://protomaps.com">Protomaps</a> &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
       },
@@ -52,10 +75,10 @@ export function createMap(container) {
   const map = new maplibregl.Map({
     container,
     style,
-    bounds: MAINE_BOUNDS,
+    bounds: region.bounds,
     fitBoundsOptions: { padding: 40 },
     // Pan limits match the basemap extract, so no untiled area is ever shown.
-    maxBounds: [[-71.2, 42.9], [-66.8, 47.5]],
+    maxBounds: region.bounds,
     attributionControl: false,
     cooperativeGestures: false,
   });

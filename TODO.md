@@ -68,11 +68,30 @@ reach by SSH, or a wish to schedule builds in CI. The `pgeo-build` image would g
 `publish` subcommand beside `push`; the bundle would gain the `refresh` profile; nothing about
 the build or the swap changes.
 
-## 3. Multi-region builds
+## 3. ~~Multi-region builds~~ Done in the pipeline 2026-09-22; still to do in the images
 
-Added 2026-09-22 to the images design: `PGEO_REGION` accepts a list. See `docs/DOCKER_IMAGES.md`,
-"Region parameter", for what a multi-region build has to merge and what the report says about
-capacity as data grows.
+The build pipeline is now parameterised by *build*: one or more US states, named in
+`regions/regions.json`, which `scripts/gen_regions.py` fills from the Census boundary file, the
+Who's on First distribution and the OpenAddresses source listing. Every step takes `--build`
+(`ny`, or a bare list such as `me,nh,vt`), and nothing in `scripts/`, `prep/` or `pgeo/` names a
+state any more. Proven by building New York - about ten times Maine - beside the Maine stack on
+one workstation; `GETTING_STARTED.md` is the procedure, written against that run.
+
+What the parameterisation changed, beyond paths:
+
+- OpenAddresses and Who's on First are now fetched straight from their publishers, so a pgeo
+  build no longer needs the Pelias CLI for anything.
+- ZCTAs are assigned to states by Census land area rather than by ZIP prefix. The prefix range
+  was a Maine fact; the land-area rule is the same question asked of the data, and it also fixes
+  Maine, which gains 03579 (846 km2 in Oxford County against 611 in Coos County, NH).
+- Postcodes in source data are validated against the prefixes a build has to itself, so a
+  neighbour's ZIPs cannot leak in - New York holds 06390 on Fishers Island, and a plain prefix
+  test there would have admitted every Connecticut 063xx.
+
+Still to do: the container images take the same parameter (`docs/DOCKER_IMAGES.md`, "Region
+parameter"), and a multi-state build has only been exercised by unit tests, not by a real run.
+Per-machine server tuning is shared by every stack on a workstation, which does not arise on a
+host that serves one build.
 
 ## 4. An explicit tie-break rule
 

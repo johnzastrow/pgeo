@@ -2,7 +2,7 @@
 // reverse geocoding and the batch tool. Rendering uses DOM APIs and textContent only.
 import { PeliasClient, setApiKey, hasApiKey } from './pelias-client.js';
 import './pelias-search.js';
-import { createMap, makeMarker } from './map.js';
+import { createMap, loadRegion, makeMarker } from './map.js';
 import { setupBatch } from './batch.js';
 import { setupDemoTabs } from './demo-tabs.js';
 import { dms, fixed, distanceLabel } from './format.js';
@@ -27,9 +27,13 @@ const el = (tag, cls, text) => {
 const client = new PeliasClient();
 
 // ---- API key ------------------------------------------------------------------------------
-// The edge refuses /v1/* without a known key. The page holds one per tab; the form appears when
-// there is none, or when the edge stops accepting the one it has, and disappears once a request
-// succeeds. The key is sent in a header by PeliasClient and appears nowhere on the page.
+// The edge refuses /v1/* without a known key. The page holds one per tab; the form appears the
+// first time the edge answers 401, and disappears once a request succeeds. The key is sent in a
+// header by PeliasClient and appears nowhere on the page.
+//
+// The form is not shown on load, only on a 401: a deployment may sit behind a proxy that inserts
+// the key itself (the public host does this, see infra/wharf/pelias.caddy), and there the page
+// never sees a 401 and must not ask for a key it does not need.
 const keyForm = $('#apikey-form');
 const keyNote = $('#apikey-note');
 function showKeyForm(message) {
@@ -53,7 +57,6 @@ keyForm.addEventListener('submit', (e) => {
 window.addEventListener('pelias-unauthorized', () => {
   showKeyForm(hasApiKey() ? 'Your API key is no longer accepted. Enter a current one.' : 'This service needs an API key.');
 });
-if (!hasApiKey()) showKeyForm('This service needs an API key.');
 
 // ---- Engines ------------------------------------------------------------------------------
 // The server announces its engines with <meta name="demo-engines" content="/engines.json">:
@@ -126,7 +129,18 @@ async function setupEngines() {
 }
 
 // The page is light only: the chart, its marks and the panel share one palette.
-const map = createMap('map');
+// The region decides the map extent, the basemap file and the page's own name, so it is read
+// before the map is built. Top-level await: app.js is a module.
+const region = await loadRegion();
+document.documentElement.dataset.build = region.build || '';
+document.title = region.name ? `${region.name} Geocoder` : 'Geocoder';
+$('#region-name').textContent = region.name || '';
+$('#region-kicker').textContent = region.name ? `United States \u00b7 ${region.name}` : 'United States';
+$('#map').setAttribute('aria-label', region.name ? `Map of ${region.name}` : 'Map');
+if (region.features) {
+  $('#region-features').textContent = `${Number(region.features).toLocaleString('en-US')} features \u00b7 `;
+}
+const map = createMap('map', region);
 const marker = makeMarker('primary');
 const probe = makeMarker('probe');
 

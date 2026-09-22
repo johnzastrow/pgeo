@@ -4,6 +4,12 @@ All features are loaded as layer `venue` with `category` = GNIS feature class
 (lake, summit, island, civil, populated_place, ...). Keeping them out of the admin
 layers (locality, county) avoids competing with Who's On First, which owns the admin
 hierarchy and point-in-polygon lookups. Revisit with the Phase 10 harness.
+
+GNIS publishes one file per state and a build may cover several, so each file is filtered
+against its own state's box and the results are unioned. Filtering against the union box
+instead would let a New Hampshire feature through on a Maine-plus-New-York build, and
+filtering against the region polygon would drop the offshore ledges and buoys that the
+state's own file legitimately carries.
 """
 
 from __future__ import annotations
@@ -12,13 +18,9 @@ from pathlib import Path
 
 import duckdb
 
-from .common import MAINE_BBOX, ExportResult, export_csv
+from .common import ExportResult, Region, export_csv
 
-SQL = """
-WITH src AS (
-    SELECT *
-    FROM read_csv(?, delim = '|', header = true, all_varchar = true, quote = '')
-)
+ROW = """
 SELECT
     feature_id                                   AS id,
     'gnis'                                       AS source,
@@ -34,19 +36,28 @@ SELECT
         map_name: map_name,
         date_edited: nullif(date_edited, '')
     })                                           AS addendum_json_gnis
-FROM src
--- Drop features whose primary point lies outside Maine (e.g. a river mouth in
+FROM read_csv(?, delim = '|', header = true, all_varchar = true, quote = '')
+-- Drop features whose primary point lies outside the state (e.g. a river mouth in
 -- New Brunswick, the Atlantic Ocean point off North Carolina).
 WHERE CAST(prim_lat_dec AS DOUBLE) BETWEEN ? AND ?
   AND CAST(prim_long_dec AS DOUBLE) BETWEEN ? AND ?
   AND (? OR feature_name NOT ILIKE '%(historical)%')
-ORDER BY CAST(feature_id AS BIGINT)
 """
 
 
 def convert(
-    con: duckdb.DuckDBPyConnection, src: Path, out: Path, include_historical: bool = False
+    con: duckdb.DuckDBPyConnection,
+    sources: list[tuple[str, Path]],
+    out: Path,
+    reg: Region,
+    include_historical: bool = False,
 ) -> ExportResult:
-    lon_min, lat_min, lon_max, lat_max = MAINE_BBOX
-    params = [str(src), lat_min, lat_max, lon_min, lon_max, include_historical]
-    return export_csv(con, SQL, params, out)
+    """Convert one `(state, file)` per member state into a single CSV."""
+    boxes = reg.state_boxes
+    con.execute("DROP TABLE IF EXISTS _gnis")
+    for i, (state, src) in enumerate(sources):
+        lon_min, lat_min, lon_max, lat_max = boxes[state]
+        params = [str(src), lat_min, lat_max, lon_min, lon_max, include_historical]
+        verb = "CREATE TEMP TABLE _gnis AS" if i == 0 else "INSERT INTO _gnis"
+        con.execute(f"{verb} {ROW}", params)  # noqa: S608 - fixed SQL, bound parameters
+    return export_csv(con, "SELECT * FROM _gnis ORDER BY CAST(id AS BIGINT)", [], out, reg)

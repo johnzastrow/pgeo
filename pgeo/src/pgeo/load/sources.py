@@ -13,9 +13,10 @@ from pathlib import Path
 
 import duckdb
 
+from pgeo.regions import Region
 from pgeo.settings import DATA_DIR
 
-MAINE_WOF_ID = 85688769
+# The Who's on First distributions are national: every build reads the same two files.
 WOF_DIR = DATA_DIR / "pelias" / "whosonfirst" / "sqlite"
 STAGE_POINT_COLS = (
     "source, layer, source_id, name, housenumber, street, unit, postcode, locality_hint, "
@@ -35,8 +36,8 @@ def _duck() -> duckdb.DuckDBPyConnection:
     return con
 
 
-def wof_admin(out: Path) -> int:
-    """Maine admin areas and postal codes from the WOF SQLite distributions."""
+def wof_admin(out: Path, reg: Region) -> int:
+    """The build's admin areas and postal codes from the WOF SQLite distributions."""
     con = _duck()
     # ATTACH does not take bind parameters; these are our own fixed paths (checked for quotes).
     for alias, fname in (
@@ -62,13 +63,16 @@ def wof_admin(out: Path) -> int:
              s.min_longitude AS minlon, s.min_latitude AS minlat, s.max_longitude AS maxlon, s.max_latitude AS maxlat
       FROM {db}.spr s
       JOIN {db}.geojson g ON g.id = s.id AND g.is_alt = 0
-      WHERE s.id IN (SELECT id FROM {db}.ancestors WHERE ancestor_id = {me} UNION SELECT {me})
+      WHERE s.id IN (SELECT id FROM {db}.ancestors WHERE ancestor_id IN ({me})
+                     UNION SELECT unnest([{me}]))
         AND s.is_current <> 0 AND s.is_deprecated = 0 AND s.placetype IN ({types})
     """
+    # reg.wof_ids are integers read from the registry, so they are safe as SQL literals.
+    ids = ", ".join(str(int(i)) for i in reg.wof_ids)
     admin = select.format(
-        db="wa", me=MAINE_WOF_ID, types="'region', 'county', 'localadmin', 'locality', 'neighbourhood'"
+        db="wa", me=ids, types="'region', 'county', 'localadmin', 'locality', 'neighbourhood'"
     )
-    postal = select.format(db="wp", me=MAINE_WOF_ID, types="'postalcode'")
+    postal = select.format(db="wp", me=ids, types="'postalcode'")
     con.execute(f"COPY ({admin} UNION ALL {postal}) TO ? (FORMAT csv, HEADER true)", [str(out)])
     return con.execute("SELECT count(*) FROM read_csv(?)", [str(out)]).fetchone()[0]
 
@@ -77,9 +81,13 @@ def wof_admin(out: Path) -> int:
 # subquery, so these statements use explicit numbered parameters ($1 input, $2 output).
 
 
-def openaddresses(out: Path) -> int:
-    """OpenAddresses (already converted to CSV for Pelias interpolation) -> address points."""
-    src = str(DATA_DIR / "pelias" / "interpolation_oa" / "us" / "me" / "*.csv")
+def openaddresses(out: Path, reg: Region) -> int:
+    """OpenAddresses CSVs (scripts/fetch_data.sh oa) -> address points.
+
+    Sources overlap - New York publishes a statewide file and county files covering the same
+    addresses - so rows are deduplicated on the OpenAddresses HASH, as they always were.
+    """
+    src = reg.oa_glob
     con = _duck()
     con.execute(
         """COPY (
@@ -88,7 +96,12 @@ def openaddresses(out: Path) -> int:
             NUMBER || ' ' || STREET AS name, NUMBER AS housenumber, STREET AS street, UNIT AS unit,
             POSTCODE AS postcode, CITY AS locality_hint, '' AS category, '' AS addendum,
             LON AS lon, LAT AS lat, NULL::REAL AS popularity
-          FROM read_csv($1, all_varchar=true, union_by_name=true)
+          -- The dialect is stated, not sniffed. OpenAddresses files are quoted comma CSV with
+          -- CRLF endings, but quoted fields can be rare: on New York's statewide file DuckDB
+          -- sampled 20,480 rows, saw no quote character, chose quote='' and then failed on line
+          -- 90,718, a unit field reading "BLDG 16, Boys Girls Club Room".
+          FROM read_csv($1, all_varchar=true, union_by_name=true,
+                        delim=',', quote='"', escape='"', header=true)
           WHERE coalesce(NUMBER, '') <> '' AND coalesce(STREET, '') <> '' AND coalesce(HASH, '') <> ''
           ORDER BY HASH
         ) TO $2 (FORMAT csv, HEADER true)""",
@@ -100,11 +113,11 @@ def openaddresses(out: Path) -> int:
 CSV_SOURCES = ("gnis", "zcta", "overture")
 
 
-def csv_source(name: str, out: Path) -> int:
+def csv_source(name: str, out: Path, reg: Region) -> int:
     """Processed Pelias-CSV files (gnis, zcta, overture) -> points, addendum kept as JSON."""
     if name not in CSV_SOURCES:  # name is interpolated into the SQL below
         raise ValueError(f"unknown CSV source {name!r}")
-    src = str(DATA_DIR / "processed" / "csv" / f"{name}.csv")
+    src = str(reg.processed_dir / f"{name}.csv")
     con = _duck()
     cols = {c[0] for c in con.execute("DESCRIBE SELECT * FROM read_csv(?)", [src]).fetchall()}
 
@@ -134,9 +147,12 @@ def csv_source(name: str, out: Path) -> int:
     return con.execute("SELECT count(*) FROM read_csv(?)", [str(out)]).fetchone()[0]
 
 
-def osm_to_postgis(pbf: Path, pg_conn: str, schema: str, password: str) -> None:
+def osm_to_postgis(
+    pbfs: list[Path], pg_conn: str, schema: str, password: str, log=print
+) -> None:
     """Load OSM points, lines and polygons into <schema>.osm_* with ogr2ogr (GDAL OSM driver).
 
+    One extract per state: the first creates the tables, the rest append to them.
     The password is passed through the environment (PGPASSWORD), never on the command line.
     """
     ogr2ogr = shutil.which("ogr2ogr")
@@ -144,29 +160,35 @@ def osm_to_postgis(pbf: Path, pg_conn: str, schema: str, password: str) -> None:
         raise RuntimeError("ogr2ogr (GDAL) is required for the OpenStreetMap loader")
     conf = Path(__file__).with_name("osmconf.ini")
     env = dict(os.environ, PGPASSWORD=password, OSM_CONFIG_FILE=str(conf), OSM_USE_CUSTOM_INDEXING="NO")
-    for layer, table in (("points", "osm_points"), ("lines", "osm_lines"), ("multipolygons", "osm_polygons")):
-        subprocess.run(  # noqa: S603 - fixed argv, our own paths, no shell
-            [
-                ogr2ogr,
-                "-f",
-                "PostgreSQL",
-                f"PG:{pg_conn} active_schema={schema}",
-                str(pbf),
-                layer,
-                "-nln",
-                table,
-                "-lco",
-                "GEOMETRY_NAME=geom",
-                "-lco",
-                "SPATIAL_INDEX=NONE",
-                "-lco",
-                "FID=ogc_fid",
-                "-gt",
-                "65536",
-                "--config",
-                "PG_USE_COPY",
-                "YES",
-            ],  # fmt: skip
-            check=True,
-            env=env,
-        )
+    layers = (("points", "osm_points"), ("lines", "osm_lines"),
+              ("multipolygons", "osm_polygons"))
+    for i, pbf in enumerate(pbfs):
+        log(f"ogr2ogr {pbf.name} ({i + 1}/{len(pbfs)})")
+        for layer, table in layers:
+            subprocess.run(  # noqa: S603 - fixed argv, our own paths, no shell
+                [
+                    ogr2ogr,
+                    # The first extract creates the tables; later ones add to them.
+                    *(["-append"] if i else []),
+                    "-f",
+                    "PostgreSQL",
+                    f"PG:{pg_conn} active_schema={schema}",
+                    str(pbf),
+                    layer,
+                    "-nln",
+                    table,
+                    "-lco",
+                    "GEOMETRY_NAME=geom",
+                    "-lco",
+                    "SPATIAL_INDEX=NONE",
+                    "-lco",
+                    "FID=ogc_fid",
+                    "-gt",
+                    "65536",
+                    "--config",
+                    "PG_USE_COPY",
+                    "YES",
+                ],  # fmt: skip
+                check=True,
+                env=env,
+            )

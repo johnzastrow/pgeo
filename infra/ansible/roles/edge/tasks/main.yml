@@ -59,8 +59,64 @@
 - name: Basemap PMTiles extract
   ansible.posix.synchronize:
     src: "{{ local_basemap_file }}"
-    dest: "{{ edge_demo_root }}/tiles/maine.pmtiles"
+    dest: "{{ edge_demo_root }}/tiles/{{ pgeo_build }}.pmtiles"
     rsync_opts: ["--chown=root:www-data", "--chmod=F0644"]
+
+# Basemaps from an earlier build, or from before the files were named after the build. Each is
+# about 300 MB and nothing references it once region.json names the current one.
+- name: Find basemaps this host no longer serves
+  ansible.builtin.find:
+    paths: "{{ edge_demo_root }}/tiles"
+    patterns: "*.pmtiles"
+    excludes: "{{ pgeo_build }}.pmtiles"
+  register: stale_tiles
+
+- name: Remove them
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ stale_tiles.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
+
+# What the demo page needs to know about this deployment's region: the map extent, which
+# basemap to ask for, and what to call itself. Read by web/js/map.js; the same file is
+# generated locally by scripts/gen_region_json.py for previews.
+- name: Count the features this host serves
+  ansible.builtin.command:
+    cmd: >-
+      docker exec pgeo_db psql -U pgeo -d pgeo -Atc
+      "SELECT count(*) FROM pgeo.feature"
+  register: pgeo_feature_count
+  changed_when: false
+  failed_when: false
+  when: pgeo_enabled | bool
+
+- name: Region description for the demo page
+  ansible.builtin.copy:
+    # Built in one expression so the numbers stay numbers: a YAML list of "{{ ... }}" strings
+    # would put quoted coordinates in the JSON and MapLibre wants floats.
+    content: |
+      {{ {
+           'build': pgeo_build,
+           'name': build_states | map('extract', registry.states) | map(attribute='name') | join(', '),
+           'states': build_states,
+           'bounds': [[boxes | map(attribute=0) | min, boxes | map(attribute=1) | min],
+                      [boxes | map(attribute=2) | max, boxes | map(attribute=3) | max]],
+           'tiles': '/tiles/' + pgeo_build + '.pmtiles',
+           'features': (pgeo_feature_count.stdout | default('0') | trim | int),
+         } | to_nice_json }}
+    dest: "{{ edge_demo_root }}/region.json"
+    owner: root
+    group: www-data
+    mode: "0644"
+  vars:
+    registry: "{{ lookup('file', local_repo_root + '/regions/regions.json') | from_json }}"
+    build_states: >-
+      {{ registry.builds[pgeo_build].states
+         if pgeo_build in registry.builds
+         else (pgeo_build | upper | split(',')) }}
+    boxes: "{{ build_states | map('extract', registry.states) | map(attribute='bbox') | list }}"
 
 - name: Remove default site
   ansible.builtin.file:

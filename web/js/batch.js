@@ -90,7 +90,8 @@ export function setupBatch(ui) {
     const url = URL.createObjectURL(new Blob([lastCsv], { type: 'text/csv' }));
     const a = document.createElement('a');
     a.href = url;
-    a.download = `pelias-maine-batch-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '')}.csv`;
+    const build = document.documentElement.dataset.build || 'geocoder';
+    a.download = `pgeo-${build}-batch-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '')}.csv`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   });

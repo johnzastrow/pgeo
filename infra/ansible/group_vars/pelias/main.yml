@@ -31,9 +31,13 @@ edge_allowed_sources: ["192.0.2.254"]
 edge_trusted_proxies: ["192.0.2.254"]
 edge_server_name: geocoder.example.org
 edge_demo_root: /srv/pelias-demo
+# Which build this host serves: one or more states, named in regions/regions.json. It selects
+# the basemap, the dump directory and what the demo page calls itself. One host, one build.
+pgeo_build: me
+
 # Controller-side sources for the demo page and its basemap.
 local_web_dir: "{{ local_repo_root }}/web"
-local_basemap_file: "{{ local_repo_root }}/data/raw/basemap/maine.pmtiles"
+local_basemap_file: "{{ local_repo_root }}/data/raw/{{ pgeo_build }}/basemap/{{ pgeo_build }}.pmtiles"
 # Requests per second per client IP (real IP from X-Forwarded-For set by wharf Caddy).
 edge_rate_search: 10
 edge_rate_autocomplete: 25
@@ -50,6 +54,8 @@ edge_api_keys: []
 # Set false to deploy pgeo alone: the Pelias upstream and routes disappear, pgeo answers on the
 # canonical /v1/* paths so existing clients need no change, and the demo page announces one
 # engine (no switch, no Compare tab). This is the small-VPS deployment the study recommends.
+# Which engines this host runs. A pgeo-only host (the VPS case in GETTING_STARTED.md) sets
+# pelias_enabled: false in zz-local.yml: the Pelias role is skipped and pgeo takes the /v1/* paths.
 pelias_enabled: true
 pgeo_enabled: true
 pgeo_user: pgeo
@@ -68,4 +74,4 @@ pgeo_mem_limit_rest: 256m
 # Dump to restore (created by scripts/pgeo_dump.sh). Required on first deploy.
 pgeo_dump_name: ""
 pgeo_force_restore: false
-local_pgeo_dump_dir: "{{ local_repo_root }}/data/pgeo/dumps"
+local_pgeo_dump_dir: "{{ local_repo_root }}/data/pgeo{{ '' if pgeo_build == 'me' else '-' + pgeo_build }}/dumps"

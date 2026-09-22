@@ -120,9 +120,10 @@ Changing a pin changes the output. Bump pins deliberately, rebuild, and re-run t
 | Census ZCTA Gazetteer | 2025 | `scripts/fetch_data.sh` (`ZCTA_YEAR`) |
 | Census state boundaries | `cb_2024_us_state_500k` | `scripts/fetch_data.sh`, `prep/src/pelias_prep/cli.py` |
 | Python deps | duckdb 1.5.5, pytest 9.1.1, ruff 0.16.8 | `prep/pyproject.toml`, `prep/uv.lock` |
-| Who's On First place | Maine region `85688769` | `projects/pelias_maine/pelias.template.json` |
+| Who's On First place | Maine region `85688769` | `regions/regions.json`; `projects/pelias_maine/pelias.template.json` for the Pelias stack |
 | TIGER state | FIPS `23` (Maine) | `projects/pelias_maine/pelias.template.json` |
-| OpenAddresses sources | `us/me/statewide`, `us/me/city_of_biddeford` | `projects/pelias_maine/pelias.template.json` |
+| OpenAddresses sources | `us/me/statewide`, `us/me/city_of_biddeford` | `regions/regions.json` (pinned there as built); the Pelias template for the Pelias stack |
+| Census ZCTA-to-county | `tab20_zcta520_county20_natl` (2020) | `scripts/fetch_data.sh` (`zcta` target) |
 
 "Latest" inputs that are **not** pinned, because upstream keeps no dated URL: the Geofabrik
 Maine PBF, GNIS Domestic Names, OpenAddresses, WOF, TIGER. Their exact bytes are archived in
@@ -139,15 +140,25 @@ curl -s https://build-metadata.protomaps.dev/builds.json | jq -r '.[-1].key' # e
 
 ## 3. Extract raw inputs
 
-Everything in this step lands in `data/raw/`. Pelias-native sources (OSM for import, OA,
-WOF, TIGER) are fetched later by `pelias download` (step 6). The OSM PBF is also kept here
-as an archival copy.
+> **Builds and paths (2026-09-22).** The pipeline is parameterised by *build* - one or more US
+> states named in `regions/regions.json`. Per-build inputs live in `data/raw/<build>/` and
+> outputs in `data/processed/<build>/csv/`; national files shared by every build are in
+> `data/raw/shared/`. Every command below takes `--build NAME` and defaults to `me`, so the
+> Maine examples are still literally correct. `GETTING_STARTED.md` walks the same ground for a
+> new region, and section 3 of `TODO.md` records what the change involved.
+>
+> A pgeo build no longer needs the Pelias CLI at all: OpenAddresses comes from
+> `results.openaddresses.io` and Who's on First from `data.geocode.earth`, both as targets of
+> `scripts/fetch_data.sh`. Steps 6-8 below remain the route for the *Pelias* stack, which is
+> still built the Pelias way so the comparison in the report stays like-for-like.
 
-Scripted, all at once (about 5 minutes on broadband):
+Everything in this step lands in `data/raw/<build>/` and `data/raw/shared/`.
+
+Scripted, all at once (about 5 minutes on broadband for one state):
 
 ```bash
-scripts/fetch_data.sh all
-# or one target: osm | gnis | zcta | boundary | overture | overture_themes | basemap
+scripts/fetch_data.sh --build me all
+# or one target: osm | gnis | oa | wof | zcta | boundary | overture | overture_themes | basemap
 ```
 
 Maine bbox used everywhere: `-71.2,42.9,-66.8,47.5` (lon_min, lat_min, lon_max, lat_max),

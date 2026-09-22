@@ -45,3 +45,6 @@ slides/.slidev/
 infra/ansible/inventory/hosts.yml
 infra/ansible/group_vars/pelias/local.yml
 infra/ansible/group_vars/pelias/zz-local.yml
+
+# Generated per-build stack settings (ports, names, data dir)
+pgeo/builds/

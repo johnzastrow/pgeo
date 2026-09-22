@@ -6,8 +6,18 @@
 # Pre-change backup on wharf: ~/Caddyfile.pre-pelias-orig
 
 # Pelias Maine geocoder - VM 120 pelias-maine (192.0.2.20), nginx edge on 8080
+#
+# The edge refuses /v1/* without a known API key (docs/API_KEYS.md). Caddy presents the "demo" key
+# on behalf of every public visitor, so the demo page needs no key of its own and no key is visible
+# to the browser. The consequence is deliberate: at this hostname the key is labelling and rate
+# limiting, not access control - whoever can reach the URL is "demo". Traffic sent straight to
+# 192.0.2.20:8080 still has to carry its own key. To revoke: drop the demo entry from
+# edge_api_keys in zz-local.yml, re-run the edge role, and put the replacement key here.
+# The real key is not in this file; it lives in the password manager and in /etc/caddy/Caddyfile.
 geocoder.example.org {
 	import acme_dns_opts
 	encode zstd gzip
-	reverse_proxy 192.0.2.20:8080
+	reverse_proxy 192.0.2.20:8080 {
+		header_up X-API-Key "pgeo_REPLACE_WITH_THE_DEMO_KEY"
+	}
 }

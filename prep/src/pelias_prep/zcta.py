@@ -1,8 +1,12 @@
-"""Census Gazetteer ZCTA file (national, pipe-delimited since 2025) -> Pelias CSV, Maine only.
+"""Census Gazetteer ZCTAs -> Pelias CSV, limited to the build's states.
 
-Maine ZIP codes use the 039-049 prefixes. Each ZCTA becomes a `postalcode` layer
-record at its internal point. The polygons are not used: Pelias reverse
-point-in-polygon only uses Who's On First.
+Each ZCTA becomes a `postalcode` record at its internal point. The polygons are not used:
+Pelias reverse point-in-polygon only uses Who's On First.
+
+Which ZCTAs belong is decided in common.load_region_zctas, by asking whether the Census
+internal point falls inside the region polygon. The earlier Maine-only version matched the
+ZIP prefixes 039-049 instead, which is a fact about one state; the point test is the same
+question asked directly and needs nothing looked up per state.
 """
 
 from __future__ import annotations
@@ -11,32 +15,27 @@ from pathlib import Path
 
 import duckdb
 
-from .common import ExportResult, export_csv
+from .common import ExportResult, Region, export_csv
 
 SQL = """
-WITH src AS (
-    SELECT *
-    FROM read_csv(?, delim = '|', header = true, all_varchar = true, normalize_names = true)
-)
 SELECT
-    trim(geoid)                                  AS id,
+    geoid                                        AS id,
     'zcta'                                       AS source,
     'postalcode'                                 AS layer,
-    trim(geoid)                                  AS name,
-    CAST(trim(intptlat) AS DOUBLE)               AS lat,
-    CAST(trim(intptlong) AS DOUBLE)              AS lon,
-    trim(geoid)                                  AS postcode,
+    geoid                                        AS name,
+    lat,
+    lon,
+    geoid                                        AS postcode,
     to_json({
-        zcta5: trim(geoid),
-        aland_sqmi: CAST(trim(aland_sqmi) AS DOUBLE),
-        awater_sqmi: CAST(trim(awater_sqmi) AS DOUBLE)
+        zcta5: geoid,
+        aland_sqmi: aland_sqmi,
+        awater_sqmi: awater_sqmi
     })                                           AS addendum_json_zcta
-FROM src
-WHERE substr(trim(geoid), 1, 3) BETWEEN '039' AND '049'
+FROM zctas
 ORDER BY id
 """
 
 
-def convert(con: duckdb.DuckDBPyConnection, src: Path, out: Path) -> ExportResult:
-    # `src` is the extracted .txt; the CLI unpacks it from the Census zip.
-    return export_csv(con, SQL, [str(src)], out)
+def convert(con: duckdb.DuckDBPyConnection, out: Path, reg: Region) -> ExportResult:
+    """Export the `zctas` table (built by common.load_region_zctas) as a Pelias CSV."""
+    return export_csv(con, SQL, [], out, reg)

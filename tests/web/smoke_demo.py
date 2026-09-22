@@ -16,6 +16,7 @@ import re
 import sys
 from pathlib import Path
 
+from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 from playwright.sync_api import sync_playwright
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -68,7 +69,13 @@ def run(base: str, shots: Path) -> list[str]:
                     failures.append(f"{tag}: no API key (set PGEO_API_KEY or run scripts/dev_web.sh)")
                     page.close()
                     continue
-                if page.is_hidden("#apikey-form"):
+                # The form appears on the first 401, not on load: a deployment can sit behind a
+                # proxy that presents the key itself, and there the page must never ask. So the
+                # test makes a request first, the way a visitor would.
+                page.type("#search .ps-input", "portland", delay=20)
+                try:
+                    page.wait_for_selector("#apikey-form:not([hidden])", timeout=8000)
+                except PlaywrightTimeoutError:
                     failures.append(f"{tag}: the page did not ask for an API key")
                 page.fill("#apikey-input", "pgeo_" + "x" * 43)          # a well-formed wrong key
                 page.click("#apikey-form button")

@@ -102,8 +102,12 @@ def typo(text: str) -> str:
     return "".join(chars)
 
 
-def variant_address(addr: str) -> str:
-    """A real address written the way people actually type it."""
+def variant_address(addr: str, state_code: str = "ME", state_name: str = "Maine") -> str:
+    """A real address written the way people actually type it.
+
+    The state is a parameter so the same mangling serves any build (tests/accuracy/build_cases.py
+    passes the build's own state); the defaults keep the Maine corpus exactly as it was.
+    """
     number_street, town, _state = (addr.split(", ") + ["", ""])[:3]
     words = number_street.split()
     words = [SUFFIXES.get(w, w) if RNG.random() < 0.5 else w for w in words]
@@ -113,12 +117,12 @@ def variant_address(addr: str) -> str:
     if form == "no_state":
         return f"{street}, {town}"
     if form == "no_town":
-        return f"{street} Maine"
+        return f"{street} {state_name}"
     if form == "unit":
-        return f"{street} Apt {RNG.randint(1, 12)}, {town}, ME"
+        return f"{street} Apt {RNG.randint(1, 12)}, {town}, {state_code}"
     if form == "lower":
-        return f"{street} {town} me".lower()
-    return f"{street} {town} Maine"
+        return f"{street} {town} {state_code}".lower()
+    return f"{street} {town} {state_name}"
 
 
 def variant_place(name: str) -> str:
@@ -170,9 +174,16 @@ OUT_OF_STATE = [
 ]
 
 
-def misses(streets: list[str]) -> list[str]:
+def misses(streets: list[str], n: int | None = None,
+           out_of_state: list[str] | None = None) -> list[str]:
+    """Queries that should return nothing, or nothing confident.
+
+    `out_of_state` is a parameter because the list below is only out of state for Maine: on a
+    New York build "Times Square, New York" and "Niagara Falls, Ontario" are not misses at all.
+    """
+    elsewhere = OUT_OF_STATE if out_of_state is None else out_of_state
     out: list[str] = []
-    while len(out) < N["misses"]:
+    while len(out) < (n or N["misses"]):
         kind = RNG.choice(("big_number", "invented", "out_of_state", "gibberish"))
         if kind == "big_number":
             out.append(f"{RNG.randint(90000, 99999)} {RNG.choice(streets)}")
@@ -184,7 +195,7 @@ def misses(streets: list[str]) -> list[str]:
                 f"{word} {RNG.choice(('Pond', 'Mountain', 'Street', 'Plaza', 'Brewing Co'))}"
             )
         elif kind == "out_of_state":
-            out.append(RNG.choice(OUT_OF_STATE))
+            out.append(RNG.choice(elsewhere))
         else:
             out.append(
                 "".join(
