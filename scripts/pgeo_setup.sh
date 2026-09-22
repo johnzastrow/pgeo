@@ -30,7 +30,9 @@ while [[ $# -gt 0 ]]; do
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
 done
-build="${build,,}"
+# A build given as a state list ("me,nh,vt") names a directory, a database and containers, so
+# it takes the same dashed form the rest of the pipeline uses.
+build="$(tr ',' '-' <<<"${build,,}")"
 [[ -n "$offset" ]] || { [[ "$build" == "me" ]] && offset=0 || offset=1; }
 [[ "$offset" =~ ^[0-9]+$ ]] || { echo "--offset must be a number" >&2; exit 2; }
 

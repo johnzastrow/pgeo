@@ -42,12 +42,12 @@ done
 # Resolve the build to its member states: either a named build or a bare list of state codes.
 states="$(jq -r --arg b "$build" '.builds[$b].states // empty | join(" ")' "$REGISTRY")"
 if [[ -z "$states" ]]; then
-  states="$(tr ',' ' ' <<<"${build^^}")"
+  states="$(tr ',-' '  ' <<<"${build^^}")"
   for st in $states; do
     jq -e --arg s "$st" '.states[$s]' "$REGISTRY" >/dev/null \
       || { echo "unknown state or build: $st (see regions/regions.json)" >&2; exit 2; }
   done
-  # The build names a directory, so "me,nh,vt" becomes "me-nh-vt".
+  # The build names a directory, so "me,nh,vt" becomes "me-nh-vt" (already dashed is fine).
   build="$(tr ',' '-' <<<"${build,,}")"
 fi
 RAW="${ROOT}/data/raw/${build}"

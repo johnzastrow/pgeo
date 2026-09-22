@@ -17,7 +17,9 @@ while [[ $# -gt 0 ]]; do
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
 done
-build="${build,,}"
+# A build given as a state list ("me,nh,vt") names a directory, a database and containers, so
+# it takes the same dashed form the rest of the pipeline uses.
+build="$(tr ',' '-' <<<"${build,,}")"
 
 TILES="${ROOT}/data/raw/${build}/basemap/${build}.pmtiles"
 [[ -f "$TILES" ]] || { echo "missing ${TILES} (scripts/fetch_data.sh --build ${build} basemap)" >&2; exit 1; }

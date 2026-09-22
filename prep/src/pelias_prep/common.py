@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -60,7 +61,9 @@ def region(build: str) -> Region:
     reg = _registry()
     states = reg.get("builds", {}).get(build, {}).get("states")
     if states is None:
-        states = [s.strip().upper() for s in build.split(",") if s.strip()]
+        # Either separator: "me,nh,vt" as a person types it, or the dashed form the
+        # scripts pass around because it also names directories and containers.
+        states = [s.strip().upper() for s in re.split(r"[,-]", build) if s.strip()]
         build = "-".join(s.lower() for s in states)  # the build names a directory
     unknown = [s for s in states if s not in reg["states"]]
     if not states or unknown:

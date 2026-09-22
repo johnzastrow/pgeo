@@ -17,7 +17,9 @@ while [[ $# -gt 0 ]]; do
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
 done
-build="${build,,}"
+# A build given as a state list ("me,nh,vt") names a directory, a database and containers, so
+# it takes the same dashed form the rest of the pipeline uses.
+build="$(tr ',' '-' <<<"${build,,}")"
 
 # The default build keeps the original container, database and paths.
 container=pgeo_db; database=pgeo; OUT="$ROOT/data/pgeo/dumps"; tag=""

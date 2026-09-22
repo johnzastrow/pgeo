@@ -45,7 +45,9 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-build="${build,,}"
+# A build given as a state list ("me,nh,vt") names a directory, a database and containers, so
+# it takes the same dashed form the rest of the pipeline uses.
+build="$(tr ',' '-' <<<"${build,,}")"
 # Ports and database for this build. Offset 0 is the original stack; any other build has an env
 # file written by scripts/pgeo_setup.sh.
 api_port=4500; sql_port=4700
