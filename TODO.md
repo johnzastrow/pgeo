@@ -121,13 +121,26 @@ LEFT JOIN LATERAL (
 Partial GiST indexes per placetype are the other candidate. Either changes what the build writes,
 so either needs a Maine rebuild proving the output is identical row for row before it is kept.
 
-## 5. An explicit tie-break rule
+## 5. An explicit tie-break rule, at query time and at build time
 
 Where candidates tie on score, the winner is currently decided by physical row order (report
 Section 3.16.3). It is deterministic per build but not chosen, and it puts about one case of
 noise into the accuracy figure between builds and hosts ("Stevenns Corner", Section 5.7 of
 `docs/PERFORMANCE_OPTIMIZATION.md`). Any rule - source priority, then id - changes some
 current outputs, so it is a deliberate change with its own accuracy run.
+
+The same arbitrariness exists in the **build**, which matters more, and the rebuild of
+2026-09-22 caught it. The address dedupe keeps one row per (house number, street, town) and
+orders only by source, so among several OpenAddresses rows for one address the winner is
+whichever the table happens to hold first. OpenAddresses has eight rows for 101 Hancock St,
+Rumford: seven agree on 44.5490971,-70.5485485 and one sits 25 m away. The rebuild kept the
+outlier, and a reverse-geocoding case that had passed for months began to fail - not because
+anything got worse, but because nothing ever chose.
+
+The fix is better than a tie-break: keep the point the rows agree on. Group the duplicates,
+take the modal coordinate, and fall back to the lowest hash only when there is no majority.
+That is deterministic *and* more accurate, and it costs one aggregate in the dedupe. It
+changes some current outputs, so it needs its own accuracy run and a note in the report.
 
 ## 6. ~~Rewrite history before publishing to GitHub~~ Done 2026-09-22
 
