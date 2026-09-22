@@ -109,6 +109,15 @@ named, so a venue on the wrong side of a border does not get in.
 
 ## 5. Build the database
 
+Write down a handful of answers you already know before building - two well-known cities, a
+street address you can check on a map, a coordinate you recognise. They are facts about the
+region, so you can write them before the geocoder exists, and they are what tells you the build
+is sound rather than merely finished:
+
+```bash
+cp pgeo/tuning/verify/me.json pgeo/tuning/verify/ny.json   # then edit it for your region
+```
+
 ```bash
 scripts/pgeo_setup.sh --build ny       # containers, passwords, ports; first run compiles libpostal
 scripts/pgeo_rebuild.sh --build ny --profile medium --skip-gate

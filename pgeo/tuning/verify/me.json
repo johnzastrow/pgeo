@@ -1,0 +1,66 @@
+{
+  "build": "me",
+  "note": "Known answers for the Maine build: facts about the region, not about the engine.",
+  "cases": [
+    {
+      "path": "search",
+      "params": {
+        "text": "389 Congress St, Portland, ME"
+      },
+      "want": "389 Congress St, Portland"
+    },
+    {
+      "path": "search",
+      "params": {
+        "text": "Portland, Maine"
+      },
+      "want": "Portland, ME"
+    },
+    {
+      "path": "search",
+      "params": {
+        "text": "Portlnd, ME"
+      },
+      "want": "Portland, ME"
+    },
+    {
+      "path": "search",
+      "params": {
+        "text": "Subway, Cumberland Mills"
+      },
+      "want": "Westbrook"
+    },
+    {
+      "path": "search",
+      "params": {
+        "text": "main st",
+        "focus.point.lat": "44.80",
+        "focus.point.lon": "-68.77"
+      },
+      "want": "Bangor"
+    },
+    {
+      "path": "search/structured",
+      "params": {
+        "address": "389 Congress St",
+        "locality": "Portland"
+      },
+      "want": "389 Congress St"
+    },
+    {
+      "path": "autocomplete",
+      "params": {
+        "text": "389 congress st portland"
+      },
+      "want": "389 Congress St"
+    },
+    {
+      "path": "reverse",
+      "params": {
+        "point.lat": "43.6568",
+        "point.lon": "-70.2626"
+      },
+      "want": "Portland"
+    }
+  ]
+}

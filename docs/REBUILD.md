@@ -52,7 +52,7 @@ scripts/rebuild_all.sh deploy       # ship to the query host (explicit only)
 ```bash
 scripts/bootstrap.sh                 # pelias/docker CLI at a pinned commit -> vendor/pelias-docker
 scripts/fetch_data.sh all            # OSM extract, GNIS, ZCTA, state boundary, Overture places, basemap
-(cd prep && uv run pytest -q && uv run pelias-prep all)   # GNIS, ZCTA, Overture -> Pelias CSV
+(cd prep && uv run python -m pytest -q && uv run pelias-prep all)   # GNIS, ZCTA, Overture -> Pelias CSV
 ```
 
 Checks and expected counts: DATA_PIPELINE.md sections 3-4. The Pelias download step in 3.2 also
@@ -108,10 +108,10 @@ Locally the page offers three engines (Pelias, pgeo pure SQL, pgeo FastAPI), the
 
 ```bash
 uv run --project pgeo python tests/compat/compat_test.py     # Pelias API contract, 28 cases
-(cd pgeo && uv run pytest -q)                               # parser, tuning tools, SQL address functions
+(cd pgeo && uv run python -m pytest -q)                               # parser, tuning tools, SQL address functions
 python3 tests/web/smoke_demo.py                              # browser test, every tab and engine
 uv run --project report --with pytest pytest report/tests -q # the report renderer (37)
-uv run --project pgeo pytest tests/security -q               # deployment posture (30 deployed)
+uv run --project pgeo python -m pytest tests/security -q               # deployment posture (30 deployed)
 uv run --project pgeo --with jinja2 pytest tests/web/test_engine_modes.py -q  # one engine or two
 uv run --project pgeo python tests/accuracy/run_accuracy.py --engine pgeo --base http://127.0.0.1:4700 --label check
 uv run --project pgeo python tests/accuracy/gate.py data/accuracy/pgeo-check.json

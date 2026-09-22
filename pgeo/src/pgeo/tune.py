@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import json
 import math
 import re
 import subprocess
@@ -335,24 +336,32 @@ def cmd_show(_: argparse.Namespace) -> int:
 
 
 # Known answers that exercise each tuned path (all found in docs/PGEO_TUNING.md).
-VERIFY = [
-    ("search", {"text": "389 Congress St, Portland, ME"}, "389 Congress St, Portland"),
-    ("search", {"text": "Portland, Maine"}, "Portland, ME"),
-    ("search", {"text": "Portlnd, ME"}, "Portland, ME"),
-    ("search", {"text": "Subway, Cumberland Mills"}, "Westbrook"),
-    ("search", {"text": "main st", "focus.point.lat": "44.80", "focus.point.lon": "-68.77"}, "Bangor"),
-    ("search/structured", {"address": "389 Congress St", "locality": "Portland"}, "389 Congress St"),
-    ("autocomplete", {"text": "389 congress st portland"}, "389 Congress St"),
-    ("reverse", {"point.lat": "43.6568", "point.lon": "-70.2626"}, "Portland"),
-]
+# Known answers live per build in pgeo/tuning/verify/<build>.json, because they are facts about
+# a region, not about the engine: "Portland, Maine" is a Maine fact and says nothing about a New
+# York build. A build with no file of its own has nothing to check, and says so rather than
+# passing silently.
+VERIFY_DIR = PGEO_ROOT / "tuning" / "verify"
+
+
+def verify_cases(build: str) -> list[tuple[str, dict, str]]:
+    path = VERIFY_DIR / f"{build}.json"
+    if not path.exists():
+        raise SystemExit(
+            f"no known answers for build {build!r}: write {path.relative_to(PGEO_ROOT.parent)} "
+            f"(see me.json) with queries whose right answer is a fact about the region"
+        )
+    doc = json.loads(path.read_text())
+    return [(c["path"], c["params"], c["want"]) for c in doc["cases"]]
+
 
 
 def cmd_verify(args: argparse.Namespace) -> int:
     import httpx
 
     failures = 0
+    cases = verify_cases(args.build)
     for base in args.url:
-        for path, params, want in VERIFY:
+        for path, params, want in cases:
             try:
                 r = httpx.get(f"{base.rstrip('/')}/v1/{path}", params=params | {"size": 1}, timeout=10)
                 feats = r.json().get("features", []) if r.status_code == 200 else []
@@ -366,7 +375,9 @@ def cmd_verify(args: argparse.Namespace) -> int:
     # every response then carries a meaningless engine version, so treat it as a failure
     for base in args.url:
         try:
-            r = httpx.get(f"{base.rstrip('/')}/v1/search", params={"text": "bangor", "size": 1}, timeout=10)
+            # any query from this build's own set: only the stamped version is being read
+            probe = cases[0][1] | {"size": 1}
+            r = httpx.get(f"{base.rstrip('/')}/v1/{cases[0][0]}", params=probe, timeout=10)
             ver = (r.json().get("geocoding", {}).get("engine", {}) or {}).get("version", "")
         except (httpx.HTTPError, ValueError) as e:
             ver = f"<error {type(e).__name__}>"
@@ -395,6 +406,7 @@ def main() -> None:
     sub.add_parser("show").set_defaults(fn=cmd_show)
     v = sub.add_parser("verify")
     v.add_argument("--url", action="append", default=None)
+    v.add_argument("--build", default="me", help="which known-answer set to use")
     v.set_defaults(fn=cmd_verify)
     args = ap.parse_args()
     if args.cmd == "verify" and not args.url:

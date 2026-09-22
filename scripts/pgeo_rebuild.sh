@@ -87,7 +87,8 @@ else
 fi
 
 step "3/4 known-answer checks"
-pgeo pgeo-tune verify --url "http://127.0.0.1:${api_port}" --url "http://127.0.0.1:${sql_port}"
+pgeo pgeo-tune verify --build "$build" \
+  --url "http://127.0.0.1:${api_port}" --url "http://127.0.0.1:${sql_port}"
 
 if [[ $skip_gate -eq 1 ]]; then
   echo "accuracy gate skipped (--skip-gate)"

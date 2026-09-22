@@ -254,7 +254,7 @@ row inside the Maine bbox, unique ids, at least one row. Any failure stops the r
 ```bash
 cd prep
 uv sync                      # creates .venv with Python >= 3.12 and duckdb 1.5.5 from uv.lock
-uv run pytest -q             # 7 tests on synthetic inputs; expect "7 passed"
+uv run python -m pytest -q   # tests on synthetic inputs; expect "10 passed"
 uv run pelias-prep all       # or: gnis | zcta | overture
 cd ..
 ```
@@ -715,7 +715,7 @@ Monthly is a sensible cadence (Overture releases monthly; OSM and OA change cont
 # 1. New raw inputs (bump OVERTURE_RELEASE / PROTOMAPS_BUILD pins first if desired)
 scripts/fetch_data.sh all
 # 2. Re-prepare custom sources
-(cd prep && uv run pytest -q && uv run pelias-prep all)
+(cd prep && uv run python -m pytest -q && uv run pelias-prep all)
 # 3. Clean rebuild of the index
 (cd projects/pelias_maine && ../../vendor/pelias-docker/pelias elastic drop)
 scripts/build_local.sh

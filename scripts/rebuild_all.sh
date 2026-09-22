@@ -11,12 +11,16 @@
 #   data    pelias CLI (pinned), raw inputs, prepared CSVs (GNIS, ZCTA, Overture)
 #   pelias  Pelias download + prepare + import + start + tests, then an Elasticsearch snapshot
 #   pgeo    pgeo first-time setup, then build + tuning profile + known answers + accuracy gate
-#           (needs the Pelias download outputs: WOF, OSM, OpenAddresses as CSV)
+#           (pgeo fetches its own OpenAddresses and Who's on First; see GETTING_STARTED.md)
 #   verify  API compatibility contract and browser smoke test of the demo page
 #   report  docs/REPORT.md and docs/REPORT.pdf from the saved results
 #   deploy  pgeo dump, then Ansible to the query host with the newest snapshot and dump
 #           (VM 120 must have 14 GB: docs/DEPLOY_PGEO.md)
 # Load tests are not a stage: they take hours (docs/REBUILD.md, section 7).
+#
+# This script rebuilds the Maine build, because that is what the report measures and what the
+# `pelias` stage needs. To build another region, follow GETTING_STARTED.md: the same stages with
+# --build, and without Pelias, which is not part of a pgeo deployment.
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
@@ -37,7 +41,7 @@ stage_check() {
 stage_data() {
   scripts/bootstrap.sh
   scripts/fetch_data.sh all
-  (cd prep && uv run pytest -q && uv run pelias-prep all)
+  (cd prep && uv run python -m pytest -q && uv run pelias-prep all)
 }
 
 stage_pelias() {
@@ -60,9 +64,9 @@ stage_pgeo() {
 
 stage_verify() {
   uv run --project pgeo python tests/compat/compat_test.py --json report/data/compat.json
-  (cd pgeo && uv run pytest -q)
+  (cd pgeo && uv run python -m pytest -q)
   uv run --project report --with pytest pytest report/tests -q     # the report renderer
-  uv run --project pgeo pytest tests/security -q                   # posture of the local stack
+  uv run --project pgeo python -m pytest tests/security -q                   # posture of the local stack
   if ! curl -sf -o /dev/null http://127.0.0.1:8088/; then
     (nohup scripts/dev_web.sh > data/logs/dev_web.log 2>&1 &)
     sleep 3
@@ -87,7 +91,7 @@ stage_deploy() {
   python3 tests/web/smoke_demo.py "$site"
   # the deployed posture, including the host checks that only apply to a real deployment
   PGEO_EDGE="$site/pgeo" PELIAS_EDGE="$site" \
-    PGEO_VM_SSH="${PGEO_VM_SSH:-}" uv run --project pgeo pytest tests/security -q
+    PGEO_VM_SSH="${PGEO_VM_SSH:-}" uv run --project pgeo python -m pytest tests/security -q
 }
 
 for s in "${stages[@]}"; do
