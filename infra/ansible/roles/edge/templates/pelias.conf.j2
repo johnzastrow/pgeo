@@ -147,7 +147,10 @@ server {
         if ($api_client = "") { return 401; }
         limit_req zone=pelias_autocomplete burst=50 nodelay;
         proxy_intercept_errors on;
+        # error_page does not merge: a location with its own inherits none from the server, so
+        # the 401 handler has to be repeated wherever a 404 one is declared.
         error_page 404 = @pgeo_unsupported;
+        error_page 401 = @unauthorized;
         proxy_pass http://pgeo_rest/rpc/v1_autocomplete?$pgeo_circle_args;
     }
     location = {{ pgeo_prefix }}/v1/search {
@@ -155,7 +158,10 @@ server {
         if ($api_client = "") { return 401; }
         limit_req zone=pelias_search burst=20 nodelay;
         proxy_intercept_errors on;
+        # error_page does not merge: a location with its own inherits none from the server, so
+        # the 401 handler has to be repeated wherever a 404 one is declared.
         error_page 404 = @pgeo_unsupported;
+        error_page 401 = @unauthorized;
         proxy_pass http://pgeo_rest/rpc/v1_search?$pgeo_circle_args;
     }
     location = {{ pgeo_prefix }}/v1/search/structured {
@@ -163,7 +169,10 @@ server {
         if ($api_client = "") { return 401; }
         limit_req zone=pelias_search burst=20 nodelay;
         proxy_intercept_errors on;
+        # error_page does not merge: a location with its own inherits none from the server, so
+        # the 401 handler has to be repeated wherever a 404 one is declared.
         error_page 404 = @pgeo_unsupported;
+        error_page 401 = @unauthorized;
         proxy_pass http://pgeo_rest/rpc/v1_search_structured?$pgeo_circle_args;
     }
     location ~ ^{{ pgeo_prefix }}/v1/(?<pgeo_fn>reverse|place|address)$ {
@@ -171,7 +180,10 @@ server {
         if ($api_client = "") { return 401; }
         limit_req zone=pelias_search burst=20 nodelay;
         proxy_intercept_errors on;
+        # error_page does not merge: a location with its own inherits none from the server, so
+        # the 401 handler has to be repeated wherever a 404 one is declared.
         error_page 404 = @pgeo_unsupported;
+        error_page 401 = @unauthorized;
         proxy_pass http://pgeo_rest/rpc/v1_$pgeo_fn$is_args$args;
     }
     # Pelias serves the licence page to any client; PostgREST returns the media-type domain

@@ -23,6 +23,18 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+### Fixed
+- The pgeo locations answered a refused key with nginx's HTML 401 page and no
+  `WWW-Authenticate`: `error_page` does not merge, and a location with its own `error_page 404`
+  inherits none from the server. The 401 handler is now declared beside each 404 one, and a
+  configuration test checks every guarded location resolves its 401 to the JSON handler. Found on
+  VM 120 by the production run of the suite, which is what the suite is for.
+
+### Deployed
+- VM 120: the key check is on. Two clients issued, `demo` and `dispatch`; hashes in the
+  inventory, keys handed over out of band. 38 checks pass against production; the browser smoke
+  test passes through the key form; the access log shows client names and no keys.
+
 ## [0.19.0] - 2026-09-22
 
 ### Added

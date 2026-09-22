@@ -278,3 +278,16 @@ def test_the_deployed_inventory_has_the_check_on():
         assert not re.search(
             r"^edge_require_api_key:\s*false", local.read_text(), re.MULTILINE
         ), "zz-local.yml turns the key check off"
+
+
+def test_every_guarded_location_resolves_401_to_the_json_handler():
+    """error_page directives do not merge in nginx: a location that declares its own error_page
+    (the pgeo locations do, for 404) inherits none from the server, and its 401 would fall to
+    nginx's HTML page with no WWW-Authenticate. Found on VM 120 after the first deploy."""
+    conf = render()
+    blocks = re.findall(r"location[^{]*\{(.*?)\n    \}", conf, re.DOTALL)
+    for b in blocks:
+        if "if ($api_client" not in b:
+            continue
+        if "error_page" in b:
+            assert "error_page 401 = @unauthorized;" in b, b[:160]
