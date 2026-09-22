@@ -93,7 +93,35 @@ parameter"), and a multi-state build has only been exercised by unit tests, not 
 Per-machine server tuning is shared by every stack on a workstation, which does not arise on a
 host that serves one build.
 
-## 4. An explicit tie-break rule
+## 4. The build's point-in-polygon step is the whole cost of a bigger region
+
+Every raw feature is matched against the admin polygons with four lateral probes - one each for
+neighbourhood, locality, localadmin and county - and the step runs on one core (it writes a temp
+table, which Postgres will not do in parallel). It is most of the build:
+
+| Build | Raw features | Admin polygons | Point-in-polygon |
+|---|---|---|---|
+| Maine | 1.65 M | 3,351 | minutes |
+| New York | 14.9 M | 11,015 | about an hour |
+
+A one-probe form should be worth roughly three times: ask the index once per point and pick the
+smallest polygon per placetype inside the lateral, rather than probing once per placetype.
+
+```sql
+LEFT JOIN LATERAL (
+  SELECT max(name) FILTER (WHERE placetype = 'locality') AS lo_name, ...
+  FROM (SELECT DISTINCT ON (a.placetype) a.placetype, a.name
+        FROM admin a
+        WHERE ST_Intersects(a.geom, r.geom)
+          AND a.placetype IN ('neighbourhood','locality','localadmin','county')
+        ORDER BY a.placetype, ST_Area(a.geom)) d
+) x ON true
+```
+
+Partial GiST indexes per placetype are the other candidate. Either changes what the build writes,
+so either needs a Maine rebuild proving the output is identical row for row before it is kept.
+
+## 5. An explicit tie-break rule
 
 Where candidates tie on score, the winner is currently decided by physical row order (report
 Section 3.16.3). It is deterministic per build but not chosen, and it puts about one case of
@@ -101,7 +129,7 @@ noise into the accuracy figure between builds and hosts ("Stevenns Corner", Sect
 `docs/PERFORMANCE_OPTIMIZATION.md`). Any rule - source priority, then id - changes some
 current outputs, so it is a deliberate change with its own accuracy run.
 
-## 5. ~~Rewrite history before publishing to GitHub~~ Done 2026-09-22
+## 6. ~~Rewrite history before publishing to GitHub~~ Done 2026-09-22
 
 The local inventory file had been tracked for a day, and the sanitisation of 2026-09-21 had left
 every earlier commit's copies of the private details in place (some twenty files: the plan, the
@@ -113,7 +141,7 @@ Commit hashes before this date changed; a backup bundle of the old history is ke
 repository. Three tokens the original sanitisation had missed at HEAD (a tailnet address, the
 VM's MAC, the internal DNS name) went in the same pass.
 
-## 6. Authorization: single sign-on
+## 7. Authorization: single sign-on
 
 API keys at the edge are done (0.19.0, report Section 3.13.2). A key names a client - the
 dispatch application, the demo - not a person. Single sign-on for the people behind the clients
