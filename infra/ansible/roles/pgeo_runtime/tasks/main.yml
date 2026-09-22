@@ -175,6 +175,28 @@
           /dumps/{{ pgeo_dump_name }}.dump
       timeout: 1800
 
+    - name: Rebuild the autocomplete side table in this host's physical order
+      # feature_ac must be in the same physical order as feature (ties between equal candidates
+      # are broken by arrival order, and the two routes must agree). Dump and restore does not
+      # preserve the relative order of two tables, so it is not shipped: it is made here, from the
+      # restored feature table, with CREATE TABLE AS, which bulk-appends and keeps the order exactly.
+      # DROP IF EXISTS covers a dump made before the table was excluded.
+      ansible.builtin.command:
+        cmd: docker exec -i pgeo_db psql -v ON_ERROR_STOP=1 -U pgeo -d pgeo
+        stdin: |
+          BEGIN;
+          SET LOCAL max_parallel_workers_per_gather = 0;
+          DROP TABLE IF EXISTS pgeo.feature_ac;
+          CREATE TABLE pgeo.feature_ac AS
+            SELECT id, importance, geom, layer, label, name_norm, tokens
+            FROM pgeo.feature WHERE layer <> 'address' ORDER BY ctid;
+          ALTER TABLE pgeo.feature_ac ADD PRIMARY KEY (id);
+          CREATE INDEX feature_ac_tokens_idx ON pgeo.feature_ac USING gin (tokens);
+          CREATE INDEX feature_ac_name_trgm_idx ON pgeo.feature_ac USING gin (name_norm gin_trgm_ops);
+          GRANT SELECT ON pgeo.feature_ac TO pgeo_api;
+          COMMIT;
+      changed_when: true
+
     - name: VACUUM ANALYZE (fresh tables have no visibility map or statistics)
       ansible.builtin.command: docker exec pgeo_db psql -U pgeo -d pgeo -c "VACUUM (ANALYZE)"
       timeout: 1800

@@ -23,6 +23,20 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+### Fixed
+- `pgeo.feature_ac` no longer travels in the dump; the restore rebuilds it on the target from the
+  restored `feature` table in that host's physical order. A dump and restore of two tables does
+  not preserve their relative order - on VM 120, 177 rows landed elsewhere and 6 of 276
+  keystrokes then answered differently on the fast and slow routes. Now consistent by
+  construction on any host.
+- `tests/accuracy/run_accuracy.py --rps N` paces requests, so the set can be run through an edge
+  with a rate limit; without it VM 120 answered 1,469 cases with HTTP 429.
+
+### Deployed
+- VM 120: the four demo tabs (0.18.0) and pgeo 0.10.0. Accuracy over the public endpoint 95.8%,
+  gate passed; one case differs from the workstation, a two-way tie at equal confidence that a
+  fresh restore orders the other way.
+
 ## [0.18.0] - 2026-09-21
 
 ### Added

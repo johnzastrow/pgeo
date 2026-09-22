@@ -372,6 +372,25 @@ rebuild lays rows out in a new physical order, and ties fall with it (Section 5.
 one thing the byte-for-byte comparison cannot carry across a rebuild, which is why the checks
 that survive it are properties, not snapshots.
 
+### 5.7 Deployment to VM 120
+
+pgeo 0.10.0 was dumped and restored onto VM 120 with the existing Ansible role. The first check
+found **177 of 203,399 side-table rows out of physical order and 6 of 276 keystrokes answering
+differently on the fast and slow routes**: `pg_dump` and `pg_restore` handle the two tables
+separately and do not preserve their relative order. The fix is structural rather than a repair:
+the side table no longer travels. `scripts/pgeo_dump.sh` excludes it, and the restore rebuilds it
+on the target from the target's own `feature` table with `CREATE TABLE AS ... ORDER BY ctid`, so
+the two are consistent by construction on any host. After that: 0 rows out of order, 276 of 276
+identical.
+
+The 1,560-case set was then run over the public endpoint (paced to 8 requests a second - the
+edge's rate limit had turned 1,469 of the first run's answers into HTTP 429, which the scorer
+counts as failures). Gate passed at 95.8%. Against the workstation, one case flipped:
+`Stevenns Corner` ties two different Stevens Corners at confidence 0.906 - correctly marked
+ambiguous - and a fresh restore orders them the other way. The accuracy figure carries about one
+case of noise from tie order between builds and hosts; an explicit tie-break rule (Section 7)
+would remove it.
+
 ## 7. What is left
 
 - The typo fallback is now the dominant cost and cannot be gated. Making the trigram recheck

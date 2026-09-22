@@ -72,13 +72,27 @@ def score(case: dict, body: dict | None, error: str | None) -> dict:
     return res
 
 
-async def run(base: str, extra: dict, concurrency: int, cases_path: Path) -> list[dict]:
+async def run(base: str, extra: dict, concurrency: int, cases_path: Path, rps: float = 0) -> list[dict]:
     cases = json.loads(cases_path.read_text())
     sem = asyncio.Semaphore(concurrency)
+    # Optional pacing: the production edge answers 429 above its per-client rate, which the
+    # scorer would count as 1,469 wrong answers. A token every 1/rps seconds keeps under it.
+    gap = 1.0 / rps if rps > 0 else 0.0
+    next_slot = [time.monotonic()]
+
+    async def pace():
+        if not gap:
+            return
+        now = time.monotonic()
+        wait = next_slot[0] - now
+        next_slot[0] = max(now, next_slot[0]) + gap
+        if wait > 0:
+            await asyncio.sleep(wait)
     async with httpx.AsyncClient(base_url=base.rstrip("/"), timeout=20) as client:
 
         async def one(case: dict) -> dict:
             async with sem:
+                await pace()
                 params = {**case["params"], **extra, "size": 10}
                 t = time.perf_counter()
                 try:
@@ -135,12 +149,14 @@ def main() -> None:
     ap.add_argument("--label", default="default")
     ap.add_argument("--param", action="append", default=[], help="extra query param k=v (e.g. pgeo.parse=none)")
     ap.add_argument("--concurrency", type=int, default=4)
+    ap.add_argument("--rps", type=float, default=0,
+                    help="cap requests per second, for an edge with a rate limit (VM 120 allows 10/s)")
     ap.add_argument(
         "--cases", type=Path, default=CASES, help="cases file (default cases.json; fuzz_cases.json for rounds)"
     )
     a = ap.parse_args()
     extra = dict(p.split("=", 1) for p in a.param)
-    results = asyncio.run(run(a.base, extra, a.concurrency, a.cases))
+    results = asyncio.run(run(a.base, extra, a.concurrency, a.cases, a.rps))
     summary = summarize(results)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     out = OUT_DIR / f"{a.engine}-{a.label}.json"
