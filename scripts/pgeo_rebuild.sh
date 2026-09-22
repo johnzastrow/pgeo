@@ -86,6 +86,15 @@ else
   # would move the other builds too. On a host that serves one build this does not arise.
   step "2/4 tuning profile: keeping $profile (shared with the other stacks on this machine)"
   docker restart "pgeo-${build}_api" "pgeo-${build}_rest" >/dev/null
+  # Wait for them, or the known answers that follow test a front end that is still starting and
+  # report every case as a read error. pgeo-tune does this for the default build; here it is ours.
+  for url in "http://127.0.0.1:${api_port}/v1/search?text=a&size=1" \
+             "http://127.0.0.1:${sql_port}/v1/search?text=a&size=1"; do
+    for _ in $(seq 60); do
+      curl -fsS -o /dev/null --max-time 3 "$url" && break
+      sleep 2
+    done
+  done
 fi
 
 step "3/4 known-answer checks"

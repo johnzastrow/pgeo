@@ -88,10 +88,16 @@ What the parameterisation changed, beyond paths:
   neighbour's ZIPs cannot leak in - New York holds 06390 on Fishers Island, and a plain prefix
   test there would have admitted every Connecticut 063xx.
 
+A multi-state build was then run for real, through the one command the guide gives
+(`scripts/build_region.sh --build vt,nh`): 1,074,744 raw features from two OSM extracts appended
+into one schema, 285,846 of them on the Vermont side and 121,554 on the New Hampshire side, and
+all sixteen known answers passing on both front ends - including "Burlington, Vermont" ->
+`Burlington, VT, USA` and "Concord, New Hampshire" -> `Concord, NH, USA`, which is the thing a
+multi-state build has to get right and a bare name check would not notice.
+
 Still to do: the container images take the same parameter (`docs/DOCKER_IMAGES.md`, "Region
-parameter"), and a multi-state build has only been exercised by unit tests, not by a real run.
-Per-machine server tuning is shared by every stack on a workstation, which does not arise on a
-host that serves one build.
+parameter"). Per-machine server tuning is shared by every stack on a workstation, which does not
+arise on a host that serves one build.
 
 ## 4. The build's point-in-polygon step is the whole cost of a bigger region
 
