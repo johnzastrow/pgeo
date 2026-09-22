@@ -136,7 +136,7 @@ Profiles are in `pgeo/tuning/profiles/`: `tiny`, `small`, `medium`, `large`, `wo
 by the server's memory, not by the region's size (`uv run --project pgeo pgeo-tune list`).
 
 `--skip-gate` is needed for any region except Maine: the accuracy gate compares against a
-1,560-case Maine set. Section 9 covers building a case set for a new region.
+1,560-case Maine set. Section 11 covers building a case set for a new region.
 
 ---
 
@@ -153,7 +153,7 @@ The demo page, with the map and the four demonstration tabs:
 
 ```bash
 scripts/vendor_web.sh                  # once: pinned libraries, fonts, glyphs
-scripts/dev_web.sh --build ny          # http://127.0.0.1:8088
+scripts/dev_web.sh --build ny          # http://127.0.0.1:8089 (it prints the URL)
 ```
 
 ---
@@ -161,7 +161,8 @@ scripts/dev_web.sh --build ny          # http://127.0.0.1:8088
 ## 7. Snapshot it for the server
 
 ```bash
-scripts/pgeo_dump.sh --build ny        # -> data/pgeo-ny/dumps/pgeo-ny-<date>.dump
+scripts/pgeo_dump.sh --build ny
+# -> data/pgeo-ny/dumps/pgeo-ny-<engine version>-<date>.dump, and the deploy line to run
 ```
 
 The server restores this rather than rebuilding, which is why the VPS can be small.
@@ -208,7 +209,7 @@ The edge refuses `/v1/*` without a known key and only the hash is ever stored
 
 ```bash
 cd infra/ansible
-ansible-playbook site.yml -e pgeo_dump_name=pgeo-ny-<date>
+ansible-playbook site.yml -e pgeo_dump_name=pgeo-ny-0.11.0-20260922-1712   # the name printed above
 ```
 
 This hardens the host, installs Docker, restores the dump, starts PostgreSQL, PostgREST and the

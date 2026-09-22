@@ -1,0 +1,2973 @@
+[
+ {
+  "id": 1,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "101 Penbrooke Drive Penfield New York"
+  },
+  "truth": {
+   "lat": 43.1342862,
+   "lon": -77.4354573,
+   "radius_m": 150,
+   "housenumber": "101",
+   "locality": "Penfield"
+  }
+ },
+ {
+  "id": 2,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "132 East Maple Avenuee, East Rochester, NY"
+  },
+  "truth": {
+   "lat": 43.1137133,
+   "lon": -77.4820952,
+   "radius_m": 150,
+   "housenumber": "132",
+   "locality": "East Rochester"
+  }
+ },
+ {
+  "id": 3,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "10710 Long Hoousse Lane, Corning, NY"
+  },
+  "truth": {
+   "lat": 42.1273483,
+   "lon": -77.0550494,
+   "radius_m": 150,
+   "housenumber": "10710",
+   "locality": "Corning"
+  }
+ },
+ {
+  "id": 4,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "128 Hastings Place, Syracuse, NY"
+  },
+  "truth": {
+   "lat": 43.0664205,
+   "lon": -76.1180405,
+   "radius_m": 150,
+   "housenumber": "128",
+   "locality": "Syracuse"
+  }
+ },
+ {
+  "id": 5,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "22 DEN ST, NORTH BABYLON, NY"
+  },
+  "truth": {
+   "lat": 40.7223374,
+   "lon": -73.326648,
+   "radius_m": 150,
+   "housenumber": "22",
+   "locality": "NORTH BABYLON"
+  }
+ },
+ {
+  "id": 6,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "50 Carey Road, Day, NY"
+  },
+  "truth": {
+   "lat": 43.3079,
+   "lon": -74.0197277,
+   "radius_m": 150,
+   "housenumber": "50",
+   "locality": "Day"
+  }
+ },
+ {
+  "id": 7,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "692 Boyle Center Apartments, Auburn, NY"
+  },
+  "truth": {
+   "lat": 42.9306794,
+   "lon": -76.5692086,
+   "radius_m": 150,
+   "housenumber": "692",
+   "locality": "Auburn"
+  }
+ },
+ {
+  "id": 8,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "80 Malloy Road, Shawangunk, NY"
+  },
+  "truth": {
+   "lat": 41.6065623,
+   "lon": -74.2088199,
+   "radius_m": 150,
+   "housenumber": "80",
+   "locality": "Shawangunk"
+  }
+ },
+ {
+  "id": 9,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "222 Craigville Road, Goshen, NY"
+  },
+  "truth": {
+   "lat": 41.3966798,
+   "lon": -74.2900865,
+   "radius_m": 150,
+   "housenumber": "222",
+   "locality": "Goshen"
+  }
+ },
+ {
+  "id": 10,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "203 Tool House Road, Catskill, NY"
+  },
+  "truth": {
+   "lat": 42.2087836,
+   "lon": -73.9147053,
+   "radius_m": 150,
+   "housenumber": "203",
+   "locality": "Catskill"
+  }
+ },
+ {
+  "id": 11,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "133 Lyman Street Sweden New York"
+  },
+  "truth": {
+   "lat": 43.2158955,
+   "lon": -77.9287286,
+   "radius_m": 150,
+   "housenumber": "133",
+   "locality": "Sweden"
+  }
+ },
+ {
+  "id": 12,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "292 Joseph Avenue, Rochester, NY"
+  },
+  "truth": {
+   "lat": 43.1688988,
+   "lon": -77.6071004,
+   "radius_m": 150,
+   "housenumber": "292",
+   "locality": "Rochester"
+  }
+ },
+ {
+  "id": 13,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "12 Fenimore Drive, Pittsford, NY"
+  },
+  "truth": {
+   "lat": 43.0606998,
+   "lon": -77.5113358,
+   "radius_m": 150,
+   "housenumber": "12",
+   "locality": "Pittsford"
+  }
+ },
+ {
+  "id": 14,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "5 Nikis Drive, Islip, NY"
+  },
+  "truth": {
+   "lat": 40.7372155,
+   "lon": -73.214874,
+   "radius_m": 150,
+   "housenumber": "5",
+   "locality": "Islip"
+  }
+ },
+ {
+  "id": 15,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "310 WOODBRIDGE DR, RIDGE, NY"
+  },
+  "truth": {
+   "lat": 40.9145482,
+   "lon": -72.8997803,
+   "radius_m": 150,
+   "housenumber": "310",
+   "locality": "RIDGE"
+  }
+ },
+ {
+  "id": 16,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "2042 Welher Roxd, Arcadia, NY"
+  },
+  "truth": {
+   "lat": 43.0825374,
+   "lon": -77.0692013,
+   "radius_m": 150,
+   "housenumber": "2042",
+   "locality": "Arcadia"
+  }
+ },
+ {
+  "id": 17,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "1282 Clinton Street, Buffalo, NY"
+  },
+  "truth": {
+   "lat": 42.8753777,
+   "lon": -78.8280888,
+   "radius_m": 150,
+   "housenumber": "1282",
+   "locality": "Buffalo"
+  }
+ },
+ {
+  "id": 18,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "4210 State Highway 8, New Berlin, NY"
+  },
+  "truth": {
+   "lat": 42.5786398,
+   "lon": -75.3352557,
+   "radius_m": 150,
+   "housenumber": "4210",
+   "locality": "New Berlin"
+  }
+ },
+ {
+  "id": 19,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "29 Smokey Bear Lane, Lake George, NY"
+  },
+  "truth": {
+   "lat": 43.4669414,
+   "lon": -73.6857648,
+   "radius_m": 150,
+   "housenumber": "29",
+   "locality": "Lake George"
+  }
+ },
+ {
+  "id": 20,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "155 North Drury Lane Apt 7, Montgomery, NY"
+  },
+  "truth": {
+   "lat": 41.5325085,
+   "lon": -74.1290295,
+   "radius_m": 150,
+   "housenumber": "155",
+   "locality": "Montgomery"
+  }
+ },
+ {
+  "id": 21,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "1548 GOWANS RD, Evans, NY"
+  },
+  "truth": {
+   "lat": 42.6419315,
+   "lon": -78.9946537,
+   "radius_m": 150,
+   "housenumber": "1548",
+   "locality": "Evans"
+  }
+ },
+ {
+  "id": 22,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "182 Reeed Avenue, Syracuse, NY"
+  },
+  "truth": {
+   "lat": 43.0302218,
+   "lon": -76.1817793,
+   "radius_m": 150,
+   "housenumber": "182",
+   "locality": "Syracuse"
+  }
+ },
+ {
+  "id": 23,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "3634 Lake Breeze Way, Canandaigua, NY"
+  },
+  "truth": {
+   "lat": 42.8572497,
+   "lon": -77.2902864,
+   "radius_m": 150,
+   "housenumber": "3634",
+   "locality": "Canandaigua"
+  }
+ },
+ {
+  "id": 24,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "33 Knowles Road Rensselaerville New York"
+  },
+  "truth": {
+   "lat": 42.4351439,
+   "lon": -74.2418552,
+   "radius_m": 150,
+   "housenumber": "33",
+   "locality": "Rensselaerville"
+  }
+ },
+ {
+  "id": 25,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "3 Sachs Rd, Saugerties, NY"
+  },
+  "truth": {
+   "lat": 42.0676093,
+   "lon": -73.9752208,
+   "radius_m": 150,
+   "housenumber": "3",
+   "locality": "Saugerties"
+  }
+ },
+ {
+  "id": 26,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "46 SCHLENKER AVE, Cheektowaga"
+  },
+  "truth": {
+   "lat": 42.905789,
+   "lon": -78.7523979,
+   "radius_m": 150,
+   "housenumber": "46",
+   "locality": "Cheektowaga"
+  }
+ },
+ {
+  "id": 27,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "382 round lake road milan ny"
+  },
+  "truth": {
+   "lat": 41.9375889,
+   "lon": -73.8050337,
+   "radius_m": 150,
+   "housenumber": "382",
+   "locality": "Milan"
+  }
+ },
+ {
+  "id": 28,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "27 Claremont Avenue Apt 8, Mount Vernon, NY"
+  },
+  "truth": {
+   "lat": 40.9127959,
+   "lon": -73.8259486,
+   "radius_m": 150,
+   "housenumber": "27",
+   "locality": "Mount Vernon"
+  }
+ },
+ {
+  "id": 29,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "33 West Granada Avenue, Babylon"
+  },
+  "truth": {
+   "lat": 40.6682448,
+   "lon": -73.3822955,
+   "radius_m": 150,
+   "housenumber": "33",
+   "locality": "Babylon"
+  }
+ },
+ {
+  "id": 30,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "6 West Avenue, Mamarobeck, NY"
+  },
+  "truth": {
+   "lat": 40.9314514,
+   "lon": -73.7607822,
+   "radius_m": 150,
+   "housenumber": "6",
+   "locality": "Mamaroneck"
+  }
+ },
+ {
+  "id": 31,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "675 PORTION RD, LAKE RONKONKOMA, NY"
+  },
+  "truth": {
+   "lat": 40.8339134,
+   "lon": -73.0845313,
+   "radius_m": 150,
+   "housenumber": "675",
+   "locality": "LAKE RONKONKOMA"
+  }
+ },
+ {
+  "id": 32,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "3230 Lexington Avenue, Cortlandt, NY"
+  },
+  "truth": {
+   "lat": 41.311077,
+   "lon": -73.8584191,
+   "radius_m": 150,
+   "housenumber": "3230",
+   "locality": "Cortlandt"
+  }
+ },
+ {
+  "id": 33,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "1980 Western Avenue, Guilderland, NY"
+  },
+  "truth": {
+   "lat": 42.6962434,
+   "lon": -73.8835198,
+   "radius_m": 150,
+   "housenumber": "1980",
+   "locality": "Guilderland"
+  }
+ },
+ {
+  "id": 34,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "1461 Stte Route 30, Tuppe Lake, NY"
+  },
+  "truth": {
+   "lat": 44.1874179,
+   "lon": -74.4955133,
+   "radius_m": 150,
+   "housenumber": "1461",
+   "locality": "Tupper Lake"
+  }
+ },
+ {
+  "id": 35,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "5036 Merlau Road, Wales, NY"
+  },
+  "truth": {
+   "lat": 42.7523823,
+   "lon": -78.5083577,
+   "radius_m": 150,
+   "housenumber": "5036",
+   "locality": "Wales"
+  }
+ },
+ {
+  "id": 36,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "421 North Broadway Apt 6, Yonkers, NY"
+  },
+  "truth": {
+   "lat": 40.9497639,
+   "lon": -73.8925634,
+   "radius_m": 150,
+   "housenumber": "421",
+   "locality": "Yonkers"
+  }
+ },
+ {
+  "id": 37,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "1745 Route 9, Clifton Park, NY"
+  },
+  "truth": {
+   "lat": 42.8705278,
+   "lon": -73.7729518,
+   "radius_m": 150,
+   "housenumber": "1745",
+   "locality": "Clifton Park"
+  }
+ },
+ {
+  "id": 38,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "7 Pine Crest Lane Apt 8, Southampton, NY"
+  },
+  "truth": {
+   "lat": 40.9886413,
+   "lon": -72.3252471,
+   "radius_m": 150,
+   "housenumber": "7",
+   "locality": "Southampton"
+  }
+ },
+ {
+  "id": 39,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "444 KAYMAR DR, Amheerst, NY"
+  },
+  "truth": {
+   "lat": 43.0104366,
+   "lon": -78.8066154,
+   "radius_m": 150,
+   "housenumber": "444",
+   "locality": "Amherst"
+  }
+ },
+ {
+  "id": 40,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "7 Grandview Avenue, Montgomery, NY"
+  },
+  "truth": {
+   "lat": 41.5559831,
+   "lon": -74.1904857,
+   "radius_m": 150,
+   "housenumber": "7",
+   "locality": "Montgomery"
+  }
+ },
+ {
+  "id": 41,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "22 KINGS DR, MIDDLETOWN, NY"
+  },
+  "truth": {
+   "lat": 41.4496094,
+   "lon": -74.3235924,
+   "radius_m": 150,
+   "housenumber": "22",
+   "locality": "MIDDLETOWN"
+  }
+ },
+ {
+  "id": 42,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "83 intercession way chazy ny"
+  },
+  "truth": {
+   "lat": 44.8187089,
+   "lon": -73.5143837,
+   "radius_m": 150,
+   "housenumber": "83",
+   "locality": "Chazy"
+  }
+ },
+ {
+  "id": 43,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "151 Cayuta Street Corning New York"
+  },
+  "truth": {
+   "lat": 42.1533702,
+   "lon": -77.0682274,
+   "radius_m": 150,
+   "housenumber": "151",
+   "locality": "Corning"
+  }
+ },
+ {
+  "id": 44,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "3685 Meadowbrook Acres, Wheatfield, NY"
+  },
+  "truth": {
+   "lat": 43.0692422,
+   "lon": -78.8400084,
+   "radius_m": 150,
+   "housenumber": "3685",
+   "locality": "Wheatfield"
+  }
+ },
+ {
+  "id": 45,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "447 Albany Avenue Apt 10, Babylon, NY"
+  },
+  "truth": {
+   "lat": 40.6977775,
+   "lon": -73.4099759,
+   "radius_m": 150,
+   "housenumber": "447",
+   "locality": "Babylon"
+  }
+ },
+ {
+  "id": 46,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "422 Rushmore Avenue, Mamaroneck, NY"
+  },
+  "truth": {
+   "lat": 40.9417754,
+   "lon": -73.7342282,
+   "radius_m": 150,
+   "housenumber": "422",
+   "locality": "Mamaroneck"
+  }
+ },
+ {
+  "id": 47,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "86 Elm Street, Chautauqua, NY"
+  },
+  "truth": {
+   "lat": 42.2511756,
+   "lon": -79.4972553,
+   "radius_m": 150,
+   "housenumber": "86",
+   "locality": "Chautauqua"
+  }
+ },
+ {
+  "id": 48,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "22 Park Place Apt 6, North Hempstead, NY"
+  },
+  "truth": {
+   "lat": 40.7899607,
+   "lon": -73.7269681,
+   "radius_m": 150,
+   "housenumber": "22",
+   "locality": "North Hempstead"
+  }
+ },
+ {
+  "id": 49,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "1445 County Highway 31, Middlefield, NY"
+  },
+  "truth": {
+   "lat": 42.7822577,
+   "lon": -74.8692849,
+   "radius_m": 150,
+   "housenumber": "1445",
+   "locality": "Middlefield"
+  }
+ },
+ {
+  "id": 50,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "26492 Ridge Rod, Rutland, NY"
+  },
+  "truth": {
+   "lat": 43.9824328,
+   "lon": -75.8415571,
+   "radius_m": 150,
+   "housenumber": "26492",
+   "locality": "Rutland"
+  }
+ },
+ {
+  "id": 51,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "414 Hardy Cornerd Road, Farmersville, NY"
+  },
+  "truth": {
+   "lat": 42.3630749,
+   "lon": -78.3313613,
+   "radius_m": 150,
+   "housenumber": "414",
+   "locality": "Farmersville"
+  }
+ },
+ {
+  "id": 52,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "2 HERITAGE CT",
+   "locality": "WARWICK",
+   "postalcode": "10990",
+   "region": "NY"
+  },
+  "truth": {
+   "lat": 41.252624,
+   "lon": -74.4089039,
+   "radius_m": 150,
+   "housenumber": "2",
+   "locality": "WARWICK"
+  }
+ },
+ {
+  "id": 53,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "138 East Utica Street",
+   "locality": "Buffalo",
+   "postalcode": "14209",
+   "region": "NY"
+  },
+  "truth": {
+   "lat": 42.9114195,
+   "lon": -78.8606249,
+   "radius_m": 150,
+   "housenumber": "138",
+   "locality": "Buffalo"
+  }
+ },
+ {
+  "id": 54,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "41 North Fulton Street",
+   "locality": "Homer",
+   "postalcode": "13077",
+   "region": "NY"
+  },
+  "truth": {
+   "lat": 42.6401823,
+   "lon": -76.1829745,
+   "radius_m": 150,
+   "housenumber": "41",
+   "locality": "Homer"
+  }
+ },
+ {
+  "id": 55,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "107 Broadmoor Trail",
+   "locality": "Perinton",
+   "postalcode": "14450",
+   "region": "NY"
+  },
+  "truth": {
+   "lat": 43.0749192,
+   "lon": -77.4034793,
+   "radius_m": 150,
+   "housenumber": "107",
+   "locality": "Perinton"
+  }
+ },
+ {
+  "id": 56,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "296 Pinebrook Drive",
+   "locality": "Hyde Park",
+   "postalcode": "12538",
+   "region": "NY"
+  },
+  "truth": {
+   "lat": 41.7532403,
+   "lon": -73.9137717,
+   "radius_m": 150,
+   "housenumber": "296",
+   "locality": "Hyde Park"
+  }
+ },
+ {
+  "id": 57,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "266 44th Street",
+   "locality": "Babylon",
+   "postalcode": "11726",
+   "region": "NY"
+  },
+  "truth": {
+   "lat": 40.6990879,
+   "lon": -73.401508,
+   "radius_m": 150,
+   "housenumber": "266",
+   "locality": "Babylon"
+  }
+ },
+ {
+  "id": 58,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "71 Beatrice Avenue",
+   "locality": "Islip",
+   "postalcode": "11795",
+   "region": "NY"
+  },
+  "truth": {
+   "lat": 40.7309044,
+   "lon": -73.2889132,
+   "radius_m": 150,
+   "housenumber": "71",
+   "locality": "Islip"
+  }
+ },
+ {
+  "id": 59,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "24 Leitch Avenue",
+   "locality": "Skaneateles",
+   "postalcode": "13152",
+   "region": "NY"
+  },
+  "truth": {
+   "lat": 42.9470748,
+   "lon": -76.4231686,
+   "radius_m": 150,
+   "housenumber": "24",
+   "locality": "Skaneateles"
+  }
+ },
+ {
+  "id": 60,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "375 Hurley Road",
+   "locality": "Stockholm",
+   "postalcode": "13697",
+   "region": "NY"
+  },
+  "truth": {
+   "lat": 44.8183618,
+   "lon": -74.8321549,
+   "radius_m": 150,
+   "housenumber": "375",
+   "locality": "Stockholm"
+  }
+ },
+ {
+  "id": 61,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "62 COLONY DR",
+   "locality": "HOLBROOK",
+   "postalcode": "11741",
+   "region": "NY"
+  },
+  "truth": {
+   "lat": 40.8042153,
+   "lon": -73.0614704,
+   "radius_m": 150,
+   "housenumber": "62",
+   "locality": "HOLBROOK"
+  }
+ },
+ {
+  "id": 62,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "1502 Annandale Road",
+   "locality": "Red Hook",
+   "postalcode": "12504",
+   "region": "NY"
+  },
+  "truth": {
+   "lat": 42.0254018,
+   "lon": -73.9021139,
+   "radius_m": 150,
+   "housenumber": "1502",
+   "locality": "Red Hook"
+  }
+ },
+ {
+  "id": 63,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "2456 Lucas Tpke",
+   "locality": "Marbletown",
+   "postalcode": null,
+   "region": "NY"
+  },
+  "truth": {
+   "lat": 41.8271334,
+   "lon": -74.1525966,
+   "radius_m": 150,
+   "housenumber": "2456",
+   "locality": "Marbletown"
+  }
+ },
+ {
+  "id": 64,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "51 San Rafael Court",
+   "locality": "Amherst",
+   "postalcode": "14051",
+   "region": "NY"
+  },
+  "truth": {
+   "lat": 43.0336323,
+   "lon": -78.7110799,
+   "radius_m": 150,
+   "housenumber": "51",
+   "locality": "Amherst"
+  }
+ },
+ {
+  "id": 65,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "6 UDELL CT",
+   "locality": "Cortlandt Manor",
+   "postalcode": "10567",
+   "region": "NY"
+  },
+  "truth": {
+   "lat": 41.3300022,
+   "lon": -73.8672984,
+   "radius_m": 150,
+   "housenumber": "6",
+   "locality": "Cortlandt Manor"
+  }
+ },
+ {
+  "id": 66,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "2724 Route 52",
+   "locality": "East Fishkill",
+   "postalcode": "12533",
+   "region": "NY"
+  },
+  "truth": {
+   "lat": 41.5622738,
+   "lon": -73.7767359,
+   "radius_m": 150,
+   "housenumber": "2724",
+   "locality": "East Fishkill"
+  }
+ },
+ {
+  "id": 67,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "118 Chestnut Street",
+   "locality": "Clay",
+   "postalcode": "13212",
+   "region": "NY"
+  },
+  "truth": {
+   "lat": 43.1363892,
+   "lon": -76.1316979,
+   "radius_m": 150,
+   "housenumber": "118",
+   "locality": "Clay"
+  }
+ },
+ {
+  "id": 68,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "439 Union Avenue",
+   "locality": "North Hempstead",
+   "postalcode": "11590",
+   "region": "NY"
+  },
+  "truth": {
+   "lat": 40.754896,
+   "lon": -73.583108,
+   "radius_m": 150,
+   "housenumber": "439",
+   "locality": "North Hempstead"
+  }
+ },
+ {
+  "id": 69,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "212 North Fourteenth Street",
+   "locality": "Olean",
+   "postalcode": "14760",
+   "region": "NY"
+  },
+  "truth": {
+   "lat": 42.0805975,
+   "lon": -78.4468086,
+   "radius_m": 150,
+   "housenumber": "212",
+   "locality": "Olean"
+  }
+ },
+ {
+  "id": 70,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "48 Lilac Drive",
+   "locality": "Brighton",
+   "postalcode": "14620",
+   "region": "NY"
+  },
+  "truth": {
+   "lat": 43.1271527,
+   "lon": -77.5999248,
+   "radius_m": 150,
+   "housenumber": "48",
+   "locality": "Brighton"
+  }
+ },
+ {
+  "id": 71,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 40.9534669,
+   "point.lon": -73.054436,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 40.9534669,
+   "lon": -73.054436,
+   "radius_m": 60,
+   "housenumber": "44"
+  }
+ },
+ {
+  "id": 72,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 42.8351712,
+   "point.lon": -76.7355985,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 42.8351712,
+   "lon": -76.7355985,
+   "radius_m": 60,
+   "housenumber": "3911"
+  }
+ },
+ {
+  "id": 73,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 43.0658535,
+   "point.lon": -77.438623,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 43.0658535,
+   "lon": -77.438623,
+   "radius_m": 60,
+   "housenumber": "188"
+  }
+ },
+ {
+  "id": 74,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 42.9090714,
+   "point.lon": -78.6809719,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 42.9090714,
+   "lon": -78.6809719,
+   "radius_m": 60,
+   "housenumber": "136"
+  }
+ },
+ {
+  "id": 75,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 43.0003713,
+   "point.lon": -78.1740869,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 43.0003713,
+   "lon": -78.1740869,
+   "radius_m": 60,
+   "housenumber": "6"
+  }
+ },
+ {
+  "id": 76,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 42.9517083,
+   "point.lon": -77.5773928,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 42.9517083,
+   "lon": -77.5773928,
+   "radius_m": 60,
+   "housenumber": "81"
+  }
+ },
+ {
+  "id": 77,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 40.6749222,
+   "point.lon": -73.5476017,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 40.6749222,
+   "lon": -73.5476017,
+   "radius_m": 60,
+   "housenumber": "2300"
+  }
+ },
+ {
+  "id": 78,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 40.8678318,
+   "point.lon": -73.5263912,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 40.8678318,
+   "lon": -73.5263912,
+   "radius_m": 60,
+   "housenumber": "177"
+  }
+ },
+ {
+  "id": 79,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 41.9828385,
+   "point.lon": -73.6654845,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 41.9828385,
+   "lon": -73.6654845,
+   "radius_m": 60,
+   "housenumber": "2795"
+  }
+ },
+ {
+  "id": 80,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 44.3451311,
+   "point.lon": -75.4525606,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 44.3451311,
+   "lon": -75.4525606,
+   "radius_m": 60,
+   "housenumber": "471"
+  }
+ },
+ {
+  "id": 81,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 41.678277,
+   "point.lon": -74.138264,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 41.678277,
+   "lon": -74.138264,
+   "radius_m": 60,
+   "housenumber": "12"
+  }
+ },
+ {
+  "id": 82,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 43.1759821,
+   "point.lon": -77.577694,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 43.1759821,
+   "lon": -77.577694,
+   "radius_m": 60,
+   "housenumber": "1652"
+  }
+ },
+ {
+  "id": 83,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 43.0910054,
+   "point.lon": -75.2426188,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 43.0910054,
+   "lon": -75.2426188,
+   "radius_m": 60,
+   "housenumber": "1520"
+  }
+ },
+ {
+  "id": 84,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 43.0418453,
+   "point.lon": -76.1429296,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 43.0418453,
+   "lon": -76.1429296,
+   "radius_m": 60,
+   "housenumber": "123"
+  }
+ },
+ {
+  "id": 85,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 41.6009374,
+   "point.lon": -74.1418503,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 41.6009374,
+   "lon": -74.1418503,
+   "radius_m": 60,
+   "housenumber": "2332"
+  }
+ },
+ {
+  "id": 86,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 43.1753344,
+   "point.lon": -77.5690139,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 43.1753344,
+   "lon": -77.5690139,
+   "radius_m": 60,
+   "housenumber": "55"
+  }
+ },
+ {
+  "id": 87,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 41.483426,
+   "point.lon": -74.2179298,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 41.483426,
+   "lon": -74.2179298,
+   "radius_m": 60,
+   "housenumber": "103"
+  }
+ },
+ {
+  "id": 88,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 43.1479374,
+   "point.lon": -77.5730123,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 43.1479374,
+   "lon": -77.5730123,
+   "radius_m": 60,
+   "housenumber": "255"
+  }
+ },
+ {
+  "id": 89,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 42.9455118,
+   "point.lon": -78.8223225,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 42.9455118,
+   "lon": -78.8223225,
+   "radius_m": 60,
+   "housenumber": "217"
+  }
+ },
+ {
+  "id": 90,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 42.733417,
+   "point.lon": -78.8501199,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 42.733417,
+   "lon": -78.8501199,
+   "radius_m": 60,
+   "housenumber": "357"
+  }
+ },
+ {
+  "id": 91,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 43.512283,
+   "point.lon": -75.795954,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 43.512283,
+   "lon": -75.795954,
+   "radius_m": 60,
+   "housenumber": "253"
+  }
+ },
+ {
+  "id": 92,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 40.781022,
+   "point.lon": -72.9788904,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 40.781022,
+   "lon": -72.9788904,
+   "radius_m": 60,
+   "housenumber": "4"
+  }
+ },
+ {
+  "id": 93,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 40.8369646,
+   "point.lon": -73.6231487,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 40.8369646,
+   "lon": -73.6231487,
+   "radius_m": 60,
+   "housenumber": "28"
+  }
+ },
+ {
+  "id": 94,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 43.0707676,
+   "point.lon": -78.7461527,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 43.0707676,
+   "lon": -78.7461527,
+   "radius_m": 60,
+   "housenumber": "5281"
+  }
+ },
+ {
+  "id": 95,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 43.7755778,
+   "point.lon": -75.5923678,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 43.7755778,
+   "lon": -75.5923678,
+   "radius_m": 60,
+   "housenumber": "3702"
+  }
+ },
+ {
+  "id": 96,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 41.2466873,
+   "point.lon": -74.2703296,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 41.2466873,
+   "lon": -74.2703296,
+   "radius_m": 60,
+   "housenumber": "42"
+  }
+ },
+ {
+  "id": 97,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Baychester Houses, New York"
+  },
+  "truth": {
+   "lat": 40.88361,
+   "lon": -73.84389,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 98,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Tiogq Terrace"
+  },
+  "truth": {
+   "lat": 42.05528,
+   "lon": -76.12139,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 99,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Poughkeepsue"
+  },
+  "truth": {
+   "lat": 41.698841,
+   "lon": -73.921563,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 100,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "North Woodmere, New York"
+  },
+  "truth": {
+   "lat": 40.6501,
+   "lon": -73.72402,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 101,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Canoga, New York"
+  },
+  "truth": {
+   "lat": 42.8534,
+   "lon": -76.74856,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 102,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Enlgeville"
+  },
+  "truth": {
+   "lat": 42.75507,
+   "lon": -74.64848,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 103,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Thorn Hill, New York"
+  },
+  "truth": {
+   "lat": 42.89784,
+   "lon": -76.34132,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 104,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Clitnon"
+  },
+  "truth": {
+   "lat": 41.885425,
+   "lon": -73.823098,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 105,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "town",
+  "params": {
+   "text": "daytonville"
+  },
+  "truth": {
+   "lat": 42.97729,
+   "lon": -75.34295,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 106,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "town",
+  "params": {
+   "text": "west bangor"
+  },
+  "truth": {
+   "lat": 44.80422,
+   "lon": -74.43379,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 107,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Cherry Lane, New York"
+  },
+  "truth": {
+   "lat": 42.29472,
+   "lon": -76.95528,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 108,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Flat Creek, New York"
+  },
+  "truth": {
+   "lat": 42.84285,
+   "lon": -74.50153,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 109,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "town",
+  "params": {
+   "text": "hagedorns mills"
+  },
+  "truth": {
+   "lat": 43.07618,
+   "lon": -74.09985,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 110,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Wappingers Falls, New York"
+  },
+  "truth": {
+   "lat": 41.598449,
+   "lon": -73.91915,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 111,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Guilderland, New York"
+  },
+  "truth": {
+   "lat": 42.70452,
+   "lon": -73.91151,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 112,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Stafford, New York"
+  },
+  "truth": {
+   "lat": 42.98173,
+   "lon": -78.0739,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 113,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Constableville, New York"
+  },
+  "truth": {
+   "lat": 43.56487,
+   "lon": -75.428055,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 114,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "town",
+  "params": {
+   "text": "graphite"
+  },
+  "truth": {
+   "lat": 43.75117,
+   "lon": -73.5629,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 115,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Cumminsville, New York"
+  },
+  "truth": {
+   "lat": 42.570594,
+   "lon": -77.718938,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 116,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Bare Hill, Harmony Park"
+  },
+  "truth": {
+   "lat": 41.4958832,
+   "lon": -73.6562804,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 117,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Toll Gate Hill"
+  },
+  "truth": {
+   "lat": 44.2031063,
+   "lon": -73.4756608,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 118,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Lake Chartreuse"
+  },
+  "truth": {
+   "lat": 43.410139,
+   "lon": -74.3888635,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 119,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Balsam Pond, Tusten"
+  },
+  "truth": {
+   "lat": 41.5920541,
+   "lon": -74.9018763,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 120,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Duck Pond, Laek Bonaparte"
+  },
+  "truth": {
+   "lat": 44.1602242,
+   "lon": -75.3709919,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 121,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Marble Mountain, Clifton"
+  },
+  "truth": {
+   "lat": 44.2098446,
+   "lon": -74.8858725,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 122,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Roundtop Mountain, Stony Creek"
+  },
+  "truth": {
+   "lat": 43.3922914,
+   "lon": -73.9570705,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 123,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Bear Hill, Palmyra"
+  },
+  "truth": {
+   "lat": 43.0531815,
+   "lon": -77.2281242,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 124,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Irish Hill, Cayuta"
+  },
+  "truth": {
+   "lat": 42.2725618,
+   "lon": -76.6566259,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 125,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Mud Lake, Jordanville"
+  },
+  "truth": {
+   "lat": 42.9041354,
+   "lon": -74.9012703,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 126,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Badeau Hill"
+  },
+  "truth": {
+   "lat": 42.616187,
+   "lon": -74.8432087,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 127,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "lake_summit",
+  "params": {
+   "text": "wolf pond, yulan"
+  },
+  "truth": {
+   "lat": 41.5126602,
+   "lon": -74.9579945,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 128,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Lake Rileyy"
+  },
+  "truth": {
+   "lat": 43.1425625,
+   "lon": -77.5736107,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 129,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Golden Hill"
+  },
+  "truth": {
+   "lat": 41.9164813,
+   "lon": -74.019306,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 130,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Limekiln La"
+  },
+  "truth": {
+   "lat": 43.7125625,
+   "lon": -74.7995166,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 131,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Cave Knoll"
+  },
+  "truth": {
+   "lat": 43.4916424,
+   "lon": -73.9954479,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 132,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Shlalow Lake"
+  },
+  "truth": {
+   "lat": 43.8183578,
+   "lon": -74.7360473,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 133,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Tirrell Mountain"
+  },
+  "truth": {
+   "lat": 43.8928721,
+   "lon": -74.3616738,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 134,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Little Square Pond"
+  },
+  "truth": {
+   "lat": 44.3200586,
+   "lon": -74.3862766,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 135,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Columbia Consulting Engineers"
+  },
+  "truth": {
+   "lat": 40.75889644,
+   "lon": -73.98096842,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 136,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Judy Perl Travel"
+  },
+  "truth": {
+   "lat": 40.7262798,
+   "lon": -73.9958898,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 137,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "Flatlands Reeformed Church⛪"
+  },
+  "truth": {
+   "lat": 40.62391348,
+   "lon": -73.93609878,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 138,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "Catskiills, NY"
+  },
+  "truth": {
+   "lat": 42.15045505,
+   "lon": -74.000504966667,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 139,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Madden's Ron Auto Body Complete Collision Service"
+  },
+  "truth": {
+   "lat": 42.0637936,
+   "lon": -79.2536076,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 140,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Trisha M. Lindstrom, Cpnp"
+  },
+  "truth": {
+   "lat": 42.0708077,
+   "lon": -79.2240123,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 141,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Better Image Digital"
+  },
+  "truth": {
+   "lat": 43.19845,
+   "lon": -78.97056,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 142,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Sally Beauty, Roseland Park"
+  },
+  "truth": {
+   "lat": 42.878603,
+   "lon": -77.256822,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 143,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "Truhomes Reallty Group"
+  },
+  "truth": {
+   "lat": 40.57454345,
+   "lon": -74.10518532,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 144,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Apple Bank, Village of the Branch"
+  },
+  "truth": {
+   "lat": 40.8494984,
+   "lon": -73.18811945,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 145,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Shell, Sears Corners"
+  },
+  "truth": {
+   "lat": 41.41704289,
+   "lon": -73.57460182,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 146,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "RealtyUSA - Orchard Park Office"
+  },
+  "truth": {
+   "lat": 42.767350128886726,
+   "lon": -78.74367159553186,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 147,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "Pop-A-Tlo"
+  },
+  "truth": {
+   "lat": 43.09710454,
+   "lon": -75.6538529,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 148,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Los Almuerzos Mexicanos"
+  },
+  "truth": {
+   "lat": 40.70272,
+   "lon": -73.81464,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 149,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "U-Haul Neihborhodo Dealer, North Petersburg"
+  },
+  "truth": {
+   "lat": 42.85432264,
+   "lon": -73.34387362,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 150,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Greater Mahopac-Carmel Chamber of Commerce"
+  },
+  "truth": {
+   "lat": 41.37377553,
+   "lon": -73.72898718,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 151,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Pinnacle Trips"
+  },
+  "truth": {
+   "lat": 41.3383489,
+   "lon": -73.6514364,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 152,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Ditch Plains, Gashouse District"
+  },
+  "truth": {
+   "lat": 40.729237,
+   "lon": -74.003702,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 153,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "H&R Block, Roe Park"
+  },
+  "truth": {
+   "lat": 41.31164271,
+   "lon": -73.86684253,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 154,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "13803"
+  },
+  "truth": {
+   "lat": 42.457979,
+   "lon": -76.053971,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 155,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "13026"
+  },
+  "truth": {
+   "lat": 42.744043,
+   "lon": -76.652266,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 156,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "11379"
+  },
+  "truth": {
+   "lat": 40.717061,
+   "lon": -73.880519,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 157,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "14739"
+  },
+  "truth": {
+   "lat": 42.186661,
+   "lon": -78.156823,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 158,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "13471"
+  },
+  "truth": {
+   "lat": 43.378027,
+   "lon": -75.610579,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 159,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "12874"
+  },
+  "truth": {
+   "lat": 43.690561,
+   "lon": -73.549743,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 160,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "12121"
+  },
+  "truth": {
+   "lat": 42.839913,
+   "lon": -73.60738,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 161,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "12475"
+  },
+  "truth": {
+   "lat": 42.013988,
+   "lon": -74.013305,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 162,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Baychester "
+  },
+  "truth": {
+   "lat": 40.88361,
+   "lon": -73.84389,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 163,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Tioga Ter"
+  },
+  "truth": {
+   "lat": 42.05528,
+   "lon": -76.12139,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 164,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Poughke"
+  },
+  "truth": {
+   "lat": 41.698841,
+   "lon": -73.921563,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 165,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "North Wood"
+  },
+  "truth": {
+   "lat": 40.6501,
+   "lon": -73.72402,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 166,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Cano"
+  },
+  "truth": {
+   "lat": 42.8534,
+   "lon": -76.74856,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 167,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Englevi"
+  },
+  "truth": {
+   "lat": 42.75507,
+   "lon": -74.64848,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 168,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Thorn "
+  },
+  "truth": {
+   "lat": 42.89784,
+   "lon": -76.34132,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 169,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Clint"
+  },
+  "truth": {
+   "lat": 41.885425,
+   "lon": -73.823098,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 170,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Daytonv"
+  },
+  "truth": {
+   "lat": 42.97729,
+   "lon": -75.34295,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 171,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Garland Of Divinity'"
+  },
+  "truth": {
+   "lat": 40.7130289,
+   "lon": -73.8062587,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 172,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "West Side Mark"
+  },
+  "truth": {
+   "lat": 40.768734,
+   "lon": -73.992237,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 173,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Sunset G"
+  },
+  "truth": {
+   "lat": 43.2022704986533,
+   "lon": -75.72833597062674,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 174,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Western "
+  },
+  "truth": {
+   "lat": 43.211238,
+   "lon": -77.707023,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 175,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Brooklyn Kids A"
+  },
+  "truth": {
+   "lat": 40.66983911,
+   "lon": -73.9313372,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 176,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Aspire Down"
+  },
+  "truth": {
+   "lat": 40.752727,
+   "lon": -73.974794,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 177,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Bar-Jan Jewelry Rep"
+  },
+  "truth": {
+   "lat": 41.93356779946244,
+   "lon": -74.01981711387636,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 178,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Tobacco & Gift E"
+  },
+  "truth": {
+   "lat": 40.5595496,
+   "lon": -74.1689499,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 179,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "SU Catholic "
+  },
+  "truth": {
+   "lat": 43.04302426,
+   "lon": -76.13302463,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 180,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "hsswkxnj"
+  },
+  "truth": null
+ },
+ {
+  "id": 181,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Pelpelblax Mountain"
+  },
+  "truth": null
+ },
+ {
+  "id": 182,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Vancouver"
+  },
+  "truth": null
+ },
+ {
+  "id": 183,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "ncwlszj"
+  },
+  "truth": null
+ },
+ {
+  "id": 184,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "93918 LESTERS RD"
+  },
+  "truth": null
+ },
+ {
+  "id": 185,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Quendrankro Street"
+  },
+  "truth": null
+ },
+ {
+  "id": 186,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Dranquenpel Street"
+  },
+  "truth": null
+ },
+ {
+  "id": 187,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Vipelyux Mountain"
+  },
+  "truth": null
+ },
+ {
+  "id": 188,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Pelmib Pond"
+  },
+  "truth": null
+ },
+ {
+  "id": 189,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Miami Beach"
+  },
+  "truth": null
+ },
+ {
+  "id": 190,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Blaxtrum Pond"
+  },
+  "truth": null
+ },
+ {
+  "id": 191,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Trumyuxzor Pond"
+  },
+  "truth": null
+ },
+ {
+  "id": 192,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "znqrfjk"
+  },
+  "truth": null
+ },
+ {
+  "id": 193,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Blaxquenyux Mountain"
+  },
+  "truth": null
+ },
+ {
+  "id": 194,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Eiffel Tower"
+  },
+  "truth": null
+ },
+ {
+  "id": 195,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "hdhrppjvkztp"
+  },
+  "truth": null
+ },
+ {
+  "id": 196,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "sbxkgbrxdl"
+  },
+  "truth": null
+ },
+ {
+  "id": 197,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "95211 Providence Court"
+  },
+  "truth": null
+ },
+ {
+  "id": 198,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Quenquendran Street"
+  },
+  "truth": null
+ }
+]
