@@ -16,9 +16,11 @@ Values already present in regions.json are kept, never overwritten: the Maine en
 box and the source list the measured Maine build actually used, and a later run of this script
 must not quietly move them. Delete an entry to have it regenerated.
 
-  scripts/gen_regions.py                 # fill in anything missing
-  scripts/gen_regions.py --states NY,VT  # only these
-  scripts/gen_regions.py --check         # report drift, write nothing
+Run it through prep's environment, which pins DuckDB:
+
+  uv run --project prep python scripts/gen_regions.py                 # fill in anything missing
+  uv run --project prep python scripts/gen_regions.py --states NY,VT  # only these
+  uv run --project prep python scripts/gen_regions.py --check         # report drift, write nothing
 """
 
 from __future__ import annotations
@@ -27,11 +29,12 @@ import argparse
 import json
 import math
 import sqlite3
-import subprocess
 import sys
 import urllib.request
 from datetime import UTC, datetime
 from pathlib import Path
+
+import duckdb
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY = ROOT / "regions" / "regions.json"
@@ -53,18 +56,15 @@ def census_states() -> dict[str, dict]:
     if not BOUNDARY.exists():
         sys.exit(f"missing {BOUNDARY}; run: scripts/fetch_data.sh boundary")
     shp = f"/vsizip/{BOUNDARY}/cb_2024_us_state_500k.shp"
-    sql = (
-        "INSTALL spatial; LOAD spatial; "
-        "SELECT STUSPS, NAME, STATEFP, ST_XMin(geom) AS xmin, ST_YMin(geom) AS ymin, "
-        f"ST_XMax(geom) AS xmax, ST_YMax(geom) AS ymax FROM ST_Read('{shp}')"
-    )
-    out = subprocess.run(  # noqa: S603 - fixed argv, our own path
-        ["duckdb", "-json", "-c", sql], capture_output=True, text=True, check=True, cwd=ROOT
-    )
+    con = duckdb.connect()
+    con.execute("INSTALL spatial; LOAD spatial")
+    rows = con.execute(
+        "SELECT STUSPS, NAME, STATEFP, ST_XMin(geom), ST_YMin(geom), ST_XMax(geom), "
+        "ST_YMax(geom) FROM ST_Read(?)",
+        [shp],
+    ).fetchall()
     states = {}
-    for row in json.loads(out.stdout):
-        stusps, name, fips = row["STUSPS"], row["NAME"], row["STATEFP"]
-        xmin, ymin, xmax, ymax = row["xmin"], row["ymin"], row["xmax"], row["ymax"]
+    for stusps, name, fips, xmin, ymin, xmax, ymax in rows:
         states[stusps] = {
             "name": name,
             "fips": fips,

@@ -15,7 +15,8 @@
 #
 # Pinned versions live below; bump them deliberately and re-run. Nothing here needs the Pelias
 # CLI: OpenAddresses and Who's on First are fetched straight from their publishers, so a pgeo
-# build has no Pelias dependency (docs/DATA_PIPELINE.md section 2).
+# build has no Pelias dependency (docs/DATA_PIPELINE.md section 2). DuckDB comes from prep/,
+# so there is no separate CLI to install or keep in step.
 set -euo pipefail
 
 OVERTURE_RELEASE="${OVERTURE_RELEASE:-2026-08-19.0}"
@@ -64,6 +65,13 @@ bbox() {  # the union of the member states' boxes, as "xmin,ymin,xmax,ymax"
     | [ $ARGS.positional[] | $s[.].bbox ] as $b
     | [ ([$b[][0]] | min), ([$b[][1]] | min), ([$b[][2]] | max), ([$b[][3]] | max) ]
     | @csv' "$REGISTRY" --args $states
+}
+
+duck() {  # run a SQL script on stdin through the DuckDB pinned in prep/
+  # Not the duckdb CLI: prep already depends on the library at a pinned version, so using it
+  # here means one less thing to install and one less version to keep in step.
+  uv run --project "${ROOT}/prep" python -c \
+    'import sys, duckdb; duckdb.connect().execute(sys.stdin.read())'
 }
 
 fetch() {  # fetch URL DEST: download atomically, fail on HTTP errors
@@ -155,13 +163,14 @@ overture() {
   IFS=, read -r xmin ymin xmax ymax < <(bbox)
   mkdir -p "$(dirname "$out")"
   # Anonymous read of the public Overture bucket; bbox prefilter only, clipping happens in prep.
-  duckdb -c "
+  duck <<SQL
     INSTALL spatial; LOAD spatial; INSTALL httpfs; LOAD httpfs; SET s3_region='us-west-2';
     COPY (
       SELECT * FROM read_parquet('s3://overturemaps-us-west-2/release/${OVERTURE_RELEASE}/theme=places/type=place/*',
                                  hive_partitioning=1)
       WHERE bbox.xmin BETWEEN ${xmin} AND ${xmax} AND bbox.ymin BETWEEN ${ymin} AND ${ymax}
-    ) TO '${out}.part' (FORMAT parquet, COMPRESSION zstd);"
+    ) TO '${out}.part' (FORMAT parquet, COMPRESSION zstd);
+SQL
   mv "${out}.part" "$out"
   echo "fetched $(basename "$out") ($(du -h "$out" | cut -f1))"
 }
@@ -172,7 +181,7 @@ overture_themes() {
   local xmin ymin xmax ymax dir="${RAW}/overture"
   IFS=, read -r xmin ymin xmax ymax < <(bbox)
   mkdir -p "$dir"
-  duckdb -c "
+  duck <<SQL
     INSTALL spatial; LOAD spatial; INSTALL httpfs; LOAD httpfs; SET s3_region='us-west-2';
     CREATE MACRO inbox(b) AS b.xmin BETWEEN ${xmin} AND ${xmax} AND b.ymin BETWEEN ${ymin} AND ${ymax};
     CREATE MACRO overlaps(b) AS b.xmax >= ${xmin} AND b.xmin <= ${xmax} AND b.ymax >= ${ymin} AND b.ymin <= ${ymax};
@@ -187,7 +196,8 @@ overture_themes() {
     COPY (SELECT * FROM read_parquet('${base}/theme=base/type=land/*', hive_partitioning=1)
           WHERE inbox(bbox) AND names.primary IS NOT NULL) TO '${dir}/land_named_${r}_bbox.parquet' (FORMAT parquet, COMPRESSION zstd);
     COPY (SELECT * FROM read_parquet('${base}/theme=transportation/type=segment/*', hive_partitioning=1)
-          WHERE inbox(bbox) AND subtype='road') TO '${dir}/segment_road_${r}_bbox.parquet' (FORMAT parquet, COMPRESSION zstd);"
+          WHERE inbox(bbox) AND subtype='road') TO '${dir}/segment_road_${r}_bbox.parquet' (FORMAT parquet, COMPRESSION zstd);
+SQL
   ls -la "$dir"
 }
 

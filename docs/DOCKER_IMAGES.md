@@ -26,7 +26,7 @@ Everything below is packaging and a transport around those pieces; no new engine
 | The push command | **One command in the build image** | `pgeo-build push` dumps, rsyncs, and triggers the swap. Ansible keeps working for this project's own VM 120 but is not required of adopters. |
 | Applying a new dump on the VPS | **Atomic online swap** | Restore into a build schema, rename, drop the old - the loader's own trick. A refresh is a non-event. This delivers the "atomic online restore" future-work item. |
 | Raw sources | **The image fetches them**, into a cache volume | One flow for a first-timer; the volume makes the second build cheap. |
-| Regions | **Parameterised from the start** (`PGEO_REGION`), **one or several** | A New Hampshire build becomes a flag, not a fork; a three-state build is a list. Ranking stays tuned on Maine, as the report says. |
+| Regions | **Parameterised** (`PGEO_BUILD`, as the scripts already are), **one or several** | A New Hampshire build becomes a flag, not a fork; a three-state build is a list. Ranking stays tuned on Maine, as the report says. |
 
 ## The three artifacts
 
@@ -38,7 +38,7 @@ About 1.2 GB. Needs Docker and about 6 GB of memory while building.
 
 ```bash
 # first time: fetch (cached in ./data), build, dump - one command
-docker run --rm -v ./data:/data -e PGEO_REGION=us/maine \
+docker run --rm -v ./data:/data -e PGEO_BUILD=me \
   git.wharf.example/jcz/pgeo-build:0.10 build
 #   -> /data/dumps/pgeo-us-maine-20260922.dump   (117 MB)
 
@@ -100,12 +100,14 @@ bundle's functions expect (the version is stamped in the dump's `build_info`).
 
 ## Region parameter, including several at once
 
-`PGEO_REGION` takes one region or a comma-separated list: `us/maine`, or
-`us/maine,us/new-hampshire,us/vermont`. A region is a row in a small table in the loader:
+`PGEO_BUILD` takes one state code or a comma-separated list: `me`, or `me,nh,vt`. It is the same
+name `scripts/build_region.sh --build` takes, and the facts come from the same place - a row per
+state in `regions/regions.json`, which `scripts/gen_regions.py` fills from the Census boundary
+file, the Who's on First distribution and the OpenAddresses source listing:
 
 | Field | Maine's value | Used by |
 |---|---|---|
-| Geofabrik extract | `north-america/us/maine` | OSM fetch |
+| Geofabrik extract | `maine` (under `north-america/us`) | OSM fetch |
 | OpenAddresses collection | `us/me` | OA fetch |
 | Who's On First filter | region id 85688769 | WOF bounding |
 | Overture bounding box | Maine's | Overture fetch (DuckDB reads Parquet by bbox) |

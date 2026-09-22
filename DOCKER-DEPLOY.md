@@ -19,14 +19,16 @@ minutes; serving needs a quarter of a core and 1.4 GB.
 
 ```bash
 mkdir pgeo && cd pgeo
-docker run --rm -v ./data:/data -e PGEO_REGION=us/maine \
+docker run --rm -v ./data:/data -e PGEO_BUILD=me \
   git.wharf.example/jcz/pgeo-build build
 ```
 
 That fetches the sources for the region into `./data` (kept, so the next build is quick), builds
-the database, and writes `./data/dumps/pgeo-us-maine-<date>.dump` - about 120 MB.
+the database, and writes `./data/dumps/pgeo-me-<version>-<date>.dump` - about 120 MB.
 
-Several regions in one build: `-e PGEO_REGION=us/maine,us/new-hampshire`.
+`PGEO_BUILD` is the same name the scripts take: a state code, several of them
+(`-e PGEO_BUILD=me,nh,vt`), or a named build from `regions/regions.json`. The image is the
+five stages of `scripts/build_region.sh` with the tools already installed.
 
 Check it before shipping (the 1,560-case Maine accuracy set; other regions need their own):
 
