@@ -449,6 +449,7 @@ One page, both engines, switchable at the top.
 - **Address** — type-ahead, then a formatted USPS address
 - **Structured**, **Reverse**, **Batch** (CSV)
 - **Compare** — the same query on both engines
+- **Form filler**, **Confidence**, **Area**, **Nearby** — next slide
 
 Served same-origin with a strict CSP: no CDN, no remote script, every value written with
 `textContent`.
@@ -458,6 +459,42 @@ Served same-origin with a strict CSP: no CDN, no remote script, every value writ
 <img src="/desktop-light-06-engine.png" class="rounded shadow" />
 
 <img src="/desktop-light-07-address.png" class="rounded shadow mt-3" />
+
+---
+
+# Four more things pgeo can show (1 of 2)
+
+<div grid="~ cols-2 gap-4">
+
+<div>
+<img src="/desktop-light-10-form-filled.png" class="rounded shadow" />
+<p class="text-xs opacity-70 mt-1"><b>Form filler.</b> The map follows the single best candidate as you type, with its confidence; Confirm fills a contact form from <code>/v1/address</code> (USPS Pub 28). Confirm is disabled while the engine is unsure.</p>
+</div>
+
+<div>
+<img src="/desktop-light-11-confidence.png" class="rounded shadow" />
+<p class="text-xs opacity-70 mt-1"><b>Confidence.</b> "Mud Pond": pgeo finds ten and divides the score, <b>0.36 each</b>. Switch to Pelias: eight at <b>1.00</b>, no doubt expressed. The calibration finding, live.</p>
+</div>
+
+</div>
+
+---
+
+# Four more things pgeo can show (2 of 2)
+
+<div grid="~ cols-2 gap-4">
+
+<div>
+<img src="/desktop-light-12-area.png" class="rounded shadow" />
+<p class="text-xs opacity-70 mt-1"><b>Area.</b> Drag a rectangle or click a circle; "Main Street" inside it, against what the statewide answer would have been. The <code>boundary.*</code> parameters, which nothing else on the page exercised.</p>
+</div>
+
+<div>
+<img src="/desktop-light-13-nearby.png" class="rounded shadow" />
+<p class="text-xs opacity-70 mt-1"><b>Nearby.</b> Click: the address at that point, then everything around it by distance, grouped by kind. Reverse geocoding the way a dispatcher uses it.</p>
+</div>
+
+</div>
 
 ---
 

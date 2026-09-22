@@ -38,6 +38,10 @@
       <button type="button" role="tab" id="tab-reverse" aria-controls="panel-reverse" aria-selected="false" tabindex="-1">Reverse</button>
       <button type="button" role="tab" id="tab-compare" aria-controls="panel-compare" aria-selected="false" tabindex="-1">Compare</button>
       <button type="button" role="tab" id="tab-batch" aria-controls="panel-batch" aria-selected="false" tabindex="-1">Batch</button>
+      <button type="button" role="tab" id="tab-form" aria-controls="panel-form" aria-selected="false" tabindex="-1">Form filler</button>
+      <button type="button" role="tab" id="tab-confidence" aria-controls="panel-confidence" aria-selected="false" tabindex="-1">Confidence</button>
+      <button type="button" role="tab" id="tab-boundary" aria-controls="panel-boundary" aria-selected="false" tabindex="-1">Area</button>
+      <button type="button" role="tab" id="tab-nearby" aria-controls="panel-nearby" aria-selected="false" tabindex="-1">Nearby</button>
     </nav>
 
     <section class="panel" id="panel-search" role="tabpanel" aria-labelledby="tab-search">
@@ -131,6 +135,71 @@
       </form>
       <p class="status" id="compare-summary" role="status"></p>
       <div class="compare" id="compare-cols"></div>
+    </section>
+
+    <section class="panel" id="panel-form" role="tabpanel" aria-labelledby="tab-form" hidden>
+      <p class="hint">Type an address or a business. The map follows the single best candidate as it
+        refines, with its confidence. Confirm fills the contact form from pgeo's USPS address endpoint.</p>
+      <pelias-search id="form-search" placeholder="Start typing an address or venue..." min-chars="3" debounce="150"></pelias-search>
+      <div class="row">
+        <button type="button" class="btn btn-ink" id="form-confirm" disabled>Confirm and fill</button>
+        <button type="button" class="btn" id="form-clear">Clear</button>
+      </div>
+      <p class="status" id="form-status" role="status"></p>
+      <form id="contact-form" class="grid-form" autocomplete="off">
+        <label class="wide">Business / venue<input name="venue" maxlength="120" readonly></label>
+        <label class="wide">Street address<input name="street" maxlength="120" readonly></label>
+        <label>City<input name="city" maxlength="80" readonly></label>
+        <label>State<input name="state" maxlength="2" readonly></label>
+        <label>ZIP<input name="zip" maxlength="5" readonly></label>
+        <label>Latitude<input name="lat" readonly></label>
+        <label>Longitude<input name="lon" readonly></label>
+      </form>
+    </section>
+
+    <section class="panel" id="panel-confidence" role="tabpanel" aria-labelledby="tab-confidence" hidden>
+      <p class="hint">Every candidate with its confidence, from whichever engine is selected above.
+        Try <em>Mud Pond</em> on each: there are dozens, and the two engines answer that differently.
+        Then <em>Portland City Hall</em>.</p>
+      <form id="conf-form" class="row" autocomplete="off">
+        <input id="conf-text" maxlength="200" placeholder="e.g. Mud Pond" aria-label="Query">
+        <button type="submit" class="btn btn-ink">Explain</button>
+      </form>
+      <div class="opts"><label class="switch"><input type="checkbox" id="conf-focus" checked><span>Bias to map center</span></label></div>
+      <p class="status" id="conf-note" role="status"></p>
+      <ol class="results conf-list" id="conf-results" aria-label="Candidates by confidence"></ol>
+    </section>
+
+    <section class="panel" id="panel-boundary" role="tabpanel" aria-labelledby="tab-boundary" hidden>
+      <p class="hint">Draw an area, then search inside it: drag a rectangle, or click a centre for a
+        circle. "Main Street" statewide is hundreds of streets; in a drawn town it is one.</p>
+      <div class="opts">
+        <label class="select">Shape
+          <select id="bnd-mode"><option value="rect">rectangle (drag)</option><option value="circle">circle (click)</option></select>
+        </label>
+        <label class="select">Radius
+          <select id="bnd-radius"><option value="1">1 km</option><option value="3" selected>3 km</option><option value="10">10 km</option><option value="25">25 km</option></select>
+        </label>
+        <button type="button" class="btn" id="bnd-clear">Clear area</button>
+      </div>
+      <form id="bnd-form" class="row" autocomplete="off">
+        <input id="bnd-text" maxlength="200" placeholder="e.g. Main Street" aria-label="Query">
+        <button type="submit" class="btn btn-ink">Search inside</button>
+      </form>
+      <p class="status" id="bnd-status" role="status"></p>
+      <ol class="results conf-list" id="bnd-results" aria-label="Results inside the area"></ol>
+    </section>
+
+    <section class="panel" id="panel-nearby" role="tabpanel" aria-labelledby="tab-nearby" hidden>
+      <p class="hint">Click the map: the address at that point, then everything around it ranked by
+        distance and grouped by kind.</p>
+      <div class="opts">
+        <label class="select">Within
+          <select id="near-radius"><option value="0.25" selected>250 m</option><option value="0.5">500 m</option><option value="1">1 km</option><option value="2">2 km</option></select>
+        </label>
+      </div>
+      <p class="status" id="near-status" role="status"></p>
+      <ul class="near-list" id="near-results" aria-label="Nearby features"></ul>
     </section>
 
     <section class="panel" id="panel-batch" role="tabpanel" aria-labelledby="tab-batch" hidden>

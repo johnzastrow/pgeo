@@ -161,6 +161,88 @@ def run(base: str, shots: Path) -> list[str]:
                         page.wait_for_timeout(1200)
                         page.screenshot(path=str(shots / f"{tag}-08-compare.png"))
 
+                    # Form filler (needs pgeo): the point follows the best candidate while
+                    # typing, and Confirm fills the contact form from /v1/address.
+                    if page.is_visible("#tab-form"):
+                        page.click("#tab-form")
+                        page.fill("#form-search .ps-input", "")
+                        page.type("#form-search .ps-input", "portland city hall", delay=25)
+                        page.wait_for_selector(".maplibregl-popup .callout strong", timeout=8000)
+                        callout = page.inner_text(".maplibregl-popup .callout")
+                        if "Portland City Hall" not in callout:
+                            failures.append(f"{tag}: form-filler callout {callout!r}")
+                        # a complete query gets a confidence; a half-typed one only a type-ahead match
+                        page.wait_for_function(
+                            "() => /confidence/.test(document.querySelector('.maplibregl-popup .callout')?.textContent || '')",
+                            timeout=8000,
+                        )
+                        page.keyboard.press("Escape")
+                        page.wait_for_timeout(1500)
+                        page.screenshot(path=str(shots / f"{tag}-09-form-filler.png"))
+                        page.click("#form-confirm")
+                        page.wait_for_function(
+                            "() => document.querySelector('#contact-form [name=zip]').value.length === 5",
+                            timeout=8000,
+                        )
+                        filled = {k: page.input_value(f"#contact-form [name={k}]") for k in ("venue", "street", "city", "state", "zip", "lat")}
+                        if filled["venue"] != "Portland City Hall" or filled["city"] != "PORTLAND" or filled["state"] != "ME" or not filled["street"]:
+                            failures.append(f"{tag}: form filled {filled!r}")
+                        page.wait_for_timeout(800)
+                        page.screenshot(path=str(shots / f"{tag}-10-form-filled.png"))
+                        # an address is not a business: the venue field must stay empty
+                        page.click("#form-clear")
+                        page.type("#form-search .ps-input", "389 congress st portland", delay=25)
+                        page.wait_for_selector(".maplibregl-popup .callout strong", timeout=8000)
+                        page.keyboard.press("Escape")
+                        page.click("#form-confirm")
+                        page.wait_for_function(
+                            "() => document.querySelector('#contact-form [name=zip]').value.length === 5",
+                            timeout=8000,
+                        )
+                        if page.input_value("#contact-form [name=venue]") != "":
+                            failures.append(f"{tag}: address filled the venue field")
+
+                    # Confidence explorer: an ambiguous name is reported as such by pgeo
+                    if page.is_visible("#engine-pick"):
+                        page.select_option("#engine", page.locator("#engine option").evaluate_all(
+                            "os => os.map(o => o.value).find(v => v.includes('pgeo')) ?? os[0].value"))
+                    page.click("#tab-confidence")
+                    page.fill("#conf-text", "Mud Pond")
+                    page.click("#conf-form button")
+                    page.wait_for_selector("#conf-results li", timeout=10000)
+                    note = page.inner_text("#conf-note")
+                    n_rows = page.locator("#conf-results li").count()
+                    if n_rows < 2 or not re.search(r"ambiguous|no doubt expressed|confident|weak", note):
+                        failures.append(f"{tag}: confidence note {note!r} with {n_rows} rows")
+                    page.wait_for_timeout(1200)
+                    page.screenshot(path=str(shots / f"{tag}-11-confidence.png"))
+
+                    # Area: a drawn rectangle restricts the search to it
+                    page.click("#tab-boundary")
+                    w, h = vp["width"], vp["height"]
+                    page.mouse.move(w * 0.55, h * 0.35)
+                    page.mouse.down()
+                    page.mouse.move(w * 0.75, h * 0.6, steps=8)
+                    page.mouse.up()
+                    page.wait_for_function(
+                        "() => /Rectangle/.test(document.querySelector('#bnd-status').textContent)", timeout=5000)
+                    page.fill("#bnd-text", "Main Street")
+                    page.click("#bnd-form button")
+                    page.wait_for_function(
+                        "() => /inside/.test(document.querySelector('#bnd-status').textContent)", timeout=10000)
+                    page.wait_for_timeout(1200)
+                    page.screenshot(path=str(shots / f"{tag}-12-area.png"))
+
+                    # Nearby: click the map, get an address here and a grouped list
+                    page.click("#tab-nearby")
+                    page.mouse.click(w * 0.62, h * 0.5)
+                    page.wait_for_selector("#near-results .near-group", timeout=10000)
+                    status = page.inner_text("#near-status")
+                    if not re.search(r"here|no address", status):
+                        failures.append(f"{tag}: nearby status {status!r}")
+                    page.wait_for_timeout(1000)
+                    page.screenshot(path=str(shots / f"{tag}-13-nearby.png"))
+
                 bad = [
                     e
                     for e in errors

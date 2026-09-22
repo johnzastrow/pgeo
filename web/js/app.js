@@ -4,6 +4,7 @@ import { PeliasClient } from './pelias-client.js';
 import './pelias-search.js';
 import { createMap, makeMarker } from './map.js';
 import { setupBatch } from './batch.js';
+import { setupDemoTabs } from './demo-tabs.js';
 import { dms, fixed, distanceLabel } from './format.js';
 
 const LAYERS = ['address', 'venue', 'street', 'locality', 'localadmin', 'neighbourhood', 'county', 'postalcode'];
@@ -89,6 +90,8 @@ async function setupEngines() {
     for (const id of ['#search-results', '#structured-results', '#reverse-results']) $(id).replaceChildren();
     showDots([]);
     clearSelection();
+    // the demo tabs hold the previous engine's answer too; tell them the engine changed
+    for (const fn of tabListeners) fn('engine-change');
   });
   $('#engine-pick').hidden = false;
 }
@@ -158,12 +161,14 @@ function activate(tab) {
     t.tabIndex = on ? 0 : -1;
     document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
   }
-  map.getCanvas().style.cursor = ['tab-reverse', 'tab-address'].includes(tab.id) ? 'crosshair' : '';
+  map.getCanvas().style.cursor = ['tab-reverse', 'tab-address', 'tab-nearby', 'tab-boundary'].includes(tab.id) ? 'crosshair' : '';
   clearSelection();
   drawCircle();
   if (tab.id !== 'tab-compare') map.getSource('compare')?.setData(EMPTY);
   if (tab.id !== 'tab-address') clearAddress();
+  for (const fn of tabListeners) fn(tab.id);
 }
+const tabListeners = [];
 tabs.forEach((t, i) => {
   t.addEventListener('click', () => activate(t));
   t.addEventListener('keydown', (e) => {
@@ -473,6 +478,7 @@ function setupExtras() {
     addrSearch.client = pgeoClient; // suggestions and addresses from the same engine (gids match)
     addrSearch.context = () => { const c = map.getCenter(); return { focus: { lat: c.lat, lon: c.lng } }; };
   }
+  setupDemoTabs({ map, client, pgeoClient, meter, row, current, panelPadding, onTab: (fn) => tabListeners.push(fn) });
 }
 
 function clearAddress() {

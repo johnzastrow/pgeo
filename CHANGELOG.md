@@ -23,6 +23,33 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-09-21
+
+### Added
+- Four demo tabs (`web/js/demo-tabs.js`), each showing something the study measured:
+  - **Form filler.** The map follows the single best type-ahead candidate on every keystroke,
+    with a callout that gains a confidence once the query is complete enough for full search to
+    score it; Confirm fills a contact form (business, street, city, state, ZIP, lat, lon) from
+    pgeo's `/v1/address`, and is disabled while the confidence is below 0.5. The point follows
+    the top *autocomplete* result, not a search: full search on a half-typed address parses the
+    wrong street and returns nothing.
+  - **Confidence.** Every candidate with its score, from whichever engine is selected, and a
+    note that says what the engine actually did. "Mud Pond" on pgeo: ten places tie, confidence
+    divided to 0.36 each. On Pelias: eight at 1.00, no doubt expressed. The calibration finding
+    of Section 3.1.1, live.
+  - **Area.** Drag a rectangle or click a circle; results restricted to it, with what the
+    statewide answer would have been. This is the `boundary.rect` / `boundary.circle` path, which
+    nothing else on the page exercised.
+  - **Nearby.** Click the map: the address at that point, then everything within the radius by
+    distance, grouped by kind.
+- `tests/web/smoke_demo.py` drives all four in light and dark, asserting outcomes (the filled
+  form's fields, that an address does not fill the business field, the confidence note, a
+  rectangle that restricts, an address "here"), under the production CSP with no console errors.
+- Two deck slides with screenshots of the four tabs.
+
+### Changed
+- Switching engines now clears the demo tabs' results, as it already did the others'.
+
 ## [0.17.0] - 2026-09-21
 
 ### Added
