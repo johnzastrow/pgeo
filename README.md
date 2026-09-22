@@ -13,7 +13,11 @@ accuracy, speed and scalability: [docs/REPORT.pdf](docs/REPORT.pdf).
 This project is unrelated to pgeocode, a Python postal-code library.
 
 **[Getting started](GETTING_STARTED.md)** goes from nothing to a geocoder answering on a public
-URL, for any US state.
+URL, for any US state. The workstation half is one command:
+
+```bash
+scripts/build_region.sh --build ny     # or me,nh,vt, or any state code
+```
 
 ## Why pgeo
 

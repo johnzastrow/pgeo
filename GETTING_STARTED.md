@@ -110,9 +110,11 @@ The demo page - map, autocomplete, structured search, reverse geocoding, a batch
 tabs showing confidence, area search, nearby search and form filling:
 
 ```bash
-scripts/vendor_web.sh                  # once: pinned libraries, fonts, glyphs
 scripts/dev_web.sh --build ny          # it prints the URL
 ```
+
+The page's libraries, fonts and glyphs are committed, so there is nothing to fetch;
+`scripts/vendor_web.sh` re-vendors them when a pinned version changes.
 
 ---
 
