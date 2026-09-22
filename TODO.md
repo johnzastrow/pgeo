@@ -82,7 +82,19 @@ noise into the accuracy figure between builds and hosts ("Stevenns Corner", Sect
 `docs/PERFORMANCE_OPTIMIZATION.md`). Any rule - source priority, then id - changes some
 current outputs, so it is a deliberate change with its own accuracy run.
 
-## 5. Authorization (Phase 11)
+## 5. Rewrite history before publishing to GitHub
 
-The one open security item in the report (Section 3.13): hashed API keys checked at the edge,
-issued out of band. Blocking for LANCER's use of the service.
+`infra/ansible/group_vars/pelias/zz-local.yml` - the TLS terminator's LAN address, the tailnet
+range and the hostname - was tracked from commit `64c3b93` (2026-09-21) to `6a0171f`
+(2026-09-22) because the ignore rule named the file's old name. It is untracked now, but the two
+commits are in the history on Forgejo (a private remote). Before the repository goes to GitHub,
+drop it from history (`git filter-repo --invert-paths --path infra/ansible/group_vars/pelias/zz-local.yml`)
+and force-push to Forgejo; this is a rewrite of a shared remote, so it is the owner's call and
+should be done in one sitting with no other clones open. The values are low-severity (no
+credentials) but they are exactly what that commit set out to remove.
+
+## 6. Authorization: single sign-on
+
+API keys at the edge are done (0.19.0, report Section 3.13.2). A key names a client - the
+dispatch application, the demo - not a person. Single sign-on for the people behind the clients
+is the remaining half; it costs a component and is not needed for three users in one department.

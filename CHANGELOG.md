@@ -23,6 +23,13 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+### Security
+- `infra/ansible/group_vars/pelias/zz-local.yml` was tracked by git from 2026-09-21 to
+  2026-09-22: the ignore rule named the file's previous name. It holds the TLS terminator's LAN
+  address, the tailnet range and the hostname - no credentials. Untracked, the rule corrected, a
+  test pins both. The two commits remain in history on the private Forgejo remote; `TODO.md` item
+  5 is the rewrite to do before publishing to GitHub.
+
 ### Fixed
 - The pgeo locations answered a refused key with nginx's HTML 401 page and no
   `WWW-Authenticate`: `error_page` does not merge, and a location with its own `error_page 404`
