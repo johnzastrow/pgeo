@@ -121,35 +121,24 @@ scripts/dev_web.sh --build ny          # it prints the URL
 Debian 13, a user with sudo, your SSH key installed. Then on the workstation:
 
 ```bash
-cd infra/ansible
-cp inventory/hosts.yml.example inventory/hosts.yml
-cp group_vars/pelias/zz-local.yml.example group_vars/pelias/zz-local.yml
+scripts/new_host.sh --build ny
 ```
 
-Put the server's address in `inventory/hosts.yml`, then edit
-`group_vars/pelias/zz-local.yml`, which is gitignored and holds everything specific to your
-network:
-
-```yaml
-pelias_enabled: false            # pgeo only; it then serves the canonical /v1/* paths
-pgeo_build: ny                   # the basemap to ship, and what the page calls itself
-ssh_allowed_sources: ["203.0.113.0/24"]     # where you administer from
-edge_allowed_sources: ["203.0.113.7"]       # the TLS terminator, and only it
-edge_trusted_proxies: ["203.0.113.7"]
-edge_server_name: geocoder.your-domain.example
-edge_api_keys: []                # filled in next
-```
-
-Issue a key for each client. It is printed once; keep it in a password manager.
+It asks for the five things that are specific to your network - the server's address, the user
+to log in as, the network you administer from, whatever terminates TLS, and the hostname people
+will use - issues the first API key, and writes the two gitignored inventory files. It never
+overwrites one without asking. Then:
 
 ```bash
-cd ../.. && scripts/edge_apikey.sh new demo     # prints the key and the entry to paste
 cd infra/ansible && ansible-playbook site.yml -e pgeo_dump_name=<the name step 3 printed>
 ```
 
 That hardens the host, installs Docker, restores the dump, starts the database and both front
 ends, and puts nginx in front on port 8080 with the demo page, the basemap, rate limits and the
 API-key check (`docs/API_KEYS.md`).
+
+Add a key for each later client with `scripts/edge_apikey.sh new <name>`, paste the entry it
+prints under `edge_api_keys`, and re-run with `--tags edge` (nginx reloads; no downtime).
 
 Then terminate TLS in front of it. There is no TLS role - use whatever you already run:
 
