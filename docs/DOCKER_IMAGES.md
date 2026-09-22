@@ -1,6 +1,6 @@
 # Published container images - design
 
-Status: **designed, not built** (2026-09-22). Goal: pgeo deployable with `docker pull` rather than
+Status: **designed, not built** (2026-09-22; multi-region and the data-image option added the same day). Operator's page: `DOCKER-DEPLOY.md`. Goal: pgeo deployable with `docker pull` rather than
 "clone the repository and run four scripts". Decisions below were taken in conversation on
 2026-09-22; the remaining open points are listed at the end.
 
@@ -19,14 +19,14 @@ Everything below is packaging and a transport around those pieces; no new engine
 
 | Question | Decision | Why |
 |---|---|---|
-| Transport from workstation to VPS | **Push over SSH/rsync**, from the build image | The operator already has SSH to their VPS; no registry account or bucket to operate for data. (A registry "data image" was considered and declined for now.) |
+| Transport from workstation to VPS | **Push over SSH/rsync**, from the build image | The operator already has SSH to their VPS; no registry account or bucket to operate for data. The registry "data image" is kept as an option - `TODO.md` item 2 describes it - and adds beside this without changing the build or the swap. |
 | The all-in-one | **A compose bundle**, not a single container | Keeps the measured two-container design; each image stays stock and upgrades on its own. |
 | The pre-processor's database | **Self-contained** - the image carries its own PostgreSQL | A workstation needs only Docker. |
 | Architectures | **amd64 only** to start | Ship what is measured; arm64 when someone needs it. |
 | The push command | **One command in the build image** | `pgeo-build push` dumps, rsyncs, and triggers the swap. Ansible keeps working for this project's own VM 120 but is not required of adopters. |
 | Applying a new dump on the VPS | **Atomic online swap** | Restore into a build schema, rename, drop the old - the loader's own trick. A refresh is a non-event. This delivers the "atomic online restore" future-work item. |
 | Raw sources | **The image fetches them**, into a cache volume | One flow for a first-timer; the volume makes the second build cheap. |
-| Regions | **Parameterised from the start** (`PGEO_REGION`) | A New Hampshire build becomes a flag, not a fork. Ranking stays tuned on Maine, as the report says. |
+| Regions | **Parameterised from the start** (`PGEO_REGION`), **one or several** | A New Hampshire build becomes a flag, not a fork; a three-state build is a list. Ranking stays tuned on Maine, as the report says. |
 
 ## The three artifacts
 
@@ -98,13 +98,45 @@ The push is idempotent and resumable (rsync), verifies the dump's checksum on th
 before swapping, and refuses to swap a dump built by a newer `pgeo` schema version than the
 bundle's functions expect (the version is stamped in the dump's `build_info`).
 
-## Region parameter
+## Region parameter, including several at once
 
-`PGEO_REGION=us/maine` selects, from a small table in the loader: the Geofabrik extract path,
-the OpenAddresses collection, the Who's On First bounding filter, the Overture bounding box, the
-state code and FIPS. Adding a state is adding a row. Nothing in the query path knows the region;
-the accuracy set does, and a new region's build should run `pgeo-build accuracy` with its own
-cases before it ships - the report's numbers hold for Maine only.
+`PGEO_REGION` takes one region or a comma-separated list: `us/maine`, or
+`us/maine,us/new-hampshire,us/vermont`. A region is a row in a small table in the loader:
+
+| Field | Maine's value | Used by |
+|---|---|---|
+| Geofabrik extract | `north-america/us/maine` | OSM fetch |
+| OpenAddresses collection | `us/me` | OA fetch |
+| Who's On First filter | region id 85688769 | WOF bounding |
+| Overture bounding box | Maine's | Overture fetch (DuckDB reads Parquet by bbox) |
+| State code, FIPS | ME, 23 | `region_a`, county FIPS, `/v1/address` |
+| Accuracy set | `tests/accuracy/cases.json` | `pgeo-build accuracy` |
+
+Adding a state is adding a row. Nothing in the query path knows the region.
+
+**A multi-region build** is the union of its rows, and four things have to be done as a merge
+rather than a repeat:
+
+1. **Sources are fetched per region and staged into one set of tables.** Geofabrik extracts are
+   loaded one after another into the same staging tables (no `osmium merge` needed - overlap at
+   state borders is a handful of ways, and the enrich step's dedupe already handles a feature that
+   appears twice). OA collections and Overture bboxes likewise. Who's On First is one download
+   filtered by the union of region ids.
+2. **Admin lookup, labels and the town table span all regions**, so "Portland" resolves to the
+   right one by state, and a label says which. `region_a` is per feature, not per build.
+3. **The `ac_prefix` top-25 and the street-name table are built over the whole set**, once, at
+   the end - they are global by construction, so a merge is free.
+4. **The accuracy check is per region.** `pgeo-build accuracy` runs each region's set that
+   exists and reports them separately; Maine's 95.8% says nothing about New Hampshire until New
+   Hampshire has cases of its own (report Section 5: "one state, tested").
+
+What a larger build costs is measured, not guessed: report Section 3.6.1 found pgeo loses about
+four times its capacity across Maine's own data range where Pelias loses two, and Section 3.16
+then raised every pgeo figure by a third. A three-state build should expect roughly that curve,
+and the build machine's 5.5 GB peak grows with the largest single source, not the sum. The
+serving side's memory does not: Section 3.4.4 found the hot working set far smaller than the
+tables. Both numbers should be re-measured on the first multi-state build and written into the
+report as the New Hampshire future-work item.
 
 ## Registries and tags
 
