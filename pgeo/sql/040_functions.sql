@@ -33,7 +33,10 @@ RETURNS boolean LANGUAGE sql STABLE PARALLEL SAFE
 AS $$ SELECT (layers IS NULL OR cardinality(layers) = 0 OR f.layer = ANY (layers))
          AND (sources IS NULL OR cardinality(sources) = 0 OR f.source = ANY (sources))
          AND (rect IS NULL OR ST_Intersects(f.geom, rect))
-         AND (gid IS NULL OR f.gid = gid OR gid IN ('whosonfirst:country:85633793', 'whosonfirst:region:85688769')
+         -- the country, or any state this build covers, means "everywhere in this build"
+         AND (gid IS NULL OR f.gid = gid OR gid = 'whosonfirst:country:85633793'
+              OR EXISTS (SELECT 1 FROM geocode.region_ref r
+                         WHERE gid = 'whosonfirst:region:' || r.wof_id)
               OR EXISTS (SELECT 1 FROM jsonb_each_text(f.hier) e WHERE e.value = gid))
          AND (cats IS NULL OR cardinality(cats) = 0 OR f.category && cats) $$;
 
@@ -592,7 +595,9 @@ BEGIN
       -- boundary.gid, written inline: a function call here stopped the planner from using the
       -- admin_id index (13 s per request instead of milliseconds)
       AND (p_gid IS NULL OR f.gid = p_gid OR f.hier ->> 'county_gid' = p_gid OR f.hier ->> 'localadmin_gid' = p_gid
-           OR p_gid IN ('whosonfirst:country:85633793', 'whosonfirst:region:85688769'))
+           OR p_gid = 'whosonfirst:country:85633793'
+           OR EXISTS (SELECT 1 FROM geocode.region_ref r
+                      WHERE p_gid = 'whosonfirst:region:' || r.wof_id))
   )
   SELECT (x.h).* FROM (
     SELECT geocode.to_hit(n.f, geocode.distance_confidence(n.d), NULL,

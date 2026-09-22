@@ -8,15 +8,30 @@ ANALYZE admin;
 
 -- Smallest containing polygon per placetype for each raw point: its name, and its WOF id
 -- for the Pelias hierarchy fields (locality_gid, county_gid, ...).
+-- The state a feature is in comes from its county's parent, which is how Who's on First
+-- records it, so no extra point-in-polygon pass is needed for it. A feature with no county -
+-- offshore, or outside every county polygon - falls back to the build's own state when the
+-- build has exactly one; on a multi-state build it is left unset rather than guessed.
 CREATE TEMP TABLE hier AS
+WITH sole AS (
+  SELECT wof_id, name, abbr FROM geocode.region_ref
+  WHERE (SELECT count(*) FROM geocode.region_ref) = 1
+)
 SELECT r.rid,
   nb.name AS neighbourhood, lo.name AS locality, la.name AS localadmin, co.name AS county,
+  coalesce(rg.name, (SELECT name FROM sole)) AS region,
+  coalesce(rg.abbr, (SELECT abbr FROM sole)) AS region_a,
+  coalesce(rg.wof_id, (SELECT wof_id FROM sole)) AS region_wof,
   jsonb_strip_nulls(jsonb_build_object(
     'neighbourhood_gid', 'whosonfirst:neighbourhood:' || nb.source_id,
     'locality_gid', 'whosonfirst:locality:' || lo.source_id,
     'localadmin_gid', 'whosonfirst:localadmin:' || la.source_id,
     'county_gid', 'whosonfirst:county:' || co.source_id,
-    'county_a', (SELECT c.abbr FROM geocode.county_ref c WHERE c.county = lower(co.name)))) AS hier
+    -- county_ref holds Maine's counties only, and county names repeat across states (New York
+    -- has a Franklin and a Washington too), so the state has to match as well or Maine's
+    -- abbreviations would be attached to another state's counties.
+    'county_a', (SELECT c.abbr FROM geocode.county_ref c
+                 WHERE c.county = lower(co.name) AND substr(c.fips, 1, 2) = rg.fips))) AS hier
 FROM feature_raw r
 LEFT JOIN LATERAL (SELECT a.name, a.source_id FROM admin a WHERE a.placetype = 'neighbourhood'
                    AND ST_Intersects(a.geom, r.geom) ORDER BY ST_Area(a.geom) LIMIT 1) nb ON true
@@ -24,14 +39,16 @@ LEFT JOIN LATERAL (SELECT a.name, a.source_id FROM admin a WHERE a.placetype = '
                    AND ST_Intersects(a.geom, r.geom) ORDER BY ST_Area(a.geom) LIMIT 1) lo ON true
 LEFT JOIN LATERAL (SELECT a.name, a.source_id FROM admin a WHERE a.placetype = 'localadmin'
                    AND ST_Intersects(a.geom, r.geom) ORDER BY ST_Area(a.geom) LIMIT 1) la ON true
-LEFT JOIN LATERAL (SELECT a.name, a.source_id FROM admin a WHERE a.placetype = 'county'
-                   AND ST_Intersects(a.geom, r.geom) ORDER BY ST_Area(a.geom) LIMIT 1) co ON true;
+LEFT JOIN LATERAL (SELECT a.name, a.source_id, a.parent_id FROM admin a WHERE a.placetype = 'county'
+                   AND ST_Intersects(a.geom, r.geom) ORDER BY ST_Area(a.geom) LIMIT 1) co ON true
+LEFT JOIN geocode.region_ref rg ON rg.wof_id = co.parent_id;
 
 -- Address dedupe: OpenAddresses and OSM carry most Maine addresses twice. Keep one row per
 -- (house number, street, town), preferring OpenAddresses (authoritative E911 points). Pelias removes such
 -- duplicates at query time instead; the outcome for users is the same.
 CREATE TEMP TABLE raw_ranked AS
 SELECT r.*, h.neighbourhood, h.locality AS pip_locality, h.localadmin, h.county, h.hier,
+       h.region, h.region_a, h.region_wof,
        geocode.norm(r.name) AS name_norm,
        geocode.norm(r.street) AS street_norm,
        geocode.hn_int(r.housenumber) AS hn_int,
@@ -55,19 +72,24 @@ SELECT
     r.source, r.layer, r.source_id, r.name, r.housenumber, r.street, r.unit, r.postcode,
     r.neighbourhood,
     coalesce(r.pip_locality, CASE WHEN r.localadmin IS NULL THEN r.locality_hint END),
-    r.localadmin, r.county, 'Maine', 'ME',
-    -- Pelias-style label
+    r.localadmin, r.county, r.region, r.region_a,
+    -- Pelias-style label. The state segment is the feature's own, so a build covering several
+    -- states labels each one correctly; it is dropped rather than guessed when unknown.
     CASE r.layer
-      WHEN 'region' THEN 'Maine, USA'
-      WHEN 'county' THEN r.name || ', ME, USA'
-      WHEN 'locality' THEN r.name || ', ME, USA'
-      WHEN 'localadmin' THEN r.name || ', ME, USA'
-      WHEN 'postalcode' THEN r.name || coalesce(', ' || coalesce(r.pip_locality, r.localadmin), '') || ', ME, USA'
-      ELSE r.name || coalesce(', ' || coalesce(r.pip_locality, r.localadmin, r.locality_hint, r.county), '') || ', ME, USA'
+      WHEN 'region' THEN r.name || ', USA'
+      WHEN 'postalcode' THEN r.name || coalesce(', ' || coalesce(r.pip_locality, r.localadmin), '')
+                             || coalesce(', ' || r.region_a, '') || ', USA'
+      WHEN 'county' THEN r.name || coalesce(', ' || r.region_a, '') || ', USA'
+      WHEN 'locality' THEN r.name || coalesce(', ' || r.region_a, '') || ', USA'
+      WHEN 'localadmin' THEN r.name || coalesce(', ' || r.region_a, '') || ', USA'
+      ELSE r.name || coalesce(', ' || coalesce(r.pip_locality, r.localadmin, r.locality_hint, r.county), '')
+           || coalesce(', ' || r.region_a, '') || ', USA'
     END,
     r.category, r.addendum, r.geom, r.bbox, r.admin_id,
-    -- the region and country are the same for every Maine feature
-    r.hier || jsonb_build_object('region_gid', 'whosonfirst:region:85688769'),
+    -- the country is the same for every feature; the region is the feature's own
+    r.hier || jsonb_strip_nulls(jsonb_build_object(
+      'region_gid', CASE WHEN r.region_wof IS NOT NULL
+                         THEN 'whosonfirst:region:' || r.region_wof END)),
     -- importance: layer prior, then modest boosts from population / popularity
     least(1.0, CASE r.layer
         WHEN 'region' THEN 1.0 WHEN 'county' THEN 0.85 WHEN 'locality' THEN 0.75

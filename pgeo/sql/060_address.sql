@@ -16,7 +16,8 @@
 -- Reference data (schema geocode: survives rebuilds; recreated here so edits apply)
 -- ---------------------------------------------------------------------------------------
 DROP TABLE IF EXISTS geocode.usps_suffix, geocode.usps_unit, geocode.usps_direction, geocode.county_fips CASCADE;
--- county FIPS codes live in geocode.county_ref (010_base.sql), shared with the build
+-- county FIPS codes live in geocode.county_ref and state ones in geocode.region_ref
+-- (010_base.sql), shared with the build
 -- OUT-parameter functions cannot change their result columns in place
 DROP FUNCTION IF EXISTS geocode.usps_street(text), geocode.usps_secondary(text),
   geocode.nearest_address(geometry, double precision),
@@ -124,7 +125,8 @@ INSERT INTO geocode.usps_direction (variant, standard) VALUES
   ('NE','NE'),('NORTHEAST','NE'),('NW','NW'),('NORTHWEST','NW'),('SE','SE'),('SOUTHEAST','SE'),
   ('SW','SW'),('SOUTHWEST','SW');
 
-GRANT SELECT ON geocode.usps_suffix, geocode.usps_unit, geocode.usps_direction, geocode.county_ref TO pgeo_api;
+GRANT SELECT ON geocode.usps_suffix, geocode.usps_unit, geocode.usps_direction,
+  geocode.county_ref, geocode.region_ref TO pgeo_api;
 
 -- Invalid input: same error code as the 050 helpers, which the APIs return as HTTP 400
 CREATE OR REPLACE FUNCTION geocode.check_fail(msg text) RETURNS void
@@ -272,10 +274,10 @@ BEGIN
     'secondary_designator', sec.designator,
     'secondary_number', sec.unit_number,
     'city', nullif(city, ''),
-    'state', coalesce(upper(f.region_a), 'ME'),
+    'state', upper(f.region_a),
     'zip5', zip,
     'delivery_line', nullif(line, ''),
-    'last_line', nullif(concat_ws(' ', nullif(city, ''), coalesce(upper(f.region_a), 'ME'), zip), ''),
+    'last_line', nullif(concat_ws(' ', nullif(city, ''), upper(f.region_a), zip), ''),
     'source', f.source,
     'gid', f.gid,
     -- the address point itself (for a 'nearest' match it differs from the selected place)
@@ -295,11 +297,15 @@ AS $$
     'municipality', coalesce(f.locality, f.localadmin),
     'neighbourhood', f.neighbourhood,
     'county', f.county,
+    -- County names repeat across states, so the state's FIPS has to match; county_ref holds
+    -- Maine's counties only, so this is null for other states rather than wrong.
     'county_fips', (SELECT c.fips FROM geocode.county_ref c
-                    WHERE c.county = lower(regexp_replace(coalesce(f.county, ''), '\s+County$', '', 'i'))),
+                    WHERE c.county = lower(regexp_replace(coalesce(f.county, ''), '\s+County$', '', 'i'))
+                      AND substr(c.fips, 1, 2) = (SELECT r.fips FROM geocode.region_ref r
+                                                  WHERE r.abbr = f.region_a)),
     'state', f.region,
-    'state_code', coalesce(f.region_a, 'ME'),
-    'state_fips', '23',
+    'state_code', f.region_a,
+    'state_fips', (SELECT r.fips FROM geocode.region_ref r WHERE r.abbr = f.region_a),
     'zip5', substring(f.postcode from '\d{5}'),
     'lat', round(ST_Y(f.geom)::numeric, 6),
     'lon', round(ST_X(f.geom)::numeric, 6)))

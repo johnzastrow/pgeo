@@ -325,7 +325,7 @@ function setupBoundary({ map, client, meter, current, panelPadding, onTab }) {
       const first = everywhere.features?.[0]?.properties?.label;
       status.replaceChildren(el('span', 'badge exact', `${feats.length} inside`), document.createTextNode(' the area.'));
       if (first && feats[0] && first !== feats[0].properties.label) {
-        status.append(document.createTextNode(` Without it, the first answer statewide would have been ${first}.`));
+        status.append(document.createTextNode(`  Without the area filter, the first answer would have been ${first}.`));
       }
       feats.forEach((f, i) => {
         const p = f.properties;

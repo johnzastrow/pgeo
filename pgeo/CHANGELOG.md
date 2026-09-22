@@ -10,6 +10,38 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-09-22
+
+### Fixed
+- The region a feature is in is now the feature's own, not a constant. `'Maine'`, `'ME'`,
+  `', ME, USA'` in every label, and the Maine region gid were written into every row by the
+  build; a New York build would have labelled Albany "Albany, ME, USA". The state comes from
+  the feature's county, which is how Who's on First records it, so no extra point-in-polygon
+  pass is needed; a feature with no county falls back to the build's own state when the build
+  has one, and is left unset rather than guessed when it has several.
+- County abbreviations and FIPS codes no longer cross state lines. `geocode.county_ref` holds
+  Maine's counties, and county names repeat: New York has a Franklin and a Washington, which
+  would have been given Maine's abbreviations and Maine's FIPS codes. The state must now match.
+  For states other than Maine `county_a` and `county_fips` are null, which is true rather than
+  wrong.
+- `/v1/address` took `state_fips` from the literal `'23'` and defaulted `state` to `'ME'`.
+  Both now come from the feature.
+- The query parser stripped a trailing `me` or `maine` from the text. It now strips any state
+  the build covers, written as the postal code or the full name - and does not strip a name
+  that is also a town here, so "350 5th Ave, New York" keeps its locality while
+  "Portland, Maine" still loses its state.
+- `boundary.gid` treated the Maine region gid as "everywhere"; it now accepts any region the
+  build covers.
+- `/v1/attribution` said "serving the State of Maine" whatever the build held.
+
+### Added
+- `geocode.region_ref`: the states a build covers, filled by the loader from
+  regions/regions.json, and read by the query functions. `pgeo-load functions` takes `--build`
+  because it refills it.
+
+All 1,560 Maine accuracy cases are unchanged, case by case, by the query-side half of this;
+the build-side half is checked by rebuilding Maine and running the gate.
+
 ## [0.11.0] - 2026-09-22
 
 ### Added

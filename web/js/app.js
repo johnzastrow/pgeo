@@ -1,4 +1,4 @@
-// Pelias Maine demo: wires the map, the <pelias-search> element, structured search,
+// pgeo demo page: wires the map, the <pelias-search> element, structured search,
 // reverse geocoding and the batch tool. Rendering uses DOM APIs and textContent only.
 import { PeliasClient, setApiKey, hasApiKey } from './pelias-client.js';
 import './pelias-search.js';

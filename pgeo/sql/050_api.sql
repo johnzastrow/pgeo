@@ -26,6 +26,7 @@ DECLARE
   n      integer;
   maxw   integer := 4;
   cand   text;
+  tail   text;
 BEGIN
   s := regexp_replace(s, '\m(apt|apartment|unit|ste|suite)\M\.?\s*[[:alnum:]-]+|#\s*[[:alnum:]-]+', ' ', 'gi');
   m := regexp_match(s, '\m(\d{5})(-\d{4})?\M');
@@ -35,11 +36,30 @@ BEGIN
   END IF;
   parts := ARRAY(SELECT trim(x) FROM unnest(string_to_array(s, ',')) x WHERE trim(x) <> '');
   words := regexp_split_to_array(trim(array_to_string(parts, ' ')), '\s+');
-  IF cardinality(words) > 0 AND lower(rtrim(words[cardinality(words)], '.')) IN ('me', 'maine') THEN
-    state := 'ME';
-    words := words[1:cardinality(words) - 1];
-    IF cardinality(parts) > 0 AND lower(rtrim(parts[cardinality(parts)], '.')) IN ('me', 'maine') THEN
+  -- Strip a trailing state, for any state this build covers (geocode.region_ref). It used to be
+  -- the literals 'me' and 'maine'. A state name can be several words, so the comma-separated
+  -- part is tried before the last word; and the name is only stripped when it is not also a town
+  -- here, because "Portland, Maine" has no town called Maine but "350 5th Ave, New York" means
+  -- the city and the locality must survive.
+  IF cardinality(parts) > 0 THEN
+    tail := lower(rtrim(parts[cardinality(parts)], '.'));
+    SELECT r.abbr INTO state FROM geocode.region_ref r
+     WHERE tail = lower(r.abbr)
+        OR (tail = lower(r.name) AND NOT EXISTS (SELECT 1 FROM pgeo.town t WHERE t.name = tail))
+     LIMIT 1;
+    IF state IS NOT NULL THEN
       parts := parts[1:cardinality(parts) - 1];
+      words := regexp_split_to_array(trim(array_to_string(parts, ' ')), '\s+');
+    END IF;
+  END IF;
+  IF state IS NULL AND cardinality(words) > 0 THEN
+    tail := lower(rtrim(words[cardinality(words)], '.'));
+    SELECT r.abbr INTO state FROM geocode.region_ref r
+     WHERE tail = lower(r.abbr)
+        OR (tail = lower(r.name) AND NOT EXISTS (SELECT 1 FROM pgeo.town t WHERE t.name = tail))
+     LIMIT 1;
+    IF state IS NOT NULL THEN
+      words := words[1:cardinality(words) - 1];
     END IF;
   END IF;
 
@@ -457,14 +477,15 @@ LANGUAGE sql STABLE PARALLEL SAFE AS $fn$
                               '<', '&lt;'), '>', '&gt;') || '</h3>
     <h3>Attribution</h3>
     <p>Geocoding by <a href="https://github.com/">pgeo</a>, a PostgreSQL/PostGIS geocoder,
-       serving the State of Maine. Data from:</p>
+       serving ' || (SELECT string_agg(r.name, ', ' ORDER BY r.name) FROM geocode.region_ref r)
+              || '. Data from:</p>
     <ul>
       <li><a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>
           &copy; OpenStreetMap contributors, under
           <a href="https://opendatacommons.org/licenses/odbl/">ODbL 1.0</a>. See also the
           <a href="https://operations.osmfoundation.org/policies/nominatim/">OSM geocoding
           guidelines</a> for acceptable use.</li>
-      <li><a href="https://openaddresses.io/">OpenAddresses</a> (Maine E911 and municipal
+      <li><a href="https://openaddresses.io/">OpenAddresses</a> (E911 and municipal
           sources), under the licence of each contributing source.</li>
       <li><a href="https://whosonfirst.org/">Who&#39;s On First</a>, under CC-BY 4.0 with
           per-record source licences.</li>

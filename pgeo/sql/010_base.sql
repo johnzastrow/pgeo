@@ -62,8 +62,22 @@ CREATE OR REPLACE FUNCTION geocode.engine_version() RETURNS text
 LANGUAGE sql IMMUTABLE PARALLEL SAFE
 AS $$ SELECT '0+unknown'::text $$;
 
+-- The regions (US states) this build covers: name, postal abbreviation, Census FIPS, and the
+-- Who's on First id that ties a feature to its state through its county. The loader fills it
+-- from regions/regions.json, because which states a build holds is a property of the build.
+-- Who's on First carries no wof:abbreviation on US region records, so "NY" has to come from
+-- somewhere, and the registry is where the rest of the per-state facts already live.
+DROP TABLE IF EXISTS geocode.region_ref CASCADE;
+CREATE TABLE geocode.region_ref (
+  wof_id bigint PRIMARY KEY,
+  name text NOT NULL,
+  abbr text NOT NULL,
+  fips text NOT NULL
+);
+
 -- Maine counties: Census FIPS codes and the Pelias/WOF abbreviations (county_a), which do
 -- not follow one rule (Waldo WL, Washington WS). Reference data, rebuilt on every apply.
+-- Maine only: no other state has a curated set of these, so county_a is null elsewhere.
 DROP TABLE IF EXISTS geocode.county_ref CASCADE;
 CREATE TABLE geocode.county_ref (county text PRIMARY KEY, abbr text NOT NULL, fips text NOT NULL);
 INSERT INTO geocode.county_ref (county, abbr, fips) VALUES

@@ -41,6 +41,12 @@ class Region:
         """Every OpenAddresses CSV downloaded for this build, at any depth."""
         return str(self.raw_dir / "oa" / "**" / "*.csv")
 
+    def ref_rows(self) -> list[tuple[int, str, str, str]]:
+        """(wof_id, name, abbr, fips) per member state, for geocode.region_ref."""
+        reg = _registry()["states"]
+        return [(int(reg[st]["wof_id"]), reg[st]["name"], st, reg[st]["fips"])
+                for st in self.states]
+
     def pbfs(self) -> list[Path]:
         """The OSM extracts for this build, in state order. Missing files are an error."""
         reg = _registry()["states"]

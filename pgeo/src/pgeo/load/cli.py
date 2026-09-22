@@ -86,6 +86,12 @@ async def build(settings: Settings, selected: list[str], reg: Region) -> None:
     try:
         t0 = time.time()
         await run_sql(con, "010_base.sql")
+        # Which states this build holds, for the region name, abbreviation and gid that every
+        # feature carries. 010_base.sql creates the table empty; the facts are the registry's.
+        await con.executemany(
+            "INSERT INTO geocode.region_ref (wof_id, name, abbr, fips) VALUES ($1, $2, $3, $4)",
+            reg.ref_rows(),
+        )
         await con.execute("DROP SCHEMA IF EXISTS pgeo_build CASCADE; CREATE SCHEMA pgeo_build")
         await con.execute("SET search_path = pgeo_build, public")
         await run_sql(con, "020_tables.sql")
@@ -169,11 +175,19 @@ async def build(settings: Settings, selected: list[str], reg: Region) -> None:
         await con.close()
 
 
-async def functions_only(settings: Settings) -> None:
+async def functions_only(settings: Settings, reg: Region) -> None:
     con = await asyncpg.connect(settings.dsn, timeout=30)
     try:
         async with con.transaction():
+            # 010_base.sql recreates geocode.region_ref empty, and the query functions read it
+            # (the trailing-state strip in the parser, the boundary.gid filters, attribution),
+            # so it has to be refilled here too, not only by a build.
             await run_sql(con, "010_base.sql")
+            await con.executemany(
+                "INSERT INTO geocode.region_ref (wof_id, name, abbr, fips) "
+                "VALUES ($1, $2, $3, $4)",
+                reg.ref_rows(),
+            )
             await run_sql(con, "040_functions.sql")
             await run_sql(con, "050_api.sql")
             await run_sql(con, "060_address.sql")
@@ -205,7 +219,9 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("--sources", default=",".join(ALL_SOURCES))
     b.add_argument("--build", dest="build_name", default=None,
                    help="build name or state list (default: $PGEO_BUILD, else me)")
-    sub.add_parser("functions")
+    f = sub.add_parser("functions")
+    f.add_argument("--build", dest="build_name", default=None,
+                   help="build name or state list (default: $PGEO_BUILD, else me)")
     sub.add_parser("info")
     args = ap.parse_args(argv)
     settings = Settings.load()
@@ -218,7 +234,7 @@ def main(argv: list[str] | None = None) -> int:
             selected.insert(0, "whosonfirst")
         asyncio.run(build(settings, selected, region(args.build_name)))
     elif args.cmd == "functions":
-        asyncio.run(functions_only(settings))
+        asyncio.run(functions_only(settings, region(args.build_name)))
     else:
         asyncio.run(info(settings))
     return 0

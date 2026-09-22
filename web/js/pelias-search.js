@@ -1,6 +1,6 @@
 // <pelias-search>: reusable single-field autocomplete for Pelias.
 //
-//   <pelias-search placeholder="Search Maine" min-chars="2" debounce="160"></pelias-search>
+//   <pelias-search placeholder="Search" min-chars="2" debounce="160"></pelias-search>
 //   el.client  = new PeliasClient();            // required
 //   el.context = () => ({ focus, boundary, layers, sources });  // optional, per request
 //   el.addEventListener('pelias-select', e => e.detail.feature);
