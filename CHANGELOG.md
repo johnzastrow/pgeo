@@ -27,8 +27,11 @@ commits where each milestone was complete.
 - `infra/ansible/group_vars/pelias/zz-local.yml` was tracked by git from 2026-09-21 to
   2026-09-22: the ignore rule named the file's previous name. It holds the TLS terminator's LAN
   address, the tailnet range and the hostname - no credentials. Untracked, the rule corrected, a
-  test pins both. The two commits remain in history on the private Forgejo remote; `TODO.md` item
-  5 is the rewrite to do before publishing to GitHub.
+  test pins both. The history was then rewritten in full (`git filter-repo --replace-text`): every
+  private address and hostname in every commit replaced with the placeholders HEAD already used,
+  including the copies the 2026-09-21 sanitisation had left in earlier commits and three tokens it
+  had missed at HEAD. Force-pushed; a fresh clone shows 149 commits, 38 tags, no private token.
+  Commit hashes before 2026-09-22 changed.
 
 ### Fixed
 - The pgeo locations answered a refused key with nginx's HTML 401 page and no

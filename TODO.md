@@ -82,16 +82,17 @@ noise into the accuracy figure between builds and hosts ("Stevenns Corner", Sect
 `docs/PERFORMANCE_OPTIMIZATION.md`). Any rule - source priority, then id - changes some
 current outputs, so it is a deliberate change with its own accuracy run.
 
-## 5. Rewrite history before publishing to GitHub
+## 5. ~~Rewrite history before publishing to GitHub~~ Done 2026-09-22
 
-`infra/ansible/group_vars/pelias/zz-local.yml` - the TLS terminator's LAN address, the tailnet
-range and the hostname - was tracked from commit `64c3b93` (2026-09-21) to `6a0171f`
-(2026-09-22) because the ignore rule named the file's old name. It is untracked now, but the two
-commits are in the history on Forgejo (a private remote). Before the repository goes to GitHub,
-drop it from history (`git filter-repo --invert-paths --path infra/ansible/group_vars/pelias/zz-local.yml`)
-and force-push to Forgejo; this is a rewrite of a shared remote, so it is the owner's call and
-should be done in one sitting with no other clones open. The values are low-severity (no
-credentials) but they are exactly what that commit set out to remove.
+The local inventory file had been tracked for a day, and the sanitisation of 2026-09-21 had left
+every earlier commit's copies of the private details in place (some twenty files: the plan, the
+project log, the Proxmox scripts, the Caddy config, the inventory). The whole history was
+rewritten with `git filter-repo --replace-text`, mapping each real value to the placeholder HEAD
+already used - LAN addresses to 192.0.2.x, hostnames to *.example.org - and force-pushed. A fresh
+clone of the remote holds 149 commits and 38 tags with zero blobs containing any private token.
+Commit hashes before this date changed; a backup bundle of the old history is kept outside the
+repository. Three tokens the original sanitisation had missed at HEAD (a tailnet address, the
+VM's MAC, the internal DNS name) went in the same pass.
 
 ## 6. Authorization: single sign-on
 
