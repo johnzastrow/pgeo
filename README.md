@@ -2,54 +2,28 @@
 
 # pgeo
 
-A geocoder that lives inside PostgreSQL, built and measured against Pelias on open data for the
-State of Maine.
+PGEO is a feature-rich geocoder that can live entirely inside PostgreSQL. It's a personal, petite PostgreSQL Geocoder (hence the short name PGEO) for when you need just enough geocoding and a simple deployment. It is fast, resource-efficient, easy to deploy, and feature-rich. With 1 CPU and 2 GB RAM, PGEO can easily serve 10-15 concurrent users with answers in 100 ms (most return sub-25 ms), even for complex queries using rich data for the full State of Maine. However, it does not scale horizontally as well as other options like Pelias. We measured it against Pelias and other popular geocoders to assess accuracy, speed, and scalability. Read the full [docs/REPORT.pdf](report).
 
-The name is `pg` (PostgreSQL's usual prefix, as in `psql` and `pg_dump`) plus *geo*, said
-"pee-geo". It is unrelated to `pgeocode`, a Python postal-code library.
+This project is unrelated to pgeocode, a Python postal-code library.
 
-Self-hosted Pelias geocoder for Maine, built from every applicable open data source, plus
-(Phase 10) a PostGIS-native geocoder tuned against it. See [PLAN.md](PLAN.md) for the
-full plan, decisions, and security baseline, and
-[docs/DATA_PIPELINE.md](docs/DATA_PIPELINE.md) for the step-by-step data extraction and
-loading runbook (every step with manual commands, checks, and reference counts).
+PGEO also includes a collection of useful utilities alongside the core geocoding/reverse geocoding service.
 
-**Rebuild everything** (data, Pelias, pgeo, verification, report, deployment):
-[docs/REBUILD.md](docs/REBUILD.md) is the authoritative runbook, and
-`scripts/rebuild_all.sh` runs it end to end (`scripts/rebuild_all.sh --help` lists the stages).
-The study that compares the two engines is [docs/REPORT.md](docs/REPORT.md)
-([PDF](docs/REPORT.pdf), [Word](docs/REPORT.docx)). A slide deck covering pgeo's architecture, features, use and limits
-runs from the repository with `scripts/slides.sh` ([slides/README.md](slides/README.md)).
+* Docker images for the server and pre-processing data (pre-processing needs more memory and compute than serving the service)
+* An HTML page that demonstrates connecting to PGEO and optionally Pelias to show off features
+* A rich test suite to prove performance and accuracy
+* Scripts and documentation to get it running
+
+Links to other useful documents here are the following:
+
+* Quick Start deployment guide
+* 
+
 
 ## Licence and data
 
 The code is [Apache-2.0](LICENSE). The data it loads is not: each source carries its own licence
 and a deployment that redistributes data or derived tiles must comply with them - see [NOTICE](NOTICE)
 and `docs/DATA_PIPELINE.md` section 13. A running service reports the same list at `/v1/attribution`.
-
-## Your own network
-
-Addresses and host names in this repository are documentation placeholders (RFC 5737
-`192.0.2.0/24`, RFC 2606 `example.org`). Put the real ones in two gitignored files, both of which
-have a committed `.example` beside them:
-
-- `infra/ansible/inventory/hosts.yml` - the host to deploy to
-- `infra/ansible/group_vars/pelias/zz-local.yml` - the edge name, the TLS terminator and the SSH
-  allow-list. The `zz-` prefix matters: Ansible reads a `group_vars` directory alphabetically, so
-  the override has to sort after `main.yml`.
-
-Version: see [VERSION](VERSION) and [CHANGELOG.md](CHANGELOG.md) (semver; pgeo and
-pelias-prep are versioned separately in their own changelogs).
-
-## Endpoint
-
-All clients use **https://geocoder.example.org** (LAN and tailnet only; TLS at the
-wharf Caddy). Exposed paths: `/v1/search`, `/v1/search/structured`, `/v1/autocomplete`,
-`/v1/reverse`, `/v1/place` (GET only), plus the demo page at `/`.
-
-```bash
-curl 'https://geocoder.example.org/v1/search?text=389%20Congress%20St,%20Portland,%20ME'
-```
 
 ## Layout
 
