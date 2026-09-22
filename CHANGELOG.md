@@ -51,7 +51,8 @@ commits where each milestone was complete.
   than by ZIP prefix. Maine gains 03579, which has 846 km2 of land in Oxford County against 611
   in Coos County, New Hampshire. Deciding by geometry instead was tried and rejected: the
   cartographic state polygon generalises away Peaks Island, Cliff Island, the Cranberry Isles and
-  five other coastal ZCTAs.
+  five other coastal ZCTAs. Maine therefore holds 906,102 features where the report's measured
+  build held 906,101; the report is left as it stands, because it describes what was measured.
 - Postcodes in source data are validated against the ZIP prefixes a build has to itself, which
   reproduces Maine's old 039-049 range exactly and does not leak across a border - New York holds
   06390 on Fishers Island, so a plain prefix test there would have admitted Connecticut's 063xx.
