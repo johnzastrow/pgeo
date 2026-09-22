@@ -12,9 +12,17 @@ The examples build New York. Substitute any state code, or several
 
 ## 0. What you need
 
-**Workstation** - Linux or macOS, 8 GB RAM, and free disk of roughly ten times the OSM extract:
-about 15 GB for Maine, 45 GB for New York, and note that Who's on First adds a one-off 5 GB shared
-by every build.
+**Workstation** - Linux or macOS, 8 GB RAM, and free disk. Measured, for one state:
+
+| | Maine | New York |
+|---|---|---|
+| Downloads (`data/raw/<build>`) | 0.6 GB | 3.0 GB |
+| Database while building | 2.6 GB | 8 GB |
+| Basemap for the demo page | 0.3 GB | 1.5 GB |
+
+Who's on First adds a one-off 5.2 GB that every build shares, and the build needs room for a
+second copy of the data during the swap. Budget 15 GB for a small state and 40 GB for a large
+one.
 
 ```bash
 # Debian/Ubuntu. On macOS: brew install jq gdal duckdb go-pmtiles
@@ -133,7 +141,10 @@ scripts/pgeo_rebuild.sh --build ny --profile medium --skip-gate
 | Pelias-compatible SQL API | 4700 | 4701 |
 
 Profiles are in `pgeo/tuning/profiles/`: `tiny`, `small`, `medium`, `large`, `workstation`. Pick
-by the server's memory, not by the region's size (`uv run --project pgeo pgeo-tune list`).
+by the server's memory, not by the region's size (`uv run --project pgeo pgeo-tune list`). On a
+workstation already running another build, the profile is left alone and the message says so:
+PostgreSQL's settings are per machine here, not per stack. On the server, where one host serves
+one build, the profile is whatever you deploy.
 
 `--skip-gate` is needed for any region except Maine: the accuracy gate compares against a
 1,560-case Maine set. Section 11 covers building a case set for a new region.
@@ -146,7 +157,7 @@ by the server's memory, not by the region's size (`uv run --project pgeo pgeo-tu
 curl -s 'http://127.0.0.1:4701/v1/search?text=350+5th+Ave,+New+York&size=1' | jq '.features[0].properties.label'
 curl -s 'http://127.0.0.1:4701/v1/autocomplete?text=albany' | jq '.features[0].properties.label'
 curl -s 'http://127.0.0.1:4701/v1/reverse?point.lat=40.7484&point.lon=-73.9857&size=1' | jq '.features[0].properties.label'
-uv run --project pgeo pgeo-load info | jq '.features_by_layer'
+uv run --project pgeo pgeo-load info --build ny | jq '.features_by_layer'
 ```
 
 The demo page, with the map and the four demonstration tabs:

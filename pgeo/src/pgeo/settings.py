@@ -45,9 +45,12 @@ class Settings:
                 raise RuntimeError("set PGEO_DSN or PGEO_DB_PASSWORD (pgeo/pgeo.secrets)")
             host = env.get("PGEO_DB_HOST", "127.0.0.1")
             port = env.get("PGEO_DB_PORT", "5433")
+            # One stack per build: a build other than the default has its own database on its
+            # own port, named in pgeo/builds/<build>.env (scripts/pgeo_setup.sh writes it).
+            name = env.get("PGEO_DB_NAME", "pgeo")
             # Percent-encode: an unencoded "/" or "#" in the password ends the authority, so
             # the URL would name a different host and the connection would go elsewhere.
-            dsn = f"postgresql://pgeo:{quote(pw, safe='')}@{host}:{port}/pgeo"
+            dsn = f"postgresql://pgeo:{quote(pw, safe='')}@{host}:{port}/{name}"
         mode = env.get("PGEO_PARSE_MODE", "service")
         if mode not in ("service", "extension", "none"):
             raise RuntimeError(f"PGEO_PARSE_MODE must be service|extension|none, not {mode!r}")

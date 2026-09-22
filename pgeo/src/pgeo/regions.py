@@ -69,6 +69,25 @@ def _registry() -> dict:
     return json.loads(REGISTRY.read_text())
 
 
+def stack_env(build: str) -> dict[str, str]:
+    """The per-build stack settings scripts/pgeo_setup.sh generated, if this build has any.
+
+    A build other than the default runs its own containers on its own ports with its own
+    database, so every pgeo-load command has to be told which one it means. Reading the file the
+    setup script already wrote keeps `--build ny` sufficient on its own.
+    """
+    path = REPO_ROOT / "pgeo" / "builds" / f"{build}.env"
+    if not path.is_file():
+        return {}
+    out: dict[str, str] = {}
+    for line in path.read_text().splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            k, v = line.split("=", 1)
+            out[k.strip()] = v.strip()
+    return out
+
+
 def region(build: str | None = None) -> Region:
     """Resolve a build name or state list. Defaults to $PGEO_BUILD, else `me`."""
     build = build or os.environ.get("PGEO_BUILD") or "me"

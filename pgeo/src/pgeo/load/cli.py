@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import os
 import re
 import sys
 import time
@@ -25,7 +26,7 @@ from urllib.parse import urlparse
 import asyncpg
 
 from pgeo.load import sources
-from pgeo.regions import Region, region
+from pgeo.regions import Region, region, stack_env
 from pgeo.settings import DATA_DIR, SECRETS_FILE, SQL_DIR, Settings, _read_env_file
 
 ALL_SOURCES = ["whosonfirst", "openaddresses", "openstreetmap", "gnis", "zcta", "overture"]
@@ -203,9 +204,16 @@ async def functions_only(settings: Settings, reg: Region) -> None:
         await con.close()
 
 
-async def info(settings: Settings) -> None:
+async def info(settings: Settings, reg: Region) -> None:
     con = await asyncpg.connect(settings.dsn, timeout=30)
     try:
+        built = await con.fetchval("SELECT to_regclass('pgeo.build_info')")
+        if built is None:
+            # A stack that has been set up but never built, or one still building: say so
+            # instead of failing on a missing table.
+            print(f"no build in {settings.dsn.rsplit('/', 1)[-1]} yet "
+                  f"(run: scripts/pgeo_rebuild.sh --build {reg.build})")
+            return
         v = await con.fetchval("SELECT value FROM pgeo.build_info WHERE key = 'build'")
         print(json.dumps(json.loads(v), indent=2))
     finally:
@@ -222,8 +230,15 @@ def main(argv: list[str] | None = None) -> int:
     f = sub.add_parser("functions")
     f.add_argument("--build", dest="build_name", default=None,
                    help="build name or state list (default: $PGEO_BUILD, else me)")
-    sub.add_parser("info")
+    i = sub.add_parser("info")
+    i.add_argument("--build", dest="build_name", default=None,
+                   help="build name or state list (default: $PGEO_BUILD, else me)")
     args = ap.parse_args(argv)
+    # --build also says which stack to talk to: its database, port and parser service. Anything
+    # already set in the environment wins, so PGEO_DSN still overrides everything.
+    reg = region(getattr(args, "build_name", None))
+    for key, value in stack_env(reg.build).items():
+        os.environ.setdefault(key, value)
     settings = Settings.load()
     if args.cmd == "build":
         selected = [s for s in args.sources.split(",") if s]
@@ -232,11 +247,11 @@ def main(argv: list[str] | None = None) -> int:
             ap.error(f"unknown sources: {bad}")
         if "whosonfirst" not in selected:
             selected.insert(0, "whosonfirst")
-        asyncio.run(build(settings, selected, region(args.build_name)))
+        asyncio.run(build(settings, selected, reg))
     elif args.cmd == "functions":
-        asyncio.run(functions_only(settings, region(args.build_name)))
+        asyncio.run(functions_only(settings, reg))
     else:
-        asyncio.run(info(settings))
+        asyncio.run(info(settings, reg))
     return 0
 
 
