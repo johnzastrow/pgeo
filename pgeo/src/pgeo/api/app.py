@@ -61,7 +61,14 @@ async def lifespan(app: FastAPI):
         names = await con.fetch(
             "SELECT DISTINCT lower(name) AS n FROM pgeo.feature WHERE layer IN ('locality', 'localadmin')"
         )
-    app.state.rules = RuleParser({r["n"] for r in names})
+        # The states this build covers, so the parser can strip a trailing one whatever it is.
+        regions = await con.fetch("SELECT lower(name) AS name, lower(abbr) AS abbr, abbr AS code "
+                                  "FROM geocode.region_ref")
+    states = {}
+    for r in regions:
+        states[r["abbr"]] = r["code"]
+        states[r["name"]] = r["code"]
+    app.state.rules = RuleParser({r["n"] for r in names}, states)
     yield
     await app.state.http.aclose()
     await app.state.pool.close()

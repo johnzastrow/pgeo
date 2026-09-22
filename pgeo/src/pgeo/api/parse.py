@@ -2,7 +2,7 @@
 
 - service:   libpostal HTTP service (pelias/libpostal-service: GET /parse?address=)
 - extension: libpostal inside Postgres (pgsql-postal: SELECT postal_parse($1))
-- none:      rule-based parser (house number, street, known Maine town, ZIP, state)
+- none:      rule-based parser (house number, street, a town this build knows, ZIP, state)
 
 All modes return a Parsed. The search never trusts a parse: every component only shapes
 candidate retrieval and scoring, and the full text is always searched as a name too.
@@ -13,7 +13,6 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
-STATES = {"me", "maine"}
 ZIP_RE = re.compile(r"\b(\d{5})(?:-\d{4})?\b")
 HN_RE = re.compile(r"^\s*(\d{1,6}[a-zA-Z]?)(?:\s*-\s*\d{1,6})?\s+(.+)$")
 UNIT_RE = re.compile(r"\b(?:apt|apartment|unit|ste|suite|#)\s*[\w-]+", re.I)
@@ -71,9 +70,14 @@ def from_libpostal(text: str, components: list[dict] | dict) -> Parsed:
 class RuleParser:
     """Small US-address parser. Towns are recognized from the loaded admin names."""
 
-    def __init__(self, localities: set[str]) -> None:
+    def __init__(self, localities: set[str], states: dict[str, str] | None = None) -> None:
         self.localities = localities  # normalized, lowercase
         self.max_words = max((len(x.split()) for x in localities), default=1)
+        # Lower-case spelling -> postal abbreviation, for every state this build covers: {"me":
+        # "ME", "maine": "ME"}. It used to be the literal {"me", "maine"}, which on a New York
+        # build left "NY" in the text and the parser then read it as the town, turning
+        # "350 5th Ave, New York, NY" into a search for 350 New York Ave.
+        self.states = states or {}
 
     def parse(self, text: str) -> Parsed:
         p = Parsed(text=text)
@@ -85,10 +89,19 @@ class RuleParser:
         parts = [x.strip() for x in s.split(",") if x.strip()]
         # trailing state
         words = " ".join(parts).split()
-        if words and words[-1].lower().strip(".") in STATES:
-            p.state = "ME"
+        # A state name can be several words ("New York"), so try the comma part before the last
+        # word; and never strip a name that is also a town here, or "350 5th Ave, New York" loses
+        # its locality.
+        tail_part = parts[-1].lower().strip(".") if parts else ""
+        tail_word = words[-1].lower().strip(".") if words else ""
+        if tail_part in self.states and tail_part not in self.localities:
+            p.state = self.states[tail_part]
+            parts = parts[:-1]
+            words = " ".join(parts).split()
+        elif tail_word in self.states and tail_word not in self.localities:
+            p.state = self.states[tail_word]
             words = words[:-1]
-            if parts and parts[-1].lower().strip(".") in STATES:
+            if parts and parts[-1].lower().strip(".") == tail_word:
                 parts = parts[:-1]
         # town: last comma part if it is a known town, else longest known suffix of words;
         # "number street, Town" keeps an unknown (possibly misspelled) last part as the town,

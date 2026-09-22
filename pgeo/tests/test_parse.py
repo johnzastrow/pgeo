@@ -5,10 +5,14 @@ from __future__ import annotations
 from pgeo.api.parse import RuleParser, from_libpostal
 
 TOWNS = {"portland", "south portland", "bar harbor", "augusta", "bangor", "mount desert"}
+# The states the build covers, as the app loads them from geocode.region_ref. The parser has no
+# built-in list any more, so a parser given none strips no state at all - which is what a build
+# whose region_ref is empty should do.
+STATES = {"me": "ME", "maine": "ME"}
 
 
-def rp() -> RuleParser:
-    return RuleParser(TOWNS)
+def rp(states: dict[str, str] | None = STATES) -> RuleParser:
+    return RuleParser(TOWNS, states)
 
 
 def test_full_address_with_commas():
@@ -87,3 +91,24 @@ def test_libpostal_venue_misread_falls_back_to_rule_street():
     )
     p = merge_rule_fallback(lp, rp().parse("12 Wenbelle Df, Buckspotr, ME"))
     assert (p.housenumber, p.street, p.locality, p.name) == ("12", "Wenbelle Df", "Buckspotr", None)
+
+
+def test_a_trailing_state_is_stripped_whatever_the_state_is():
+    """The parser has no built-in state list: it uses the ones the build covers."""
+    ny = RuleParser({"new york", "albany", "buffalo"}, {"ny": "NY", "new york": "NY"})
+    p = ny.parse("350 5th Ave, New York, NY")
+    assert (p.housenumber, p.street, p.locality, p.state) == ("350", "5th Ave", "New York", "NY")
+
+
+def test_a_state_name_that_is_also_a_town_stays_the_town():
+    """"New York" is both; stripping it as the state would lose the locality."""
+    ny = RuleParser({"new york", "albany"}, {"ny": "NY", "new york": "NY"})
+    p = ny.parse("350 5th Ave, New York")
+    assert (p.housenumber, p.street, p.locality) == ("350", "5th Ave", "New York")
+
+
+def test_a_multi_state_build_reports_whichever_state_was_written():
+    two = RuleParser({"burlington", "concord"}, {"vt": "VT", "vermont": "VT",
+                                                 "nh": "NH", "new hampshire": "NH"})
+    assert two.parse("Burlington, VT").state == "VT"
+    assert two.parse("Concord, New Hampshire").state == "NH"
