@@ -49,6 +49,25 @@ if [[ ! -f "$secrets" ]]; then
   } > "$secrets"
   umask 022
 fi
+# The data directory is recorded as an absolute path when the secrets file is first written, so
+# renaming the checkout leaves it pointing at a directory that no longer exists. Running
+# containers survive on the open inode and look fine; the next `up --force-recreate` would let
+# Docker create the missing path and PostgreSQL initialise an empty cluster there. Caught after
+# the checkout was renamed from pelia_maine to pgeo, with the Maine stack still mounted on the
+# old name. Only a path that has gone missing is corrected, since pointing the data at another
+# disk is a legitimate thing to do.
+recorded="$(sed -n 's/^PGEO_DATA_DIR=//p' "$secrets" | tail -1)"
+if [[ -n "$recorded" && ! -d "$recorded" ]]; then
+  moved="$ROOT/data/$(basename "$recorded")"
+  if [[ -d "$moved" ]]; then
+    echo "== PGEO_DATA_DIR pointed at $recorded, which is gone; using $moved"
+    sed -i "s|^PGEO_DATA_DIR=.*|PGEO_DATA_DIR=${moved}|" "$secrets"
+  else
+    echo "PGEO_DATA_DIR=$recorded does not exist and there is no $moved to use instead" >&2
+    exit 1
+  fi
+fi
+
 # Names, ports and paths for this build. Offset 0 reproduces the original single-stack layout
 # exactly, so the Maine stack is untouched by the arrival of a second build.
 stack=pgeo; data_dir="$ROOT/data/pgeo"; env_files=(--env-file "$secrets")
