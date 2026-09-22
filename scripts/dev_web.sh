@@ -24,10 +24,12 @@ build="$(tr ',' '-' <<<"${build,,}")"
 TILES="${ROOT}/data/raw/${build}/basemap/${build}.pmtiles"
 [[ -f "$TILES" ]] || { echo "missing ${TILES} (scripts/fetch_data.sh --build ${build} basemap)" >&2; exit 1; }
 
-# The page asks the server which region it is serving.
-REGION="$(mktemp --suffix=.json)"
+# The page asks the server which region it is serving. Written into web/ rather than mounted
+# over it: the web directory is mounted read-only, and Docker cannot create a mountpoint inside
+# a read-only mount. This is also what production does - the edge role writes the same file into
+# the web root - so the preview matches it. Gitignored.
+REGION="${ROOT}/web/region.json"
 python3 "${ROOT}/scripts/gen_region_json.py" --build "$build" > "$REGION"
-chmod 0644 "$REGION"
 
 # A build other than the default sits one step up the port range (scripts/pgeo_setup.sh), so the
 # dev edge needs its own copy of the config with those ports.
@@ -39,9 +41,13 @@ if [[ "$build" != "me" ]]; then
   off=$((api_port - 4500))
   port=$((8088 + off))
   DEVCONF="$(mktemp --suffix=.conf)"
+  # Ports for this build's stack, and a pgeo-only engine list: there is no Pelias for any build
+  # but the default, and announcing the default's Pelias here would have the page answer this
+  # region's queries from the other region's index.
   sed -e "s/127\.0\.0\.1:4500/127.0.0.1:$((4500 + off))/g" \
       -e "s/127\.0\.0\.1:4700/127.0.0.1:$((4700 + off))/g" \
       -e "s/127\.0\.0\.1:8088/127.0.0.1:${port}/g" \
+      -e 's#{"engines":\[{"label":"Pelias","base":"","kind":"pelias"},#{"engines":[#' \
       "${ROOT}/scripts/dev/nginx.dev.conf" > "$DEVCONF"
   chmod 0644 "$DEVCONF"
 fi
@@ -62,7 +68,6 @@ name=pelias_maine_web_dev   # the default build keeps its historical name
 [[ "$build" == "me" ]] || name="pgeo_web_dev_${build}"
 docker run --rm --name "$name" --network host \
   -v "${ROOT}/web:/srv/pelias-demo:ro" \
-  -v "${REGION}:/srv/pelias-demo/region.json:ro" \
   -v "${TILES}:/srv/tiles/${build}.pmtiles:ro" \
   -v "${ROOT}/scripts/dev/nginx.dev.main.conf:/etc/nginx/nginx.conf:ro" \
   -v "${DEVCONF}:/etc/nginx/conf.d/default.conf:ro" \

@@ -48,3 +48,6 @@ infra/ansible/group_vars/pelias/zz-local.yml
 
 # Generated per-build stack settings (ports, names, data dir)
 pgeo/builds/
+
+# Generated per-build region description for the demo page (the edge role writes its own)
+web/region.json
