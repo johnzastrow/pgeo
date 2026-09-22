@@ -47,7 +47,7 @@ scripts/rebuild_all.sh deploy       # ship to the query host (explicit only)
 | Stage | What runs | Time | Result |
 |-------|-----------|------|--------|
 | `check` | tool check | seconds | "tools ok" |
-| `data` | `scripts/bootstrap.sh`, `scripts/fetch_data.sh all`, `pelias-prep all` | 10-20 min (downloads) | `data/raw/*`, `data/processed/csv/{gnis,zcta,overture}.csv` |
+| `data` | `scripts/bootstrap.sh`, `scripts/fetch_data.sh --build me all`, `pelias-prep all --build me` | 10-20 min (downloads) | `data/raw/me/*`, `data/raw/shared/*`, `data/processed/me/csv/{gnis,zcta,overture}.csv` |
 | `pelias` | `scripts/build_local.sh setup download prepare import up test`, `scripts/snapshot_local.sh` | ~30 min | Elasticsearch index `pelias` (1,649,644 documents), snapshot `pelias-<date>` |
 | `pgeo` | `scripts/pgeo_setup.sh`, `scripts/pgeo_rebuild.sh` | ~20 min (first image build adds ~10 min) | database `pgeo` (906,101 features), profile applied, accuracy gate passed |
 | `verify` | compatibility contract, pgeo unit tests, browser smoke test | ~3 min | "compat: passed", "OK" |

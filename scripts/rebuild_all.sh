@@ -54,9 +54,11 @@ stage_pelias() {
 }
 
 stage_pgeo() {
-  for f in data/pelias/whosonfirst/sqlite data/pelias/openstreetmap/maine-latest.osm.pbf data/pelias/interpolation_oa/us/me \
-           data/processed/csv/gnis.csv; do
-    [[ -e "$f" ]] || { echo "missing $f: run the data and pelias stages first (or scripts/build_local.sh setup download)" >&2; exit 1; }
+  # pgeo reads its own downloads now (data/raw/me), not the Pelias stage's outputs; Who's on
+  # First is the one file both stacks share.
+  for f in data/pelias/whosonfirst/sqlite data/raw/me/osm/maine-latest.osm.pbf \
+           data/raw/me/oa data/processed/me/csv/gnis.csv; do
+    [[ -e "$f" ]] || { echo "missing $f: run the data stage first (scripts/fetch_data.sh --build me all)" >&2; exit 1; }
   done
   scripts/pgeo_setup.sh --profile workstation
   scripts/pgeo_rebuild.sh --profile workstation -f pgeo/compose.pinned.yml

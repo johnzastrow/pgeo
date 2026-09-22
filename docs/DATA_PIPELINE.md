@@ -127,7 +127,7 @@ Changing a pin changes the output. Bump pins deliberately, rebuild, and re-run t
 
 "Latest" inputs that are **not** pinned, because upstream keeps no dated URL: the Geofabrik
 Maine PBF, GNIS Domestic Names, OpenAddresses, WOF, TIGER. Their exact bytes are archived in
-`data/` and recorded by hash in `data/processed/csv/manifest.json` (custom sources).
+`data/` and recorded by hash in `data/processed/<build>/csv/manifest.json` (custom sources).
 
 Find the current Overture release and Protomaps build before bumping pins:
 

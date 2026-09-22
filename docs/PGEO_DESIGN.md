@@ -83,7 +83,7 @@ Pelias interpolation service without TIGER as a hard dependency; TIGER ranges ca
 | WOF | `data/pelias/whosonfirst/sqlite/*.db` | DuckDB sqlite scan, Maine descendants, polygons -> `pgeo.admin`; localities/postal codes also -> `pgeo.feature` |
 | OpenAddresses | `data/pelias/interpolation_oa/us/me/*.csv` | COPY -> address features |
 | OSM | `data/pelias/openstreetmap/maine-latest.osm.pbf` | `ogr2ogr` (GDAL OSM driver): named POIs -> venues, `addr:*` -> addresses, named highways -> streets (lines) |
-| GNIS, ZCTA, Overture | `data/processed/csv/*.csv` | COPY -> venue / postalcode features |
+| GNIS, ZCTA, Overture | `data/processed/<build>/csv/*.csv` | COPY -> venue / postalcode features |
 
 Load is into staging tables, then PIP enrichment, normalization, dedupe, index build, and an
 atomic schema swap (`pgeo_next` -> `pgeo`). Loaders are Python (uv project `pgeo/`), using
