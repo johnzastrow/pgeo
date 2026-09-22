@@ -139,6 +139,23 @@ example 150 m for an address, with the right house number; 8 km for a town) at r
 top result's confidence is below 0.8. The report also checks whether confidence scores
 mean anything: correct answers should carry higher confidence than wrong ones.
 
+The set is about a region, not about the engine, so each build has its own. Maine's 1,560
+cases are `tests/accuracy/cases.json`; another build's are built the same way and land in
+`tests/accuracy/cases_<build>.json`:
+
+```bash
+uv run --project prep python tests/accuracy/build_cases.py --build ny --n 200
+```
+
+The number of cases is a choice about how much evidence you want, not about the region's size.
+Two things are region-specific and worth reading before trusting a new set: the "somewhere
+else" misses are filtered against the build's own states and towns (Niagara Falls is not a
+miss in New York), and the query text names the state only when the build is a single state.
+
+The regression gate (`tests/accuracy/gate.py`) compares a run against
+`tests/accuracy/baseline.json`, which is Maine's. A new region has no baseline until you take
+one, so its first builds run with `--skip-gate`.
+
 ---
 
 ## 8. Findings so far that shaped the tests

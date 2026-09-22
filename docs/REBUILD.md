@@ -9,6 +9,15 @@ Detailed background for the data steps (sources, pinned versions, checks, licenc
 [DATA_PIPELINE.md](DATA_PIPELINE.md); pgeo deployment details in [DEPLOY_PGEO.md](DEPLOY_PGEO.md);
 tuning in [TUNING_REPORT.md](TUNING_REPORT.md).
 
+**This runbook rebuilds Maine**, because Maine is what the report measures and what the Pelias
+half of the comparison is built from. Every pgeo step here takes a `--build` argument and
+defaults to `me`; to build a different region - one state or several - follow
+[../GETTING_STARTED.md](../GETTING_STARTED.md), which is the same sequence without Pelias.
+A region other than Maine needs two things this runbook takes for granted: its own known
+answers in `pgeo/tuning/verify/<build>.json`, and its own accuracy set from
+`tests/accuracy/build_cases.py --build <name>`, since both are facts about a region rather
+than about the engine.
+
 ## 1. Requirements
 
 | Item | Needed for | Notes |
