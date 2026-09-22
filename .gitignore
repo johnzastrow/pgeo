@@ -44,3 +44,4 @@ slides/.slidev/
 # Real network details stay out of the published repository (see the .example files)
 infra/ansible/inventory/hosts.yml
 infra/ansible/group_vars/pelias/local.yml
+infra/ansible/group_vars/pelias/zz-local.yml

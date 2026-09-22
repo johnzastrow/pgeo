@@ -291,3 +291,15 @@ def test_every_guarded_location_resolves_401_to_the_json_handler():
             continue
         if "error_page" in b:
             assert "error_page 401 = @unauthorized;" in b, b[:160]
+
+
+def test_the_local_inventory_is_ignored_and_untracked():
+    """zz-local.yml holds the deployment's real addresses and the API-key hashes. It was tracked
+    for a day because the ignore rule named the file's previous name; the commit that was meant
+    to take private details out of the repository put this file in. Both properties, pinned."""
+    rel = "infra/ansible/group_vars/pelias/zz-local.yml"
+    ignored = subprocess.run(["git", "check-ignore", "-q", rel], cwd=ROOT, check=False)
+    assert ignored.returncode == 0, f"{rel} is not gitignored"
+    tracked = subprocess.run(["git", "ls-files", "--error-unmatch", rel], cwd=ROOT,
+                             capture_output=True, text=True, check=False)  # fmt: skip
+    assert tracked.returncode != 0, f"{rel} is tracked by git"
