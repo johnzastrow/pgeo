@@ -12,6 +12,18 @@ CREATE SCHEMA geocode_api;
 -- Rule parser: house number, street, town (known towns from pgeo.town, or the last comma
 -- part after "number street"), ZIP, state; otherwise a place name.
 -- ---------------------------------------------------------------------------------------
+-- Does the first `upto` words end with a town this build knows? Used to decide an ambiguous
+-- trailing state: in "101 Penbrooke Drive Penfield New York", Penfield is a town, so New York is
+-- the state. Towns can be several words ("South Portland"), so it tries each length.
+CREATE OR REPLACE FUNCTION geocode.tail_is_town(words text[], upto int, maxw int)
+RETURNS boolean LANGUAGE sql STABLE PARALLEL SAFE AS $$
+  SELECT upto > 0 AND EXISTS (
+    SELECT 1 FROM generate_series(1, least(maxw, upto)) k
+    JOIN pgeo.town t
+      ON t.name = lower(array_to_string(words[upto - k + 1 : upto], ' '))
+  )
+$$;
+
 CREATE OR REPLACE FUNCTION geocode.parse_rule(p_text text,
     OUT name text, OUT housenumber text, OUT street text, OUT locality text,
     OUT postcode text, OUT state text)
@@ -27,6 +39,7 @@ DECLARE
   maxw   integer := 4;
   cand   text;
   tail   text;
+  prev   text;
 BEGIN
   s := regexp_replace(s, '\m(apt|apartment|unit|ste|suite)\M\.?\s*[[:alnum:]-]+|#\s*[[:alnum:]-]+', ' ', 'gi');
   m := regexp_match(s, '\m(\d{5})(-\d{4})?\M');
@@ -38,29 +51,49 @@ BEGIN
   words := regexp_split_to_array(trim(array_to_string(parts, ' ')), '\s+');
   -- Strip a trailing state, for any state this build covers (geocode.region_ref). It used to be
   -- the literals 'me' and 'maine'. A state name can be several words, so the comma-separated
-  -- part is tried before the last word; and the name is only stripped when it is not also a town
-  -- here, because "Portland, Maine" has no town called Maine but "350 5th Ave, New York" means
-  -- the city and the locality must survive.
+  -- part is tried before the last word.
+  --
+  -- The abbreviation is unambiguous. The full name may also be a town - New York is both - and
+  -- then the head decides: "North Woodmere, New York" names a town, so New York is the state;
+  -- "350 5th Ave, New York" names an address, so New York is the city and must survive as the
+  -- locality. Without this, every "<hamlet>, New York" searched inside New York City, found
+  -- nothing, fell back to matching names across a million venues, and answered "Canoga, New
+  -- York" with "New York Yoga".
   IF cardinality(parts) > 0 THEN
     tail := lower(rtrim(parts[cardinality(parts)], '.'));
+    prev := CASE WHEN cardinality(parts) > 1
+                 THEN lower(rtrim(parts[cardinality(parts) - 1], '.')) END;
     SELECT r.abbr INTO state FROM geocode.region_ref r
      WHERE tail = lower(r.abbr)
-        OR (tail = lower(r.name) AND NOT EXISTS (SELECT 1 FROM pgeo.town t WHERE t.name = tail))
+        OR (tail = lower(r.name)
+            AND (NOT EXISTS (SELECT 1 FROM pgeo.town t WHERE t.name = tail)
+                 OR EXISTS (SELECT 1 FROM pgeo.town t WHERE t.name = prev)))
      LIMIT 1;
     IF state IS NOT NULL THEN
       parts := parts[1:cardinality(parts) - 1];
       words := regexp_split_to_array(trim(array_to_string(parts, ' ')), '\s+');
     END IF;
   END IF;
+  -- Without commas the state is the last few words, and how many depends on the state: fifteen
+  -- of the fifty are two or more ("New York", "North Carolina", "District of Columbia"). Testing
+  -- only the last word meant "101 Penbrooke Drive Penfield New York" kept "New York", the town
+  -- matcher then took it as the town, and the answer came back 395 km away in the city.
   IF state IS NULL AND cardinality(words) > 0 THEN
-    tail := lower(rtrim(words[cardinality(words)], '.'));
-    SELECT r.abbr INTO state FROM geocode.region_ref r
-     WHERE tail = lower(r.abbr)
-        OR (tail = lower(r.name) AND NOT EXISTS (SELECT 1 FROM pgeo.town t WHERE t.name = tail))
-     LIMIT 1;
-    IF state IS NOT NULL THEN
-      words := words[1:cardinality(words) - 1];
-    END IF;
+    FOR n IN REVERSE least(maxw, cardinality(words)) .. 1 LOOP
+      tail := lower(rtrim(array_to_string(words[cardinality(words) - n + 1 : cardinality(words)],
+                                          ' '), '.'));
+      SELECT r.abbr INTO state FROM geocode.region_ref r
+       WHERE tail = lower(r.abbr)
+          OR (tail = lower(r.name)
+              AND (NOT EXISTS (SELECT 1 FROM pgeo.town t WHERE t.name = tail)
+                   -- the head decides, as above; here it is any town ending the remainder
+                   OR geocode.tail_is_town(words, cardinality(words) - n, maxw)))
+       LIMIT 1;
+      IF state IS NOT NULL THEN
+        words := words[1 : cardinality(words) - n];
+        EXIT;
+      END IF;
+    END LOOP;
   END IF;
 
   IF cardinality(parts) >= 2 AND (

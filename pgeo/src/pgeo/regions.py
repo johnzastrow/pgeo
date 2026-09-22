@@ -105,10 +105,19 @@ def region(build: str | None = None) -> Region:
     if missing_wof:
         raise ValueError(f"no Who's on First region id for {', '.join(missing_wof)}")
     boxes = [reg["states"][s]["bbox"] for s in states]
+    bbox = (min(b[0] for b in boxes), min(b[1] for b in boxes),
+            max(b[2] for b in boxes), max(b[3] for b in boxes))
+    if bbox[2] - bbox[0] > 180:
+        # Alaska reaches past 180 degrees, so its box as min/max longitude spans the planet:
+        # the Overture prefilter would pull the world, the basemap extract would be the world,
+        # and the coordinate check would accept anything. Refusing is honest; handling it means
+        # two boxes through every step (TODO.md).
+        raise ValueError(
+            f"{build} crosses the antimeridian ({bbox[0]} to {bbox[2]}); not supported yet"
+        )
     return Region(
         build=build,
         states=tuple(states),
         wof_ids=tuple(int(reg["states"][s]["wof_id"]) for s in states),
-        bbox=(min(b[0] for b in boxes), min(b[1] for b in boxes),
-              max(b[2] for b in boxes), max(b[3] for b in boxes)),
+        bbox=bbox,
     )

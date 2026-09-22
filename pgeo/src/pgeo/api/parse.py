@@ -78,6 +78,7 @@ class RuleParser:
         # build left "NY" in the text and the parser then read it as the town, turning
         # "350 5th Ave, New York, NY" into a search for 350 New York Ave.
         self.states = states or {}
+        self.max_state_words = max((len(x.split()) for x in self.states), default=1)
 
     def parse(self, text: str) -> Parsed:
         p = Parsed(text=text)
@@ -92,17 +93,40 @@ class RuleParser:
         # A state name can be several words ("New York"), so try the comma part before the last
         # word; and never strip a name that is also a town here, or "350 5th Ave, New York" loses
         # its locality.
+        def tail_is_town(ws: list[str]) -> bool:
+            """Does this word list end with a town? Towns can be several words."""
+            return any(" ".join(ws[-k:]).lower() in self.localities
+                       for k in range(1, min(self.max_words, len(ws)) + 1)) if ws else False
+
+        def is_state(tail: str, rest: list[str]) -> bool:
+            """A trailing state, allowing for one that is also a town here.
+
+            New York is both. What precedes decides: "North Woodmere, New York" names a town, so
+            New York is the state; "350 5th Ave, New York" names an address, so it is the city
+            and has to survive as the locality.
+            """
+            if tail not in self.states:
+                return False
+            return tail not in self.localities or tail_is_town(rest)
+
         tail_part = parts[-1].lower().strip(".") if parts else ""
-        tail_word = words[-1].lower().strip(".") if words else ""
-        if tail_part in self.states and tail_part not in self.localities:
+        if is_state(tail_part, " ".join(parts[:-1]).split()):
             p.state = self.states[tail_part]
             parts = parts[:-1]
             words = " ".join(parts).split()
-        elif tail_word in self.states and tail_word not in self.localities:
-            p.state = self.states[tail_word]
-            words = words[:-1]
-            if parts and parts[-1].lower().strip(".") == tail_word:
-                parts = parts[:-1]
+        else:
+            # Without commas the state is the last few words, and how many depends on the state:
+            # eleven of the fifty are two or more. Testing only the last word left "New York" in
+            # "101 Penbrooke Drive Penfield New York", and the town matcher then took it as the
+            # town, answering 395 km away in the city.
+            for n in range(min(self.max_state_words, len(words)), 0, -1):
+                tail = " ".join(words[-n:]).lower().strip(".")
+                if is_state(tail, words[:-n]):
+                    p.state = self.states[tail]
+                    words = words[:-n]
+                    if parts and parts[-1].lower().strip(".") == tail:
+                        parts = parts[:-1]
+                    break
         # town: last comma part if it is a known town, else longest known suffix of words;
         # "number street, Town" keeps an unknown (possibly misspelled) last part as the town,
         # since the SQL compares towns fuzzily.

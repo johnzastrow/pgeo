@@ -127,7 +127,17 @@ LEFT JOIN LATERAL (
 Partial GiST indexes per placetype are the other candidate. Either changes what the build writes,
 so either needs a Maine rebuild proving the output is identical row for row before it is kept.
 
-## 5. An explicit tie-break rule, at query time and at build time
+## 5. Alaska crosses the antimeridian
+
+Its box runs -179.3 to 179.95, so as min/max longitude it spans the planet: the Overture
+prefilter would pull the world, the basemap extract would be the world, and the coordinate check
+in prep would accept anything. Both region resolvers refuse an Alaska build with that reason.
+
+Handling it means carrying two boxes through every bbox step - the Overture S3 filter, the
+pmtiles extract, prep's validation - or working in a projected space. Nobody has asked for
+Alaska; the refusal is honest until they do. Hawaii is fine: islands, but one box.
+
+## 6. An explicit tie-break rule, at query time and at build time
 
 Where candidates tie on score, the winner is currently decided by physical row order (report
 Section 3.16.3). It is deterministic per build but not chosen, and it puts about one case of
@@ -148,7 +158,7 @@ take the modal coordinate, and fall back to the lowest hash only when there is n
 That is deterministic *and* more accurate, and it costs one aggregate in the dedupe. It
 changes some current outputs, so it needs its own accuracy run and a note in the report.
 
-## 6. ~~Rewrite history before publishing to GitHub~~ Done 2026-09-22
+## 7. ~~Rewrite history before publishing to GitHub~~ Done 2026-09-22
 
 The local inventory file had been tracked for a day, and the sanitisation of 2026-09-21 had left
 every earlier commit's copies of the private details in place (some twenty files: the plan, the
@@ -160,7 +170,7 @@ Commit hashes before this date changed; a backup bundle of the old history is ke
 repository. Three tokens the original sanitisation had missed at HEAD (a tailnet address, the
 VM's MAC, the internal DNS name) went in the same pass.
 
-## 7. Authorization: single sign-on
+## 8. Authorization: single sign-on
 
 API keys at the edge are done (0.19.0, report Section 3.13.2). A key names a client - the
 dispatch application, the demo - not a person. Single sign-on for the people behind the clients

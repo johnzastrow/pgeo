@@ -112,3 +112,30 @@ def test_a_multi_state_build_reports_whichever_state_was_written():
                                                  "nh": "NH", "new hampshire": "NH"})
     assert two.parse("Burlington, VT").state == "VT"
     assert two.parse("Concord, New Hampshire").state == "NH"
+
+
+def test_an_ambiguous_state_name_is_decided_by_the_head():
+    """New York is both a state and a town, so what precedes it decides which one is meant."""
+    ny = RuleParser({"new york", "north woodmere", "brooklyn"},
+                    {"ny": "NY", "new york": "NY"})
+    # the head is a town, so New York is the state
+    p = ny.parse("North Woodmere, New York")
+    assert (p.locality, p.state) == (None, "NY") or p.locality == "North Woodmere"
+    assert p.state == "NY"
+    # the head is an address, so New York is the city
+    q = ny.parse("350 5th Ave, New York")
+    assert (q.housenumber, q.street, q.locality, q.state) == ("350", "5th Ave", "New York", None)
+
+
+def test_a_multi_word_state_without_commas():
+    """Eleven of the fifty states have two-word names; only the last word used to be tested."""
+    ny = RuleParser({"new york", "penfield", "south portland"}, {"ny": "NY", "new york": "NY"})
+    p = ny.parse("101 Penbrooke Drive Penfield New York")
+    assert (p.housenumber, p.locality, p.state) == ("101", "Penfield", "NY")
+    assert p.street == "Penbrooke Drive"
+
+
+def test_a_two_word_town_before_a_two_word_state():
+    nh = RuleParser({"new hampshire", "north conway"}, {"nh": "NH", "new hampshire": "NH"})
+    p = nh.parse("5 Elm St North Conway New Hampshire")
+    assert (p.housenumber, p.locality, p.state) == ("5", "North Conway", "NH")

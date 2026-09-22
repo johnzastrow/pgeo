@@ -71,6 +71,14 @@ def region(build: str) -> Region:
     boxes = [reg["states"][s]["bbox"] for s in states]
     bbox = (min(b[0] for b in boxes), min(b[1] for b in boxes),
             max(b[2] for b in boxes), max(b[3] for b in boxes))
+    if bbox[2] - bbox[0] > 180:
+        # Alaska reaches past 180 degrees, so its box as min/max longitude spans the planet:
+        # the Overture prefilter would pull the world, the basemap extract would be the world,
+        # and the coordinate check would accept anything. Refusing is honest; handling it means
+        # two boxes through every step (TODO.md).
+        raise ValueError(
+            f"{build} crosses the antimeridian ({bbox[0]} to {bbox[2]}); not supported yet"
+        )
     return Region(build=build, states=tuple(states), bbox=bbox)
 
 

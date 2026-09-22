@@ -158,6 +158,30 @@ one, so its first builds run with `--skip-gate`.
 
 ---
 
+## 7b. Corner cases across the fifty states
+
+pgeo builds any US state, and states differ in ways that break rules written for one of them.
+These were found by asking the registry and Who's on First, not by building fifty times. Each is
+either handled or refused; none needs per-region tuning, and none should.
+
+| Corner case | Which states | What happens |
+|---|---|---|
+| **Name is two or more words** | 11: DC, NC, ND, NH, NJ, NM, NY, RI, SC, SD, WV | The parser tries the last *n* words, not the last one. Without this, "101 Penbrooke Drive Penfield New York" kept "New York", the town matcher took it as the town, and the answer came back 395 km away. |
+| **Name is also a town inside the state** | 3: MO, NY, WY | What precedes decides. "Canoga, New York" names a town, so New York is the state; "350 5th Ave, New York" names an address, so it is the city. Without this, New York's town accuracy was 60.7%. |
+| **Abbreviation is an ordinary word** | 8: HI, ID, IN, LA, ME, MT, OK, OR | Only a *trailing* token is treated as a state, which makes "in", "or" and "me" safe in ordinary positions. A place whose name ends in one of these is the residual risk. |
+| **Box crosses the antimeridian** | 1: AK | Refused, with the reason. Alaska reaches past 180 degrees, so min/max longitude spans the planet: the Overture prefilter would pull the world and the coordinate check would accept anything. Handling it means two boxes through every step. |
+| **County name repeats in another state** | many | The county abbreviation and FIPS lookups match on the state as well. New York has a Franklin and a Washington, as Maine does. |
+| **ZIP prefix shared with a neighbour** | many | A postcode is accepted when its prefix belongs to this build alone. New York holds 06390 on Fishers Island, so a plain prefix test there would admit Connecticut's 063xx. |
+| **A feature on a state line** | any multi-state build | GNIS publishes it in both states' files with one id; the duplicates are collapsed. Vermont and New Hampshire share 36. |
+| **No OpenAddresses sources** | none today | A source with no current run is reported and skipped, so a state that loses all of them still builds. |
+
+The general point: every one of these is fixed in the rule, not in a per-state setting. A build
+needs its row in `regions/regions.json`, which is generated, and its known answers, which are
+facts you write down. There is no ranking to tune per region, and there must not be - fifty sets
+of tuning would be fifty things to keep true.
+
+---
+
 ## 8. Findings so far that shaped the tests
 
 - Pelias' memory floor is set by services that cannot shrink (libpostal ~1.8 GB,
