@@ -25,23 +25,6 @@
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #111a29;
-    --paper-2: #172235;
-    --paper-3: #1f2c43;
-    --ink: #eadfc4;
-    --ink-2: #c9bfa6;
-    --muted: #9a8f78;
-    --rule: rgba(234, 223, 196, 0.8);
-    --hair: rgba(234, 223, 196, 0.2);
-    --magenta: #e0579a;
-    --magenta-soft: rgba(224, 87, 154, 0.16);
-    --sounding: #86a9d4;
-    --shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.8);
-    color-scheme: dark;
-  }
-}
 
 * { box-sizing: border-box; }
 html, body { height: 100%; }
@@ -533,9 +516,6 @@ progress::-moz-progress-bar { background: var(--magenta); }
 }
 .maplibregl-ctrl-attrib { background: color-mix(in srgb, var(--paper) 85%, transparent) !important; font: 11px var(--ui); }
 .maplibregl-ctrl-attrib a { color: var(--ink-2); }
-@media (prefers-color-scheme: dark) {
-  .maplibregl-ctrl button .maplibregl-ctrl-icon { filter: invert(0.9); }
-}
 
 /* ---- Small screens: the cartouche becomes a bottom sheet ------------------------------- */
 
@@ -635,7 +615,6 @@ progress::-moz-progress-bar { background: var(--magenta); }
 .badge.exact { color: var(--buoy-green); }
 .badge.nearest { color: #8a5a00; }
 .badge.place { color: var(--muted); }
-@media (prefers-color-scheme: dark) { .badge.nearest { color: #f2c14e; } }
 .usps-wrap { position: relative; margin: 0 0 12px; }
 .usps-block {
   margin: 0;

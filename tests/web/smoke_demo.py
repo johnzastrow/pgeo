@@ -31,10 +31,8 @@ def run(base: str, shots: Path) -> list[str]:
         browser = pw.chromium.launch(
             args=["--use-angle=swiftshader", "--enable-unsafe-swiftshader"]
         )
-        for scheme in ("light", "dark"):
+        for scheme in ("light",):   # the page is light only
             for name, vp in VIEWPORTS.items():
-                if scheme == "dark" and name == "mobile":
-                    continue
                 page = browser.new_page(viewport=vp, color_scheme=scheme)
                 errors: list[str] = []
                 # Record where the error came from: a bare "Error" says nothing when a run

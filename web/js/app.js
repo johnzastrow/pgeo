@@ -96,8 +96,8 @@ async function setupEngines() {
   $('#engine-pick').hidden = false;
 }
 
-const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-const map = createMap('map', { dark });
+// The page is light only: the chart, its marks and the panel share one palette.
+const map = createMap('map');
 const marker = makeMarker('primary');
 const probe = makeMarker('probe');
 
@@ -107,23 +107,23 @@ const EMPTY = { type: 'FeatureCollection', features: [] };
 map.on('load', () => {
   map.addSource('filter-circle', { type: 'geojson', data: EMPTY });
   map.addLayer({ id: 'filter-circle-fill', type: 'fill', source: 'filter-circle',
-    paint: { 'fill-color': dark ? '#e0579a' : '#b3246b', 'fill-opacity': 0.06 } });
+    paint: { 'fill-color': '#b3246b', 'fill-opacity': 0.06 } });
   map.addLayer({ id: 'filter-circle-line', type: 'line', source: 'filter-circle',
-    paint: { 'line-color': dark ? '#e0579a' : '#b3246b', 'line-width': 1.2, 'line-dasharray': [3, 2] } });
+    paint: { 'line-color': '#b3246b', 'line-width': 1.2, 'line-dasharray': [3, 2] } });
   map.addSource('addr-link', { type: 'geojson', data: EMPTY });
   map.addLayer({ id: 'addr-link', type: 'line', source: 'addr-link',
-    paint: { 'line-color': dark ? '#f2c14e' : '#8a5a00', 'line-width': 2, 'line-dasharray': [2, 2] } });
+    paint: { 'line-color': '#8a5a00', 'line-width': 2, 'line-dasharray': [2, 2] } });
   map.addSource('compare', { type: 'geojson', data: EMPTY });
   map.addLayer({ id: 'compare-dot', type: 'circle', source: 'compare',
     paint: { 'circle-radius': ['case', ['==', ['get', 'rank'], 1], 7, 4.5],
       'circle-color': ['match', ['get', 'engine'], 'pelias', '#1f5f8b', '#c0392b'],
-      'circle-stroke-color': dark ? '#111a29' : '#ffffff', 'circle-stroke-width': 1.5, 'circle-opacity': 0.9 } });
+      'circle-stroke-color': '#ffffff', 'circle-stroke-width': 1.5, 'circle-opacity': 0.9 } });
   map.addSource('results', { type: 'geojson', data: EMPTY });
   map.addLayer({
     id: 'results-halo',
     type: 'circle',
     source: 'results',
-    paint: { 'circle-radius': 7, 'circle-color': dark ? '#111a29' : '#f3ead2', 'circle-opacity': 0.9 },
+    paint: { 'circle-radius': 7, 'circle-color': '#f3ead2', 'circle-opacity': 0.9 },
   });
   map.addLayer({
     id: 'results-dot',
@@ -133,7 +133,7 @@ map.on('load', () => {
       'circle-radius': 4.5,
       'circle-color': 'rgba(0,0,0,0)',
       'circle-stroke-width': 2,
-      'circle-stroke-color': dark ? '#e0579a' : '#b3246b',
+      'circle-stroke-color': '#b3246b',
     },
   });
   map.on('click', 'results-dot', (e) => {

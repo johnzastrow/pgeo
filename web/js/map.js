@@ -7,16 +7,8 @@ const ORIGIN = window.location.origin;
 export const MAINE_BOUNDS = [[-71.2, 42.9], [-66.8, 47.5]];
 
 // "Chart paper" flavor: buff land, chart-blue water, magenta boundaries, ink labels.
-function chartFlavor(dark) {
-  const base = window.basemaps.namedFlavor(dark ? 'dark' : 'light');
-  if (dark) {
-    return {
-      ...base,
-      background: '#0d1624', earth: '#141d2c', water: '#0a2238',
-      boundaries: '#8a3d63', city_label: '#e8dcc0', city_label_halo: '#0d1624',
-      ocean_label: '#6f93bf', state_label: '#9a8f78',
-    };
-  }
+function chartFlavor() {
+  const base = window.basemaps.namedFlavor('light');
   return {
     ...base,
     background: '#e9dfc3', earth: '#f3ead2', water: '#b7d0df',
@@ -38,14 +30,14 @@ function chartFlavor(dark) {
   };
 }
 
-export function createMap(container, { dark = false } = {}) {
+export function createMap(container) {
   const protocol = new window.pmtiles.Protocol();
   maplibregl.addProtocol('pmtiles', protocol.tile);
 
   const style = {
     version: 8,
     glyphs: `${ORIGIN}/vendor/glyphs/{fontstack}/{range}.pbf`,
-    sprite: `${ORIGIN}/vendor/sprites/${dark ? 'dark' : 'light'}`,
+    sprite: `${ORIGIN}/vendor/sprites/light`,
     sources: {
       protomaps: {
         type: 'vector',
@@ -54,7 +46,7 @@ export function createMap(container, { dark = false } = {}) {
           '<a href="https://protomaps.com">Protomaps</a> &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
       },
     },
-    layers: window.basemaps.layers('protomaps', chartFlavor(dark), { lang: 'en' }),
+    layers: window.basemaps.layers('protomaps', chartFlavor(), { lang: 'en' }),
   };
 
   const map = new maplibregl.Map({
