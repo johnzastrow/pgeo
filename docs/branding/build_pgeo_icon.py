@@ -3,10 +3,11 @@
     python3 docs/branding/build_pgeo_icon.py
 
 The wordmark is 3:1 and illegible below about 120px wide, so an icon has to be a different
-drawing rather than a crop. Two are produced, both on a 512 square:
+drawing rather than a crop. One is produced, on a 512 square:
 
-    pgeo-icon.svg       the split ring with a simplified globe inside
     pgeo-icon-g.svg     the 'g' and its globe, lifted from the wordmark
+
+(icon_ring below made a split-ring alternative; it was dropped in favour of the 'g'.)
 
 Both take their proportions from the master (docs/branding/pgeo-clean.svg), where every bowl is
 R=157 with a 68 stroke and the 'o' is cut by two 21-wide parallel slots on the diagonal, so the
@@ -132,7 +133,8 @@ def icon_g() -> str:
 
 
 def main() -> None:
-    for name, content in (("pgeo-icon.svg", icon_ring()), ("pgeo-icon-g.svg", icon_g())):
+    # The split-ring icon (icon_ring) was made and dropped on 2026-09-22; only the 'g' is the icon.
+    for name, content in (("pgeo-icon-g.svg", icon_g()),):
         (HERE / name).write_text(content)
         print(f"wrote {HERE / name} ({len(content)} bytes)")
 
