@@ -1,7 +1,8 @@
-# Published container images - design notes
+# Published container images - design
 
-Status: **TODO, design open** (added 2026-09-22). Goal: make pgeo deployable with `docker pull`
-rather than "clone the repository and run four scripts".
+Status: **designed, not built** (2026-09-22). Goal: pgeo deployable with `docker pull` rather than
+"clone the repository and run four scripts". Decisions below were taken in conversation on
+2026-09-22; the remaining open points are listed at the end.
 
 ## What exists today
 
@@ -9,19 +10,133 @@ rather than "clone the repository and run four scripts".
   PostgreSQL does the enrichment, indexes and an atomic schema swap. 13 minutes, 5.5 GB peak.
 - The result ships as a `pg_dump` of the `pgeo` schema (`scripts/pgeo_dump.sh`, 117 MB), which
   the Ansible `pgeo_runtime` role restores on the VM. The VM never builds from raw data.
-- The serving side is two pinned images: `postgis/postgis:18-3.6` and `postgrest/postgrest:v16.3`,
-  plus nginx at the edge. Runtime floor 0.25 vCPU / 1.4 GB (report Section 3.12).
+- Serving is two pinned images, `postgis/postgis:18-3.6` and `postgrest/postgrest:v16.3`, with
+  nginx at the edge. Runtime floor 0.25 vCPU / 1.4 GB (report Section 3.12).
 
-## Proposed shape (to be confirmed - see the open questions)
+Everything below is packaging and a transport around those pieces; no new engine code.
 
-1. **`pgeo-build`** - the pre-processor. Everything needed to turn raw sources into a built
-   database: the Python loader, DuckDB, GDAL, and a PostgreSQL to build into. Meant for a
-   workstation; produces an artifact.
-2. **`pgeo`** (all-in-one) - PostgreSQL + PostGIS + the pgeo schema functions + PostgREST, with the
-   pre-processors included so a single centralised host can also refresh its own data.
-3. **A transport** from the build artifact to a VPS running the server side, with an atomic
-   online swap on arrival (already a future-work item in its own right).
+## Decisions
 
-## Open questions
+| Question | Decision | Why |
+|---|---|---|
+| Transport from workstation to VPS | **Push over SSH/rsync**, from the build image | The operator already has SSH to their VPS; no registry account or bucket to operate for data. (A registry "data image" was considered and declined for now.) |
+| The all-in-one | **A compose bundle**, not a single container | Keeps the measured two-container design; each image stays stock and upgrades on its own. |
+| The pre-processor's database | **Self-contained** - the image carries its own PostgreSQL | A workstation needs only Docker. |
+| Architectures | **amd64 only** to start | Ship what is measured; arm64 when someone needs it. |
+| The push command | **One command in the build image** | `pgeo-build push` dumps, rsyncs, and triggers the swap. Ansible keeps working for this project's own VM 120 but is not required of adopters. |
+| Applying a new dump on the VPS | **Atomic online swap** | Restore into a build schema, rename, drop the old - the loader's own trick. A refresh is a non-event. This delivers the "atomic online restore" future-work item. |
+| Raw sources | **The image fetches them**, into a cache volume | One flow for a first-timer; the volume makes the second build cheap. |
+| Regions | **Parameterised from the start** (`PGEO_REGION`) | A New Hampshire build becomes a flag, not a fork. Ranking stays tuned on Maine, as the report says. |
 
-Recorded here so the answers become the design. See the conversation of 2026-09-22.
+## The three artifacts
+
+### 1. `pgeo-build` - the pre-processor (workstation)
+
+Contents: PostgreSQL 18 + PostGIS 3.6 (the same `postgis/postgis:18-3.6` base), the `pgeo`
+Python package with DuckDB and GDAL, `pgeo/sql/*`, and the fetch, dump and push scripts.
+About 1.2 GB. Needs Docker and about 6 GB of memory while building.
+
+```bash
+# first time: fetch (cached in ./data), build, dump - one command
+docker run --rm -v ./data:/data -e PGEO_REGION=us/maine \
+  git.wharf.example/jcz/pgeo-build:0.10 build
+#   -> /data/dumps/pgeo-us-maine-20260922.dump   (117 MB)
+
+# ship it to a VPS running the serving bundle (atomic swap on arrival, no downtime)
+docker run --rm -v ./data:/data -v "$SSH_AUTH_SOCK:/ssh-agent" -e SSH_AUTH_SOCK=/ssh-agent \
+  git.wharf.example/jcz/pgeo-build:0.10 push deploy@vps.example.org
+```
+
+Subcommands: `fetch` (sources missing from the cache), `build` (fetch + load + dump),
+`dump` (from the image's own database), `push <host>` (rsync the newest dump, then run the swap
+on the far side), `accuracy` (the 1,560-case gate against the built database, so a region build
+can be checked before it ships). The internal PostgreSQL is started for the duration of the
+command and lives in `/data/pg`, so a rebuild reuses nothing and a re-dump costs nothing.
+
+### 2. `pgeo` - the serving bundle (VPS, and the "all-in-one")
+
+A published `compose.yml` that pins three services:
+
+| Service | Image | Role |
+|---|---|---|
+| `db` | `postgis/postgis:18-3.6@sha256:...` | the database; `/srv/pgeo/pg` volume |
+| `api` | `postgrest/postgrest:v16.3@sha256:...` | the pure-SQL front end, bound to loopback |
+| `edge` | `nginx` with the project's config | path allowlist, rate limits, security headers, the demo page, `/v1/*` -> `/rpc/v1_*` |
+
+plus, **optionally**, `build` = the `pgeo-build` image with a profile (`--profile build`), so a
+centralised host can refresh its own data in place: `docker compose run build build && docker
+compose run build swap`. That is the "all-in-one": the same bundle, with the pre-processor
+switched on, for the slower-but-central deployment.
+
+The bundle starts empty and serves a clear 503 with a one-line hint until a dump has arrived.
+The swap is a script in the `db` image's `/docker-entrypoint-initdb.d`-adjacent tooling:
+
+```
+pgeo-swap <dump>:  pg_restore into schema pgeo_incoming
+                   -> run pgeo/sql 040-060 (functions are versioned with the dump)
+                   -> BEGIN; ALTER SCHEMA pgeo RENAME TO pgeo_old; ALTER SCHEMA pgeo_incoming
+                      RENAME TO pgeo; COMMIT; DROP SCHEMA pgeo_old CASCADE
+                   -> NOTIFY pgrst, 'reload schema'
+```
+
+The rename is one transaction; PostgREST's connections see the old schema until it commits and
+the new one after. This is what the loader does locally today.
+
+### 3. The pipeline between them
+
+```
+workstation                              VPS
+-----------                              ---
+pgeo-build build                         (bundle running, serving the previous data)
+  fetch -> stage -> load -> swap -> dump
+pgeo-build push deploy@vps  ---rsync--->  /srv/pgeo/incoming/<dump>
+                            ---ssh----->  docker compose exec db pgeo-swap <dump>
+                                          (service up throughout; old schema dropped after)
+```
+
+The push is idempotent and resumable (rsync), verifies the dump's checksum on the far side
+before swapping, and refuses to swap a dump built by a newer `pgeo` schema version than the
+bundle's functions expect (the version is stamped in the dump's `build_info`).
+
+## Region parameter
+
+`PGEO_REGION=us/maine` selects, from a small table in the loader: the Geofabrik extract path,
+the OpenAddresses collection, the Who's On First bounding filter, the Overture bounding box, the
+state code and FIPS. Adding a state is adding a row. Nothing in the query path knows the region;
+the accuracy set does, and a new region's build should run `pgeo-build accuracy` with its own
+cases before it ships - the report's numbers hold for Maine only.
+
+## Registries and tags
+
+- Forgejo container registry at the project's Forgejo (canonical), mirrored to GHCR when the
+  repository is published on GitHub. Same tags on both.
+- `pgeo-build:<pgeo semver>` and `pgeo-build:latest`; the compose bundle pins the serving images
+  by digest, and the bundle file itself is released with the repository tag.
+- Built by CI on a tag (Forgejo Actions; GitHub Actions mirroring), amd64. Images pinned by
+  digest in the published compose file, as the Ansible role already does.
+
+## What this delivers against the report
+
+- "Fewest components" (G6) becomes literal for an adopter: Docker, one command, one push.
+- The runtime floor is unchanged (the bundle *is* the measured configuration).
+- The "atomic online restore" future-work item is delivered as `pgeo-swap`.
+- The build-machine requirement (5.5 GB) stays on the workstation side, where the report put it.
+
+## Estimate
+
+3-5 days: the images and compose file (1), `pgeo-swap` and the push with its checks (1), the
+region table and fetch-with-cache (1), CI and registry publishing (0.5-1), documentation and a
+clean-VPS rehearsal (0.5-1).
+
+## Still open
+
+- **SSH credentials for the push.** Mounting the agent socket (as above) is the least-privilege
+  option; a mounted key file is the fallback for CI. Confirm which to document as primary.
+- **The edge in the bundle.** Included above because the report's security posture depends on
+  it (rate limits, allowlist, headers). An adopter with their own reverse proxy would disable
+  the service; the compose file should make that a one-line change.
+- **Authorization** is still Phase 11. The bundle ships with the edge's LAN allowlist and no API
+  keys, exactly as VM 120 runs today; the report already says this is the one open security item.
+- **Dump compatibility across PostgreSQL majors.** `pg_restore` accepts a dump from the same or
+  an older major, so a bundle on PG 18 accepts a workstation dump from PG 18 - both images share
+  the base, so this is enforced by construction. Worth a check in `pgeo-swap` all the same.
