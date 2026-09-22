@@ -45,7 +45,7 @@ its `/v1/address` endpoint are this project's own. Bugs there are ours to find.
 | Access log | path only - the query string is **not** logged (fixed 2026-09-20; see below) |
 | Database | `pgeo_api` is a non-superuser with `SELECT` only; the password is percent-encoded into the DSN |
 | Images | pinned by tag and digest |
-| Authorization | **none yet** - anything that reaches the edge may query (Phase 11) |
+| Authorization | **API keys at the edge** (Phase 11, done 2026-09-22): `X-API-Key` header, SHA-256 hashes in the inventory, refused in the URL, client name in the log, fails closed. `docs/API_KEYS.md` |
 
 ### Two findings from this assessment
 
@@ -68,9 +68,9 @@ are now parametrised in `pgeo/tests/test_settings.py`.
 
 Both platforms, as deployed today, plus:
 
-- **Authorization at the edge** (Phase 11). Until then any device on the LAN can query, and for
-  LANCER that means any device can resolve a client address. Hashed API keys in nginx are a few
-  lines and no new component; single sign-on is better and costs a component.
+- ~~**Authorization at the edge** (Phase 11).~~ Done: hashed API keys checked by nginx's njs
+  module, no new component (`docs/API_KEYS.md`). What remains is single sign-on for the people
+  behind the clients, which does cost a component and names people rather than machines.
 - **Backups of the data store**, tested by restoring. Both engines rebuild from source data, so
   the backup is a convenience for the index or dump rather than the only copy - which is itself a
   security property: a ransomware event costs a rebuild, not the data.
@@ -139,11 +139,12 @@ against threats a LAN-only departmental service does not face. G6 and good secur
 longer than one might expect, and they part company at the point where the service stops being
 departmental.
 
-The one place they genuinely conflict today is **authorization**. Any authentication scheme adds
-something: a key store, a session, a place to revoke. The lightest honest answer is hashed API
-keys checked in nginx with keys issued out of band - no new component, no user database, and
-revocation by editing a file. It is not single sign-on, and for three users in one department it
-does not need to be.
+The one place they genuinely conflicted was **authorization**. Any authentication scheme adds
+something: a key store, a session, a place to revoke. The lightest honest answer - hashed API
+keys checked in nginx with keys issued out of band - turned out to add nothing: the hash is
+computed by a module nginx already ships, the key store is the inventory file the deployment
+already has, and revocation is deleting a line and reloading. It is not single sign-on, and for
+three users in one department it does not need to be.
 
 ## 5. Why self-hosting and LAN-only help, beyond cost
 

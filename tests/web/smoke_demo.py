@@ -18,6 +18,9 @@ from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import apikey  # noqa: E402
+
 VIEWPORTS = {
     "desktop": {"width": 1440, "height": 900},
     "mobile": {"width": 400, "height": 860},
@@ -57,6 +60,30 @@ def run(base: str, shots: Path) -> list[str]:
                 )
                 page.wait_for_timeout(2500)  # tiles and glyphs
                 page.screenshot(path=str(shots / f"{tag}-01-load.png"))
+
+                # API key (Phase 11). The page must ask for one and refuse to work without it;
+                # the key goes in through the page's own form, as a person would enter it.
+                key = apikey.api_key()
+                if not key:
+                    failures.append(f"{tag}: no API key (set PGEO_API_KEY or run scripts/dev_web.sh)")
+                    page.close()
+                    continue
+                if page.is_hidden("#apikey-form"):
+                    failures.append(f"{tag}: the page did not ask for an API key")
+                page.fill("#apikey-input", "pgeo_" + "x" * 43)          # a well-formed wrong key
+                page.click("#apikey-form button")
+                page.wait_for_function(
+                    "() => /not accepted/.test(document.querySelector('#apikey-note').textContent)", timeout=8000)
+                page.fill("#apikey-input", key)
+                page.click("#apikey-form button")
+                page.wait_for_function("() => document.querySelector('#apikey-form').hidden", timeout=8000)
+                # the wrong key above was meant to be refused: those 401s are the test, not a failure
+                errors[:] = [e for e in errors if "401" not in e]
+                # the key must not be visible anywhere in the document, nor persist beyond the tab
+                if key in page.content():
+                    failures.append(f"{tag}: the API key appears in the page")
+                if page.evaluate("() => localStorage.getItem('pgeo-api-key')") is not None:
+                    failures.append(f"{tag}: the API key was written to localStorage")
 
                 # Autocomplete -> suggestions -> select
                 page.fill(".ps-input", "")

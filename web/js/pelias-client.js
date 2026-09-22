@@ -80,6 +80,23 @@ function applyOptions(params, opts = {}) {
   return params;
 }
 
+// The API key, shared by every client on the page (the Compare tab makes its own instances).
+// Held in memory and in sessionStorage - per tab, gone when it closes - never in localStorage,
+// a cookie or a URL. Sent only to this origin, in a header, so it does not land in browser
+// history, referers or the access log (which records the client's name, not the key).
+const KEY_STORE = 'pgeo-api-key';
+let apiKey = '';
+try { apiKey = sessionStorage.getItem(KEY_STORE) || ''; } catch { /* storage unavailable */ }
+
+export function setApiKey(key) {
+  apiKey = String(key || '').trim();
+  try {
+    if (apiKey) sessionStorage.setItem(KEY_STORE, apiKey);
+    else sessionStorage.removeItem(KEY_STORE);
+  } catch { /* storage unavailable: the key lives for this page load only */ }
+}
+export function hasApiKey() { return apiKey !== ''; }
+
 export class PeliasClient {
   /**
    * @param {object} [config]
@@ -99,7 +116,9 @@ export class PeliasClient {
     let res;
     const t0 = performance.now();
     try {
-      res = await fetch(url, { signal: combined, headers: { Accept: 'application/json' } });
+      const headers = { Accept: 'application/json' };
+      if (apiKey) headers['X-API-Key'] = apiKey;
+      res = await fetch(url, { signal: combined, headers });
       this.lastMs = Math.round(performance.now() - t0);
     } catch (err) {
       if (err.name === 'AbortError' && signal?.aborted) throw err; // caller cancelled
@@ -109,6 +128,11 @@ export class PeliasClient {
       throw new PeliasError('network error', 0);
     }
     if (res.status === 429) throw new PeliasError('rate limited, slow down', 429);
+    if (res.status === 401) {
+      // Tell the page, once per refusal, so it can ask for a key; the request itself fails.
+      window.dispatchEvent(new CustomEvent('pelias-unauthorized'));
+      throw new PeliasError(apiKey ? 'API key not accepted' : 'API key required', 401);
+    }
     const type = res.headers.get('content-type') || '';
     if (!type.includes('json')) throw new PeliasError(`HTTP ${res.status}`, res.status);
     const body = await res.json();

@@ -38,6 +38,13 @@ local_basemap_file: "{{ local_repo_root }}/data/raw/basemap/maine.pmtiles"
 edge_rate_search: 10
 edge_rate_autocomplete: 25
 
+# API keys (Phase 11). The edge refuses /v1/* requests that do not carry a known key in the
+# X-API-Key header. The server holds SHA-256 hashes only, listed here as {name, sha256}; the keys
+# themselves are shown once by scripts/edge_apikey.sh and kept by the client. Put real entries in
+# zz-local.yml (gitignored). With the check on and no keys, the play refuses to deploy.
+edge_require_api_key: true
+edge_api_keys: []
+
 # --- pgeo runtime (PostgreSQL/PostGIS geocoder; pure SQL via PostgREST) --------
 # Decision 2026-09-19: deploy next to Pelias; VM 120 resized for it (docs/DEPLOY_PGEO.md).
 # Set false to deploy pgeo alone: the Pelias upstream and routes disappear, pgeo answers on the

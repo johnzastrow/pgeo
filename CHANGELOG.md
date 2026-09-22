@@ -23,6 +23,37 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-09-22
+
+### Added
+- **Phase 11: API keys at the edge.** Every `/v1/*` request needs a key in the `X-API-Key`
+  header. nginx hashes it with SHA-256 through the njs module - a Debian package, no new process -
+  and maps the hash to a client name from the inventory; no name, no API. Keys are 32 CSPRNG bytes
+  made by `scripts/edge_apikey.sh`, shown once, never stored; the server holds hashes only. A key
+  in the URL is refused, valid or not. The access log gains the client name and never the key.
+  Fails closed: the play refuses to deploy with the check on and no keys. Static files, tiles and
+  the page shell need no key. `docs/API_KEYS.md`.
+- The demo page asks for a key, keeps it per tab in `sessionStorage`, sends it in the header, and
+  asks again if the edge stops accepting it.
+- `PGEO_API_KEY` is read by every harness that can reach an edge (accuracy runner, compatibility
+  contract, browser smoke test, k6 via `API_KEY`); `scripts/dev_web.sh` enforces keys like
+  production and issues a dev key. `tests/apikey.py` is the one place they read it.
+- `tests/security/test_api_keys.py`: 37 checks against a live edge (no key, wrong key, malformed
+  key, key in the query string, every endpoint with a good key, static assets open, the log) and
+  against the configuration (every proxied location guarded before it proxies, hashes only, fails
+  closed, the off switch named, the inventory has it on). The smoke test enters a wrong key, then
+  the right one, and checks the key is nowhere in the page or `localStorage`.
+- Report Section 3.13.2 describes the design; the 3.13 caution that said Phase 11 was not done is
+  replaced, and the future-work row is closed except for single sign-on.
+
+### Changed
+- The demo page is light only.
+- `tests/compat/compat_test.py` no longer reports a pass when Pelias itself failed most of the
+  contract: three engines refusing every request identically used to read as "compatible".
+
+### Fixed
+- The dev edge now routes `/v1/attribution` for pgeo, as production does.
+
 ### Fixed
 - `pgeo.feature_ac` no longer travels in the dump; the restore rebuilds it on the target from the
   restored `feature` table in that host's physical order. A dump and restore of two tables does

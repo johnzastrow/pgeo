@@ -1,10 +1,37 @@
 # nginx on the VM: path allowlist, rate limits, real client IP, demo static files.
 # TLS is terminated upstream (wharf Caddy on the LAN, or added here for exposure: public).
 
-- name: Install nginx
+- name: Install nginx and the njs module (hashes API keys at the edge)
   ansible.builtin.apt:
-    name: nginx
+    name: [nginx, libnginx-mod-http-js]
     state: present
+
+- name: Refuse to deploy an edge that would accept no one
+  # Fail closed, loudly: with the key check on and no keys, every API request is a 401. That is
+  # the correct behaviour and almost never what an operator meant.
+  ansible.builtin.assert:
+    that: not (edge_require_api_key | default(true) | bool) or (edge_api_keys | default([]) | length > 0)
+    fail_msg: >-
+      edge_require_api_key is true but edge_api_keys is empty. Make a key with
+      scripts/edge_apikey.sh new <client> and add its entry to group_vars/pelias/zz-local.yml,
+      or set edge_require_api_key: false for a LAN demo with no authorization.
+
+- name: njs script directory
+  ansible.builtin.file:
+    path: /etc/nginx/njs
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: API-key hash function (njs)
+  ansible.builtin.copy:
+    src: apikey.js
+    dest: /etc/nginx/njs/apikey.js
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload nginx
 
 - name: Demo site root
   ansible.builtin.file:

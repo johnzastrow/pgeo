@@ -19,6 +19,8 @@ const BASE = (__ENV.BASE_URL || 'http://127.0.0.1:4000').replace(/\/+$/, '');
 const VUS = Number(__ENV.VUS || 3);
 const DURATION = __ENV.DURATION || '60s';
 const WARMUP = __ENV.WARMUP || '15s';
+// Only an edge checks keys; the engines' own ports, which the matrix runs against, do not.
+const API_KEY = __ENV.API_KEY || '';
 
 // One SharedArray per category: element access deserializes only that element.
 const RAW = open('../corpus/maine_corpus.json');
@@ -78,6 +80,7 @@ function get(ep, path, params, qtype = 'exact') {
     .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
     .join('&');
   const res = http.get(`${BASE}/v1/${path}?${qs}`, {
+    headers: API_KEY ? { 'X-API-Key': API_KEY } : {},
     tags: { ep, qtype, phase: phase(), name: `/v1/${path}` },
     timeout: '20s',
   });

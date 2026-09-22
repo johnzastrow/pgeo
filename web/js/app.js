@@ -1,6 +1,6 @@
 // Pelias Maine demo: wires the map, the <pelias-search> element, structured search,
 // reverse geocoding and the batch tool. Rendering uses DOM APIs and textContent only.
-import { PeliasClient } from './pelias-client.js';
+import { PeliasClient, setApiKey, hasApiKey } from './pelias-client.js';
 import './pelias-search.js';
 import { createMap, makeMarker } from './map.js';
 import { setupBatch } from './batch.js';
@@ -25,6 +25,35 @@ const el = (tag, cls, text) => {
 };
 
 const client = new PeliasClient();
+
+// ---- API key ------------------------------------------------------------------------------
+// The edge refuses /v1/* without a known key. The page holds one per tab; the form appears when
+// there is none, or when the edge stops accepting the one it has, and disappears once a request
+// succeeds. The key is sent in a header by PeliasClient and appears nowhere on the page.
+const keyForm = $('#apikey-form');
+const keyNote = $('#apikey-note');
+function showKeyForm(message) {
+  keyForm.hidden = false;
+  keyNote.textContent = message || '';
+  $('#apikey-input').focus();
+}
+keyForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  setApiKey($('#apikey-input').value);
+  $('#apikey-input').value = '';
+  keyNote.textContent = 'Checking...';
+  client.autocomplete('portland', { size: 1 }).then(() => {
+    keyForm.hidden = true;
+    keyNote.textContent = '';
+  }).catch((err) => {
+    if (err.status === 401) { setApiKey(''); showKeyForm('That key was not accepted.'); }
+    else keyNote.textContent = err.message;
+  });
+});
+window.addEventListener('pelias-unauthorized', () => {
+  showKeyForm(hasApiKey() ? 'Your API key is no longer accepted. Enter a current one.' : 'This service needs an API key.');
+});
+if (!hasApiKey()) showKeyForm('This service needs an API key.');
 
 // ---- Engines ------------------------------------------------------------------------------
 // The server announces its engines with <meta name="demo-engines" content="/engines.json">:

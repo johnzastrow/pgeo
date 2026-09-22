@@ -29,6 +29,15 @@
       <label class="select engine" id="engine-pick" hidden>Engine <select id="engine"></select>
         <span id="engine-only" hidden></span>
         <span class="engine-note" id="engine-note"></span></label>
+      <!-- The API requires a key (X-API-Key). Kept for this tab only, sent in a header, never in
+           a URL. The form is shown until a key is accepted, and again if one stops being. -->
+      <form class="apikey" id="apikey-form" autocomplete="off" hidden>
+        <label for="apikey-input">API key</label>
+        <input id="apikey-input" type="password" autocomplete="off" spellcheck="false"
+               placeholder="pgeo_..." pattern="pgeo_[A-Za-z0-9_\-]{43}" maxlength="48" required>
+        <button type="submit" class="btn btn-ink">Use</button>
+        <p class="apikey-note" id="apikey-note" role="status"></p>
+      </form>
     </header>
 
     <nav class="tabs" role="tablist" aria-label="Mode">

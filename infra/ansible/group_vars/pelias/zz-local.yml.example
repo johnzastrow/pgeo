@@ -6,3 +6,11 @@ ssh_allowed_sources: ["10.0.0.0/24", "100.64.0.0/10"]
 edge_allowed_sources: ["10.0.0.254"]      # the TLS terminator, and only it
 edge_trusted_proxies: ["10.0.0.254"]
 edge_server_name: geocoder.your-domain.example
+
+# API keys: one entry per client. Make one with `scripts/edge_apikey.sh new <name>`, which prints
+# the key once and this entry. Revoke by deleting the entry and re-running the edge role.
+edge_api_keys:
+  - name: dispatch          # the LANCER application
+    sha256: 0000000000000000000000000000000000000000000000000000000000000000
+  - name: demo              # people using the demo page
+    sha256: 1111111111111111111111111111111111111111111111111111111111111111

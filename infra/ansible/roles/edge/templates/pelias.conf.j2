@@ -9,8 +9,32 @@ limit_req_status 429;
 
 # Access-log format that omits the query string: $uri, not $request. A geocoder's query string
 # is the address someone searched for.
-log_format pathonly '$remote_addr - $remote_user [$time_local] "$request_method $uri" '
+# ...and names the API client (from its key) where the combined format has $remote_user. The key
+# itself is never logged; 401s carry "-", which is how a bad or missing key shows up.
+log_format pathonly '$remote_addr - $api_client [$time_local] "$request_method $uri" '
                     '$status $body_bytes_sent "$http_referer" "$http_user_agent"';
+
+# ---- API keys (Phase 11). The njs function hashes the X-API-Key header; the map turns the hash
+# into a client name. No name, no API. Hashes come from edge_api_keys (group_vars zz-local.yml,
+# not in git); scripts/edge_apikey.sh makes a key and prints the entry. Static files, the demo
+# page shell, tiles and engines.json need no key: they hold no data.
+# A SHA-256 hex digest is 64 characters; nginx's default map bucket (32 or 64 bytes, by
+# platform) cannot hold it, and the server refuses to start with "could not build map_hash".
+map_hash_bucket_size 128;
+js_import apikey from /etc/nginx/njs/apikey.js;
+js_set $api_key_hash apikey.keyHash;
+map $api_key_hash $api_client {
+{% if edge_require_api_key | default(true) | bool %}
+    default "";
+{% else %}
+    # edge_require_api_key is false: every caller is "anonymous" and nothing is refused. This
+    # is the LAN-demo exception, and the security tests fail against a host configured this way.
+    default "anonymous";
+{% endif %}
+{% for k in edge_api_keys | default([]) %}
+    "{{ k.sha256 }}" "{{ k.name }}";
+{% endfor %}
+}
 
 # Only the TLS terminator may connect. Checked against the TCP peer
 # ($realip_remote_addr), not $remote_addr: the realip module below rewrites
@@ -102,12 +126,14 @@ server {
 {% if pelias_on %}
     location = /v1/autocomplete {
         limit_except GET { deny all; }
+        if ($api_client = "") { return 401; }
         limit_req zone=pelias_autocomplete burst=50 nodelay;
         proxy_pass http://pelias_api;
     }
 
     location ~ ^/v1/(search|search/structured|reverse|place)$ {
         limit_except GET { deny all; }
+        if ($api_client = "") { return 401; }
         limit_req zone=pelias_search burst=20 nodelay;
         proxy_pass http://pelias_api;
     }
@@ -118,6 +144,7 @@ server {
     # PostgREST answer 404; turn it into a Pelias-shaped 400.
     location = {{ pgeo_prefix }}/v1/autocomplete {
         limit_except GET { deny all; }
+        if ($api_client = "") { return 401; }
         limit_req zone=pelias_autocomplete burst=50 nodelay;
         proxy_intercept_errors on;
         error_page 404 = @pgeo_unsupported;
@@ -125,6 +152,7 @@ server {
     }
     location = {{ pgeo_prefix }}/v1/search {
         limit_except GET { deny all; }
+        if ($api_client = "") { return 401; }
         limit_req zone=pelias_search burst=20 nodelay;
         proxy_intercept_errors on;
         error_page 404 = @pgeo_unsupported;
@@ -132,6 +160,7 @@ server {
     }
     location = {{ pgeo_prefix }}/v1/search/structured {
         limit_except GET { deny all; }
+        if ($api_client = "") { return 401; }
         limit_req zone=pelias_search burst=20 nodelay;
         proxy_intercept_errors on;
         error_page 404 = @pgeo_unsupported;
@@ -139,6 +168,7 @@ server {
     }
     location ~ ^{{ pgeo_prefix }}/v1/(?<pgeo_fn>reverse|place|address)$ {
         limit_except GET { deny all; }
+        if ($api_client = "") { return 401; }
         limit_req zone=pelias_search burst=20 nodelay;
         proxy_intercept_errors on;
         error_page 404 = @pgeo_unsupported;
@@ -148,6 +178,7 @@ server {
     # verbatim only when asked for it, so the edge asks on the client's behalf.
     location = {{ pgeo_prefix }}/v1/attribution {
         limit_except GET { deny all; }
+        if ($api_client = "") { return 401; }
         limit_req zone=pelias_search burst=20 nodelay;
         proxy_set_header Accept "text/html";
         proxy_pass http://pgeo_rest/rpc/v1_attribution;
@@ -157,6 +188,18 @@ server {
         return 404;
     }
 {% endif %}
+    # A refused key, in the shape Pelias clients already parse.
+    error_page 401 = @unauthorized;
+    location @unauthorized {
+        default_type application/json;
+        # A location with its own add_header inherits none from the server, so the two that
+        # matter for a JSON error are repeated here.
+        add_header X-Content-Type-Options nosniff always;
+        add_header X-Frame-Options DENY always;
+        add_header WWW-Authenticate 'X-API-Key realm="pgeo"' always;
+        return 401 '{"geocoding":{"version":"0.2","errors":["an API key is required: send it in the X-API-Key header"]},"type":"FeatureCollection","features":[]}';
+    }
+
     location @pgeo_unsupported {
         default_type application/json;
         return 400 '{"geocoding":{"version":"0.2","errors":["unsupported parameter or endpoint: pgeo accepts the documented Pelias parameters"]},"type":"FeatureCollection","features":[]}';

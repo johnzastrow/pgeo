@@ -19,8 +19,12 @@ import json
 import math
 import sys
 from collections.abc import Callable
+from pathlib import Path
 
 import httpx
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import apikey  # noqa: E402
 
 ENVELOPE = {"geocoding", "type", "features"}
 BASE_PROPS = {"gid", "layer", "source", "source_id", "name", "confidence", "label", "country", "country_gid",
@@ -187,7 +191,7 @@ def main() -> int:
     matrix: list[dict] = []
     engines = {"pelias": a.pelias, "pgeo-api": a.api, "pgeo-sql": a.sql}
     failures = 0
-    with httpx.Client() as client:
+    with httpx.Client(headers=apikey.headers()) as client:
         print(f"{'case':30} " + " ".join(f"{e:10}" for e in engines))
         for case in CASES:
             name, path, params, status, checks = case[:5]
@@ -208,6 +212,15 @@ def main() -> int:
             for e in engines:
                 if res[e]:
                     print(f"    {e}: {res[e]}")
+    # A pass is only meaningful if something was compared. When the reference fails most of the
+    # contract, the engines agreeing tells us nothing - typically every request was refused the
+    # same way (a missing API key at an edge, an engine down), and "compatible" would be false
+    # comfort. Two reference failures are known and expected (Pelias's own contract gaps).
+    ref_fail = sum(1 for m in matrix if m["results"].get("pelias") is not None)
+    if ref_fail > len(CASES) // 2:
+        print(f"\ncompat: NOT COMPARED - Pelias itself failed {ref_fail} of {len(CASES)} cases, so the"
+              " engines could not be compared (is every engine up, and is an API key set?)")
+        failures = max(failures, 1)
     print(f"\ncompat: {'passed' if not failures else f'{failures} pgeo failure(s) where Pelias passes'}"
           "  (fail* = fails on Pelias too; reference = Pelias itself fails the contract)")  # fmt: skip
     if a.json:

@@ -19,10 +19,14 @@ import argparse
 import asyncio
 import json
 import math
+import sys
 import time
 from pathlib import Path
 
 import httpx
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import apikey  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 CASES = Path(__file__).resolve().parent / "cases.json"
@@ -88,7 +92,7 @@ async def run(base: str, extra: dict, concurrency: int, cases_path: Path, rps: f
         next_slot[0] = max(now, next_slot[0]) + gap
         if wait > 0:
             await asyncio.sleep(wait)
-    async with httpx.AsyncClient(base_url=base.rstrip("/"), timeout=20) as client:
+    async with httpx.AsyncClient(base_url=base.rstrip("/"), timeout=20, headers=apikey.headers()) as client:
 
         async def one(case: dict) -> dict:
             async with sem:
