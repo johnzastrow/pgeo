@@ -45,6 +45,13 @@ of this project in a {{value:budget_rest_Pmin}} memory budget on one vCPU, and h
 {{value:lim_rest_Pmin}} users there, where the same test needs about {{value:budget_C1}} for Pelias in its standard profile and {{value:floor_pelias_gb}} once every service is squeezed to its floor (Section 3.12). A
 single missing index had made pgeo's reverse geocoding 20 to 45 times slower; fixing it raised pgeo's
 one-vCPU capacity from {{value:before_lim_rest_P1}} to {{value:lim_rest_P1}} users.
+**Optimization.** Those figures describe pgeo as first tuned. Profiling the query path itself
+afterwards (Section 3.16) cut autocomplete CPU by 36% and raised capacity by a third at every
+size - 24 to 32 users on one vCPU, 48 to 64 on two, 96 to 128 on four, 128 to 192 unconstrained -
+on the same memory budgets, narrowing Pelias's lead from four times to three. It was done under
+a stricter rule than "accuracy held": 7,380 recorded queries return byte-identical results before
+and after, and a change that would have made autocomplete 3.3 times cheaper was taken back out
+because it lost one case in 3,360.
 **The smallest server.** Shrinking one resource at a time until the three-user load stopped
 meeting its targets (Section 3.12) put pgeo's floor at **{{value:floor_pgeo_vcpu}} vCPU and
 {{value:floor_pgeo_gb}}** of memory and Pelias's at **{{value:floor_pelias_vcpu}} vCPU and
@@ -56,7 +63,8 @@ pgeo is limited by autocomplete, and the specialist at autocomplete is Photon. B
 Nominatim were therefore built and measured the same way. On two cores Pelias holds 192
 concurrent users, **Photon 128, Nominatim 64 and pgeo 48** -- so the cost of putting the whole
 query path in SQL is four times against Pelias, 2.7 times against Photon, and **1.33 times
-against Nominatim**, the engine closest to pgeo's own architecture. Photon did not turn out to be
+against Nominatim**, the engine closest to pgeo's own architecture (after the optimization of
+Section 3.16: three times, two times, and level with Nominatim). Photon did not turn out to be
 the harsher yardstick: it is quicker per keystroke than pgeo and the lightest engine measured
 (1.84 GB), but less CPU-efficient than Pelias. On accuracy the two score 73.7% and 61.7% against
 pgeo's {{value:acc_pgeo_sql}}, and that gap is mostly data rather than engine -- both index
@@ -1670,7 +1678,9 @@ same two cores. Nominatim lands between Photon and pgeo, and closer to pgeo.}}
 
 Nominatim holds 64 concurrent users to pgeo's 48. That is the narrowest gap in this report:
 **pgeo is within 1.33 times of the reference OpenStreetMap geocoder**, against four times for
-Pelias and 2.7 times for Photon. Throughput saturates at about 75 req/s -- it was 68 req/s at 64
+Pelias and 2.7 times for Photon. (These are the figures as measured at the time. The optimization
+reported in Section 3.16 later took pgeo to 64 users on the same two cores - level with
+Nominatim.) Throughput saturates at about 75 req/s -- it was 68 req/s at 64
 users, 75 at 96 and 77 at 128, while latency went from 0.62 to 3.05 to 5.26 times target, which
 is the signature of a queue rather than of a cliff.
 
@@ -1791,8 +1801,138 @@ the OpenStreetMap engines is not that it searches better, but that it can hold d
 
 What survives that caveat is the capacity result, which is measured on the same machine
 regardless of what each engine holds: **pgeo costs four times Pelias per CPU, 2.7 times Photon,
-and 1.33 times Nominatim.** Against the engine closest to its own architecture, the price of
-putting the whole query path in SQL is a third.
+and 1.33 times Nominatim** - as first tuned. Section 3.16 then removed a third of pgeo's
+autocomplete cost without changing an answer, which makes those three times, two times, and
+parity: against the engine closest to its own architecture, the measured price of putting the
+whole query path in SQL is now nothing the ramp can resolve.
+
+### 3.16 Optimization: a third more capacity, with no answer changed
+
+Every capacity figure so far describes pgeo as it was first tuned - by configuration and one
+missing index (Section 3.2). The SQL of the query path itself had never been profiled. This
+section reports what profiling it found, and how the changes were proven not to alter a single
+answer, which for this project is the part that matters: accuracy is the reason to choose pgeo,
+so a faster engine that answers differently would be a worse one. The working log, with every
+measurement, is `docs/PERFORMANCE_OPTIMIZATION.md`.
+
+#### 3.16.1 Where the time went
+
+Autocomplete sets pgeo's capacity (Section 3.4.3) and pgeo is CPU-bound (Section 3.4.4), so the
+target was CPU per autocomplete request. It was measured over a seeded workload of 2,920
+keystrokes - 140 type-ahead sessions with the load test's own mix, every prefix of every text.
+
+```table opt_findings
+| Finding | What was happening | The change | Effect on the stage |
+|---|---|---|---|
+| F1. A filter that filtered nothing | `keep()` applies the optional layer, source and boundary filters. It holds an `EXISTS`, so PostgreSQL cannot inline it; it ran once per candidate, each call materialising the whole 780-byte row. With no filter set - the normal request - it returned true every time | Decide once per request whether any filter is set, and skip the call when none is | 127 ms -> 48 ms for a common prefix |
+| F2. Ten results kept, 376 built | A 27-field result record was assembled for every candidate, and the spheroidal distance to the focus computed twice per row; then all but `size` were discarded | Rank on a plain expression with one distance; build records for the rows that survive the `LIMIT` | 42 ms of ranking for rows that were thrown away |
+| F3. Hot columns behind cold ones | Ranking reads five columns that sit behind some twenty variable-length ones in a 780-byte row, and PostgreSQL walks every preceding variable-length field to reach them | A narrow side table for autocomplete, hot columns first: 188 bytes a row, 60 MB, built in 1.2 s. The same idea the engine already used for streets | 7,809 heap pages -> 2,912; 48 ms -> 14 ms |
+| F4. One letter, every street | While a word is typed its prefix is searched as `s:*`. GIN expands that to every token starting with "s" - including "street", in nearly every address - and unions them all before the selective words narrow anything | When the word being typed is one or two letters, ask the index for the complete words only and test the prefix on the rows that come back | 44.8 ms -> 2.9 ms for the same 54 rows |
+```
+
+{{table:opt_findings|The four changes made to the autocomplete query path. None alters what the
+query means; each removes work whose result was discarded or never needed.}}
+
+Together they cut autocomplete CPU by **36%** (50.3 s to 32.2 s over the workload). `search`
+received F1 and the single distance computation; it is not the binding endpoint and has fivefold
+headroom on its target.
+
+#### 3.16.2 How "no answer changed" was established
+
+An unchanged accuracy percentage is too weak a test. It cannot see one case breaking while
+another is fixed, nor an answer changing to a different correct one. The claim tested was the
+stronger one - **nothing a client can observe changed** - and the evidence was gathered before
+any code was touched.
+
+The complete `features` JSON, every field of every result, was recorded for **7,380 queries**:
+the 1,560 accuracy cases and 1,800 fuzz cases on all four endpoints; the 2,920 keystrokes; and
+1,100 filtered and focused variants (layers, sources, rectangle, circle, gid, sizes 1 to 40),
+because the changes add a fast route for unfiltered requests and the slow route needed its own
+proof. The original was first run against itself - 7,380 of 7,380 identical - so it is
+deterministic and any later difference is attributable to the change.
+
+```table opt_verification
+| Check | Scope | Result |
+|---|---|---|
+| Golden set, full JSON, direct SQL | 7,380 queries, 47,962 result rows | **byte-identical** |
+| Accuracy harness over HTTP, pure SQL, case by case | 3,360 cases | 0 changed |
+| Accuracy harness over HTTP, FastAPI, case by case | 3,360 cases | 0 changed |
+| Accuracy / fuzz score | both front ends | 95.8% / 66.7%, before and after |
+| Accuracy gate, Pelias compatibility contract, security posture | | pass |
+| Full rebuild from raw data, then the gate | committed build script | gate passed, 95.8% / 66.7%; verdict unchanged on all 3,360 cases |
+```
+
+{{table:opt_verification|Verification of the optimized engine. "Case by case" compares verdict,
+hit@1, hit@5, distance to the truth, confidence, error and result count for each case, rather
+than the totals.}}
+
+#### 3.16.3 What the verification caught
+
+Three things, each of which the accuracy percentage alone would have let through. They are
+reported because they are the argument for the method.
+
+**A build defect.** The side table was first filled with `INSERT ... ORDER BY ctid`. PostgreSQL's
+insert backfills earlier pages with rows that fit, and **660 of 203,399 rows landed out of
+physical order**. That matters because of a property of the engine this work exposed: *where
+candidates tie - two sources for one pond with the same label and importance - the winner is
+decided by the order rows reach the sort, which is physical order.* Twelve of 4,018 autocomplete
+results changed, every one a tie falling the other way. `CREATE TABLE AS` bulk-appends and leaves
+none out of order; the twelve went to zero, and a test now guards the order.
+
+**A change that did not belong.** The narrow table was also tried in `search`'s fuzzy-name stage.
+Generic names tie in their hundreds at one similarity, and it changed the top result of 16 of
+5,002 queries for a 17% gain on one stage. Removed.
+
+**A recommendation that was wrong.** The remaining cost is dominated by the typo fallback, which
+fires on 69% of keystrokes and is 52% of autocomplete CPU; much of what it appends looks like
+filler - for `389 congress st po`, nine other towns' Congress Streets after the one correct
+address. Firing it only when the prefix match found nothing would have made autocomplete **3.3
+times** cheaper, and the 150 autocomplete accuracy cases did not move. The fuzz set found the
+hole. `Walker Ci` is one character off "Walker Corner", but it still prefix-matches one row -
+Walker Heights Circle, 166 km away - so the fallback was suppressed, and the right town had been
+fourth, among the "filler". The premise was that a typo makes the prefix match find nothing;
+sometimes it makes it find the wrong thing instead. One case in 3,360, inside a fuzz score that
+read 66.7% both times, found only by comparing every case individually. The change was reverted
+and the query is pinned by a test.
+
+{{callout:note|The largest gain on offer was declined. A 3.3-fold reduction was available for the
+loss of one case in 3,360, and the project's position is that accuracy is what pgeo is for. The
+figure reported here, 36%, is what remained after every change that altered an answer was taken
+back out.}}
+
+#### 3.16.4 Capacity
+
+Same harness, corpus, session mix, ramp and latency targets as Section 3.4, pure-SQL front end,
+the same memory budgets.
+
+```table opt_capacity
+| Configuration | Before | After | Change | Worst endpoint at the new limit |
+|---|---|---|---|---|
+| P1 - 1 vCPU, 1.0 GB | 24 users | **32** | +33% | 54% of its target |
+| P2 - 2 vCPU, 1.5 GB | 48 users | **64** | +33% | 39% |
+| P4 - 4 vCPU, 2.0 GB | 96 users | **128** | +33% | 45% |
+| PM - unconstrained | 128 users | **192** | +50% | 21% |
+```
+
+{{table:opt_capacity|Concurrent users within the latency targets, before and after. Each
+configuration moved up one step of the ramp, the unconstrained one two; the ramp has no steps
+between, so each figure is a floor.}}
+
+Because the "before" figures were two days old, the old functions were reinstalled and P2 was run
+again on the same day: the old engine held 48 users and failed at 64 with its worst endpoint at
+1.44 times target, exactly as published, where the new engine passes 64 at 0.39. At that load the
+old engine's autocomplete p95 was 360 ms against its 250 ms target; the new one's is 98 ms. The
+gain is the code, not the day.
+
+This changes the comparisons of Sections 3.14 and 3.15. On two cores pgeo now holds **64 users,
+level with Nominatim**; the cost of the all-SQL query path falls from four times to **three
+times against Pelias**, and from 2.7 to two times against Photon. Unconstrained it reaches
+Pelias's 192, though that flatters pgeo: Pelias's unconstrained run was held to one API worker
+(Section 3.4).
+
+What is left is the typo fallback - two-thirds of the remaining autocomplete cost, and, as
+Section 3.16.3 shows, doing real work. Making its trigram recheck cheaper (10,221 index
+candidates for 1,543 survivors) is the open problem.
 
 ## 4. Discussion
 
@@ -1823,11 +1963,16 @@ users per core than Pelias, so it does not replace Pelias as the yardstick. Nomi
 whose architecture is nearest to pgeo's, comes closest of all: 64 users to pgeo's 48. That
 comparison is the most informative one in the study, because Nominatim and pgeo differ in one
 thing only. Both compute and index inside PostgreSQL; Nominatim's *search* is a Python
-application issuing queries, pgeo's search is the query. Moving that last step into SQL costs a
-third of the capacity. Set against the four times pgeo gives up to Pelias, this locates the
+application issuing queries, pgeo's search is the query. As first measured, moving that last step
+into SQL cost a third of the capacity - and Section 3.16 shows that third was not inherent: it
+was a filter function that could not be inlined, result records built for rows about to be
+discarded, and a one-letter prefix expanded inside an index scan. With those removed pgeo holds
+the same 64 users Nominatim does. Set against the four times pgeo gives up to Pelias, this locates the
 expense precisely: most of it is not "SQL instead of compiled code", it is "a general-purpose
-relational engine instead of an inverted index". The remaining third is the price of the last
-step, and it is the part this project chose to pay for G6.
+relational engine instead of an inverted index". The rest turned out to be ordinary
+inefficiency in code nobody had profiled, which is a more useful finding than a fixed tax
+would have been: the SQL-only design carries no measurable penalty against its nearest
+architectural neighbour, and a threefold one against a purpose-built search engine.
 
 **Why the accuracy column flatters pgeo against the OpenStreetMap engines.** pgeo answers
 {{value:acc_pgeo_sql}} where Photon answers 73.7% and Nominatim 61.7%, and it would be wrong to
@@ -1877,7 +2022,7 @@ Which tool suits which situation, and what the evidence supports saying. The rec
 | A few users on a small VM or VPS (this project's target) | pgeo, pure SQL | meets all targets from 1.4 GB and a quarter core (Section 3.12); most accurate; 2-3 containers |
 | Messy input: typos, variants, venues, impossible places | pgeo | 87% vs 30% on typos; misses handled 95% vs 41% |
 | Structured US addresses for another system (LANCER) | pgeo | `/v1/address`; nearest street address for venues |
-| Hundreds of concurrent users per vCPU | Pelias | four times the throughput per CPU |
+| Hundreds of concurrent users per vCPU | Pelias | three times the throughput per CPU (four before the optimization of Section 3.16) |
 | Multi-state or national coverage | Pelias today | built for planet scale; measured: pgeo loses four times its capacity across Maine's data range where Pelias loses two (Section 3.6.1) |
 | Fewest components, data in PostgreSQL (G6) | pgeo, pure SQL | database plus a stateless gateway |
 | Existing Pelias clients | either | pgeo passes the compatibility contract |
@@ -1900,8 +2045,9 @@ closely enough that an existing client cannot tell the difference ({{value:compa
 users per CPU -- and planet scale, neither of which this deployment needs. Measuring two
 further engines put that price in proportion: against Nominatim, whose architecture differs
 from pgeo's only in that its search runs in Python rather than in SQL, the cost is not four
-times but a third (64 users to 48). Most of the gap to Pelias is the inverted index, not the
-SQL. One caveat belongs in
+times but a third (64 users to 48) - and profiling the query path then closed that third
+entirely, with every one of 7,380 recorded queries returning byte-identical results (Section
+3.16). What remains against Pelias, three times, is the inverted index, not the SQL. One caveat belongs in
 the last sentence rather than a footnote: pgeo was tuned against the set that scores it, so the
 20-point accuracy gap should be read as an upper bound until both engines meet queries neither has
 seen. The capacity and memory findings carry no such caveat.

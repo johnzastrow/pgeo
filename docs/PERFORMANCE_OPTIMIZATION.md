@@ -13,8 +13,9 @@ different things:
 - **Same measured accuracy, different output** - the accuracy set scores the same, but a client
   sees a different list. That is a product decision, not an optimization, and is flagged as one.
 
-Status: **investigation and prototype complete; nothing has been changed in `pgeo/sql/` yet.** The
-prototype lives in a scratch schema, `perf_lab`, in the local bench database.
+Status: **implemented in pgeo 0.10.0.** Findings F1 to F4 are in `pgeo/sql/`; F5's proposed change
+was tried and rejected on the evidence (Section 5.3). Section 5 is the verification, Section 6 the
+results.
 
 ## 1. Where to look, and why
 
@@ -152,7 +153,8 @@ recheck: 52 ms -> 47 ms.
 correct address - and the fallback appends nine other towns' Congress Streets.
 
 This one cannot be made cheaper with identical output (see N1). What can be done is to fire it
-less often, which changes what a client sees. That is a product decision; Section 5.
+less often, which changes what a client sees. Firing it only when the prefix match found nothing
+was approved on condition that no accuracy was lost, implemented, and **rejected**: Section 5.3.
 
 ## 4. Negative results
 
@@ -169,48 +171,213 @@ rejected candidates are of similar length; they simply share too few trigrams. N
 Provably cannot change hit@5, since fallback rows follow prefix rows. But it saves almost nothing:
 33.0 s -> 31.1 s, because only 103 of 2,022 firings have five or more prefix rows.
 
-### N3. Configuration
+### N3. The narrow table does not suit `search`'s fuzzy-name stage
+
+F3 was applied to the `names` stage of `geocode.search` (16,716 trigram candidates for
+`main street`; 86 ms -> 72 ms). Generic names tie in their hundreds at one similarity - for
+`Flying Hill` the 60th and 61st candidates both score 0.375 - and which survive the 60-row cut is
+decided by the order rows reach the sort. It changed the top result of **16 of 5,002** golden
+search queries. Reverted: `search` reads the wide table there, and is byte-identical. A 17% gain
+on one stage of an endpoint with fivefold headroom was never worth a changed answer.
+
+### N4. Gating the typo fallback to "the prefix match found nothing"
+
+The largest gain on offer (3.3 times less CPU) and the one recommended at the end of the
+investigation. Rejected; see Section 5.3.
+
+### N5. Configuration
 
 Parallel query, JIT and memory settings were covered by earlier tuning (report Section 2.7) and
 were not revisited. `max_parallel_workers_per_gather = 0` is deliberate: with many concurrent
 users, parallelism between queries is worth more than within one.
 
-## 5. Results
+## 5. Verification
 
-Whole workload, 2,920 keystrokes, second pass:
+The bar was set by the project: accuracy is pgeo's selling point, so it may not drop at any point.
+"The accuracy percentage did not move" is too weak a test for that - a percentage cannot see one
+case breaking while another is fixed, or an answer changing to a different correct one. So the
+claim tested was the stronger one: **nothing a client can observe changed.**
+
+### 5.1 The golden set
+
+Before any code was touched, the full `features` JSON returned by the API functions was recorded
+for 7,380 queries - every field of every result, not just ids:
+
+| Group | Queries | What it covers |
+|---|---|---|
+| Accuracy set | 1,560 | all four endpoints |
+| Fuzz rounds | 1,800 | progressively corrupted input, F0 to F5 |
+| Keystrokes | 2,920 | every prefix of 140 type-ahead sessions, with a focus point |
+| Filtered | 880 | layers, sources, rectangle, circle, gid and sizes 1, 5, 40, on prefixes and full text |
+| Focused search | 220 | full-text search with a focus point |
+
+The filtered group exists because the optimizations add a fast route for *unfiltered* requests;
+the slow route needs its own proof. **The original was first run against itself** - 7,380 of
+7,380 identical - so it is deterministic, and any difference afterwards is attributable to the
+change and nothing else.
+
+Final result: **7,380 of 7,380 queries byte-identical, 47,962 result rows.**
+
+### 5.2 What the golden set caught that the accuracy score did not
+
+Two defects, both introduced by this work, both invisible in the accuracy percentage.
+
+**The side table was filled in the wrong order.** It was first built with `CREATE TABLE` and
+`INSERT ... SELECT ... ORDER BY ctid`. An `INSERT` consults the free-space map and backfills
+earlier pages with rows that fit: **660 of 203,399 rows landed out of physical order.** That
+matters because the engine breaks ties by arrival order - two sources for one pond with the same
+label and importance, two towns with the same score - and arrival order is physical order. It
+changed 12 of 4,018 golden autocomplete results, every one a tie falling the other way.
+`CREATE TABLE AS ... ORDER BY ctid` bulk-appends and leaves **none** out of order; the 12 went to
+zero. `test_feature_ac_sql.py` now guards it.
+
+This exposes something about the design worth knowing: **where candidates tie, the winner is
+decided by physical row order.** That was already true before this work. It is deterministic on a
+given build, which is why the accuracy numbers are stable, but it is not a rule anyone chose.
+
+**The narrow table changed answers in `search`** (N3): 16 of 5,002. Reverted.
+
+### 5.3 The recommendation that was wrong
+
+The investigation ended by recommending that the typo fallback fire only when the prefix match
+found nothing: 3.3 times less CPU, and the 150 autocomplete accuracy cases did not move (143 of
+150 either way). It was approved on condition that no accuracy was lost, and implemented.
+
+The fuzz set found the hole. **`Walker Ci`** is a one-character corruption of "Walker Corner". It
+still prefix-matches one row - *Walker Heights Circle*, in Kennebunk, 166 km away - so under the
+gate the fallback did not run. Before, it had:
+
+```
+ 1. [prefix]   Walker Heights Circle, Kennebunk      166.3 km from the truth
+ 2. [fallback] Walker
+ 3. [fallback] Walker, Central Aroostook
+ 4. [fallback] Walker Corner                           0.0 km  <- the right answer
+```
+
+The premise was that a typo makes the prefix match find nothing. **Sometimes a typo makes it find
+the wrong thing instead**, and then the "filler" is the rescue. One case of 3,360, hidden inside a
+fuzz percentage that did not change at one decimal place (66.7% both times). Found by diffing
+every case individually rather than reading the headline. The gate was reverted, the fallback
+fires exactly as before, and `test_a_typo_that_still_prefix_matches_something_is_rescued` pins
+that query so the idea is not re-tried blind.
+
+A provably safe variant exists - fire only when fewer than five rows were found, which cannot
+alter the first five results - but it saves 4% (N2) and was not worth a visible change.
+
+### 5.4 Through the front ends
+
+The golden set calls the SQL functions directly. The accuracy harness goes over HTTP, so it was
+run before and after on both front ends - PostgREST and FastAPI - for the accuracy set and the
+fuzz rounds, and compared **case by case** on verdict, hit@1, hit@5, distance to the truth,
+confidence, error and result count:
+
+| | Cases | Changed |
+|---|---|---|
+| Pure SQL, accuracy + fuzz | 3,360 | 0 |
+| FastAPI, accuracy + fuzz | 3,360 | 0 |
+
+Accuracy 95.8% and fuzz 66.7%, before and after, on both. The accuracy gate passes against the
+committed baseline; the Pelias compatibility contract passes; the security posture, unit and SQL
+suites pass (212 pgeo tests).
+
+### 5.5 Tests that stay
+
+The golden snapshot is evidence about this change on this data build; it would go stale as a
+fixture. What was added to the suite are properties that hold on any build (89 tests):
+
+- **Two routes, one answer.** A `layers` filter naming every layer excludes nothing but is still a
+  filter, so it forces the slow route - the wide table, `keep()` on every row. Its result must
+  equal the unfiltered one, on every keystroke of 18 texts, for autocomplete and search.
+- **An independent oracle.** Address mode has a total order (score, then id), so its expected
+  rows are computed by a plain query with no optimization in it and compared exactly. This is the
+  direct check on the short-prefix split (F4).
+- **The side table** is a complete, faithful copy, in the same physical order, a third the width.
+- **Behaviour.** Typos are rescued, including `Walker Ci`; the reported distance is the real
+  spheroidal distance; sizes are honoured on both routes; a real filter still filters.
+
+## 6. Results
+
+### 6.1 CPU per request
+
+Whole workload, 2,920 keystrokes, second pass, single connection:
 
 | Variant | Total | Mean | p50 | p95 | Output |
 |---|---|---|---|---|---|
 | Original | 50.3 s | 17.2 ms | 13.5 ms | 45.7 ms | - |
-| A: F1 + F2 | 45.7 s | 15.7 ms | 12.5 ms | 43.3 ms | identical |
-| A + B: + F3 narrow table | 38.0 s | 13.0 ms | 9.3 ms | 37.9 ms | identical |
-| **A + B + C: + F4 short prefix** | **32.2 s** | **11.0 ms** | **7.8 ms** | **35.3 ms** | **identical** |
-| ...and fallback only if found < 5 | 31.1 s | 10.7 ms | 7.1 ms | 36.2 ms | 88 lists shorter |
-| ...and fallback only if found = 0 | 15.4 s | 5.3 ms | 2.0 ms | 20.4 ms | 1,365 lists shorter |
+| F1 + F2 | 45.7 s | 15.7 ms | 12.5 ms | 43.3 ms | identical |
+| + F3 narrow table | 38.0 s | 13.0 ms | 9.3 ms | 37.9 ms | identical |
+| **+ F4 short prefix (shipped)** | **32.2 s** | **11.0 ms** | **7.8 ms** | **35.3 ms** | **identical** |
+| + fallback only if found < 5 | 31.1 s | 10.7 ms | 7.1 ms | 36.2 ms | 88 lists shorter - not shipped |
+| + fallback only if found = 0 | 15.4 s | 5.3 ms | 2.0 ms | 20.4 ms | loses a case - rejected |
 
-Accuracy, 150 autocomplete cases: **143 of 150 (95.3%) for every row of that table**, the
-original included.
+**A 36% cut in autocomplete CPU, with output byte-identical.** What remains is two-thirds typo
+fallback, which Section 5.3 shows is doing real work.
 
-Reading it:
+### 6.2 Capacity
 
-- **A + B + C is a 36% cut in autocomplete CPU with output identical on 2,920 of 2,920
-  keystrokes.** There is no accuracy question to ask of it.
-- The remaining cost is two-thirds typo fallback, and address-mode typing is 83% of what is left,
-  because addresses are long and so generate most keystrokes.
-- Gating the fallback to "the prefix match found nothing" takes the total to **15.4 s - 3.3 times
-  less CPU than the original** - with the same measured accuracy. It would shorten the suggestion
-  list on 47% of keystrokes, removing fuzzy filler that follows at least one exact prefix match.
+The claim that matters. Same harness, corpus, session mix, ramp and latency targets as every
+other capacity figure in the report (`tests/load/run_matrix_pgeo.py`), pure-SQL front end, run
+`20260921-1642-pgeo`. "Before" is the published figure (Section 3.4 of the report, stable across
+two independent runs on 2026-09-19).
 
-## 6. Not yet done
+| Configuration | Before | After | Change | Worst endpoint at the new limit | Throughput |
+|---|---|---|---|---|---|
+| P1 - 1 vCPU, 1.0 GB | 24 users | **32** | +33% | 54% of its target | 37 req/s |
+| P2 - 2 vCPU, 1.5 GB | 48 users | **64** | +33% | 39% | 74 req/s |
+| P4 - 4 vCPU, 2.0 GB | 96 users | **128** | +33% | 45% | 147 req/s |
+| PM - unconstrained | 128 users | **192** | +50% | 21% | 222 req/s |
 
-- **Nothing above is in `pgeo/sql/`.** It is a prototype in `perf_lab`.
-- **Capacity is unmeasured.** These are per-request CPU costs on one connection. The claim that
-  matters - concurrent users within targets - needs the load ramp (P1, P2, P4, PM) before and
-  after.
-- **`search` shares F1, F2 and the doubled distance** (`keep()` is called in nine places,
-  `to_hit()` in nine, `focus_boost()` in seven). It is not the binding endpoint, so it was left,
-  but `main st` costs 134 ms there and the same fixes should apply.
-- The full accuracy gate (1,560 cases, all endpoints) and the compatibility contract must pass
-  on the implemented version, not only the 150 autocomplete cases on the prototype.
-- F3 needs a build step in `030_enrich_index.sql`; being in the `pgeo` schema, the side table
-  would be swapped atomically with everything else.
+Every configuration moved up exactly one step of the ramp (... 24, 32, 48, 64, 96, 128, 192 ...),
+and the unconstrained one moved two. The ramp has no steps in between, so each figure is a floor:
+at every new limit the worst endpoint is at half its target or less, where before the optimization
+the limits sat closer to theirs.
+
+Memory budgets are unchanged - the same P1 to P4 profiles - so this is the same resources, as the
+project required. The side table adds 60 MB on disk.
+
+What it does to the comparisons in Sections 3.14 and 3.15 of the report, on two cores:
+
+| | Pelias | Photon | Nominatim | pgeo before | pgeo after |
+|---|---|---|---|---|---|
+| Users within targets | 192 | 128 | 64 | 48 | **64** |
+| pgeo's cost against it | | | | 4x / 2.7x / 1.33x | **3x / 2x / parity** |
+
+pgeo now holds as many users per core as Nominatim, the engine nearest its own architecture, and
+unconstrained it matches Pelias's unconstrained figure (192) - though that comparison flatters
+pgeo, since Pelias M0 was held to one API worker.
+
+**Same-day control.** The "before" figures above are two days old, so the old functions were
+reinstalled and P2 was run again on the same day, machine and harness (run `20260921-1826-pgeo`):
+
+| Users, P2 | Old engine, worst endpoint | New engine, worst endpoint | Old CPU p95 | New CPU p95 |
+|---|---|---|---|---|
+| 32 | 0.29x target | 0.21x | 131% | 107% |
+| 48 | 0.48x | 0.35x | 193% | 160% |
+| 64 | **1.44x - fails** | **0.39x - passes** | 202% | 186% |
+| 96 | 5.67x | 2.08x | 204% | 202% |
+
+The old engine holds 48 users and fails at 64, exactly the published figure, so the machine was
+not simply faster on the day: the gain is the code. At 64 users the worst endpoint went from 1.44
+times its target to 0.39. The new engine was then reinstalled and the golden set re-run against
+it: 7,380 of 7,380 byte-identical.
+
+### 5.6 The build itself
+
+The golden set and the tests above ran against a side table created by hand. The committed build
+(`scripts/pgeo_rebuild.sh`: load from raw data, atomic swap, known-answer checks, accuracy gate)
+was then run end to end. Gate passed, 95.8% and 66.7%; on the rebuilt database the verdict is
+unchanged on all 3,360 cases and the 89 new tests pass, including the physical-order guard on
+the side table. Thirty-one cases report a different distance to the truth, all still correct: a
+rebuild lays rows out in a new physical order, and ties fall with it (Section 5.2). That is the
+one thing the byte-for-byte comparison cannot carry across a rebuild, which is why the checks
+that survive it are properties, not snapshots.
+
+## 7. What is left
+
+- The typo fallback is now the dominant cost and cannot be gated. Making the trigram recheck
+  itself cheaper is the open problem: 10,221 index candidates for 1,543 survivors. A
+  word-level rather than whole-string similarity index is the direction worth trying, and would
+  need the same golden-set treatment.
+- Tie-breaking by physical row order (Section 5.2) deserves an explicit rule. Any rule changes
+  some current outputs, so it is a deliberate decision with its own accuracy run, not a cleanup.
+- `search`'s fuzzy-name stage (86 ms for `main street`) is recheck-bound in the same way.

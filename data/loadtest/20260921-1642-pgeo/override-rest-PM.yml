@@ -1,0 +1,7 @@
+services:
+  db:
+    volumes:
+      - "/home/jcz/Forge/pelia_maine/data/loadtest/20260921-1642-pgeo/tuning-PM:/etc/postgresql/tuning:ro"
+  rest:
+    environment:
+      PGRST_DB_POOL: "16"

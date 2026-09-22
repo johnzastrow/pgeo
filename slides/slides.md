@@ -195,22 +195,22 @@ pieces are all well known.
 
 Same machine, same two cores, same corpus, ramp, targets and 1,560 accuracy cases.
 
-| Two cores | Pelias | Photon | Nominatim | pgeo |
-|---|---|---|---|---|
-| Concurrent users | **192** | 128 | 64 | 48 |
-| Autocomplete p95 at 48 users | **21 ms** | 53 ms | 85 ms | 103-189 ms |
-| Memory under load | 8.4 GB | **1.84 GB** | 2.19 GB | 2.5 GB |
-| Accuracy, 1,560 cases | 75.5% | 73.7% | 61.7% | **95.8%** |
-| Autocomplete accuracy | 86.7% | 58.0% | 8.0% | **95.3%** |
-| Data sources | 6 | OSM only | OSM only | 6 |
+| Two cores | Pelias | Photon | Nominatim | pgeo | pgeo, optimized |
+|---|---|---|---|---|---|
+| Concurrent users | **192** | 128 | 64 | 48 | **64** |
+| Autocomplete p95 at 48 users | **21 ms** | 53 ms | 85 ms | 103-189 ms | 82 ms |
+| Memory under load | 8.4 GB | **1.84 GB** | 2.19 GB | 2.5 GB | 2.5 GB |
+| Accuracy, 1,560 cases | 75.5% | 73.7% | 61.7% | **95.8%** | **95.8%** |
+| Autocomplete accuracy | 86.7% | 58.0% | 8.0% | **95.3%** | **95.3%** |
+| Data sources | 6 | OSM only | OSM only | 6 | 6 |
 
 <v-click>
 
 <div class="mt-3 p-3 border-l-4 border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-sm">
 
-**The cost of putting the query path in SQL**: 4x Pelias per CPU, 2.7x Photon, **1.33x Nominatim**.
-Against the engine closest to its own architecture — Nominatim also does the work in PostgreSQL,
-but searches from a Python application — pgeo gives up a third.
+**The cost of putting the query path in SQL**: as first tuned, 4x Pelias per CPU, 2.7x Photon,
+1.33x Nominatim. After profiling the query path: **3x, 2x, and level with Nominatim** — the engine
+closest to its own architecture — with not one answer changed.
 
 </div>
 
@@ -240,6 +240,40 @@ but searches from a Python application — pgeo gives up a third.
 
 What pgeo can honestly claim against the OpenStreetMap engines is **not that it searches better,
 but that it can hold data they cannot**. What survives regardless of data is the capacity result.
+
+</div>
+
+</v-click>
+
+---
+
+# A third more capacity, no answer changed
+
+The query path had never been profiled. Four fixes, none altering what a query means:
+
+| | Was | Now |
+|---|---|---|
+| A filter function that filtered nothing, called per row | 127 ms | 48 ms |
+| Result records built for 376 rows, 10 kept | 42 ms wasted | built for 10 |
+| Hot columns behind 20 cold ones in a 780-byte row | 7,809 pages | 2,912 |
+| `s:*` expanded to every token starting with "s" — including *street* | 44.8 ms | **2.9 ms** |
+
+<v-click>
+
+| Users within targets | 1 vCPU | 2 vCPU | 4 vCPU | all cores |
+|---|---|---|---|---|
+| Before | 24 | 48 | 96 | 128 |
+| **After** | **32** | **64** | **128** | **192** |
+
+</v-click>
+
+<v-click>
+
+<div class="mt-3 p-3 border-l-4 border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-sm">
+
+**Proof, not a percentage**: 7,380 recorded queries — 47,962 result rows — byte-identical before
+and after. A change worth **3.3x** was taken back out because it lost **one case in 3,360**:
+"Walker Ci", a typo that still prefix-matches the wrong street.
 
 </div>
 

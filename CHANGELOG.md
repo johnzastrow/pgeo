@@ -23,6 +23,28 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-09-21
+
+### Added
+- Report Section 3.16, "Optimization: a third more capacity, with no answer changed", reporting
+  pgeo 0.10.0: the four query-path findings, how "no answer changed" was established (7,380
+  golden queries byte-identical; 6,720 accuracy and fuzz cases unchanged case by case on both
+  front ends), the three defects the verification caught that the accuracy percentage would have
+  let through, and capacity before and after with a same-day control run.
+- A deck slide on the optimization and its proof; the four-engine slide gains a "pgeo,
+  optimized" column.
+- `docs/PERFORMANCE_OPTIMIZATION.md` completed: verification, results, the rebuild check, and
+  what is left.
+
+### Changed
+- Capacity: pgeo now holds 32 / 64 / 128 / 192 users on 1 / 2 / 4 / all vCPU (was 24 / 48 / 96 /
+  128), on the same memory budgets. The executive summary, Sections 3.15 and 4, and the
+  conclusions restate the comparisons: three times Pelias per CPU (was four), two times Photon
+  (was 2.7), level with Nominatim (was 1.33). Sections 3.3-3.12 keep the as-first-tuned figures,
+  labelled as such, so the tuning history stays readable.
+- The Discussion's claim that moving the last search step into SQL "costs a third of the
+  capacity" is withdrawn: that third was three ordinary inefficiencies, now removed.
+
 ## [0.16.0] - 2026-09-21
 
 ### Added

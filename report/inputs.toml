@@ -8,6 +8,8 @@ pelias_datasets = ["data/loadtest/20260919-0718"]
 # before the reverse-geocoding index (pgeo 0.6.0), kept for the before/after comparison
 pgeo_before = ["data/loadtest/20260918-2343-pgeo", "data/loadtest/20260919-0350-pgeo"]
 # current pgeo (0.7.0: with the reverse-geocoding index)
+# Sections 3.3-3.12 describe pgeo as first tuned; these are those runs. The optimized engine's
+# runs (20260921-1642-pgeo, and the same-day control 20260921-1826-pgeo) are reported in 3.16.
 pgeo = ["data/loadtest/20260919-1135-pgeo", "data/loadtest/20260919-1543-pgeo"]
 # pgeo given the same memory budget as Pelias at each CPU size (configs E1, E2, E4)
 pgeo_equal = ["data/loadtest/20260920-2017-pgeo"]
