@@ -158,6 +158,20 @@ def test_gnis_filters_each_state_against_its_own_box(con, tmp_path):
     assert [r["id"] for r in rows] == ["2", "3"]
 
 
+def test_gnis_keeps_one_row_for_a_feature_on_a_state_line(con, tmp_path):
+    """GNIS publishes a border feature in both states' files, with the same id and point."""
+    two = region("me,nh")
+    a, b = tmp_path / "me.txt", tmp_path / "nh.txt"
+    shared = gnis_row("99", "Border Brook", "Stream", "43.8", "-71.0")
+    a.write_text(GNIS_HEADER + "\n" + shared + "\n"
+                 + gnis_row("2", "Katahdin", "Summit", "45.9", "-68.9") + "\n")
+    b.write_text(GNIS_HEADER + "\n" + shared + "\n")
+    res = gnis.convert(con, [("ME", a), ("NH", b)], tmp_path / "out.csv", two)
+    rows = read_rows(res.path)
+    assert [r["id"] for r in rows] == ["2", "99"]
+    assert res.rows == 2
+
+
 def test_gnis_can_keep_historical(con, tmp_path, reg):
     src = tmp_path / "gnis.txt"
     src.write_text(

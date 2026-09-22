@@ -60,4 +60,9 @@ def convert(
         params = [str(src), lat_min, lat_max, lon_min, lon_max, include_historical]
         verb = "CREATE TEMP TABLE _gnis AS" if i == 0 else "INSERT INTO _gnis"
         con.execute(f"{verb} {ROW}", params)  # noqa: S608 - fixed SQL, bound parameters
-    return export_csv(con, "SELECT * FROM _gnis ORDER BY CAST(id AS BIGINT)", [], out, reg)
+    # A feature on a state line is published in both states' files, with the same id, name and
+    # point: Vermont and New Hampshire share 36 of them, all brooks along the Connecticut River.
+    # Keeping both would put duplicate ids in the export, which validate_export refuses.
+    return export_csv(
+        con, "SELECT DISTINCT ON (id) * FROM _gnis ORDER BY CAST(id AS BIGINT)", [], out, reg
+    )
