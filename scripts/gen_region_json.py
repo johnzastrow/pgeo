@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -39,7 +40,10 @@ def states_of(registry: dict, build: str) -> tuple[str, list[str]]:
 def feature_count(build: str) -> int:
     """Ask the build's database how many features it holds; 0 when it is not reachable."""
     container = "pgeo_db" if build == "me" else f"pgeo-{build}_db"
-    database = "pgeo" if build == "me" else f"pgeo_{build}"
+    # Same rule as scripts/pgeo_setup.sh: a database name is an SQL identifier, so "vt-nh"
+    # becomes "vt_nh".
+    safe = re.sub(r"[^a-z0-9]", "_", build)
+    database = "pgeo" if build == "me" else f"pgeo_{safe}"
     try:
         out = subprocess.run(  # noqa: S603 - fixed argv
             ["docker", "exec", container, "psql", "-U", "pgeo", "-d", database,  # noqa: S607

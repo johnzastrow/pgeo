@@ -33,7 +33,29 @@ done
 # A build given as a state list ("me,nh,vt") names a directory, a database and containers, so
 # it takes the same dashed form the rest of the pipeline uses.
 build="$(tr ',' '-' <<<"${build,,}")"
-[[ -n "$offset" ]] || { [[ "$build" == "me" ]] && offset=0 || offset=1; }
+# A database name is an SQL identifier: "pgeo_vt-nh" would need quoting everywhere it appears.
+db_name="pgeo_${build//[^a-z0-9]/_}"
+[[ "$build" == "me" ]] && db_name=pgeo
+
+# Which step up the port range this build sits on. Remembered once assigned, so a rebuild keeps
+# the same ports; otherwise the lowest step no other build has taken. Assigning 1 to every build
+# put New York and Vermont-plus-New-Hampshire on the same ports, and the second stack could not
+# start.
+if [[ -z "$offset" ]]; then
+  if [[ "$build" == "me" ]]; then
+    offset=0
+  elif [[ -f "pgeo/builds/${build}.env" ]]; then
+    offset=$(( $(sed -n 's/^PGEO_API_PORT=//p' "pgeo/builds/${build}.env") - 4500 ))
+  else
+    taken=" 0 "
+    for f in pgeo/builds/*.env; do
+      [[ -e "$f" ]] || continue
+      taken+="$(( $(sed -n 's/^PGEO_API_PORT=//p' "$f") - 4500 )) "
+    done
+    offset=1
+    while [[ "$taken" == *" $offset "* ]]; do offset=$((offset + 1)); done
+  fi
+fi
 [[ "$offset" =~ ^[0-9]+$ ]] || { echo "--offset must be a number" >&2; exit 2; }
 
 secrets=pgeo/pgeo.secrets
@@ -86,7 +108,7 @@ if [[ "$build" != "me" ]]; then
 #     -f pgeo/compose.yml up -d
 PGEO_BUILD=${build}
 PGEO_STACK=${stack}
-PGEO_DB_NAME=pgeo_${build}
+PGEO_DB_NAME=${db_name}
 PGEO_DB_PORT=${db_port}
 PGEO_LIBPOSTAL_PORT=${lp_port}
 PGEO_API_PORT=${api_port}
@@ -95,7 +117,7 @@ PGEO_DATA_DIR=${data_dir}
 EOF
   umask 022
   env_files+=(--env-file "pgeo/builds/${build}.env")
-  echo "== build ${build}: stack ${stack}, database pgeo_${build}, ports ${db_port}/${api_port}/${rest_port}/${sql_port}"
+  echo "== build ${build}: stack ${stack}, database ${db_name}, ports ${db_port}/${api_port}/${rest_port}/${sql_port}"
 fi
 mkdir -p "$data_dir/pgdata" "$data_dir/stage" "$data_dir/dumps"
 

@@ -24,8 +24,13 @@ build="$(tr ',' '-' <<<"${build,,}")"
 # The default build keeps the original container, database and paths.
 container=pgeo_db; database=pgeo; OUT="$ROOT/data/pgeo/dumps"; tag=""
 if [[ "$build" != "me" ]]; then
-  container="pgeo-${build}_db"; database="pgeo_${build}"
+  container="pgeo-${build}_db"
   OUT="$ROOT/data/pgeo-${build}/dumps"; tag="${build}-"
+  # The database name is whatever scripts/pgeo_setup.sh recorded: it is an SQL identifier, so
+  # "vt-nh" becomes "vt_nh". Recomputing it here once produced a name nothing could connect to.
+  env_file="$ROOT/pgeo/builds/${build}.env"
+  [[ -f "$env_file" ]] || { echo "no $env_file; run scripts/pgeo_setup.sh --build $build" >&2; exit 1; }
+  database="$(sed -n 's/^PGEO_DB_NAME=//p' "$env_file")"
 fi
 mkdir -p "$OUT"
 ver="$(docker exec "$container" psql -U pgeo -d "$database" -Atc 'SELECT geocode.engine_version()')"

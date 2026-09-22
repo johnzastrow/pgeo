@@ -41,6 +41,8 @@ confirm_overwrite() {  # never clobber a file that already holds someone's real 
   [[ "$reply" =~ ^[Yy] ]] || { echo "  keeping $f"; return 1; }
 }
 
+[[ -t 0 ]] || { echo "scripts/new_host.sh asks questions; run it from a terminal" >&2; exit 1; }
+
 echo "A server to serve one pgeo build. Answers go into two gitignored files."
 echo
 [[ -n "$build" ]] || ask build "Which build does it serve (a state code, or a name from regions/regions.json)" "me"

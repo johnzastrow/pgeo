@@ -96,6 +96,8 @@ echo "   profile ${profile}, stages from '${from}', $( ((basemap)) && echo 'with
 echo "   a single small state takes about half an hour; a large one, a few hours, nearly all of"
 echo "   it the indexing step"
 if [[ $assume_yes -eq 0 ]]; then
+  # No terminal to ask: say so rather than hanging on a prompt nobody can see.
+  [[ -t 0 ]] || { echo "   not a terminal; pass --yes to run unattended" >&2; exit 1; }
   read -r -p "   continue? [y/N] " reply
   [[ "$reply" =~ ^[Yy] ]] || exit 1
 fi
