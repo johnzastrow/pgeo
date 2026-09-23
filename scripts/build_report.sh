@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
-# Build the study report (docs/REPORT.md and docs/REPORT.pdf) from saved results.
+# Build a report from saved results.
 #
-#   scripts/build_report.sh                    rebuild from saved results (seconds)
+#   scripts/build_report.sh                    the study: docs/REPORT.md and .pdf
+#   scripts/build_report.sh --doc optimization the companion: docs/OPTIMIZATION.md and .pdf
+#                                              (what changed after the study - generalisation to
+#                                              any US state, the build optimisation, the defects
+#                                              a second region found)
 #   scripts/build_report.sh --refresh          first refresh the live inputs: snapshot of both
 #                                              engines (counts, sizes, versions) and the
 #                                              compatibility contract test

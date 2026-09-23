@@ -1,0 +1,24 @@
+{
+  "build": "az-nv",
+  "note": "Known answers for an Arizona-plus-Nevada build. Two of them ask for the state in the label, because that is what a multi-state build has to get right: Phoenix is Arizona's and Reno is Nevada's. The last four are the names most likely to be mangled - Dine (Navajo), Hopi, Paiute and Spanish - and Tuba City and Owyhee are close to the Utah and Idaho lines, where a clip to the region could take them by mistake.",
+  "cases": [
+    { "path": "search", "params": { "text": "Phoenix, Arizona" }, "want": "Phoenix, AZ" },
+    { "path": "search", "params": { "text": "Reno, Nevada" }, "want": "Reno, NV" },
+    { "path": "search", "params": { "text": "Tuscon, AZ" }, "want": "Tucson" },
+    {
+      "path": "search",
+      "params": { "text": "main st", "focus.point.lat": "36.17", "focus.point.lon": "-115.14" },
+      "want": "NV"
+    },
+    { "path": "autocomplete", "params": { "text": "flagsta" }, "want": "Flagstaff" },
+    {
+      "path": "reverse",
+      "params": { "point.lat": "36.1699", "point.lon": "-115.1398" },
+      "want": "Las Vegas"
+    },
+    { "path": "search", "params": { "text": "Tuba City, Arizona" }, "want": "Tuba City" },
+    { "path": "search", "params": { "text": "Owyhee, Nevada" }, "want": "Owyhee" },
+    { "path": "search", "params": { "text": "Tonopah, NV" }, "want": "Tonopah" },
+    { "path": "search", "params": { "text": "Nogales, AZ" }, "want": "Nogales" }
+  ]
+}

@@ -37,9 +37,16 @@ BUILD = HERE / "build"
 FIG_BUILD = BUILD / "figures"
 DOCS = ROOT / "docs"
 FIG_PUBLISH = DOCS / "report_figures"  # PNG (used) + SVG (editable sources)
-OUT_MD = DOCS / "REPORT.md"
-OUT_PDF = DOCS / "REPORT.pdf"
-OUT_DOCX = DOCS / "REPORT.docx"
+# Two documents come out of this pipeline. The study (template.md) is the original comparison
+# against Pelias, Photon and Nominatim; the optimisation report (optimization.md) covers what
+# changed after it. They share the renderer, the values, the figures and the PDF machinery, and
+# differ only in their template and their output names.
+DOCUMENTS = {
+    "report": {"template": "template.md", "stem": "REPORT",
+               "title": "pgeo: a geocoder inside PostgreSQL"},
+    "optimization": {"template": "optimization.md", "stem": "OPTIMIZATION",
+                     "title": "pgeo: generalisation and optimisation"},
+}
 PDF_FORMAT = ("markdown+pipe_tables+implicit_figures+raw_tex-yaml_metadata_block"
               "-tex_math_dollars-tex_math_single_backslash")
 STATIC_TABLE = re.compile(r"^```table ([a-z0-9_]+)\n(.*?)\n```\n?", re.S | re.M)
@@ -56,7 +63,13 @@ def main() -> int:
     ap.add_argument("--no-docx", action="store_true")
     ap.add_argument("--collect", action="store_true", help="refresh report/data/snapshot.json from live systems")
     ap.add_argument("--draft", action="store_true", help="build even if the template has PENDING markers")
+    ap.add_argument("--doc", choices=sorted(DOCUMENTS), default="report",
+                    help="which document to build (default: the study report)")
     a = ap.parse_args()
+    doc = DOCUMENTS[a.doc]
+    OUT_MD = DOCS / f"{doc['stem']}.md"
+    OUT_PDF = DOCS / f"{doc['stem']}.pdf"
+    OUT_DOCX = DOCS / f"{doc['stem']}.docx"
 
     if a.collect:
         subprocess.run([sys.executable, str(HERE / "collect.py")], check=True)  # noqa: S603
@@ -83,7 +96,7 @@ def main() -> int:
                   f" \u00b7 {datetime.now().strftime('%-d %B %Y')}")  # fmt: skip
 
     print("report: markdown")
-    template = (HERE / "template.md").read_text()
+    template = (HERE / doc["template"]).read_text()
     # Static tables written in the template as ```table <name> ... ``` blocks (feature matrix,
     # recommendations): lifted out here and numbered like the generated ones.
     for m in list(STATIC_TABLE.finditer(template)):
@@ -120,7 +133,7 @@ def main() -> int:
                  str(logo_svg), "-o", str(logo_pdf)], check=True)  # fmt: skip
             print(f"report: refreshed {logo_pdf.relative_to(ROOT)}")
         # The PDF takes its title block from pdf/metadata.yaml: drop the Markdown's own title lines
-        pdf_md = BUILD / "report_pdf.md"
+        pdf_md = BUILD / f"{a.doc}_pdf.md"
         rp = Renderer(vals, tabs, figs, fig_dir_rel=FIG_PUBLISH.name, target="pdf", references=refs)
         pdf_text = rp.render(template)
         # The PDF and the Word document take their title block and contents from
@@ -130,12 +143,13 @@ def main() -> int:
         pdf_md.write_text(pdf_text.lstrip())
         # Two steps rather than pandoc's own PDF: the tables get grid lines, which means editing
         # the LaTeX pandoc's writer produces (no filter can reach it).
-        tex = BUILD / "report.tex"
+        tex = BUILD / f"{a.doc}.tex"
         cmd = [
             "pandoc", str(pdf_md), "-o", str(tex),
             "--from", PDF_FORMAT,
             "--metadata-file", str(HERE / "pdf" / "metadata.yaml"),
             "--metadata", f"date={cover_date}",
+            "--metadata", f"title={doc['title']}",
             "--include-in-header", str(HERE / "pdf" / "header.tex"),
             "--lua-filter", str(HERE / "pdf" / "breakcode.lua"),
             "--toc", "--toc-depth", "2", "--standalone",
@@ -151,11 +165,11 @@ def main() -> int:
                 ["xelatex", "-interaction=nonstopmode", "-halt-on-error",  # noqa: S607
                  f"-output-directory={BUILD}", str(tex)],
                 cwd=DOCS, capture_output=True, text=True)  # fmt: skip
-        if res.returncode != 0 or not (BUILD / "report.pdf").is_file():
+        if res.returncode != 0 or not (BUILD / f"{a.doc}.pdf").is_file():
             print(res.stdout[-3000:], file=sys.stderr)
             return 1
-        shutil.copy2(BUILD / "report.pdf", OUT_PDF)
-        over = len([1 for line in (BUILD / "report.log").read_text(errors="ignore").splitlines()
+        shutil.copy2(BUILD / f"{a.doc}.pdf", OUT_PDF)
+        over = len([1 for line in (BUILD / f"{a.doc}.log").read_text(errors="ignore").splitlines()
                     if "Overfull \\hbox" in line])  # fmt: skip
         print(f"report: wrote {OUT_PDF.relative_to(ROOT)} ({over} overfull boxes)")
 
@@ -164,7 +178,7 @@ def main() -> int:
         # From the Markdown, not the LaTeX: Word wants native tables and images, and the
         # Markdown target already renders callouts as block quotes.
         cmd = [
-            "pandoc", str(BUILD / "report_pdf.md"), "-o", str(OUT_DOCX),
+            "pandoc", str(pdf_md), "-o", str(OUT_DOCX),
             "--from", "markdown+pipe_tables",
             "--resource-path", str(DOCS),
             "--metadata-file", str(HERE / "pdf" / "metadata.yaml"),

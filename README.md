@@ -70,6 +70,8 @@ machine bigger rather than by adding machines, and the report's section 4 says w
 |---|---|
 | [GETTING_STARTED.md](GETTING_STARTED.md) | Zero to a hosted geocoder, mostly commands |
 | [docs/REPORT.md](docs/REPORT.md) / [REPORT.pdf](docs/REPORT.pdf) | The study: four engines, accuracy, capacity, cost |
+| [docs/OPTIMIZATION.md](docs/OPTIMIZATION.md) / [.pdf](docs/OPTIMIZATION.pdf) | What changed after it: any US state, a 3.7x faster build, and the defects a second region found |
+| [docs/SIZING.md](docs/SIZING.md) | What a deployment costs, measured for Maine and New York |
 | [DOCKER-DEPLOY.md](DOCKER-DEPLOY.md) | The container route (designed; images not yet published) |
 | [TODO.md](TODO.md) | What is not done, and what was decided about it |
 
