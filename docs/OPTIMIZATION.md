@@ -6,7 +6,7 @@ found**
 
 John Zastrow · 2026-09-23
 
-pgeo 0.7.0, project 0.20.0, commit `8c6eabc (with uncommitted changes)`.
+pgeo 0.7.0, project 0.20.0, commit `531826e (with uncommitted changes)`.
 Companion to [REPORT.md](REPORT.md), which measured pgeo against Pelias, Photon and Nominatim on
 data for the State of Maine. This document covers what changed afterwards.
 
@@ -197,13 +197,30 @@ ZCTAs are deliberately exempt. A ZCTA belongs to the state holding most of its l
 state holding its internal point, and that is the rule section 2.1 argues for: Maine owns 03579
 on 846 km² against New Hampshire's 611. Clipping them by point would undo it.
 
-What is left is the buffer itself, and it is honest to name it. The clip is the region buffered by
-about 300 m, because an unbuffered clip drops piers and island shoreline. At a coast that is
-right; at an international land border it admits a strip of the other country. New York still
-holds `Akwesasne Canada Post` 77 m outside the polygon, labelled `, NY, USA`, on a Mohawk
-territory the border runs through - the defect of this section reduced from 118 km to 300 m
-rather than removed. Subtracting Canada and Mexico from the buffer would fix it and needs their
-polygons, which the US-only Who's on First distribution does not carry (`TODO.md` section 15).
+That left the buffer itself. The clip is the region buffered by about 300 m, because an
+unbuffered clip drops piers and island shoreline. At a coast that is right; at an international
+land border it admitted a strip of the other country, and New York held `Akwesasne Canada Post`
+77 m outside the polygon labelled `, NY, USA`, on a Mohawk territory the border runs through -
+the defect of this section reduced from 118 km to 300 m rather than removed.
+
+Canada and Mexico are now subtracted from the buffer, which leaves the seaward part untouched
+because there is nothing out there to subtract. On Maine:
+
+| | Before | After |
+|---|---|---|
+| Features outside the state | 2,492 | **235** |
+| Furthest | 4.1 km | 3.3 km, and all but 19 are streets |
+
+The reason nothing inside the state is at risk is worth stating, because it is the kind of thing
+that is usually assumed: the Who's on First polygons for Maine and Canada meet at the border with
+**zero** overlapping area, measured. Maine's accuracy is unchanged at 96.0% with no case altered
+in either direction, and Peaks Island, Cliff Island, the Cranberry Isles, Isle au Haut and
+Monhegan are all still there, which is what the buffer was for.
+
+The polygons cost 5.6 MB, as two single Who's on First records rather than the `admin-ca` and
+`admin-mx` distributions at 176 MB and 230 MB compressed for two shapes. The fetch checks each
+file's `iso:country` afterwards, because the URL is built from an id and a wrong id returns a
+perfectly valid polygon for somewhere else - 85633057 looks like Mexico's and is Chile's.
 
 The clip uses Who's on First's region polygon, buffered by about 300 m, and the choice of
 polygon matters for the same reason it mattered for ZCTAs. Verified, not assumed:
