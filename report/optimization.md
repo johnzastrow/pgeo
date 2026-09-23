@@ -36,9 +36,10 @@ The headline results:
 | Regions buildable | Maine | any US state, or several at once |
 | Maine build time | 1,152 s | **309 s** |
 | New York build time | 6,699 s | **2,643 s** (measured) |
-| New York accuracy | 88.4% | **94.9%** |
-| Arizona + Nevada accuracy | 84.8% | **92.4%** |
-| Maine accuracy | 95.8% | **95.9%** |
+| New York accuracy | 88.4% | **95.5%** |
+| Arizona + Nevada accuracy | 84.8% | **91.9%** |
+| Maine accuracy | 95.8% | **96.0%** |
+| Known-answer failures across four builds | 4, unseen | **0** |
 | Two builds of the same data | differed on 10,769 rows | **identical** |
 | Maine features outside Maine | 4,270, labelled ", ME, USA" | 2,516, none foreign, none beyond 16 km |
 | Commands to build a region by hand | 25 | **1** |
@@ -204,9 +205,24 @@ rows with **identical** gids.
 
 Accuracy is measured against ground truth taken from the source data, not from another engine:
 OpenAddresses points, Who's on First town labels, GNIS features, Overture places, Census ZCTAs.
-Maine's set is 1,560 cases; New York's is 198, built the same way.
+Maine's set is 1,560 cases; each of the other three is 198, built the same way. Where all four
+stand at the end of this work:
 
-### 5.1 New York: 88.4% to 94.9%, with no New York setting
+| Group | Maine | New York | VT + NH | AZ + NV |
+|---|---|---|---|---|
+| **Overall** | **96.0%** | **95.5%** | **92.4%** | **91.9%** |
+| addresses | 97.8% | 92.9% | 91.4% | 98.6% |
+| towns | 96.4% | 92.9% | 85.7% | 89.3% |
+| venues | 94.2% | 96.4% | 92.9% | 82.1% |
+| reverse | 100.0% | 100.0% | 96.2% | 92.3% |
+| lakes and summits | 86.7% | 100.0% | 89.5% | 78.9% |
+| ZIP codes | 98.3% | 100.0% | 100.0% | 87.5% |
+| misses | 94.7% | 94.7% | 100.0% | 100.0% |
+
+Maine is highest because Maine is where the tuning was measured, and the spread between the four
+is now four points rather than eleven. No setting in the engine names a region.
+
+### 5.1 New York: 88.4% to 95.5%, with no New York setting
 
 | Group | First run | After the parser fixes | After the full rebuild | Maine |
 |---|---|---|---|---|
@@ -299,9 +315,55 @@ region by 7.6 points and three others not at all is a fix to a rule, not a tunin
 
 The residual gap is in the categories the fix does not touch: lakes and summits at 78.9%, where
 the Southwest's washes and buttes are more densely and less distinctly named than Maine's ponds,
-and towns at 89.3%, where the two remaining known-answer failures are both a venue outranking
-the locality it is named after - "Tuscon, AZ" answering `One Hope - Tuscon`. That is a ranking
-question rather than a parsing one, and is recorded in `TODO.md` rather than fixed here.
+and towns at 89.3%. That second one turned out to be a ranking defect, and section 5.4 is what
+happened when the test was sharpened enough to see it.
+
+### 5.4 The test that was passing four wrong answers
+
+Known answers were compared as substrings, so "Albany" matched the city of Albany, Albany County,
+and a shop called `Albany, NY - Albany.com` equally well. Pinning the expected layer turned four
+passes into failures across three builds, and they were two distinct defects.
+
+**A misspelling lost the town entirely.** Not outranked - absent:
+
+| Query | Answered with | Should be |
+|---|---|---|
+| `Albny, NY` | `Albany, NY - Albany.com`, a shop in Colonie | Albany the city |
+| `Manchestr, NH` | `Manchester, NH`, a venue | Manchester the city |
+| `Tuscon, AZ` | `One Hope - Tuscon`, in Valencia West | Tucson |
+
+The cause was in the parser, not the ranking. A town was recognised only by exact spelling, so a
+misspelling parsed to nothing at all and the raw string went to name matching - where venues win,
+because business listings carry their own town in their name ("Albany, NY - Albany.com") and so
+match the string "Albny, NY" better than the bare name "Albany" does. Maine never showed it
+because Maine has fewer such venues.
+
+The parser now falls back to a typo search over the build's towns: one edit, or two when the two
+strings have the same letters. That second case is a transposition, `Tuscon` for `Tucson`, and it
+is the one that most needs catching, because a transposition shares almost no trigrams with its
+own word - the search could not have found Tucson from "Tuscon" however it was ranked. The limits
+matter as much as the rule: whole remaining text only, five characters or more, and only after an
+exact match fails. Without them `walmart` becomes Balmat, New York, and `central park` becomes
+the town of Parks.
+
+**A county outranked the city of the same name.** `Albany, New York` returned Albany County and
+`york` returned York County, decided by importance alone - 1.000 against the city's 0.942, worth
+0.003 of score - while both rows read `Albany, NY, USA` and the user could not tell them apart.
+County and locality now share a deduplication bucket, so the pair collapses to one result and the
+county loses.
+
+| | Before | After | Cases changed |
+|---|---|---|---|
+| Maine | 95.9% | **96.0%** | 2 improved, 0 regressed |
+| New York | 94.9% | **95.5%** | 1 improved, 0 regressed |
+| Arizona + Nevada | 92.4% | 91.9% | 0 improved, 1 regressed |
+| Known-answer failures, all four builds | 4 | **0** | - |
+
+The one Arizona regression is `Mesaa, Arizona`, a generated case whose ground truth is a venue
+named "Mesa" inside the city of Mesa, scored against a 300 m radius. The query now answers with
+the city, which is what someone typing it means, and the case counts that wrong because the city
+centre is further than 300 m from that venue. It is reported here rather than argued away: the
+case set is the measure, and being confident about one of its cases is not a reason to edit it.
 
 ## 6. Multi-state builds
 
@@ -322,12 +384,13 @@ through the single documented command:
 
 | | Vermont + New Hampshire | Arizona + Nevada |
 |---|---|---|
-| Features | 726,653 | **5,008,365** |
-| split | 459,570 VT / 264,222 NH | 3,710,624 AZ / 1,296,052 NV |
-| features with no state | 2,861 | 1,689 |
-| Database | 792 MB | 4.7 GB |
-| Build time | 993 s | **1,787 s** |
-| Known answers | 16 of 16 | 9 of 10 |
+| Features | 731,596 | **5,008,365** |
+| split | 464,500 VT / 264,626 NH | 3,710,624 AZ / 1,296,052 NV |
+| features with no state | 2,470 | 1,689 |
+| Database | 797 MB | 4.7 GB |
+| Build time | **215 s** | **1,787 s** |
+| Known answers | 16 of 16 | 10 of 10 |
+| Accuracy | 92.4% | 91.9% |
 
 The split is the check that matters. A multi-state build that quietly attributed everything to
 the first state would still answer most queries plausibly; 3.7 M against 1.3 M, in a build whose
@@ -335,8 +398,19 @@ region boundaries were never told which state is which, is the evidence that it 
 features carrying no state at all - 1,689 of five million - are the border margin described in
 section 10, not a misattribution between the two states.
 
-The one failing known answer is the venue-outranks-locality case described in section 5.3, not a
-multi-state defect.
+Both builds now pass their known answers in full, on both front ends, under the layer-pinned
+check of section 5.4. Vermont plus New Hampshire was rebuilt on 2026-09-23 to pick up the
+OpenStreetMap clip and the null-island fix it predated; it now builds in 215 s rather than 993,
+which is the `ST_Subdivide` change of section 3 reaching a region that had not been rebuilt since.
+
+That rebuild also produced the sharpest operational lesson of this document, and it was my own
+mistake. I started it twice by accident, and the two builds destroyed each other: each begins by
+dropping and recreating the staging schema, so the second pulled the ground out from under the
+first mid-load. One process died with a traceback, the other printed `build complete in 206s`,
+and the result was missing 40% of its streets - Vermont 193 against New Hampshire's 40,300, with
+no Main Street in Burlington. A clean single rebuild gives 67,901. Nothing is wrong with the
+loader; what is missing is a lock, and a build that refuses to call itself complete when a
+loader wrote errors it exited zero on (`TODO.md` section 13).
 
 Vermont plus New Hampshire's 16 of 16 deserves a caveat, because verifying this section found the
 check to be weaker than it looks. Known answers are matched as substrings, so when that build's
