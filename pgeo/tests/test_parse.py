@@ -139,3 +139,15 @@ def test_a_two_word_town_before_a_two_word_state():
     nh = RuleParser({"new hampshire", "north conway"}, {"nh": "NH", "new hampshire": "NH"})
     p = nh.parse("5 Elm St North Conway New Hampshire")
     assert (p.housenumber, p.locality, p.state) == ("5", "North Conway", "NH")
+
+
+def test_a_five_digit_house_number_is_not_a_postcode():
+    """Phoenix and Las Vegas number houses in five digits; reading one as a ZIP broke the parse."""
+    az = RuleParser({"prescott valley", "glendale"}, {"az": "AZ", "arizona": "AZ"})
+    p = az.parse("13023 E Lima St, Prescott Valley")
+    assert (p.housenumber, p.locality, p.postcode) == ("13023", "Prescott Valley", None)
+    # a real postcode after the address is still found
+    q = az.parse("13023 E Lima St, Prescott Valley AZ 86314")
+    assert (q.housenumber, q.postcode, q.state) == ("13023", "86314", "AZ")
+    # and a bare postcode is still a postcode
+    assert az.parse("86314").postcode == "86314"

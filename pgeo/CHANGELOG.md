@@ -10,6 +10,22 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+## [0.12.1] - 2026-09-23
+
+### Fixed
+- A five-digit house number is no longer read as a postcode. `13023 E LIMA ST, PRESCOTT VALLEY`
+  parsed as postcode `13023` with no house number, so the address lookup found nothing and the
+  search fell back to the street - returning `East Lima Street` at confidence 1.0 while
+  `13023 E LIMA ST` sat in the build. Both parsers now look for a postcode only past a leading
+  house-number token. Western house numbers reach five digits far more often than New England's:
+  on the Arizona-plus-Nevada accuracy set all sixteen cases beginning with a five-digit house
+  number failed, and no case without one did. Fixed in `geocode.parse_rule` and
+  `pgeo.api.parse`, which held the same assumption written twice.
+
+  Arizona + Nevada: correct 84.8% -> 92.4%, addresses 77.1% -> 98.6%, with every other category
+  unchanged case for case. Maine re-scored 95.9% on its 1,560 cases with zero changed outcomes
+  in either direction, which is what a fix this narrow should look like.
+
 ## [0.12.0] - 2026-09-22
 
 ### Fixed

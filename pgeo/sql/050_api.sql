@@ -40,12 +40,20 @@ DECLARE
   cand   text;
   tail   text;
   prev   text;
+  lead   text;
 BEGIN
   s := regexp_replace(s, '\m(apt|apartment|unit|ste|suite)\M\.?\s*[[:alnum:]-]+|#\s*[[:alnum:]-]+', ' ', 'gi');
-  m := regexp_match(s, '\m(\d{5})(-\d{4})?\M');
+  -- Look for a postcode past any leading house number. Phoenix and Las Vegas number houses in
+  -- five digits - 13023 E Lima St - and reading that as a ZIP made the whole address parse fail:
+  -- every one of the 16 five-digit-house-number cases in the Arizona and Nevada accuracy set
+  -- answered with the street instead of the house. A bare "04101" still parses as a postcode,
+  -- because nothing follows it.
+  -- non-capturing group, so regexp_match returns the whole match rather than a group
+  lead := coalesce((regexp_match(s, '^\s*\d{1,6}[a-zA-Z]?(?:\s*-\s*\d{1,6})?\s'))[1], '');
+  m := regexp_match(substr(s, length(lead) + 1), '\m(\d{5})(-\d{4})?\M');
   IF m IS NOT NULL THEN
     postcode := m[1];
-    s := regexp_replace(s, '\m\d{5}(-\d{4})?\M', ' ');
+    s := lead || regexp_replace(substr(s, length(lead) + 1), '\m\d{5}(-\d{4})?\M', ' ');
   END IF;
   parts := ARRAY(SELECT trim(x) FROM unnest(string_to_array(s, ',')) x WHERE trim(x) <> '');
   words := regexp_split_to_array(trim(array_to_string(parts, ' ')), '\s+');

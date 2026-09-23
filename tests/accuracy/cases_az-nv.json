@@ -1,0 +1,2957 @@
+[
+ {
+  "id": 1,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "7550 west willow ave peoria "
+  },
+  "truth": {
+   "lat": 33.6065264,
+   "lon": -112.2224935,
+   "radius_m": 150,
+   "housenumber": "7550",
+   "locality": "PEORIA"
+  }
+ },
+ {
+  "id": 2,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "4313 E MONTECITO AVE, POENIX"
+  },
+  "truth": {
+   "lat": 33.4991181,
+   "lon": -111.9883241,
+   "radius_m": 150,
+   "housenumber": "4313",
+   "locality": "PHOENIX"
+  }
+ },
+ {
+  "id": 3,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "135 W UNIVERSITY DR, MEAS"
+  },
+  "truth": {
+   "lat": 33.4220724,
+   "lon": -111.8355915,
+   "radius_m": 150,
+   "housenumber": "135",
+   "locality": "MESA"
+  }
+ },
+ {
+  "id": 4,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "1300 FOSTER DR, RENO, NV"
+  },
+  "truth": {
+   "lat": 39.5156917,
+   "lon": -119.8330219,
+   "radius_m": 150,
+   "housenumber": "1300",
+   "locality": "RENO"
+  }
+ },
+ {
+  "id": 5,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "12433 N 111TH Dt, YOUNGTOWNN"
+  },
+  "truth": {
+   "lat": 33.5980142,
+   "lon": -112.299411,
+   "radius_m": 150,
+   "housenumber": "12433",
+   "locality": "YOUNGTOWN"
+  }
+ },
+ {
+  "id": 6,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "701 DESERT VIEW, Lake Havasu City, AZ"
+  },
+  "truth": {
+   "lat": 34.5095755,
+   "lon": -114.3046653,
+   "radius_m": 150,
+   "housenumber": "701",
+   "locality": "Lake Havasu City"
+  }
+ },
+ {
+  "id": 7,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "1734 E TURQUOISE AVE, PHOENIX"
+  },
+  "truth": {
+   "lat": 33.5768067,
+   "lon": -112.0441966,
+   "radius_m": 150,
+   "housenumber": "1734",
+   "locality": "PHOENIX"
+  }
+ },
+ {
+  "id": 8,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "2639 W WOLF ST, PHOENIX"
+  },
+  "truth": {
+   "lat": 33.5071064,
+   "lon": -112.116495,
+   "radius_m": 150,
+   "housenumber": "2639",
+   "locality": "PHOENIX"
+  }
+ },
+ {
+  "id": 9,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "1009 E MARCO POLO RD, PHOENIX"
+  },
+  "truth": {
+   "lat": 33.6663336,
+   "lon": -112.059176,
+   "radius_m": 150,
+   "housenumber": "1009",
+   "locality": "PHOENIX"
+  }
+ },
+ {
+  "id": 10,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "1416 VARSITY DR, PRESCOTT"
+  },
+  "truth": {
+   "lat": 34.5827786,
+   "lon": -112.4335936,
+   "radius_m": 150,
+   "housenumber": "1416",
+   "locality": "PRESCOTT"
+  }
+ },
+ {
+  "id": 11,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "2200 North THIRD ST FLAGSTAFF Arizona"
+  },
+  "truth": {
+   "lat": 35.2103524,
+   "lon": -111.6144445,
+   "radius_m": 150,
+   "housenumber": "2200",
+   "locality": "FLAGSTAFF"
+  }
+ },
+ {
+  "id": 12,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "240 N NASH WY, CHANDLER"
+  },
+  "truth": {
+   "lat": 33.3077404,
+   "lon": -111.7979766,
+   "radius_m": 150,
+   "housenumber": "240",
+   "locality": "CHANDLER"
+  }
+ },
+ {
+  "id": 13,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "2767 W ADVENTURE DR, PHOENIX"
+  },
+  "truth": {
+   "lat": 33.8511838,
+   "lon": -112.1186859,
+   "radius_m": 150,
+   "housenumber": "2767",
+   "locality": "PHOENIX"
+  }
+ },
+ {
+  "id": 14,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "2945 N 40TH LN, PHkENIX"
+  },
+  "truth": {
+   "lat": 33.4821772,
+   "lon": -112.1464602,
+   "radius_m": 150,
+   "housenumber": "2945",
+   "locality": "PHOENIX"
+  }
+ },
+ {
+  "id": 15,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "577 E CORTE PASADERA VERDE, GREEN VALLEY"
+  },
+  "truth": {
+   "lat": 31.8312917,
+   "lon": -110.9726534,
+   "radius_m": 150,
+   "housenumber": "577",
+   "locality": "GREEN VALLEY"
+  }
+ },
+ {
+  "id": 16,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "17031 E EL LAGO BLVD, FiUNTAIN HILL"
+  },
+  "truth": {
+   "lat": 33.6000299,
+   "lon": -111.7127928,
+   "radius_m": 150,
+   "housenumber": "17031",
+   "locality": "FOUNTAIN HILLS"
+  }
+ },
+ {
+  "id": 17,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "10833 W KAIBAB DR, SUN CITY"
+  },
+  "truth": {
+   "lat": 33.6450191,
+   "lon": -112.2934561,
+   "radius_m": 150,
+   "housenumber": "10833",
+   "locality": "SUN CITY"
+  }
+ },
+ {
+  "id": 18,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "2432 S PASEO LOMA CIR, MESA"
+  },
+  "truth": {
+   "lat": 33.3701579,
+   "lon": -111.881485,
+   "radius_m": 150,
+   "housenumber": "2432",
+   "locality": "MESA"
+  }
+ },
+ {
+  "id": 19,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "2919 W FAIRWAY VIEW CI, TUCSON"
+  },
+  "truth": {
+   "lat": 32.3533628,
+   "lon": -111.0297122,
+   "radius_m": 150,
+   "housenumber": "2919",
+   "locality": "TUCSON"
+  }
+ },
+ {
+  "id": 20,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "4626 West ALTA VISTA RD Apt 1, LAVEEN, "
+  },
+  "truth": {
+   "lat": 33.3886906,
+   "lon": -112.1581652,
+   "radius_m": 150,
+   "housenumber": "4626",
+   "locality": "LAVEEN"
+  }
+ },
+ {
+  "id": 21,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "1750 S 6TH AVE, YUMA"
+  },
+  "truth": {
+   "lat": 32.6958121,
+   "lon": -114.6271193,
+   "radius_m": 150,
+   "housenumber": "1750",
+   "locality": "YUMA"
+  }
+ },
+ {
+  "id": 22,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "6657 E ELLI ST, MESA"
+  },
+  "truth": {
+   "lat": 33.4306636,
+   "lon": -111.6868498,
+   "radius_m": 150,
+   "housenumber": "6657",
+   "locality": "MESA"
+  }
+ },
+ {
+  "id": 23,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "3433 E WATER ST, TUCSON"
+  },
+  "truth": {
+   "lat": 32.252809,
+   "lon": -110.9192436,
+   "radius_m": 150,
+   "housenumber": "3433",
+   "locality": "TUCSON"
+  }
+ },
+ {
+  "id": 24,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "15318 East THISTLE DR, FOUNTAIN HILLS"
+  },
+  "truth": {
+   "lat": 33.6030056,
+   "lon": -111.749784,
+   "radius_m": 150,
+   "housenumber": "15318",
+   "locality": "FOUNTAIN HILLS"
+  }
+ },
+ {
+  "id": 25,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "473 PARKRIDGE PKWY, SPRING CREEK HOUSING, NV"
+  },
+  "truth": {
+   "lat": 40.7143739,
+   "lon": -115.5773975,
+   "radius_m": 150,
+   "housenumber": "473",
+   "locality": "SPRING CREEK HOUSING"
+  }
+ },
+ {
+  "id": 26,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "3702 East PRESIDIO RD, PHOENIX"
+  },
+  "truth": {
+   "lat": 33.6106314,
+   "lon": -112.0023725,
+   "radius_m": 150,
+   "housenumber": "3702",
+   "locality": "PHOENIX"
+  }
+ },
+ {
+  "id": 27,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "1825 HIGHLAND DR Apt 11, FERNLEY, "
+  },
+  "truth": {
+   "lat": 39.572638,
+   "lon": -119.1273005,
+   "radius_m": 150,
+   "housenumber": "1825",
+   "locality": "FERNLEY"
+  }
+ },
+ {
+  "id": 28,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "4709 East NARROWLEAF DR Apt 12, GILBERT, "
+  },
+  "truth": {
+   "lat": 33.2510676,
+   "lon": -111.687754,
+   "radius_m": 150,
+   "housenumber": "4709",
+   "locality": "GILBERT"
+  }
+ },
+ {
+  "id": 29,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "435 paseo bocado rio rico "
+  },
+  "truth": {
+   "lat": 31.4879996,
+   "lon": -111.0088231,
+   "radius_m": 150,
+   "housenumber": "435",
+   "locality": "RIO RICO"
+  }
+ },
+ {
+  "id": 30,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "4907 E BRILL ST, PHOENIs"
+  },
+  "truth": {
+   "lat": 33.4639663,
+   "lon": -111.9760294,
+   "radius_m": 150,
+   "housenumber": "4907",
+   "locality": "PHOENIX"
+  }
+ },
+ {
+  "id": 31,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "6020 E EDWIN RD, TUCSON"
+  },
+  "truth": {
+   "lat": 32.5105159,
+   "lon": -110.8652676,
+   "radius_m": 150,
+   "housenumber": "6020",
+   "locality": "TUCSON"
+  }
+ },
+ {
+  "id": 32,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "9831 E BENNETT DR, TUCSON"
+  },
+  "truth": {
+   "lat": 32.1117,
+   "lon": -110.782662,
+   "radius_m": 150,
+   "housenumber": "9831",
+   "locality": "TUCSON"
+  }
+ },
+ {
+  "id": 33,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "1410 W CLEAR SPRING DR, GILBERT"
+  },
+  "truth": {
+   "lat": 33.3383455,
+   "lon": -111.8202006,
+   "radius_m": 150,
+   "housenumber": "1410",
+   "locality": "GILBERT"
+  }
+ },
+ {
+  "id": 34,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "1705 W COCHARN ST, TUCSON"
+  },
+  "truth": {
+   "lat": 32.155496,
+   "lon": -111.0020362,
+   "radius_m": 150,
+   "housenumber": "1705",
+   "locality": "TUCSON"
+  }
+ },
+ {
+  "id": 35,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "17600 N 79TH AVE, GLENDALE, AZ"
+  },
+  "truth": {
+   "lat": 33.6442319,
+   "lon": -112.2334227,
+   "radius_m": 150,
+   "housenumber": "17600",
+   "locality": "GLENDALE"
+  }
+ },
+ {
+  "id": 36,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "9310 LAGOON DR Apt 9, RENO, NV"
+  },
+  "truth": {
+   "lat": 39.6407894,
+   "lon": -119.8638663,
+   "radius_m": 150,
+   "housenumber": "9310",
+   "locality": "RENO"
+  }
+ },
+ {
+  "id": 37,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "3310 US 93 HWY S, CLOVER VALLEY, NV"
+  },
+  "truth": {
+   "lat": 40.8791747,
+   "lon": -114.9689601,
+   "radius_m": 150,
+   "housenumber": "3310",
+   "locality": "CLOVER VALLEY"
+  }
+ },
+ {
+  "id": 38,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "301 GENTRY WAY, RENO"
+  },
+  "truth": {
+   "lat": 39.4958175,
+   "lon": -119.7933817,
+   "radius_m": 150,
+   "housenumber": "301",
+   "locality": "RENO"
+  }
+ },
+ {
+  "id": 39,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "520 EAST   SPRINv, Kingman, AZ"
+  },
+  "truth": {
+   "lat": 35.1910972,
+   "lon": -114.0502458,
+   "radius_m": 150,
+   "housenumber": "520",
+   "locality": "Kingman"
+  }
+ },
+ {
+  "id": 40,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "16361 E EMERALD DR, FOUNTAIN HILLS"
+  },
+  "truth": {
+   "lat": 33.5883688,
+   "lon": -111.7263592,
+   "radius_m": 150,
+   "housenumber": "16361",
+   "locality": "FOUNTAIN HILLS"
+  }
+ },
+ {
+  "id": 41,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "11480 S VAIL BUSINESS CT, VAIL"
+  },
+  "truth": {
+   "lat": 32.0441844,
+   "lon": -110.7075772,
+   "radius_m": 150,
+   "housenumber": "11480",
+   "locality": "VAIL"
+  }
+ },
+ {
+  "id": 42,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "1796 North 144TH DR GOODYEAR "
+  },
+  "truth": {
+   "lat": 33.4670058,
+   "lon": -112.3702531,
+   "radius_m": 150,
+   "housenumber": "1796",
+   "locality": "GOODYEAR"
+  }
+ },
+ {
+  "id": 43,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "3330 West BRENDA TRL "
+  },
+  "truth": {
+   "lat": 34.7477887,
+   "lon": -112.5267333,
+   "radius_m": 150,
+   "housenumber": "3330",
+   "locality": "WILLIAMSON VALLEY"
+  }
+ },
+ {
+  "id": 44,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "13023 E LIMA ST, PRESCOTT VALLEY"
+  },
+  "truth": {
+   "lat": 34.5483929,
+   "lon": -112.2376376,
+   "radius_m": 150,
+   "housenumber": "13023",
+   "locality": "PRESCOTT VALLEY"
+  }
+ },
+ {
+  "id": 45,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "3295 South VIRGINIA ST Nevada"
+  },
+  "truth": {
+   "lat": 39.4936081,
+   "lon": -119.8008003,
+   "radius_m": 150,
+   "housenumber": "3295",
+   "locality": "RENO"
+  }
+ },
+ {
+  "id": 46,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "20717 W MAIDEN LN, BUCKEYE"
+  },
+  "truth": {
+   "lat": 33.4769388,
+   "lon": -112.5066538,
+   "radius_m": 150,
+   "housenumber": "20717",
+   "locality": "BUCKEYE"
+  }
+ },
+ {
+  "id": 47,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "1102 W WICKIEUP LN, PHOENIX"
+  },
+  "truth": {
+   "lat": 33.6650527,
+   "lon": -112.0861847,
+   "radius_m": 150,
+   "housenumber": "1102",
+   "locality": "PHOENIX"
+  }
+ },
+ {
+  "id": 48,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "17100 North 67TH AVE "
+  },
+  "truth": {
+   "lat": 33.6401947,
+   "lon": -112.2042244,
+   "radius_m": 150,
+   "housenumber": "17100",
+   "locality": "GLENDALE"
+  }
+ },
+ {
+  "id": 49,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "4100 W CALLE SIETE, GREEN VALLEY"
+  },
+  "truth": {
+   "lat": 31.7906487,
+   "lon": -111.0499555,
+   "radius_m": 150,
+   "housenumber": "4100",
+   "locality": "GREEN VALLEY"
+  }
+ },
+ {
+  "id": 50,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "825 G ST, HAWTjORNE"
+  },
+  "truth": {
+   "lat": 38.5297687,
+   "lon": -118.6229978,
+   "radius_m": 150,
+   "housenumber": "825",
+   "locality": "HAWTHORNE"
+  }
+ },
+ {
+  "id": 51,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "136 W CAMINO MANAZNA, GREEN VALLEY"
+  },
+  "truth": {
+   "lat": 31.8643819,
+   "lon": -110.9935214,
+   "radius_m": 150,
+   "housenumber": "136",
+   "locality": "GREEN VALLEY"
+  }
+ },
+ {
+  "id": 52,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "1457 N 53RD DR",
+   "locality": "PHOENIX",
+   "postalcode": "85043"
+  },
+  "truth": {
+   "lat": 33.4650334,
+   "lon": -112.1752306,
+   "radius_m": 150,
+   "housenumber": "1457",
+   "locality": "PHOENIX"
+  }
+ },
+ {
+  "id": 53,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "17700 E MED BAR RD",
+   "locality": "DEWEY-HUMBOLDT",
+   "postalcode": null
+  },
+  "truth": {
+   "lat": 34.5088536,
+   "lon": -112.1529456,
+   "radius_m": 150,
+   "housenumber": "17700",
+   "locality": "DEWEY-HUMBOLDT"
+  }
+ },
+ {
+  "id": 54,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "4714 E TIERRA BUENA LN",
+   "locality": "PHOENIX",
+   "postalcode": "85032"
+  },
+  "truth": {
+   "lat": 33.6292479,
+   "lon": -111.9796192,
+   "radius_m": 150,
+   "housenumber": "4714",
+   "locality": "PHOENIX"
+  }
+ },
+ {
+  "id": 55,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "18015 N 2ND DR",
+   "locality": "PHOENIX",
+   "postalcode": "85023"
+  },
+  "truth": {
+   "lat": 33.6496362,
+   "lon": -112.0775237,
+   "radius_m": 150,
+   "housenumber": "18015",
+   "locality": "PHOENIX"
+  }
+ },
+ {
+  "id": 56,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "1250 S RIALTO",
+   "locality": "MESA",
+   "postalcode": "85209"
+  },
+  "truth": {
+   "lat": 33.3914047,
+   "lon": -111.6277452,
+   "radius_m": 150,
+   "housenumber": "1250",
+   "locality": "MESA"
+  }
+ },
+ {
+  "id": 57,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "12311 E AVENIDA DE LA VISTA VERDE",
+   "locality": "TUCSON",
+   "postalcode": "85749"
+  },
+  "truth": {
+   "lat": 32.2541714,
+   "lon": -110.72876,
+   "radius_m": 150,
+   "housenumber": "12311",
+   "locality": "TUCSON"
+  }
+ },
+ {
+  "id": 58,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "455 EMBER CT",
+   "locality": "SPARKS",
+   "postalcode": "89436",
+   "region": "NV"
+  },
+  "truth": {
+   "lat": 39.6401259,
+   "lon": -119.7323174,
+   "radius_m": 150,
+   "housenumber": "455",
+   "locality": "SPARKS"
+  }
+ },
+ {
+  "id": 59,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "112 N HERITAGE DR",
+   "locality": "GILBERT",
+   "postalcode": "85234"
+  },
+  "truth": {
+   "lat": 33.3521666,
+   "lon": -111.7726587,
+   "radius_m": 150,
+   "housenumber": "112",
+   "locality": "GILBERT"
+  }
+ },
+ {
+  "id": 60,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "7631 N PERRYVILLE RD",
+   "locality": "WADDELL",
+   "postalcode": "85355"
+  },
+  "truth": {
+   "lat": 33.5472124,
+   "lon": -112.4603719,
+   "radius_m": 150,
+   "housenumber": "7631",
+   "locality": "WADDELL"
+  }
+ },
+ {
+  "id": 61,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "962 ALPINE DR",
+   "locality": "SPRING CREEK HOUSING",
+   "postalcode": "89815",
+   "region": "NV"
+  },
+  "truth": {
+   "lat": 40.6999226,
+   "lon": -115.5642601,
+   "radius_m": 150,
+   "housenumber": "962",
+   "locality": "SPRING CREEK HOUSING"
+  }
+ },
+ {
+  "id": 62,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "10854 N 60TH AVE",
+   "locality": "GLENDALE",
+   "postalcode": "85304",
+   "region": "AZ"
+  },
+  "truth": {
+   "lat": 33.5850641,
+   "lon": -112.1888243,
+   "radius_m": 150,
+   "housenumber": "10854",
+   "locality": "GLENDALE"
+  }
+ },
+ {
+  "id": 63,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "11614 W OGLESBY AVE",
+   "locality": "YOUNGTOWN",
+   "postalcode": "85363"
+  },
+  "truth": {
+   "lat": 33.5695271,
+   "lon": -112.3099075,
+   "radius_m": 150,
+   "housenumber": "11614",
+   "locality": "YOUNGTOWN"
+  }
+ },
+ {
+  "id": 64,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "7145 E CROWN KING RD",
+   "locality": "CROWN KING",
+   "postalcode": null
+  },
+  "truth": {
+   "lat": 34.2038137,
+   "lon": -112.3360454,
+   "radius_m": 150,
+   "housenumber": "7145",
+   "locality": "CROWN KING"
+  }
+ },
+ {
+  "id": 65,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "5933 E PIMA ST",
+   "locality": "TUCSON",
+   "postalcode": "85712"
+  },
+  "truth": {
+   "lat": 32.2437692,
+   "lon": -110.8659784,
+   "radius_m": 150,
+   "housenumber": "5933",
+   "locality": "TUCSON"
+  }
+ },
+ {
+  "id": 66,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "8727 E PARAISO DR",
+   "locality": "SCOTTSDALE",
+   "postalcode": "85255"
+  },
+  "truth": {
+   "lat": 33.6948537,
+   "lon": -111.8913551,
+   "radius_m": 150,
+   "housenumber": "8727",
+   "locality": "SCOTTSDALE"
+  }
+ },
+ {
+  "id": 67,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "4201 N LA JOLLA DR",
+   "locality": "PRESCOTT VALLEY",
+   "postalcode": null
+  },
+  "truth": {
+   "lat": 34.6028261,
+   "lon": -112.2923712,
+   "radius_m": 150,
+   "housenumber": "4201",
+   "locality": "PRESCOTT VALLEY"
+  }
+ },
+ {
+  "id": 68,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "6150 N SCOTTSDALE RD 1-3",
+   "locality": "PARADISE VALLEY",
+   "postalcode": "85253"
+  },
+  "truth": {
+   "lat": 33.5268734,
+   "lon": -111.9267998,
+   "radius_m": 150,
+   "housenumber": "6150",
+   "locality": "PARADISE VALLEY"
+  }
+ },
+ {
+  "id": 69,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "625 N YALE DR",
+   "locality": "GILBERT",
+   "postalcode": "85234"
+  },
+  "truth": {
+   "lat": 33.3615751,
+   "lon": -111.7837649,
+   "radius_m": 150,
+   "housenumber": "625",
+   "locality": "GILBERT"
+  }
+ },
+ {
+  "id": 70,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "10919 N 81ST AVE",
+   "locality": "PEORIA",
+   "postalcode": "85345"
+  },
+  "truth": {
+   "lat": 33.5840027,
+   "lon": -112.2330193,
+   "radius_m": 150,
+   "housenumber": "10919",
+   "locality": "PEORIA"
+  }
+ },
+ {
+  "id": 71,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 33.6660825,
+   "point.lon": -112.1630189,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 33.6660825,
+   "lon": -112.1630189,
+   "radius_m": 60,
+   "housenumber": "4733"
+  }
+ },
+ {
+  "id": 72,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 33.3172966,
+   "point.lon": -111.8739529,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 33.3172966,
+   "lon": -111.8739529,
+   "radius_m": 60,
+   "housenumber": "855"
+  }
+ },
+ {
+  "id": 73,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 32.1634878,
+   "point.lon": -110.9684437,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 32.1634878,
+   "lon": -110.9684437,
+   "radius_m": 60,
+   "housenumber": "4878"
+  }
+ },
+ {
+  "id": 74,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 35.04517,
+   "point.lon": -114.5934931,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 35.04517,
+   "lon": -114.5934931,
+   "radius_m": 60,
+   "housenumber": "1632"
+  }
+ },
+ {
+  "id": 75,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 33.4325119,
+   "point.lon": -112.0631424,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 33.4325119,
+   "lon": -112.0631424,
+   "radius_m": 60,
+   "housenumber": "746"
+  }
+ },
+ {
+  "id": 76,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 33.4900251,
+   "point.lon": -111.9542586,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 33.4900251,
+   "lon": -111.9542586,
+   "radius_m": 60,
+   "housenumber": "5901"
+  }
+ },
+ {
+  "id": 77,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 39.5414063,
+   "point.lon": -119.754277,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 39.5414063,
+   "lon": -119.754277,
+   "radius_m": 60,
+   "housenumber": "830"
+  }
+ },
+ {
+  "id": 78,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 33.4467559,
+   "point.lon": -111.9325195,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 33.4467559,
+   "lon": -111.9325195,
+   "radius_m": 60,
+   "housenumber": "422"
+  }
+ },
+ {
+  "id": 79,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 33.5224423,
+   "point.lon": -112.1554375,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 33.5224423,
+   "lon": -112.1554375,
+   "radius_m": 60,
+   "housenumber": "4441"
+  }
+ },
+ {
+  "id": 80,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 32.2164763,
+   "point.lon": -110.883317,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 32.2164763,
+   "lon": -110.883317,
+   "radius_m": 60,
+   "housenumber": "384"
+  }
+ },
+ {
+  "id": 81,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 34.6936612,
+   "point.lon": -112.3173928,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 34.6936612,
+   "lon": -112.3173928,
+   "radius_m": 60,
+   "housenumber": "8435"
+  }
+ },
+ {
+  "id": 82,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 39.5292131,
+   "point.lon": -119.8001338,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 39.5292131,
+   "lon": -119.8001338,
+   "radius_m": 60,
+   "housenumber": "805"
+  }
+ },
+ {
+  "id": 83,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 32.2553039,
+   "point.lon": -111.0139623,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 32.2553039,
+   "lon": -111.0139623,
+   "radius_m": 60,
+   "housenumber": "2209"
+  }
+ },
+ {
+  "id": 84,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 39.5019377,
+   "point.lon": -119.8004236,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 39.5019377,
+   "lon": -119.8004236,
+   "radius_m": 60,
+   "housenumber": "2060"
+  }
+ },
+ {
+  "id": 85,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 33.481151,
+   "point.lon": -111.6979667,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 33.481151,
+   "lon": -111.6979667,
+   "radius_m": 60,
+   "housenumber": "6133"
+  }
+ },
+ {
+  "id": 86,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 33.451685,
+   "point.lon": -112.2462765,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 33.451685,
+   "lon": -112.2462765,
+   "radius_m": 60,
+   "housenumber": "8611"
+  }
+ },
+ {
+  "id": 87,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 35.2231975,
+   "point.lon": -111.6145902,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 35.2231975,
+   "lon": -111.6145902,
+   "radius_m": 60,
+   "housenumber": "3515"
+  }
+ },
+ {
+  "id": 88,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 33.795639,
+   "point.lon": -111.9307942,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 33.795639,
+   "lon": -111.9307942,
+   "radius_m": 60,
+   "housenumber": "6936"
+  }
+ },
+ {
+  "id": 89,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 33.7453969,
+   "point.lon": -112.2019962,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 33.7453969,
+   "lon": -112.2019962,
+   "radius_m": 60,
+   "housenumber": "6610"
+  }
+ },
+ {
+  "id": 90,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 33.4198383,
+   "point.lon": -111.8499352,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 33.4198383,
+   "lon": -111.8499352,
+   "radius_m": 60,
+   "housenumber": "921"
+  }
+ },
+ {
+  "id": 91,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 33.6452723,
+   "point.lon": -111.8672564,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 33.6452723,
+   "lon": -111.8672564,
+   "radius_m": 60,
+   "housenumber": "9931"
+  }
+ },
+ {
+  "id": 92,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 34.5767398,
+   "point.lon": -113.1701537,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 34.5767398,
+   "lon": -113.1701537,
+   "radius_m": 60,
+   "housenumber": "2"
+  }
+ },
+ {
+  "id": 93,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 33.2327652,
+   "point.lon": -111.619937,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 33.2327652,
+   "lon": -111.619937,
+   "radius_m": 60,
+   "housenumber": "21472"
+  }
+ },
+ {
+  "id": 94,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 33.4118859,
+   "point.lon": -112.0408867,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 33.4118859,
+   "lon": -112.0408867,
+   "radius_m": 60,
+   "housenumber": "1901"
+  }
+ },
+ {
+  "id": 95,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 34.6006759,
+   "point.lon": -112.4607224,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 34.6006759,
+   "lon": -112.4607224,
+   "radius_m": 60,
+   "housenumber": "3191"
+  }
+ },
+ {
+  "id": 96,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 33.6444849,
+   "point.lon": -112.2319843,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 33.6444849,
+   "lon": -112.2319843,
+   "radius_m": 60,
+   "housenumber": "17600"
+  }
+ },
+ {
+  "id": 97,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Giseia"
+  },
+  "truth": {
+   "lat": 34.095975,
+   "lon": -111.287453,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 98,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Thw Crossing"
+  },
+  "truth": {
+   "lat": 37.86965,
+   "lon": -117.97149,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 99,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Minerla"
+  },
+  "truth": {
+   "lat": 40.17353,
+   "lon": -116.18674,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 100,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Sottys Jundtion"
+  },
+  "truth": {
+   "lat": 37.29882,
+   "lon": -117.05285,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 101,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Cedar Crek"
+  },
+  "truth": {
+   "lat": 33.893808,
+   "lon": -110.189748,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 102,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Roosevelt Lake Gardens Wt"
+  },
+  "truth": {
+   "lat": 33.8506,
+   "lon": -111.30624,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 103,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Pinancle Peak Estates III"
+  },
+  "truth": {
+   "lat": 33.71032,
+   "lon": -111.89737,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 104,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Brycce"
+  },
+  "truth": {
+   "lat": 32.926383,
+   "lon": -109.822842,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 105,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "town",
+  "params": {
+   "text": "dike"
+  },
+  "truth": {
+   "lat": 36.30136,
+   "lon": -115.01334,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 106,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "town",
+  "params": {
+   "text": "skoksonak"
+  },
+  "truth": {
+   "lat": 32.29563,
+   "lon": -111.53761,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 107,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Signnal"
+  },
+  "truth": {
+   "lat": 34.47418,
+   "lon": -113.63382,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 108,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Sunburst Hommes"
+  },
+  "truth": {
+   "lat": 33.46754,
+   "lon": -112.18821,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 109,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "town",
+  "params": {
+   "text": "apache mobile park"
+  },
+  "truth": {
+   "lat": 31.90681,
+   "lon": -110.22828,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 110,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Renoo"
+  },
+  "truth": {
+   "lat": 39.530395,
+   "lon": -119.806347,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 111,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Chrysofile"
+  },
+  "truth": {
+   "lat": 33.74033,
+   "lon": -110.56677,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 112,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Witresburg"
+  },
+  "truth": {
+   "lat": 33.418444,
+   "lon": -112.866683,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 113,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Bllue Vista"
+  },
+  "truth": {
+   "lat": 33.61922,
+   "lon": -109.08313,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 114,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "town",
+  "params": {
+   "text": "roadhaven recreational vehicle resort"
+  },
+  "truth": {
+   "lat": 33.40433,
+   "lon": -111.548,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 115,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Ak-Chin Villag"
+  },
+  "truth": {
+   "lat": 33.021645,
+   "lon": -112.080136,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 116,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Mustang Peak"
+  },
+  "truth": {
+   "lat": 31.6934729,
+   "lon": -110.4766702,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 117,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "lake_summit",
+  "params": {
+   "text": "volcanic hill"
+  },
+  "truth": {
+   "lat": 38.442564,
+   "lon": -114.9185859,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 118,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Twin Lakes, Zeniff"
+  },
+  "truth": {
+   "lat": 34.6180882,
+   "lon": -110.3548455,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 119,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Mowa`api"
+  },
+  "truth": {
+   "lat": 35.8669126,
+   "lon": -110.7482781,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 120,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Goodrin Mesa"
+  },
+  "truth": {
+   "lat": 34.7660448,
+   "lon": -113.4307934,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 121,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "White Ash Peak"
+  },
+  "truth": {
+   "lat": 36.5438839,
+   "lon": -109.285284,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 122,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Copper Mountain, Aztec Lodge"
+  },
+  "truth": {
+   "lat": 33.9250392,
+   "lon": -111.1015033,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 123,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Ott Lake"
+  },
+  "truth": {
+   "lat": 35.0252835,
+   "lon": -111.9510327,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 124,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Cobre Grande Mountain"
+  },
+  "truth": {
+   "lat": 32.9670011,
+   "lon": -110.2928573,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 125,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Black Rock, Bonita Trading Post"
+  },
+  "truth": {
+   "lat": 35.7244659,
+   "lon": -109.072499,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 126,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Independence Mountain"
+  },
+  "truth": {
+   "lat": 41.4655495,
+   "lon": -115.9596191,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 127,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Sawmill Hills"
+  },
+  "truth": {
+   "lat": 34.8398852,
+   "lon": -111.3295056,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 128,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Hog Mountaih, Cutter"
+  },
+  "truth": {
+   "lat": 33.2539335,
+   "lon": -110.6370388,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 129,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "lake_summit",
+  "params": {
+   "text": "holy joe pasture"
+  },
+  "truth": {
+   "lat": 32.8275616,
+   "lon": -110.5395304,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 130,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Indepnedence Hill"
+  },
+  "truth": {
+   "lat": 40.27729,
+   "lon": -118.1983546,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 131,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Valley View Point"
+  },
+  "truth": {
+   "lat": 34.1228177,
+   "lon": -110.4828828,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 132,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Tawai"
+  },
+  "truth": {
+   "lat": 35.8535526,
+   "lon": -110.5765737,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 133,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Soto Peak"
+  },
+  "truth": {
+   "lat": 31.9453679,
+   "lon": -111.2311565,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 134,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Nankoweap Butte"
+  },
+  "truth": {
+   "lat": 36.2635539,
+   "lon": -111.8837634,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 135,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "State Tattoo Company"
+  },
+  "truth": {
+   "lat": 33.65400947,
+   "lon": -112.08363526,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 136,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Melanie Lane MD: Family Medicine, Banner Health"
+  },
+  "truth": {
+   "lat": 33.6587,
+   "lon": -112.37116,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 137,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "ABC Legl Services, Inc."
+  },
+  "truth": {
+   "lat": 33.480277,
+   "lon": -112.075432,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 138,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "Mesaa, Arizona"
+  },
+  "truth": {
+   "lat": 33.4610291,
+   "lon": -111.697937,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 139,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "FJC Fotography"
+  },
+  "truth": {
+   "lat": 32.92777613,
+   "lon": -111.73813724,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 140,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Arizona Breastnet"
+  },
+  "truth": {
+   "lat": 33.58384556,
+   "lon": -111.88938808,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 141,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Nevada Cardiology Associates, Las Vegas"
+  },
+  "truth": {
+   "lat": 36.21673215,
+   "lon": -115.24976454,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 142,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "H&R Block, Cheyenne Village"
+  },
+  "truth": {
+   "lat": 33.61041876,
+   "lon": -112.13275396,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 143,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "Supercts, Tucson Country Club Estates"
+  },
+  "truth": {
+   "lat": 32.25194965,
+   "lon": -110.89138765,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 144,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Iglesia Adventista hispana de El Mirage"
+  },
+  "truth": {
+   "lat": 33.61149543,
+   "lon": -112.32050487,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 145,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Western Union, Drexel Heights"
+  },
+  "truth": {
+   "lat": 32.1355098,
+   "lon": -111.0298935,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 146,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "National Kidney Foundation, Winchester"
+  },
+  "truth": {
+   "lat": 36.13078993,
+   "lon": -115.11475636,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 147,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "MC Retnals"
+  },
+  "truth": {
+   "lat": 36.07086004,
+   "lon": -114.99425708,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 148,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Shiver River Shave Ice"
+  },
+  "truth": {
+   "lat": 35.142341,
+   "lon": -114.569023,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 149,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "Flexi Compras, Coronwdo"
+  },
+  "truth": {
+   "lat": 32.22223029478637,
+   "lon": -110.86373426860911,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 150,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "John J O'connor Md Pllc"
+  },
+  "truth": {
+   "lat": 34.597057,
+   "lon": -112.465435,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 151,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Ocean Gallery USA"
+  },
+  "truth": {
+   "lat": 36.1382528,
+   "lon": -115.1724358,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 152,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "IMS Urgent Care - Queen Creek"
+  },
+  "truth": {
+   "lat": 33.247798919677734,
+   "lon": -111.62325286865234,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 153,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Paralegal Institute"
+  },
+  "truth": {
+   "lat": 36.1598639,
+   "lon": -115.141214,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 154,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "86032"
+  },
+  "truth": {
+   "lat": 35.079003,
+   "lon": -110.284415,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 155,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "89130"
+  },
+  "truth": {
+   "lat": 36.253482,
+   "lon": -115.226706,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 156,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "86507"
+  },
+  "truth": {
+   "lat": 36.424039,
+   "lon": -109.28343,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 157,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "85714"
+  },
+  "truth": {
+   "lat": 32.169961,
+   "lon": -110.946558,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 158,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "89419"
+  },
+  "truth": {
+   "lat": 40.342885,
+   "lon": -118.287699,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 159,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "85033"
+  },
+  "truth": {
+   "lat": 33.493589,
+   "lon": -112.214037,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 160,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "85334"
+  },
+  "truth": {
+   "lat": 33.593912,
+   "lon": -114.363356,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 161,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "89411"
+  },
+  "truth": {
+   "lat": 39.018363,
+   "lon": -119.853038,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 162,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Gise"
+  },
+  "truth": {
+   "lat": 34.095975,
+   "lon": -111.287453,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 163,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "The Cros"
+  },
+  "truth": {
+   "lat": 37.86965,
+   "lon": -117.97149,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 164,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Mine"
+  },
+  "truth": {
+   "lat": 40.17353,
+   "lon": -116.18674,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 165,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Scottys Jun"
+  },
+  "truth": {
+   "lat": 37.29882,
+   "lon": -117.05285,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 166,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Cedar Cr"
+  },
+  "truth": {
+   "lat": 33.893808,
+   "lon": -110.189748,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 167,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Roosevelt Lake Garde"
+  },
+  "truth": {
+   "lat": 33.8506,
+   "lon": -111.30624,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 168,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Pinnacle Peak Es"
+  },
+  "truth": {
+   "lat": 33.71032,
+   "lon": -111.89737,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 169,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Bry"
+  },
+  "truth": {
+   "lat": 32.926383,
+   "lon": -109.822842,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 170,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Dik"
+  },
+  "truth": {
+   "lat": 36.30136,
+   "lon": -115.01334,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 171,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Go Sus"
+  },
+  "truth": {
+   "lat": 35.18647789,
+   "lon": -111.662039,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 172,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Ascend Hea"
+  },
+  "truth": {
+   "lat": 36.2957302,
+   "lon": -115.1507543,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 173,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Infuze Aesthetics & "
+  },
+  "truth": {
+   "lat": 36.01670838,
+   "lon": -115.05635201,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 174,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Creative"
+  },
+  "truth": {
+   "lat": 32.33873,
+   "lon": -111.05341,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 175,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Chapman Customs Las"
+  },
+  "truth": {
+   "lat": 36.046037,
+   "lon": -115.025936,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 176,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "House Of Cardz Casino Deali"
+  },
+  "truth": {
+   "lat": 33.354238,
+   "lon": -111.972086,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 177,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "ED Marshall Jewelry and Gold B"
+  },
+  "truth": {
+   "lat": 33.3479499,
+   "lon": -111.9111931,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 178,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Starcatcher Health"
+  },
+  "truth": {
+   "lat": 33.683183,
+   "lon": -112.081016,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 179,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Innovative "
+  },
+  "truth": {
+   "lat": 32.33655651,
+   "lon": -111.05597511,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 180,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Oskquen Brewing Co"
+  },
+  "truth": null
+ },
+ {
+  "id": 181,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "96963 N SMOKE TREE RD"
+  },
+  "truth": null
+ },
+ {
+  "id": 182,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Times Square, New York"
+  },
+  "truth": null
+ },
+ {
+  "id": 183,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Mibdranquen Brewing Co"
+  },
+  "truth": null
+ },
+ {
+  "id": 184,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "sxgfvrxmgpmv"
+  },
+  "truth": null
+ },
+ {
+  "id": 185,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Vancouver"
+  },
+  "truth": null
+ },
+ {
+  "id": 186,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Mount Rainier"
+  },
+  "truth": null
+ },
+ {
+  "id": 187,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Blaxquenyux Mountain"
+  },
+  "truth": null
+ },
+ {
+  "id": 188,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Lake Tahoe"
+  },
+  "truth": null
+ },
+ {
+  "id": 189,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "zpwlv"
+  },
+  "truth": null
+ },
+ {
+  "id": 190,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "zlqwnr"
+  },
+  "truth": null
+ },
+ {
+  "id": 191,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Blaxtrum Pond"
+  },
+  "truth": null
+ },
+ {
+  "id": 192,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Vizorblax Mountain"
+  },
+  "truth": null
+ },
+ {
+  "id": 193,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Vancouver"
+  },
+  "truth": null
+ },
+ {
+  "id": 194,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "94875 W LA DE DA LN"
+  },
+  "truth": null
+ },
+ {
+  "id": 195,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "92145 W VEDA DR"
+  },
+  "truth": null
+ },
+ {
+  "id": 196,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "92733 S PARK GROVE CIR"
+  },
+  "truth": null
+ },
+ {
+  "id": 197,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Vipelyux Mountain"
+  },
+  "truth": null
+ },
+ {
+  "id": 198,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Golden Gate Bridge"
+  },
+  "truth": null
+ }
+]

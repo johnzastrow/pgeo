@@ -15,6 +15,7 @@ from dataclasses import dataclass, field
 
 ZIP_RE = re.compile(r"\b(\d{5})(?:-\d{4})?\b")
 HN_RE = re.compile(r"^\s*(\d{1,6}[a-zA-Z]?)(?:\s*-\s*\d{1,6})?\s+(.+)$")
+HN_LEAD_RE = re.compile(r"^\s*\d{1,6}[a-zA-Z]?(?:\s*-\s*\d{1,6})?\s")
 UNIT_RE = re.compile(r"\b(?:apt|apartment|unit|ste|suite|#)\s*[\w-]+", re.I)
 
 
@@ -83,7 +84,12 @@ class RuleParser:
     def parse(self, text: str) -> Parsed:
         p = Parsed(text=text)
         s = UNIT_RE.sub(" ", text)
-        m = ZIP_RE.search(s)
+        # Look for a postcode past any leading house number. Phoenix and Las Vegas number houses
+        # in five digits - 13023 E Lima St - and reading that as a ZIP made the address parse
+        # fail and the search answer with the street. A bare "04101" is still a postcode.
+        lead = HN_LEAD_RE.match(s)
+        off = lead.end() if lead else 0
+        m = ZIP_RE.search(s, off)
         if m:
             p.postcode = m.group(1)
             s = s[: m.start()] + s[m.end() :]
