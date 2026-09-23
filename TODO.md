@@ -198,7 +198,7 @@ API keys at the edge are done (0.19.0, report Section 3.13.2). A key names a cli
 dispatch application, the demo - not a person. Single sign-on for the people behind the clients
 is the remaining half; it costs a component and is not needed for three users in one department.
 
-## 10. Only OpenStreetMap is clipped to the region polygon
+## 10. ~~Only OpenStreetMap is clipped to the region polygon~~ Done 2026-09-23; a border strip remains
 
 The Maine build held 4,270 OpenStreetMap features outside Maine, labelled `, ME, USA`, and the
 fix of 2026-09-22 clips OpenStreetMap to the region polygon. The other sources are still filtered
@@ -416,3 +416,39 @@ Its name is three words, longer than any state name the parser has had to strip,
 abbreviation "DC" is also how people write the city. `region_ref` holds a `fips` of 11 for it.
 Whether "Washington, DC" and "Washington, District of Columbia" both parse is the question, and
 the answer should be compared against what the Washington-state build does with "Washington".
+
+## 15. The clip's buffer admits a strip of the neighbouring country
+
+Section 10 is done: every point source is now clipped to the region, and across the four builds
+nothing but OpenStreetMap streets survives beyond the buffer - 270 in New York, 276 in Arizona
+plus Nevada, all of them streets, which is the intended case (a street crossing the line is kept
+whole and its representative point is the centroid of the whole thing). GNIS strays went from
+66.5 km to 0.3 km, and OpenAddresses from 9.8 km to 0.3 km.
+
+What remains is the buffer itself. The clip is the region polygon buffered by about 300 m, which
+exists because the boundary generalises the coast and an unbuffered clip drops piers, wharves and
+island shoreline. At a coast that is right. At an international land border it admits a strip of
+the other country, and in a single-state build the missing-county fallback then labels it:
+
+| Feature | Outside the polygon | Labelled |
+|---|---|---|
+| `Akwesasne Canada Post` | 77 m | `Akwesasne Canada Post, NY, USA` |
+| `Akwesasne Mohawk Police Service` | 102 m | `..., NY, USA` |
+| `Rue Akwesasne` | 195 m | `Rue Akwesasne, NY, USA` |
+
+These are on the Quebec and Ontario sides of a Mohawk territory the border runs through, so they
+are exactly the places a geocoder for northern New York is most likely to be asked about and
+least entitled to claim. It is the Maine defect again, reduced from 118 km to 300 m rather than
+removed.
+
+**The fix** is to subtract the neighbouring countries from the buffered clip -
+`ST_Difference(buffered_region, ST_Union(canada, mexico))` - which leaves the coastal buffer
+intact, because there is nothing to subtract out at sea. The obstacle is data: the Who's on First
+distribution fetched today is `whosonfirst-data-admin-us-latest`, so no Canadian or Mexican
+polygon is on disk, and this needs another download wired into `fetch_data.sh`. Worth doing
+before the Michigan/Wisconsin/Minnesota and Washington/Idaho batches of section 14, both of which
+run along the Canadian border for hundreds of kilometres.
+
+A cheaper partial measure, if the download is unwelcome: drop the buffer where the region borders
+another country and keep it elsewhere. That needs the same data to know where the border is, so
+it is not actually cheaper.
