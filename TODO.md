@@ -417,7 +417,7 @@ abbreviation "DC" is also how people write the city. `region_ref` holds a `fips`
 Whether "Washington, DC" and "Washington, District of Columbia" both parse is the question, and
 the answer should be compared against what the Washington-state build does with "Washington".
 
-## 15. The clip's buffer admits a strip of the neighbouring country
+## 15. ~~The clip's buffer admits a strip of the neighbouring country~~ Done 2026-09-23
 
 Section 10 is done: every point source is now clipped to the region, and across the four builds
 nothing but OpenStreetMap streets survives beyond the buffer - 270 in New York, 276 in Arizona
@@ -441,14 +441,19 @@ are exactly the places a geocoder for northern New York is most likely to be ask
 least entitled to claim. It is the Maine defect again, reduced from 118 km to 300 m rather than
 removed.
 
-**The fix** is to subtract the neighbouring countries from the buffered clip -
-`ST_Difference(buffered_region, ST_Union(canada, mexico))` - which leaves the coastal buffer
-intact, because there is nothing to subtract out at sea. The obstacle is data: the Who's on First
-distribution fetched today is `whosonfirst-data-admin-us-latest`, so no Canadian or Mexican
-polygon is on disk, and this needs another download wired into `fetch_data.sh`. Worth doing
-before the Michigan/Wisconsin/Minnesota and Washington/Idaho batches of section 14, both of which
-run along the Canadian border for hundreds of kilometres.
+**Done** in 0.15.0. Canada and Mexico are subtracted from the buffered clip, which leaves the
+seaward buffer untouched because there is nothing out there to subtract. The data obstacle turned
+out to be smaller than it looked: the two country polygons are available as single Who's on First
+records totalling 5.6 MB, so `scripts/fetch_data.sh neighbours` does not need the `admin-ca` and
+`admin-mx` distributions at 176 MB and 230 MB compressed.
 
-A cheaper partial measure, if the download is unwelcome: drop the buffer where the region borders
-another country and keep it elsewhere. That needs the same data to know where the border is, so
-it is not actually cheaper.
+Measured on Maine, features outside the state fell from 2,492 to 235 - all within 3.4 km, almost
+all OpenStreetMap streets whose representative point is the centroid of a way that crosses the
+line, which is the case worth keeping. Accuracy unchanged, no case altered either way, and the
+islands the buffer exists for all survive. Nothing inside the state can be removed this way: the
+Who's on First polygons for Maine and Canada meet at the border with zero overlapping area, which
+was measured rather than assumed.
+
+One thing to know for later: the fetch verifies each file's `iso:country` after downloading,
+because the URL is built from an id and a wrong id returns a perfectly valid polygon for
+somewhere else. 85633057 looks like Mexico's id and is Chile's; the right one is 85633293.
