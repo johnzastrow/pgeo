@@ -197,3 +197,30 @@ VM's MAC, the internal DNS name) went in the same pass.
 API keys at the edge are done (0.19.0, report Section 3.13.2). A key names a client - the
 dispatch application, the demo - not a person. Single sign-on for the people behind the clients
 is the remaining half; it costs a component and is not needed for three users in one department.
+
+## 10. Only OpenStreetMap is clipped to the region polygon
+
+The Maine build held 4,270 OpenStreetMap features outside Maine, labelled `, ME, USA`, and the
+fix of 2026-09-22 clips OpenStreetMap to the region polygon. The other sources are still filtered
+by the build's bounding box alone, so a margin survives. Measured on Arizona plus Nevada:
+
+| Source | Outside the region | Beyond 1 km | Furthest |
+|---|---|---|---|
+| GNIS | 297 | 227 | 66.5 km |
+| OpenAddresses | 240 | 139 | 9.8 km |
+| Overture | 115 | 0 | 0.3 km |
+| OpenStreetMap (streets) | 1,037 | 148 | 17.2 km |
+
+The GNIS and OpenAddresses rows are a genuine leak: features in Utah, New Mexico and Sonora that
+the box admitted and nothing removed. They are less harmful than the Maine defect was, because
+they have no county and so no state, and label honestly rather than claiming to be in the build's
+region - but they are findable and should not be there.
+
+The OpenStreetMap rows are a different thing and probably fine: they are all streets, and a street
+that crosses the border is kept whole while its representative point is the centroid of the merged
+geometry, which can land outside. Removing those would remove real, wanted streets.
+
+**The fix** is to apply the clip already written in `sql/025_osm.sql` to the GNIS, OpenAddresses
+and Overture staging paths, on the point rather than the line, leaving the street centroid case
+alone. It needs its own accuracy run: the border margin includes places a query near the state
+line might legitimately want.

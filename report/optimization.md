@@ -25,6 +25,10 @@ survives contact. It did not, and neither did the code. A build is now a named s
 rather than a hardwired Maine, and getting there surfaced eleven defects, four of which would
 have shipped wrong answers rather than failing loudly.
 
+Four regions have now been built: Maine, New York, Vermont plus New Hampshire, and Arizona plus
+Nevada. Each new one has found at least one general defect that the previous ones could not,
+which is the argument for building a fourth rather than asserting the third was enough.
+
 The headline results:
 
 | | Before | After |
@@ -33,6 +37,7 @@ The headline results:
 | Maine build time | 1,152 s | **309 s** |
 | New York build time | 6,699 s | ~1,800 s (projected from Maine's ratio) |
 | New York accuracy | 88.4% | **93.9%** |
+| Arizona + Nevada accuracy | 84.8% | **92.4%** |
 | Maine accuracy | 95.8% | **95.9%** |
 | Two builds of the same data | differed on 10,769 rows | **identical** |
 | Maine features outside Maine | 4,270, labelled ", ME, USA" | 0 beyond 15 km, none foreign |
@@ -229,10 +234,59 @@ Every change in this document is general, so Maine is the control. Across the wh
 | Point-in-polygon rewritten | 95.7% | 2, one each way |
 | OpenStreetMap clipped to the region | **96.0%** | 3 |
 | Duplicate addresses clustered | 95.9% | 1 |
+| Five-digit house numbers fixed | 95.9% | **0 of 1,560, in either direction** |
 
 The one case lost to the duplicate-address change is `665 Saco St, Westbrook`, whose ground truth
 is one arbitrary row among roughly 250 that OpenAddresses tags with that house number across a
 kilometre of street. The build now answers with the point 20 of them agree on.
+
+### 5.3 Arizona and Nevada: a bug two regions could not see
+
+Arizona plus Nevada was the fourth region, chosen because it is unlike the first three: desert
+rather than forest, Spanish and Diné place names rather than French and Abenaki, and a grid of
+young cities rather than New England's towns. It scored **84.8%** on first measurement against
+198 cases, and addresses were the outlier at 77.1%.
+
+Every one of the sixteen failing address cases began with a five-digit house number, and every
+case that began with a five-digit house number failed. A correlation that clean names the cause
+before any fix confirms it. The parser was reading the house number as a postcode:
+
+```
+SELECT (geocode.parse_rule('13023 E LIMA ST, PRESCOTT VALLEY')).*;
+  name       | housenumber | street     | locality        | postcode
+  E LIMA ST  |             |            | PRESCOTT VALLEY | 13023
+```
+
+With no house number the address lookup found nothing, so the search fell back to the street and
+answered `East Lima Street` **at confidence 1.0** while `13023 E LIMA ST` sat in the build. That
+is the worst shape a geocoding error can take: not a miss, which a caller can handle, but a
+confident wrong answer a kilometre up the road.
+
+The reason Maine and New York never showed it is regional convention. New England house numbers
+rarely reach five digits; Phoenix and Las Vegas number outward from a city-centre baseline and
+reach five digits routinely. The parser now looks for a postcode only past a leading
+house-number token, in both implementations - the assumption had been written twice.
+
+| Group | First run | After the fix | Maine |
+|---|---|---|---|
+| **Overall** | **84.8%** | **92.4%** | 95.9% |
+| addresses | 77.1% | **98.6%** | 97.8% |
+| towns | 89.3% | 89.3% | 95.6% |
+| venues | 85.7% | 85.7% | 94.2% |
+| reverse | 92.3% | 92.3% | 100.0% |
+| lakes and summits | 78.9% | 78.9% | 86.7% |
+| ZIP codes | 87.5% | 87.5% | 98.3% |
+| misses | 100.0% | 100.0% | 94.7% |
+
+Addresses now score higher than Maine's, and no other category moved by a single case. Maine
+re-scored 95.9% with zero changed outcomes across all 1,560 of its cases. A fix that moves one
+region by 7.6 points and three others not at all is a fix to a rule, not a tuning for a region.
+
+The residual gap is in the categories the fix does not touch: lakes and summits at 78.9%, where
+the Southwest's washes and buttes are more densely and less distinctly named than Maine's ponds,
+and towns at 89.3%, where the two remaining known-answer failures are both a venue outranking
+the locality it is named after - "Tuscon, AZ" answering `One Hope - Tuscon`. That is a ranking
+question rather than a parsing one, and is recorded in `TODO.md` rather than fixed here.
 
 ## 6. Multi-state builds
 
@@ -247,6 +301,27 @@ It found one defect the single-state builds could not: GNIS publishes a feature 
 in both states' files with the same id, and Vermont and New Hampshire share 36 of them, all
 brooks along the Connecticut River. The export validator refused the duplicate ids, which is how
 it was found rather than shipped.
+
+Arizona plus Nevada was the second multi-state build and a much larger one, run start to finish
+through the single documented command:
+
+| | Vermont + New Hampshire | Arizona + Nevada |
+|---|---|---|
+| Features | 726,653 | **5,008,365** |
+| split | 459,570 VT / 264,222 NH | 3,710,624 AZ / 1,296,052 NV |
+| features with no state | 2,861 | 1,689 |
+| Database | 792 MB | 4.7 GB |
+| Build time | 993 s | **1,787 s** |
+| Known answers | 16 of 16 | 8 of 10 |
+
+The split is the check that matters. A multi-state build that quietly attributed everything to
+the first state would still answer most queries plausibly; 3.7 M against 1.3 M, in a build whose
+region boundaries were never told which state is which, is the evidence that it does not. The
+features carrying no state at all - 1,689 of five million - are the border margin described in
+section 10, not a misattribution between the two states.
+
+The two failing known answers are the venue-outranks-locality case described in section 5.3, not
+multi-state defects.
 
 ## 7. Corner cases across the fifty states
 
@@ -309,6 +384,25 @@ Three things the study said should now be read differently:
 
 ## 10. What is not done
 
+- **The border margin.** Section 4.1 clipped OpenStreetMap to the region polygon, but the other
+  sources are still filtered by the build's bounding box alone, so a margin of out-of-region
+  features survives: 1,689 in Arizona plus Nevada, 514 of them more than a kilometre out. GNIS is
+  the worst at 297 features up to 66 km outside, in Utah, New Mexico and Sonora; OpenAddresses
+  adds 240. They carry no state, so they label honestly rather than falsely - the Maine defect of
+  section 4.1 was worse precisely because those features claimed to be in Maine - but they are
+  still findable and should not be there. The same polygon clip already written for OpenStreetMap
+  applies unchanged. A separate 1,037 OpenStreetMap streets are an artifact rather than a leak:
+  a street that crosses the border is kept whole and its representative point is its centroid,
+  which can fall outside.
+- **The Who's on First ancestry gap.** Some places carry no region ancestor in Who's on First and
+  are dropped: 1 in Maine, 5 in New York, 62 in Nevada, 72 in Arizona. The loss is not evenly
+  distributed - it falls on unincorporated and tribal communities (Chutum Vaya, Allenville,
+  Cibecue Creek, Jarbidge), which is the population least well served by every other geocoder
+  too. A point-in-polygon fallback against the region geometry would recover them.
+- **Venues outrank the localities they are named after.** "Tuscon, AZ" answers `One Hope -
+  Tuscon` and "Albany, New York" answers `Sims Metal - Albany`. This is the only known-answer
+  failure left in any build, and it is a ranking question: a near-exact name match on a venue
+  currently beats an exact match on a locality.
 - **Query-time tie-breaking** is still by physical row order, worth about one case of accuracy
   noise between builds.
 - **Alaska** is refused rather than handled.
