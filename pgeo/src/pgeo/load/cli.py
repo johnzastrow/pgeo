@@ -133,6 +133,14 @@ async def build(settings: Settings, selected: list[str], reg: Region) -> None:
         f = STAGE_DIR / "wof_admin.csv"
         counts["whosonfirst"] = sources.wof_admin(f, reg)
         await copy_csv(con, "stage_admin", sources.STAGE_ADMIN_COLS, f)
+        # Canada and Mexico, so the region clip's buffer can be taken back out of them. Optional:
+        # with no files on disk the clip keeps the plain buffer, which is what it did before.
+        f = STAGE_DIR / "neighbours.csv"
+        counts["neighbours"] = sources.neighbour_countries(f)
+        await copy_csv(con, "stage_neighbour", sources.STAGE_NEIGHBOUR_COLS, f)
+        if not counts["neighbours"]:
+            log("no neighbour countries on disk; the clip keeps its full buffer "
+                "(scripts/fetch_data.sh neighbours)")
         for name in ("openaddresses", "gnis", "zcta", "overture"):
             if name in selected:
                 f = STAGE_DIR / f"{name}.csv"

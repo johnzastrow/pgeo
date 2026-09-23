@@ -21,11 +21,34 @@ SELECT a.source, a.placetype, a.source_id, a.name,
        least(0.2, ln(coalesce(a.population, 0) + 1) / 60)::real
 FROM admin a;
 
--- The region, buffered by ~300 m, for clipping every point source to the build. Built here
--- rather than in 025_osm.sql because it is needed whether or not OpenStreetMap is loaded; that
--- file used to create it and now reuses it.
+-- The region, buffered by ~300 m and with the neighbouring countries taken back out, for
+-- clipping every point source to the build. Built here rather than in 025_osm.sql because it is
+-- needed whether or not OpenStreetMap is loaded; that file used to create it and now reuses it.
+--
+-- The buffer exists because the boundary generalises the coast, and without it piers, wharves
+-- and island shoreline are dropped. Seaward that is exactly right. Across a land border it
+-- reached into the other country, and a single-state build then labelled what it found with its
+-- own state: New York held "Akwesasne Canada Post" 77 m outside the state as ", NY, USA", on a
+-- Mohawk territory the border runs through. Subtracting Canada and Mexico removes that strip and
+-- leaves the seaward buffer alone, there being nothing out there to subtract.
 CREATE TEMP TABLE region_clip AS
-SELECT ST_Buffer(ST_Union(geom), 0.003) AS clip FROM admin WHERE placetype = 'region';
+WITH buffered AS (
+  SELECT ST_Buffer(ST_Union(geom), 0.003) AS g FROM admin WHERE placetype = 'region'
+),
+-- Canada and Mexico, cut down to the region's envelope first so the difference below is a local
+-- operation rather than one against the whole of Canada.
+neighbour AS (
+  SELECT ST_Union(ST_MakeValid(ST_Intersection(
+           ST_MakeValid(ST_GeomFromWKB(decode(n.geom_hex, 'hex'), 4326)),
+           ST_Envelope(b.g)))) AS g
+  FROM stage_neighbour n, buffered b
+  WHERE ST_Intersects(ST_MakeValid(ST_GeomFromWKB(decode(n.geom_hex, 'hex'), 4326)), b.g)
+)
+SELECT CASE
+         WHEN nb.g IS NULL OR ST_IsEmpty(nb.g) THEN b.g
+         ELSE ST_Difference(b.g, nb.g)
+       END AS clip
+FROM buffered b LEFT JOIN neighbour nb ON true;
 CREATE INDEX region_clip_gix ON region_clip USING gist (clip);
 ANALYZE region_clip;
 

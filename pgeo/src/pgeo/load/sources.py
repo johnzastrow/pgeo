@@ -18,6 +18,9 @@ from pgeo.settings import DATA_DIR
 
 # The Who's on First distributions are national: every build reads the same two files.
 WOF_DIR = DATA_DIR / "pelias" / "whosonfirst" / "sqlite"
+# Canada and Mexico, one country polygon each, fetched by scripts/fetch_data.sh neighbours.
+NEIGHBOUR_DIR = DATA_DIR / "raw" / "shared" / "neighbours"
+STAGE_NEIGHBOUR_COLS = "name, geom_hex"
 STAGE_POINT_COLS = (
     "source, layer, source_id, name, housenumber, street, unit, postcode, locality_hint, "
     "category, addendum, lon, lat, popularity"
@@ -212,3 +215,36 @@ def osm_to_postgis(
                     f"ogr2ogr reported errors loading layer {layer!r} from {pbf.name} "
                     f"(exit status {proc.returncode}):\n  {detail}"
                 )
+
+
+def neighbour_countries(out: Path) -> int:
+    """Canada and Mexico as WKB, for subtracting from the region clip.
+
+    The clip buffers the region by ~300 m so that piers and island shoreline survive a boundary
+    that generalises the coast. Seaward that is what we want; across a land border it takes in a
+    strip of the other country, which a single-state build then labels with its own state.
+    Subtracting these two removes that strip and leaves the seaward buffer alone, there being
+    nothing out there to subtract.
+
+    Absent files are not an error: a build simply keeps the plain buffer, as it did before.
+    """
+    con = _duck()
+    con.execute("INSTALL spatial; LOAD spatial;")
+    files = sorted(NEIGHBOUR_DIR.glob("*.geojson")) if NEIGHBOUR_DIR.is_dir() else []
+    if not files:
+        out.write_text("name,geom_hex\n")
+        return 0
+    rows = []
+    for f in files:
+        # read_json_objects keeps the record whole; read_json would flatten it into columns.
+        name, geom = con.execute(
+            "SELECT json_extract_string(json, '$.properties.\"wof:name\"'), "
+            "       ST_AsHEXWKB(ST_GeomFromGeoJSON(json_extract(json, '$.geometry'))) "
+            "FROM read_json_objects(?, maximum_object_size => 200000000)",
+            [str(f)],
+        ).fetchone()
+        rows.append((name, geom))
+    con.execute("CREATE TABLE n (name VARCHAR, geom_hex VARCHAR)")
+    con.executemany("INSERT INTO n VALUES (?, ?)", rows)
+    con.execute("COPY (SELECT name, geom_hex FROM n) TO ? (FORMAT csv, HEADER true)", [str(out)])
+    return len(rows)

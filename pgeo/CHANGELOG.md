@@ -10,6 +10,39 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-09-23
+
+**Requires a rebuild**, and `scripts/fetch_data.sh neighbours` before it (5.6 MB).
+
+### Fixed
+- The region clip no longer reaches across an international land border. The clip buffers the
+  region by about 300 m, because an unbuffered boundary generalises the coast and drops piers,
+  wharves and island shoreline. Seaward that is right. Across a land border it took in a strip of
+  the other country, and a single-state build then labelled what it found with its own state:
+  New York held `Akwesasne Canada Post` 77 m outside the state as `, NY, USA`, on a Mohawk
+  territory the border runs through, and Maine held 2,255 features in Canada.
+
+  Canada and Mexico are now subtracted from the buffer, which leaves the seaward part untouched
+  because there is nothing out there to subtract. Measured on Maine: features outside the state
+  fell from 2,492 to 235, all of them within 3.4 km and almost all OpenStreetMap streets, whose
+  representative point is the centroid of a way that crosses the line.
+
+  Nothing inside the state can be lost this way, and that was checked rather than assumed: the
+  Who's on First polygons for Maine and Canada meet at the border with **zero** overlapping area.
+  Maine's accuracy is unchanged at 96.0% with no case altered in either direction, and the
+  islands the buffer exists for - Peaks, Cliff, the Cranberry Isles, Isle au Haut, Monhegan - all
+  survive.
+
+### Added
+- `scripts/fetch_data.sh neighbours` fetches the two country polygons as single Who's on First
+  records, 5.6 MB, rather than the `admin-ca` and `admin-mx` distributions, which are 176 MB and
+  230 MB compressed for two polygons. It verifies each file's `iso:country` after downloading,
+  because the path is built from an id and a wrong id returns a perfectly good polygon for
+  somewhere else - 85633057 looks like Mexico's id and is Chile's.
+
+  The step is optional. With no files on disk the clip keeps its full buffer and the build says
+  so, so an existing checkout still builds without fetching anything new.
+
 ## [0.14.0] - 2026-09-23
 
 **Requires a rebuild.** `admin` gains a column, so an existing database keeps the old behaviour

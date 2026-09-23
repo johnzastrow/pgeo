@@ -112,6 +112,10 @@ CREATE UNLOGGED TABLE stage_admin (
     lon double precision, lat double precision,
     minlon double precision, minlat double precision, maxlon double precision, maxlat double precision
 );
+-- Canada and Mexico, subtracted from the region clip so the 300 m buffer cannot reach across a
+-- land border. Empty when scripts/fetch_data.sh neighbours has not been run; the clip then keeps
+-- the plain buffer, as it did before.
+CREATE UNLOGGED TABLE stage_neighbour (name text, geom_hex text);
 CREATE UNLOGGED TABLE stage_point (
     source text, layer text, source_id text, name text, housenumber text, street text,
     unit text, postcode text, locality_hint text, category text, addendum text,

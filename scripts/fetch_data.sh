@@ -10,7 +10,7 @@
 #
 # Targets:
 #   per-build  osm gnis oa overture overture_themes basemap
-#   national   zcta boundary wof
+#   national   zcta boundary wof neighbours
 #   all        everything except overture_themes (evaluation only, several GB)
 #
 # Pinned versions live below; bump them deliberately and re-run. Nothing here needs the Pelias
@@ -141,6 +141,35 @@ wof() {
   done
 }
 
+neighbours() {
+  # Canada and Mexico, as single country polygons, for subtracting from the region clip.
+  #
+  # The clip buffers the region by ~300 m so an unbuffered boundary does not drop piers and
+  # island shoreline. At a coast that is right; at an international land border it admits a strip
+  # of the other country, and New York held "Akwesasne Canada Post" 77 m outside the state,
+  # labelled ", NY, USA". Subtracting these two leaves the seaward buffer untouched, because
+  # there is nothing out there to subtract.
+  #
+  # One record each rather than the admin distributions, which are 176 MB and 230 MB compressed
+  # for two polygons. The ids are Who's on First country records, verified by name and ISO code
+  # on fetch - 85633057 looks like Mexico's and is Chile's.
+  local dir="${SHARED}/neighbours" id name p
+  mkdir -p "$dir"
+  for id in 85633041:CA:Canada 85633293:MX:Mexico; do
+    name="${id##*:}"; iso="${id#*:}"; iso="${iso%%:*}"; id="${id%%:*}"
+    local out="${dir}/${id}.geojson"
+    if [[ -f "$out" ]]; then echo "have ${name} (${id})"; continue; fi
+    p="$(echo "$id" | sed 's/.\{3\}/&\//g; s|/$||')"
+    fetch "https://data.whosonfirst.org/${p}/${id}.geojson" "$out"
+    # Refuse a file that is not the country it claims to be: the path is built from an id, and a
+    # wrong id returns a perfectly valid polygon for somewhere else.
+    if ! grep -q "\"iso:country\":\"${iso}\"" "$out"; then
+      echo "  ${out} is not ${name} (${iso}); removing" >&2; rm -f "$out"; exit 1
+    fi
+    echo "fetched ${name} ($(du -h "$out" | cut -f1))"
+  done
+}
+
 zcta() {
   fetch "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/${ZCTA_YEAR}_Gazetteer/${ZCTA_YEAR}_Gaz_zcta_national.zip" \
     "${SHARED}/zcta/${ZCTA_YEAR}_Gaz_zcta_national.zip"
@@ -213,9 +242,9 @@ targets=("${@:-all}")
 echo "build ${build}: states ${states// /, }"
 for t in "${targets[@]}"; do
   case "$t" in
-    all) wof; boundary; zcta; osm; gnis; oa; overture; basemap ;;
-    osm|gnis|oa|wof|zcta|boundary|overture|overture_themes|basemap) "$t" ;;
-    *) echo "usage: $0 [--build NAME] [all|osm|gnis|oa|wof|zcta|boundary|overture|overture_themes|basemap]" >&2
+    all) wof; neighbours; boundary; zcta; osm; gnis; oa; overture; basemap ;;
+    osm|gnis|oa|wof|neighbours|zcta|boundary|overture|overture_themes|basemap) "$t" ;;
+    *) echo "usage: $0 [--build NAME] [all|osm|gnis|oa|wof|neighbours|zcta|boundary|overture|overture_themes|basemap]" >&2
        exit 2 ;;
   esac
 done
