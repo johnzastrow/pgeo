@@ -107,40 +107,101 @@ STAGES=(fetch prep setup build dump)
 index_of() { local i; for i in "${!STAGES[@]}"; do [[ "${STAGES[i]}" == "$1" ]] && { echo "$i"; return; }; done; }
 first=$(index_of "$from")
 stage_at() { (( $(index_of "$1") >= first )); }
+stage_name=""
+
+mins_since() { echo $(( ($(date +%s) - $1) / 60 )); }
+
+# Most people run this by hand and watch it. Each stage says what it is about to do, and the long
+# ones say they are still going, because the indexing step is quiet for minutes at a time and a
+# quiet terminal looks like a hung one.
+run_stage() {
+  local label="$1" note="$2"; shift 2
+  stage_name="$label"
+  printf '\n\033[1m== %s\033[0m\n' "$label"
+  [[ -z "$note" ]] || echo "   $note"
+  local t0 pid hb rc
+  t0=$(date +%s)
+  "$@" &
+  pid=$!
+  ( while kill -0 "$pid" 2>/dev/null; do
+      sleep 60
+      kill -0 "$pid" 2>/dev/null && printf '   ... still going, %s min so far\n' "$(mins_since "$t0")"
+    done ) &
+  hb=$!
+  wait "$pid"; rc=$?
+  kill "$hb" 2>/dev/null || true
+  wait "$hb" 2>/dev/null || true
+  if (( rc != 0 )); then
+    printf '\n\033[1m!! %s failed after %s min\033[0m\n' "$label" "$(mins_since "$t0")" >&2
+    echo "   Fix it, then pick up where it stopped:" >&2
+    echo "     scripts/build_region.sh --build ${build} --from ${current_stage}" >&2
+    exit $rc
+  fi
+  printf '   %s min\n' "$(mins_since "$t0")"
+}
 
 if stage_at fetch; then
-  say "1/5 download"
+  current_stage=fetch
   targets=(wof boundary zcta osm gnis oa overture)
   ((basemap)) && targets+=(basemap)
-  scripts/fetch_data.sh --build "$build" "${targets[@]}"
+  run_stage "1/5 download" \
+    "six sources from their publishers; Who's on First is 5 GB and only downloads once" \
+    scripts/fetch_data.sh --build "$build" "${targets[@]}"
 fi
 
 if stage_at prep; then
-  say "2/5 prepare (GNIS, ZCTA, Overture -> CSV)"
-  (cd prep && uv run pelias-prep all --build "$build")
+  current_stage=prep
+  run_stage "2/5 prepare" \
+    "GNIS, Census ZCTAs and Overture into CSV, clipped to the states you named" \
+    bash -c 'cd prep && uv run pelias-prep all --build "$1"' _ "$build"
 fi
 
 if stage_at setup; then
-  say "3/5 containers"
-  scripts/pgeo_setup.sh --build "$build" --profile "$profile"
+  current_stage=setup
+  run_stage "3/5 containers" \
+    "PostgreSQL, PostgREST and the API for this build; the first run compiles libpostal" \
+    scripts/pgeo_setup.sh --build "$build" --profile "$profile"
 fi
 
 if stage_at build; then
-  say "4/5 load and index"
+  current_stage=build
   # The accuracy gate compares against Maine's case set, so it only applies to Maine.
   gate=(--skip-gate); [[ "$build" == "me" ]] && gate=()
-  scripts/pgeo_rebuild.sh --build "$build" --profile "$profile" "${gate[@]}"
+  run_stage "4/5 load and index" \
+    "the long one: minutes for a small state, half an hour for a large one, and quiet throughout" \
+    scripts/pgeo_rebuild.sh --build "$build" --profile "$profile" "${gate[@]}"
 fi
 
 if stage_at dump; then
-  say "5/5 snapshot"
-  scripts/pgeo_dump.sh --build "$build"
+  current_stage=dump
+  run_stage "5/5 snapshot" "the file a server restores" scripts/pgeo_dump.sh --build "$build"
 fi
 
-mins=$(( ($(date +%s) - started) / 60 ))
-say "done in ${mins} min"
+# What was actually built, so the last thing on screen is the answer rather than a log line.
+db_container=pgeo_db; db_name=pgeo
+if [[ "$build" != "me" ]]; then
+  db_container="pgeo-${build}_db"
+  db_name="$(sed -n 's/^PGEO_DB_NAME=//p' "pgeo/builds/${build}.env" 2>/dev/null)"
+fi
+printf '\n\033[1m== built %s in %s min\033[0m\n' "$build" "$(mins_since "$started")"
+docker exec "$db_container" psql -U pgeo -d "$db_name" -Atc "
+  SELECT '   ' || rpad(layer, 16) || to_char(count(*), 'FM999,999,999')
+  FROM pgeo.feature GROUP BY layer ORDER BY count(*) DESC" 2>/dev/null || true
+docker exec "$db_container" psql -U pgeo -d "$db_name" -Atc "
+  SELECT '   ' || rpad('database', 16) || pg_size_pretty(pg_database_size('$db_name'))" 2>/dev/null || true
+dump_dir="data/pgeo$([[ "$build" == me ]] || echo "-${build}")/dumps"
+latest="$(ls -t "${dump_dir}"/*.dump 2>/dev/null | head -1 || true)"
+[[ -z "$latest" ]] || printf '   %s%s\n' "$(printf '%-16s' dump)" "$latest"
+
+sql_port=$((4700 + offset))
 cat <<EOF
-   Try it:     scripts/dev_web.sh --build ${build}
-   Deploy it:  GETTING_STARTED.md, "Prepare the VPS"
-   Measure it: uv run --project prep python tests/accuracy/build_cases.py --build ${build} --n 200
+
+Next, in the order most people want them:
+
+  See it        scripts/dev_web.sh --build ${build}
+  Ask it        curl -s 'http://127.0.0.1:${sql_port}/v1/search?text=<a+place+you+know>&size=1' | jq -r '.features[0].properties.label'
+  Measure it    uv run --project prep python tests/accuracy/build_cases.py --build ${build} --n 200
+                uv run --project pgeo python tests/accuracy/run_accuracy.py --engine pgeo \\
+                  --base http://127.0.0.1:${sql_port} --cases tests/accuracy/cases_${build}.json --label ${build}
+  Serve it      scripts/new_host.sh --build ${build}     then GETTING_STARTED.md section 5
 EOF
