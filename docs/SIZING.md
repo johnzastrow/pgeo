@@ -9,11 +9,11 @@ Measured, not estimated. Two regions were built and served on the same workstati
 |---|---|---|
 | Population served | 1.4 M | 19.6 M |
 | Area | 91,600 km2 | 141,300 km2 |
-| **Features in the database** | **906,102** | **7,213,395** |
-| addresses | 702,701 | 5,989,367 |
-| venues | 132,373 | 992,554 |
-| streets | 67,312 | 218,168 |
-| admin, postcodes, neighbourhoods | 3,716 | 13,306 |
+| **Features in the database** | **906,102** | **7,246,923** |
+| addresses | 702,701 | 6,024,618 |
+| venues | 132,373 | 992,120 |
+| streets | 67,312 | 217,945 |
+| admin, postcodes, neighbourhoods | 3,716 | 12,240 |
 
 New York holds eight times Maine's data. Everything below scales with the feature count, not
 with the area or the population.
@@ -28,7 +28,7 @@ The workstation that builds needs far more than the server that serves.
 | Who's on First (shared by every build, once) | 5.2 GB | 5.2 GB |
 | Basemap for the demo page (optional) | 0.3 GB | 1.5 GB |
 | Database while building | 2.6 GB | 11 GB |
-| **Build time** | **5 min** | **~30 min** |
+| **Build time** | **5 min** | **44 min** (measured, 2,643 s) |
 
 Build time is dominated by one step, the admin point-in-polygon pass, which runs on a single
 core; the rest is I/O. Before the `ST_Subdivide` change of 2026-09-22 the same builds took
@@ -42,11 +42,11 @@ workstation profile) plus PostgreSQL's shared buffers. It is disk and one fast c
 
 |  | Maine | New York |
 |---|---|---|
-| Database | 1.0 GB | 7.1 GB |
+| Database | 1.0 GB | 7.0 GB |
 | of which the feature table | 804 MB | 6.5 GB |
 | of which its indexes | 231 MB | 1.8 GB |
 | On disk including WAL | 2.6 GB | 11 GB |
-| **Deployable dump** | **117 MB** | **890 MB** |
+| **Deployable dump** | **117 MB** | **892 MB** |
 
 The server restores the dump rather than building, so it needs the database size plus room for
 the restore, not the build's working space. **A New York deployment wants 20 GB of disk**;
