@@ -333,3 +333,86 @@ Worth doing at the same time: the build should fail when `ogr2ogr` writes `ERROR
 the exit status is zero, and the per-source counts at the end should be compared against the
 staged counts, so an extract that silently contributed nothing is caught by the build rather than
 by someone noticing a missing street months later.
+
+## 14. The next four regions, in order
+
+Every region built so far has found at least one general defect the previous ones could not, and
+the rate is falling but not zero: Maine defined the rules, New York found eleven, Vermont plus
+New Hampshire found one, Arizona plus Nevada found one, and sharpening the known answers for the
+fourth found two more. These four batches are chosen to keep that going - each one probes
+something the first four could not.
+
+All nine states are already in `regions/regions.json` with a bounding box, FIPS code, Geofabrik
+slug, Who's on First region id and OpenAddresses sources, so each is one `scripts/build_region.sh
+--build <states>` away. Each needs known answers written first (`pgeo/tuning/verify/<build>.json`,
+with layers pinned per section 11) and an accuracy set generated after.
+
+| Batch | OpenAddresses sources | Against what is built |
+|---|---|---|
+| Texas + Louisiana + Arkansas | 107 | Arizona + Nevada was 36 |
+| Michigan + Wisconsin + Minnesota | 186 | the largest by source count |
+| Washington + Idaho | 77 | |
+| District of Columbia | 1 | Maine was 2 |
+
+### 14.1 Texas + Louisiana + Arkansas
+
+**Louisiana has parishes, not counties**, and this is the one defect already identifiable without
+building anything. Who's on First records all 64 of them under placetype `county` with bare names
+("Acadia", not "Acadia Parish"), and `pgeo/src/pgeo/api/app.py:262` appends the word:
+
+```python
+"county": r["county"] if not r["county"] or r["county"].endswith(" County") else f"{r['county']} County",
+```
+
+with the comment "Pelias (WOF) names counties 'Cumberland County'" - a Maine fact. Louisiana will
+answer `Acadia County`, which is not a thing. Alaska would answer `Anchorage County` for a
+borough, and the District of Columbia `District of Columbia County`. The fix is to carry the
+county-equivalent's own suffix from Who's on First rather than to assume one.
+
+Also here: Texas is 254 counties, twice any state built so far, and the point-in-polygon pass
+scales with the number of admin polygons rather than the area. Spanish names throughout Texas and
+French and Cajun ones through Louisiana - Natchitoches, Atchafalaya, Thibodaux, Plaquemines -
+test the same ground as Maine's French and Wabanaki names, in a different orthography. Louisiana
+and Texas both border Mexico or the Gulf, so the border-margin question of section 10 applies.
+
+### 14.2 Michigan + Wisconsin + Minnesota
+
+The largest batch by source count, and the one that tests geometry rather than names.
+
+**Michigan is two peninsulas** separated by water, and **Minnesota's Northwest Angle** is an
+exclave north of the 49th parallel reachable by land only through Manitoba - Minnesota's box
+reaches 49.55°N for that reason. Both are questions for the region clip of section 10 and the
+point-in-polygon pass: a region whose polygon is in disconnected pieces, with a water gap that a
+buffer could bridge. Note that Who's on First stores these as a single `Polygon` rather than a
+`MultiPolygon`, which is worth confirming before relying on either reading.
+
+All three have long water boundaries with Ontario through the Great Lakes, so Canadian features
+sit close to the line without any land border - and Ojibwe, Menominee, Ho-Chunk and Dakota names
+throughout: Chequamegon, Escanaba, Sault Ste. Marie, Mille Lacs, Winnebago, Oconomowoc.
+
+### 14.3 Washington + Idaho
+
+A parser batch. **"Washington" is a state, a city (the District of Columbia's), a county in more
+than thirty states, and a common street name**; the ambiguity rules of section 7's corner-case
+survey - what precedes a trailing state name decides how to read it - get their hardest test
+here, and the county-versus-locality fix of 0.13.0 with it. **"ID" is an ordinary word** and
+already on the list of abbreviations that are, alongside LA in the first batch: a build covering
+both Louisiana and Idaho would have two of them.
+
+Idaho's panhandle also makes the state long and narrow across two time zones, which the bounding
+box handles poorly - a box around Idaho contains large parts of Washington, Oregon, Montana,
+Wyoming, Utah and Nevada, so it is the strongest test yet of whether the sources are being
+filtered by polygon or by box (section 10).
+
+### 14.4 District of Columbia
+
+Last because it is the strangest and the smallest: **not a state at all**. It is a federal
+district that is simultaneously its own region, its own county-equivalent and its own city, with
+one OpenAddresses source. Who's on First gives it exactly one county, named "District of
+Columbia", so region, county and locality all carry the same name - which is precisely the
+collision the county-versus-locality dedup of 0.13.0 was written for, in its purest form.
+
+Its name is three words, longer than any state name the parser has had to strip, and its
+abbreviation "DC" is also how people write the city. `region_ref` holds a `fips` of 11 for it.
+Whether "Washington, DC" and "Washington, District of Columbia" both parse is the question, and
+the answer should be compared against what the Washington-state build does with "Washington".
