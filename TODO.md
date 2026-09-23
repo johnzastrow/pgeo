@@ -224,3 +224,28 @@ geometry, which can land outside. Removing those would remove real, wanted stree
 and Overture staging paths, on the point rather than the line, leaving the street centroid case
 alone. It needs its own accuracy run: the border margin includes places a query near the state
 line might legitimately want.
+
+## 11. Two front ends, two copies of the parser, and no check that they agree
+
+The FastAPI front end parses in Python (`pgeo/api/parse.py`, baked into the container image);
+the pure-SQL front end parses in PL/pgSQL (`geocode.parse_rule`, stored in the database). The
+five-digit house-number fix of 2026-09-23 had to be written into both, and `pgeo-load functions`
+updates only the second. A container left on an older image therefore serves the old parser while
+the database serves the new one, and nothing reports the disagreement.
+
+This happened during that fix and was caught by accident: the Vermont-plus-New Hampshire API was
+still on a 2026-09-22 image, and answered "Burlington, Vermont" with a venue named
+`Burlington Vermont` while the SQL edge answered `Burlington, VT, USA`. Two further traps sat
+behind it:
+
+- **The known-answer check is a substring test** (`want in label`), so the wrong answer passed:
+  "Burlington" is present in `Burlington Vermont, South Burlington, VT, USA`. A build can report
+  16 of 16 while three of its town queries return venues. The check should compare the layer as
+  well as the label.
+- **The accuracy runner did not record which endpoint it measured**, so a score could not be
+  traced to a front end. Fixed 2026-09-23: the result file now carries `base`.
+
+**The fix** is a contract test that puts the same queries through both front ends and fails on
+any disagreement, run as part of the build gate. It would have caught all of this at the point
+the image went stale rather than three regions later. The deeper fix - one parser, called from
+both - is a larger change worth costing separately.

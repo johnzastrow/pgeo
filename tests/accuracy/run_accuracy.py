@@ -166,7 +166,12 @@ def main() -> None:
     out = OUT_DIR / f"{a.engine}-{a.label}.json"
     out.write_text(
         json.dumps(
-            {"engine": a.engine, "label": a.label, "params": extra, "summary": summary, "results": results}, indent=1
+            # Record the base URL. The FastAPI and pure-SQL front ends are separate
+            # implementations of the same contract and can disagree - one carries its parser in
+            # the container image, the other in the database - so a score without the endpoint it
+            # was measured against is not a fact about the build.
+            {"engine": a.engine, "label": a.label, "base": a.base, "params": extra,
+             "summary": summary, "results": results}, indent=1
         )
     )
     s = summary["ALL"]
