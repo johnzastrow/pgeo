@@ -22,8 +22,9 @@ STAGE_POINT_COLS = (
     "source, layer, source_id, name, housenumber, street, unit, postcode, locality_hint, "
     "category, addendum, lon, lat, popularity"
 )
+# Order must match the SELECT in wof_admin() and the columns of stage_admin.
 STAGE_ADMIN_COLS = (
-    "id, source, source_id, placetype, name, abbr, population, parent_id, geom_hex, "
+    "id, source, source_id, placetype, name, longname, abbr, population, parent_id, geom_hex, "
     "lon, lat, minlon, minlat, maxlon, maxlat"
 )
 
