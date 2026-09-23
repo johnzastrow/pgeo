@@ -73,19 +73,37 @@ LEFT JOIN geocode.region_ref rg ON rg.wof_id = pip.co_parent;
 -- (house number, street, town), preferring OpenAddresses (authoritative E911 points). Pelias removes such
 -- duplicates at query time instead; the outcome for users is the same.
 CREATE TEMP TABLE raw_ranked AS
-SELECT r.*, h.neighbourhood, h.locality AS pip_locality, h.localadmin, h.county, h.hier,
-       h.region, h.region_a, h.region_wof,
-       geocode.norm(r.name) AS name_norm,
-       geocode.norm(r.street) AS street_norm,
-       geocode.hn_int(r.housenumber) AS hn_int,
-       row_number() OVER (
-         PARTITION BY CASE WHEN r.layer = 'address' THEN
+WITH joined AS (
+  SELECT r.*, h.neighbourhood, h.locality AS pip_locality, h.localadmin, h.county, h.hier,
+         h.region, h.region_a, h.region_wof,
+         geocode.norm(r.name) AS name_norm,
+         geocode.norm(r.street) AS street_norm,
+         geocode.hn_int(r.housenumber) AS hn_int,
+         CASE WHEN r.layer = 'address' THEN
              lower(r.housenumber) || '|' || geocode.norm(r.street) || '|'
              || coalesce(geocode.norm(coalesce(h.locality, h.localadmin, r.locality_hint)), '')
-           ELSE r.source || r.layer || r.source_id END
-         ORDER BY CASE r.source WHEN 'openaddresses' THEN 0 WHEN 'openstreetmap' THEN 1 ELSE 2 END
+           ELSE r.source || r.layer || r.source_id END AS dup_key
+  FROM feature_raw r JOIN hier h USING (rid)
+),
+-- How many of an address's duplicates agree on this exact point. OpenAddresses publishes one
+-- row per unit, so a block of flats arrives as eight rows at one coordinate and occasionally one
+-- row somewhere else; the majority is the building. Ordering only by source left the winner to
+-- whatever the table happened to hold first, which put 101 Hancock St, Rumford 25 m off its
+-- seven agreeing siblings and made two builds of the same data disagree on 10,769 rows.
+voted AS (
+  SELECT j.*,
+         count(*) OVER (PARTITION BY dup_key, round(ST_Y(geom)::numeric, 6),
+                        round(ST_X(geom)::numeric, 6)) AS point_votes
+  FROM joined j
+)
+SELECT v.*,
+       row_number() OVER (
+         PARTITION BY dup_key
+         ORDER BY CASE source WHEN 'openaddresses' THEN 0 WHEN 'openstreetmap' THEN 1 ELSE 2 END,
+                  point_votes DESC,
+                  source_id          -- last resort, so the same data always builds the same way
        ) AS dup_rank
-FROM feature_raw r JOIN hier h USING (rid);
+FROM voted v;
 
 INSERT INTO feature (
     id, gid, source, layer, source_id, name, housenumber, street, unit, postcode,
