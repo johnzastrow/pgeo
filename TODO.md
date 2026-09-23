@@ -99,33 +99,27 @@ Still to do: the container images take the same parameter (`docs/DOCKER_IMAGES.m
 parameter"). Per-machine server tuning is shared by every stack on a workstation, which does not
 arise on a host that serves one build.
 
-## 4. The build's point-in-polygon step is the whole cost of a bigger region
+## 4. ~~The point-in-polygon step is the whole cost of a bigger region~~ Done 2026-09-22
 
-Every raw feature is matched against the admin polygons with four lateral probes - one each for
-neighbourhood, locality, localadmin and county - and the step runs on one core (it writes a temp
-table, which Postgres will not do in parallel). It is most of the build:
+It was: four probes per raw feature against whole admin polygons, on one core. A county outline
+is tens of thousands of vertices and every candidate cost a full ST_Intersects.
 
-| Build | Raw features | Admin polygons | Point-in-polygon |
-|---|---|---|---|
-| Maine | 1.65 M | 3,351 | minutes |
-| New York | 14.9 M | 11,015 | about an hour |
+ST_Subdivide cuts the polygons into pieces of at most 128 vertices, and one probe replaces the
+four. Measured on New York, 200,372 points against 8,619 polygons:
 
-A one-probe form should be worth roughly three times: ask the index once per point and pick the
-smallest polygon per placetype inside the lateral, rather than probing once per placetype.
+| Form | Time | Answers |
+|---|---|---|
+| Four probes against whole polygons (before) | 62.6 s | - |
+| One probe against whole polygons | 39.9 s | identical |
+| One probe against subdivided pieces | **7.8 s** | identical |
 
-```sql
-LEFT JOIN LATERAL (
-  SELECT max(name) FILTER (WHERE placetype = 'locality') AS lo_name, ...
-  FROM (SELECT DISTINCT ON (a.placetype) a.placetype, a.name
-        FROM admin a
-        WHERE ST_Intersects(a.geom, r.geom)
-          AND a.placetype IN ('neighbourhood','locality','localadmin','county')
-        ORDER BY a.placetype, ST_Area(a.geom)) d
-) x ON true
-```
+Maine's whole build went from 1,152 s to 309 s, and the step itself from about 18 minutes to
+4. Every hierarchy value and every label is identical row for row; the accuracy set moved by
+two cases, one each way, both from the duplicate-address tie-break below rather than from this.
 
-Partial GiST indexes per placetype are the other candidate. Either changes what the build writes,
-so either needs a Maine rebuild proving the output is identical row for row before it is kept.
+The same trick would help reverse geocoding, which does its own point-in-polygon against
+`admin` at query time. Not done: it needs the subdivided table kept rather than dropped, and
+its own measurement.
 
 ## 5. Alaska crosses the antimeridian
 

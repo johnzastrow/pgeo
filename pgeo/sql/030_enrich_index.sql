@@ -6,6 +6,22 @@ CREATE INDEX admin_geom_idx ON admin USING gist (geom);
 CREATE INDEX admin_placetype_idx ON admin (placetype);
 ANALYZE admin;
 
+-- Point-in-polygon against whole admin polygons is the slowest thing the build does: a county
+-- or a state is tens of thousands of vertices, and every candidate costs a full ST_Intersects.
+-- ST_Subdivide cuts them into pieces of at most 128 vertices, so a probe touches a small piece
+-- instead of the whole outline. Measured on New York, 200,372 points against 8,619 polygons:
+-- 62.6 s with four probes against `admin`, 39.9 s with one probe, 7.8 s with one probe against
+-- these pieces - eight times faster, and every one of the 200,372 answers identical.
+-- `full_area` is the original polygon's area, because "smallest containing polygon" has to mean
+-- the smallest whole one, not the smallest piece. Dropped before the swap: build-time only.
+CREATE TABLE admin_parts AS
+SELECT a.id, a.placetype, a.name, a.source_id, a.parent_id,
+       ST_Area(a.geom) AS full_area, ST_Subdivide(a.geom, 128) AS geom
+FROM admin a
+WHERE a.placetype IN ('neighbourhood', 'locality', 'localadmin', 'county');
+CREATE INDEX admin_parts_geom_idx ON admin_parts USING gist (geom);
+ANALYZE admin_parts;
+
 -- Smallest containing polygon per placetype for each raw point: its name, and its WOF id
 -- for the Pelias hierarchy fields (locality_gid, county_gid, ...).
 -- The state a feature is in comes from its county's parent, which is how Who's on First
@@ -18,30 +34,40 @@ WITH sole AS (
   WHERE (SELECT count(*) FROM geocode.region_ref) = 1
 )
 SELECT r.rid,
-  nb.name AS neighbourhood, lo.name AS locality, la.name AS localadmin, co.name AS county,
+  pip.nb_name AS neighbourhood, pip.lo_name AS locality, pip.la_name AS localadmin,
+  pip.co_name AS county,
   coalesce(rg.name, (SELECT name FROM sole)) AS region,
   coalesce(rg.abbr, (SELECT abbr FROM sole)) AS region_a,
   coalesce(rg.wof_id, (SELECT wof_id FROM sole)) AS region_wof,
   jsonb_strip_nulls(jsonb_build_object(
-    'neighbourhood_gid', 'whosonfirst:neighbourhood:' || nb.source_id,
-    'locality_gid', 'whosonfirst:locality:' || lo.source_id,
-    'localadmin_gid', 'whosonfirst:localadmin:' || la.source_id,
-    'county_gid', 'whosonfirst:county:' || co.source_id,
+    'neighbourhood_gid', 'whosonfirst:neighbourhood:' || pip.nb_id,
+    'locality_gid', 'whosonfirst:locality:' || pip.lo_id,
+    'localadmin_gid', 'whosonfirst:localadmin:' || pip.la_id,
+    'county_gid', 'whosonfirst:county:' || pip.co_id,
     -- county_ref holds Maine's counties only, and county names repeat across states (New York
     -- has a Franklin and a Washington too), so the state has to match as well or Maine's
     -- abbreviations would be attached to another state's counties.
     'county_a', (SELECT c.abbr FROM geocode.county_ref c
-                 WHERE c.county = lower(co.name) AND substr(c.fips, 1, 2) = rg.fips))) AS hier
+                 WHERE c.county = lower(pip.co_name) AND substr(c.fips, 1, 2) = rg.fips))) AS hier
 FROM feature_raw r
-LEFT JOIN LATERAL (SELECT a.name, a.source_id FROM admin a WHERE a.placetype = 'neighbourhood'
-                   AND ST_Intersects(a.geom, r.geom) ORDER BY ST_Area(a.geom) LIMIT 1) nb ON true
-LEFT JOIN LATERAL (SELECT a.name, a.source_id FROM admin a WHERE a.placetype = 'locality'
-                   AND ST_Intersects(a.geom, r.geom) ORDER BY ST_Area(a.geom) LIMIT 1) lo ON true
-LEFT JOIN LATERAL (SELECT a.name, a.source_id FROM admin a WHERE a.placetype = 'localadmin'
-                   AND ST_Intersects(a.geom, r.geom) ORDER BY ST_Area(a.geom) LIMIT 1) la ON true
-LEFT JOIN LATERAL (SELECT a.name, a.source_id, a.parent_id FROM admin a WHERE a.placetype = 'county'
-                   AND ST_Intersects(a.geom, r.geom) ORDER BY ST_Area(a.geom) LIMIT 1) co ON true
-LEFT JOIN geocode.region_ref rg ON rg.wof_id = co.parent_id;
+-- One probe for all four placetypes: ask the index once, then keep the smallest whole polygon
+-- of each kind among what came back.
+LEFT JOIN LATERAL (
+  SELECT max(name)      FILTER (WHERE placetype = 'neighbourhood') AS nb_name,
+         max(source_id) FILTER (WHERE placetype = 'neighbourhood') AS nb_id,
+         max(name)      FILTER (WHERE placetype = 'locality')      AS lo_name,
+         max(source_id) FILTER (WHERE placetype = 'locality')      AS lo_id,
+         max(name)      FILTER (WHERE placetype = 'localadmin')    AS la_name,
+         max(source_id) FILTER (WHERE placetype = 'localadmin')    AS la_id,
+         max(name)      FILTER (WHERE placetype = 'county')        AS co_name,
+         max(source_id) FILTER (WHERE placetype = 'county')        AS co_id,
+         max(parent_id) FILTER (WHERE placetype = 'county')        AS co_parent
+  FROM (SELECT DISTINCT ON (p.placetype) p.placetype, p.name, p.source_id, p.parent_id
+        FROM admin_parts p
+        WHERE ST_Intersects(p.geom, r.geom)
+        ORDER BY p.placetype, p.full_area) one_each
+) pip ON true
+LEFT JOIN geocode.region_ref rg ON rg.wof_id = pip.co_parent;
 
 -- Address dedupe: OpenAddresses and OSM carry most Maine addresses twice. Keep one row per
 -- (house number, street, town), preferring OpenAddresses (authoritative E911 points). Pelias removes such

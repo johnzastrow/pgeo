@@ -142,7 +142,9 @@ async def build(settings: Settings, selected: list[str], reg: Region) -> None:
         }
         await con.execute("INSERT INTO build_info (key, value) VALUES ('build', $1::jsonb)", json.dumps(info))
         # Staging and raw tables are not needed at query time (~300 MB).
-        await con.execute("DROP TABLE stage_admin, stage_point, feature_raw")
+        # admin_parts is the subdivided copy the point-in-polygon step probes; nothing reads it
+        # at query time (030_enrich_index.sql).
+        await con.execute("DROP TABLE stage_admin, stage_point, feature_raw, admin_parts")
 
         # Atomic swap + function rebuild (functions depend on the pgeo table types).
         await ensure_api_role(con)
