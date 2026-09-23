@@ -343,7 +343,7 @@ def cmd_show(_: argparse.Namespace) -> int:
 VERIFY_DIR = PGEO_ROOT / "tuning" / "verify"
 
 
-def verify_cases(build: str) -> list[tuple[str, dict, str]]:
+def verify_cases(build: str) -> list[tuple[str, dict, str, str | None]]:
     path = VERIFY_DIR / f"{build}.json"
     if not path.exists():
         raise SystemExit(
@@ -351,7 +351,11 @@ def verify_cases(build: str) -> list[tuple[str, dict, str]]:
             f"(see me.json) with queries whose right answer is a fact about the region"
         )
     doc = json.loads(path.read_text())
-    return [(c["path"], c["params"], c["want"]) for c in doc["cases"]]
+    # "layer" is optional, and wanted on any case whose answer is a place. The label alone cannot
+    # tell the city of Albany from Albany County or from a shop called "Albany, NY - Albany.com":
+    # "Albany" is in all three, so a substring test passes all three. Two real New York failures
+    # hid behind exactly that until 2026-09-23.
+    return [(c["path"], c["params"], c["want"], c.get("layer")) for c in doc["cases"]]
 
 
 
@@ -361,16 +365,22 @@ def cmd_verify(args: argparse.Namespace) -> int:
     failures = 0
     cases = verify_cases(args.build)
     for base in args.url:
-        for path, params, want in cases:
+        for path, params, want, want_layer in cases:
+            layer = ""
             try:
                 r = httpx.get(f"{base.rstrip('/')}/v1/{path}", params=params | {"size": 1}, timeout=10)
                 feats = r.json().get("features", []) if r.status_code == 200 else []
-                label = feats[0]["properties"].get("label", "") if feats else f"<HTTP {r.status_code}, no result>"
+                props = feats[0]["properties"] if feats else {}
+                label = props.get("label", "") if feats else f"<HTTP {r.status_code}, no result>"
+                layer = props.get("layer", "") or ""
             except (httpx.HTTPError, ValueError) as e:
                 label = f"<error {type(e).__name__}>"
-            ok = want in label
+            ok = want in label and (want_layer is None or layer == want_layer)
             failures += not ok
-            print(f"{'ok  ' if ok else 'FAIL'} {base} {path} {params} -> {label}")
+            shown = f"{label}" + (f"  [{layer}]" if layer else "")
+            if not ok and want_layer is not None and want in label and layer != want_layer:
+                shown += f"  <- wanted layer {want_layer}"
+            print(f"{'ok  ' if ok else 'FAIL'} {base} {path} {params} -> {shown}")
     # the build stamps geocode.engine_version(); an unstamped database reports "0+unknown" and
     # every response then carries a meaningless engine version, so treat it as a failure
     for base in args.url:

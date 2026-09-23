@@ -2,24 +2,70 @@
   "build": "vt-nh",
   "note": "Known answers for a Vermont-plus-New-Hampshire build. Two of them ask for the state in the label, because that is what a multi-state build has to get right: Burlington is Vermont's and Concord is New Hampshire's, and a build that labelled either with the other's state would be wrong in a way a bare name check would not notice. The coordinates are the two city centres.",
   "cases": [
-    { "path": "search", "params": { "text": "Burlington, Vermont" }, "want": "Burlington, VT" },
-    { "path": "search", "params": { "text": "Concord, New Hampshire" }, "want": "Concord, NH" },
-    { "path": "search", "params": { "text": "Montpelier, VT" }, "want": "Montpelier" },
-    { "path": "search", "params": { "text": "Manchestr, NH" }, "want": "Manchester" },
     {
       "path": "search",
-      "params": { "text": "main st", "focus.point.lat": "44.4759", "focus.point.lon": "-73.2121" },
-      "want": "Burlington"
-    },
-    { "path": "autocomplete", "params": { "text": "burling" }, "want": "Burlington" },
-    {
-      "path": "reverse",
-      "params": { "point.lat": "44.4759", "point.lon": "-73.2121" },
-      "want": "Burlington"
+      "params": {
+        "text": "Burlington, Vermont"
+      },
+      "want": "Burlington, VT",
+      "layer": "locality"
     },
     {
+      "path": "search",
+      "params": {
+        "text": "Concord, New Hampshire"
+      },
+      "want": "Concord, NH",
+      "layer": "locality"
+    },
+    {
+      "path": "search",
+      "params": {
+        "text": "Montpelier, VT"
+      },
+      "want": "Montpelier",
+      "layer": "locality"
+    },
+    {
+      "path": "search",
+      "params": {
+        "text": "Manchestr, NH"
+      },
+      "want": "Manchester",
+      "layer": "locality"
+    },
+    {
+      "path": "search",
+      "params": {
+        "text": "main st",
+        "focus.point.lat": "44.4759",
+        "focus.point.lon": "-73.2121"
+      },
+      "want": "Burlington",
+      "layer": "street"
+    },
+    {
+      "path": "autocomplete",
+      "params": {
+        "text": "burling"
+      },
+      "want": "Burlington",
+      "layer": "locality"
+    },
+    {
       "path": "reverse",
-      "params": { "point.lat": "43.2081", "point.lon": "-71.5376" },
+      "params": {
+        "point.lat": "44.4759",
+        "point.lon": "-73.2121"
+      },
+      "want": "Burlington"
+    },
+    {
+      "path": "reverse",
+      "params": {
+        "point.lat": "43.2081",
+        "point.lon": "-71.5376"
+      },
       "want": "Concord"
     }
   ]

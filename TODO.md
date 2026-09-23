@@ -212,13 +212,37 @@ by the build's bounding box alone, so a margin survives. Measured on Arizona plu
 | OpenStreetMap (streets) | 1,037 | 148 | 17.2 km |
 
 The GNIS and OpenAddresses rows are a genuine leak: features in Utah, New Mexico and Sonora that
-the box admitted and nothing removed. They are less harmful than the Maine defect was, because
-they have no county and so no state, and label honestly rather than claiming to be in the build's
-region - but they are findable and should not be there.
+the box admitted and nothing removed.
 
 The OpenStreetMap rows are a different thing and probably fine: they are all streets, and a street
 that crosses the border is kept whole while its representative point is the centroid of the merged
 geometry, which can land outside. Removing those would remove real, wanted streets.
+
+### A single-state build relabels the leak as its own
+
+Arizona plus Nevada leaves those features with no state, which is honest. A single-state build
+does not, and this is the part that matters. The 0.12.0 rule - a feature with no county falls back
+to the build's own state when the build has exactly one - turns every leaked feature into a claim:
+
+| Build | Outside the region | Claiming the build's state | Furthest |
+|---|---|---|---|
+| Maine | 2,516 | **2,516** | 15.3 km |
+| New York | 3,322 | **3,322** | 67.6 km |
+| Vermont + New Hampshire | 2,861 | 0 | - |
+| Arizona + Nevada | 1,689 | 0 | 66.5 km |
+
+So New York answers `Ringwood River, NY, USA` for a river in New Jersey, and holds Canadian
+features from the Akwesasne reserve - `Akwesasne Canada Post`, `Rue Akwesasne` - on the Quebec and
+Ontario sides of a territory the border runs through. Maine's 2,516 are gentler: all GNIS, all
+rivers and streams that genuinely are Maine's and whose GNIS point sits just over the line
+(Meduxnekeag River, Prestile Stream, Aroostook River, all flowing into New Brunswick).
+
+This is the Maine defect of section 4.1 in the report, reduced but not gone: clipping
+OpenStreetMap removed the bulk of it, and the single-state fallback added in the same release
+quietly re-creates it for whatever the other sources still admit. The fallback is right for
+features genuinely inside the region whose county lookup failed, and wrong for everything
+outside it - so it should be conditioned on the feature being inside the region polygon, which
+is the same test the clip already performs.
 
 **The fix** is to apply the clip already written in `sql/025_osm.sql` to the GNIS, OpenAddresses
 and Overture staging paths, on the point rather than the line, leaving the street centroid case
@@ -249,3 +273,33 @@ behind it:
 any disagreement, run as part of the build gate. It would have caught all of this at the point
 the image went stale rather than three regions later. The deeper fix - one parser, called from
 both - is a larger change worth costing separately.
+
+## 12. A misspelled town name answers with a venue
+
+Pinning the expected layer in the known answers (2026-09-23) turned four passes into failures.
+They are two distinct defects, and neither was visible while the check compared labels as
+substrings.
+
+**A misspelling loses the locality entirely.** The right place is not merely outranked; it is
+absent from the top results:
+
+| Query | Build | Answer | Wanted |
+|---|---|---|---|
+| `Albny, NY` | New York | `Albany, NY - Albany.com`, Colonie (venue, 0.53) | Albany the city |
+| `Manchestr, NH` | VT + NH | `Manchester, NH`, Manchester (venue, 0.445) | Manchester the city |
+| `Tuscon, AZ` | AZ + NV | `One Hope - Tuscon`, Valencia West (venue, 0.494) | Tucson the city |
+
+The cause is that venue names routinely embed their own city and state - businesses are listed as
+"Albany, NY - Albany.com", "Manchester, NH", "Tuson Az" - so a fuzzy match on "City, ST" scores
+those venues above the bare locality name, which contains only "Albany". The exact-match spelling
+is what normally saves the locality, and a misspelling removes it. Maine passes `Portlnd, ME`
+only because it has fewer such venues.
+
+**A county outranks the city of the same name.** `Albany, New York` returns Albany County, not the
+city of Albany, both at confidence 1.0 - a tie broken by physical row order (section 7). The same
+shows as `Cattaraugus, NY` returning the county rather than the village. A user typing a bare
+"Name, State" means the populated place far more often than the county.
+
+**The fix** for the second is a layer priority in the tie-break: locality before county before
+venue at equal confidence. The first is harder and needs its own accuracy run, since boosting
+localities on fuzzy matches will change what many queries return.

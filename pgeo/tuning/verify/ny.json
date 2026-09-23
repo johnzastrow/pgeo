@@ -7,28 +7,32 @@
       "params": {
         "text": "Albany, New York"
       },
-      "want": "Albany"
+      "want": "Albany",
+      "layer": "locality"
     },
     {
       "path": "search",
       "params": {
         "text": "Buffalo, NY"
       },
-      "want": "Buffalo"
+      "want": "Buffalo",
+      "layer": "locality"
     },
     {
       "path": "search",
       "params": {
         "text": "Albny, NY"
       },
-      "want": "Albany"
+      "want": "Albany",
+      "layer": "locality"
     },
     {
       "path": "search",
       "params": {
         "text": "350 5th Ave, New York, NY"
       },
-      "want": "350 5th Ave"
+      "want": "350 5th Ave",
+      "layer": "address"
     },
     {
       "path": "search",
@@ -37,7 +41,8 @@
         "focus.point.lat": "43.16",
         "focus.point.lon": "-77.61"
       },
-      "want": "Rochester"
+      "want": "Rochester",
+      "layer": "street"
     },
     {
       "path": "search/structured",
@@ -45,14 +50,16 @@
         "address": "350 5th Ave",
         "locality": "New York"
       },
-      "want": "350 5th Ave"
+      "want": "350 5th Ave",
+      "layer": "address"
     },
     {
       "path": "autocomplete",
       "params": {
         "text": "350 5th ave new york"
       },
-      "want": "350 5th Ave"
+      "want": "350 5th Ave",
+      "layer": "address"
     },
     {
       "path": "reverse",
@@ -67,14 +74,16 @@
       "params": {
         "text": "Skaneateles, NY"
       },
-      "want": "Skaneateles"
+      "want": "Skaneateles",
+      "layer": "locality"
     },
     {
       "path": "search",
       "params": {
         "text": "Massena, New York"
       },
-      "want": "Massena"
+      "want": "Massena",
+      "layer": "locality"
     }
   ]
 }

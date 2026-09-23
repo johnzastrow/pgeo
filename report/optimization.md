@@ -35,12 +35,12 @@ The headline results:
 |---|---|---|
 | Regions buildable | Maine | any US state, or several at once |
 | Maine build time | 1,152 s | **309 s** |
-| New York build time | 6,699 s | ~1,800 s (projected from Maine's ratio) |
-| New York accuracy | 88.4% | **93.9%** |
+| New York build time | 6,699 s | **2,643 s** (measured) |
+| New York accuracy | 88.4% | **94.9%** |
 | Arizona + Nevada accuracy | 84.8% | **92.4%** |
 | Maine accuracy | 95.8% | **95.9%** |
 | Two builds of the same data | differed on 10,769 rows | **identical** |
-| Maine features outside Maine | 4,270, labelled ", ME, USA" | 0 beyond 15 km, none foreign |
+| Maine features outside Maine | 4,270, labelled ", ME, USA" | 2,516, none foreign, none beyond 16 km |
 | Commands to build a region by hand | 25 | **1** |
 
 Nothing in this work tunes anything per region. That was the constraint throughout, and it is
@@ -146,9 +146,18 @@ OpenStreetMap features outside Maine, every one labelled `, ME, USA` because the
 build-wide constant: `22 Chemin Martin, Sainte-Anne-de-Madawaska` and `Gagetown` in New
 Brunswick, `Yarmouth Ferry Terminal` in Nova Scotia 118 km away.
 
-OpenStreetMap was the only source that needed clipping. Who's on First comes from the region's
-own descendants, GNIS from the state's own file, Overture is clipped during preparation, and
-ZCTAs are assigned by land area; only OpenStreetMap arrives as a rectangle.
+OpenStreetMap was taken to be the only source that needed clipping: Who's on First comes from the
+region's own descendants, GNIS from the state's own file, Overture is clipped during preparation,
+and ZCTAs are assigned by land area, so only OpenStreetMap arrives as a rectangle.
+
+That reasoning was checked afterwards and is wrong at the edges. A state's own GNIS file includes
+features on its border whose recorded point falls just outside the polygon, and OpenAddresses
+admits a similar margin. Measured across the four builds, between 1,689 and 3,322 features sit
+outside the region - and in a single-state build the fallback that fills in a missing county
+labels every one of them with the build's state, which is the defect this section describes,
+returning at a twentieth of its old size. New York holds `Ringwood River, NY, USA` for a river in
+New Jersey, and Canadian parts of the Akwesasne reserve. The numbers, the distinction between
+single- and multi-state builds, and the fix are in `TODO.md` section 10.
 
 The clip uses Who's on First's region polygon, buffered by about 300 m, and the choice of
 polygon matters for the same reason it mattered for ZCTAs. Verified, not assumed:
@@ -197,18 +206,24 @@ Accuracy is measured against ground truth taken from the source data, not from a
 OpenAddresses points, Who's on First town labels, GNIS features, Overture places, Census ZCTAs.
 Maine's set is 1,560 cases; New York's is 198, built the same way.
 
-### 5.1 New York: 88.4% to 93.9%, with no New York setting
+### 5.1 New York: 88.4% to 94.9%, with no New York setting
 
-| Group | First run | After the parser fixes | Maine |
-|---|---|---|---|
-| **Overall** | **88.4%** | **93.9%** | 95.8% |
-| addresses | 87.1% | 91.4% | 97.6% |
-| towns | 60.7% | **89.3%** | 95.6% |
-| venues | 96.4% | 96.4% | 94.2% |
-| reverse | 96.2% | 96.2% | 100.0% |
-| lakes and summits | 100.0% | 100.0% | 86.7% |
-| ZIP codes | 100.0% | 100.0% | 98.3% |
-| misses | 94.7% | 94.7% | 94.7% |
+| Group | First run | After the parser fixes | After the full rebuild | Maine |
+|---|---|---|---|---|
+| **Overall** | **88.4%** | **93.9%** | **94.9%** | 95.9% |
+| addresses | 87.1% | 91.4% | **92.9%** | 97.8% |
+| towns | 60.7% | **89.3%** | 89.3% | 95.6% |
+| venues | 96.4% | 96.4% | 96.4% | 94.2% |
+| reverse | 96.2% | 96.2% | **100.0%** | 100.0% |
+| lakes and summits | 100.0% | 100.0% | 100.0% | 86.7% |
+| ZIP codes | 100.0% | 100.0% | 100.0% | 98.3% |
+| misses | 94.7% | 94.7% | 94.7% | 94.7% |
+
+The last column of movement is the rebuild of 2026-09-23, which carried the duplicate-address
+clustering, the OpenStreetMap clip and the five-digit house-number fix together. It recovered
+35,251 addresses that the old duplicate key had merged away - Maine's equivalent was 4,088 - and
+removed 434 venues and 223 streets that the clip found outside the state. New York finished at
+7,246,923 features in 2,643 s.
 
 Towns were the failure, and the cause was the parser rather than the ranking. "Canoga, New York"
 was read as a place inside New York City, found nothing there, fell back to matching names across
