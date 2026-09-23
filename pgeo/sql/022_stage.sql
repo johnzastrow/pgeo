@@ -8,7 +8,9 @@ SELECT id, source, source_id, placetype, name, abbr, population, parent_id,
        ST_SetSRID(ST_MakePoint(lon, lat), 4326),
        CASE WHEN minlon IS NOT NULL THEN ARRAY[minlon, minlat, maxlon, maxlat] END
 FROM stage_admin
-WHERE lon IS NOT NULL AND lat IS NOT NULL
+-- Null island is missing data, not a location: eight Who's on First postcodes came through with
+-- (0, 0) and were labelled ", ME, USA" 8,206 km off the coast of Africa. No build covers it.
+WHERE lon IS NOT NULL AND lat IS NOT NULL AND NOT (lon = 0 AND lat = 0)
 ON CONFLICT (id) DO NOTHING;
 
 -- Admin areas are also searchable features (towns, counties, ZIPs, the state).
@@ -27,6 +29,7 @@ SELECT source, layer, source_id, name, nullif(housenumber, ''), nullif(street, '
        nullif(addendum, '')::jsonb,
        ST_SetSRID(ST_MakePoint(lon, lat), 4326), popularity
 FROM stage_point
-WHERE lon BETWEEN -180 AND 180 AND lat BETWEEN -90 AND 90 AND coalesce(name, '') <> '';
+WHERE lon BETWEEN -180 AND 180 AND lat BETWEEN -90 AND 90 AND coalesce(name, '') <> ''
+  AND NOT (lon = 0 AND lat = 0);
 
 TRUNCATE stage_admin, stage_point;

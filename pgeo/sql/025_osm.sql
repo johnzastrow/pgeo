@@ -1,6 +1,23 @@
 -- Build step 1c (search_path = pgeo_build, public): OpenStreetMap staging tables written by
 -- ogr2ogr (osm_points, osm_lines, osm_polygons) -> feature_raw. Rules follow Pelias' OSM
 -- importer: named POIs become venues, addr:* become addresses, named roads become streets.
+--
+-- Clipped to the region. OpenStreetMap is the one source with no claim to be in this build:
+-- Who's on First comes from the region's own descendants, GNIS from the state's own file,
+-- Overture is clipped in prep and ZCTAs are assigned by Census land area, but a Geofabrik
+-- extract reaches past the border. A Maine build held 4,270 features outside Maine, among them
+-- "22 Chemin Martin, Sainte-Anne-de-Madawaska" and "Gagetown" in New Brunswick, and
+-- "Yarmouth Ferry Terminal" in Nova Scotia 118 km away - every one of them labelled ", ME, USA".
+--
+-- The polygon is Who's on First's, not the Census cartographic one, and buffered by ~300 m as
+-- Overture's clip is. That matters: the cartographic outline generalises away Maine's islands,
+-- while this keeps all 276 features on Peaks Island, Cliff Island and the Cranberry Isles. The
+-- buffer keeps piers and shoreline; 2,007 features are dropped, almost all of them within 2 km
+-- of the border.
+CREATE TEMP TABLE region_clip AS
+SELECT ST_Buffer(ST_Union(geom), 0.003) AS clip FROM admin WHERE placetype = 'region';
+CREATE INDEX region_clip_gix ON region_clip USING gist (clip);
+ANALYZE region_clip;
 
 -- Venues from nodes and from areas (point on surface).
 WITH poi AS (
@@ -33,8 +50,8 @@ SELECT 'openstreetmap', 'venue', sid, name,
        CASE WHEN aeroway = 'aerodrome' OR amenity IN ('hospital', 'university', 'college')
                  OR tourism IN ('attraction', 'museum') THEN 0.2
             WHEN amenity IS NOT NULL OR tourism IS NOT NULL THEN 0.05 ELSE 0 END
-FROM poi
-WHERE name IS NOT NULL AND name <> '' AND ST_IsValid(g)
+FROM poi, region_clip
+WHERE name IS NOT NULL AND name <> '' AND ST_IsValid(g) AND ST_Intersects(g, region_clip.clip)
   AND (amenity IS NOT NULL OR shop IS NOT NULL OR tourism IS NOT NULL OR leisure IS NOT NULL
        OR office IS NOT NULL OR craft IS NOT NULL OR historic IS NOT NULL OR healthcare IS NOT NULL
        OR "natural" IN ('peak', 'bay', 'beach', 'cape', 'water', 'island', 'wood')
@@ -52,13 +69,15 @@ WITH a AS (
 )
 INSERT INTO feature_raw (source, layer, source_id, name, housenumber, street, postcode, locality_hint, geom)
 SELECT 'openstreetmap', 'address', sid, hn || ' ' || st, hn, st, pc, city, g
-FROM a
-WHERE hn IS NOT NULL AND hn <> '' AND st IS NOT NULL AND st <> '' AND ST_IsValid(g);
+FROM a, region_clip
+WHERE hn IS NOT NULL AND hn <> '' AND st IS NOT NULL AND st <> '' AND ST_IsValid(g)
+  AND ST_Intersects(g, region_clip.clip);
 
 -- Streets: named roads, merged per name within ~300 m clusters (like Pelias polylines).
 WITH roads AS (
-  SELECT osm_id, name, geom FROM osm_lines
-  WHERE name IS NOT NULL AND name <> '' AND highway IN (
+  SELECT l.osm_id, l.name, l.geom FROM osm_lines l, region_clip
+  WHERE l.name IS NOT NULL AND l.name <> '' AND ST_Intersects(l.geom, region_clip.clip)
+    AND l.highway IN (
     'motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'unclassified', 'residential',
     'service', 'living_street', 'pedestrian', 'road', 'motorway_link', 'trunk_link',
     'primary_link', 'secondary_link', 'tertiary_link', 'track')

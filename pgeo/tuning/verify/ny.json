@@ -1,26 +1,80 @@
 {
   "build": "ny",
-  "note": "Known answers for the New York build. Each is a fact about New York that holds independently of this geocoder: two well-known cities, the Empire State Building's street address and its coordinates, a misspelling of a city, and a street query biased towards Rochester. A failure here means the build is wrong, not that the expectation is stale.",
+  "note": "Known answers for the New York build. Each is a fact about New York that holds independently of this geocoder: two well-known cities, the Empire State Building's street address and its coordinates, a misspelling of a city, and a street query biased towards Rochester. A failure here means the build is wrong, not that the expectation is stale. The last two are a Haudenosaunee name and a northern-border town, the kind of place a clip to the region is most likely to take by mistake.",
   "cases": [
-    { "path": "search", "params": { "text": "Albany, New York" }, "want": "Albany" },
-    { "path": "search", "params": { "text": "Buffalo, NY" }, "want": "Buffalo" },
-    { "path": "search", "params": { "text": "Albny, NY" }, "want": "Albany" },
-    { "path": "search", "params": { "text": "350 5th Ave, New York, NY" }, "want": "350 5th Ave" },
     {
       "path": "search",
-      "params": { "text": "main st", "focus.point.lat": "43.16", "focus.point.lon": "-77.61" },
+      "params": {
+        "text": "Albany, New York"
+      },
+      "want": "Albany"
+    },
+    {
+      "path": "search",
+      "params": {
+        "text": "Buffalo, NY"
+      },
+      "want": "Buffalo"
+    },
+    {
+      "path": "search",
+      "params": {
+        "text": "Albny, NY"
+      },
+      "want": "Albany"
+    },
+    {
+      "path": "search",
+      "params": {
+        "text": "350 5th Ave, New York, NY"
+      },
+      "want": "350 5th Ave"
+    },
+    {
+      "path": "search",
+      "params": {
+        "text": "main st",
+        "focus.point.lat": "43.16",
+        "focus.point.lon": "-77.61"
+      },
       "want": "Rochester"
     },
     {
       "path": "search/structured",
-      "params": { "address": "350 5th Ave", "locality": "New York" },
+      "params": {
+        "address": "350 5th Ave",
+        "locality": "New York"
+      },
       "want": "350 5th Ave"
     },
-    { "path": "autocomplete", "params": { "text": "350 5th ave new york" }, "want": "350 5th Ave" },
+    {
+      "path": "autocomplete",
+      "params": {
+        "text": "350 5th ave new york"
+      },
+      "want": "350 5th Ave"
+    },
     {
       "path": "reverse",
-      "params": { "point.lat": "40.7484", "point.lon": "-73.9857" },
+      "params": {
+        "point.lat": "40.7484",
+        "point.lon": "-73.9857"
+      },
       "want": "New York"
+    },
+    {
+      "path": "search",
+      "params": {
+        "text": "Skaneateles, NY"
+      },
+      "want": "Skaneateles"
+    },
+    {
+      "path": "search",
+      "params": {
+        "text": "Massena, New York"
+      },
+      "want": "Massena"
     }
   ]
 }

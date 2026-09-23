@@ -174,6 +174,7 @@ either handled or refused; none needs per-region tuning, and none should.
 | **ZIP prefix shared with a neighbour** | many | A postcode is accepted when its prefix belongs to this build alone. New York holds 06390 on Fishers Island, so a plain prefix test there would admit Connecticut's 063xx. |
 | **A feature on a state line** | any multi-state build | GNIS publishes it in both states' files with one id; the duplicates are collapsed. Vermont and New Hampshire share 36. |
 | **No OpenAddresses sources** | none today | A source with no current run is reported and skipped, so a state that loses all of them still builds. |
+| **A border where the names look foreign** | ME, NY, VT, NH, MN, MI, WA and the rest of the northern tier | Clipping OpenStreetMap to the region removes what lies beyond the line, and the St. John valley is French on both sides of it - Madawaska is a Maine town and a New Brunswick one. The clip is by geometry, never by name, and both known-answer sets now ask for a border-country place: Madawaska and Mattawamkeag for Maine, Massena and Skaneateles for New York. All 22 French and Wabanaki names checked for Maine survive, as do all 22 Haudenosaunee and French names checked for New York. |
 
 The general point: every one of these is fixed in the rule, not in a per-state setting. A build
 needs its row in `regions/regions.json`, which is generated, and its known answers, which are

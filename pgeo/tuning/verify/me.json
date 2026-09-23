@@ -1,6 +1,6 @@
 {
   "build": "me",
-  "note": "Known answers for the Maine build: facts about the region, not about the engine.",
+  "note": "Known answers for the Maine build: facts about the region, not about the engine. The last two are border-country places whose names look foreign - the St. John valley is French on both sides of the line - so they are the ones a clip to the region is most likely to take by mistake.",
   "cases": [
     {
       "path": "search",
@@ -61,6 +61,20 @@
         "point.lon": "-70.2626"
       },
       "want": "Portland"
+    },
+    {
+      "path": "search",
+      "params": {
+        "text": "Madawaska, Maine"
+      },
+      "want": "Madawaska"
+    },
+    {
+      "path": "search",
+      "params": {
+        "text": "Mattawamkeag, ME"
+      },
+      "want": "Mattawamkeag"
     }
   ]
 }
