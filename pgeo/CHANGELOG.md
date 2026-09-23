@@ -10,6 +10,44 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-09-23
+
+### Changed
+- A misspelled town now reaches the town it means. `Albny, NY` parsed to nothing but the state,
+  so the whole raw string went to name matching - where venues that carry their own town in their
+  name (`Albany, NY - Albany.com`) beat the town itself. The parser now falls back to a typo
+  search over the build's town list when no town is spelled the way the query spells it, and
+  passes on the corrected spelling, because the search matches towns by trigram and a
+  transposition shares almost no trigrams with its own word.
+
+  The rule is one edit, or two when the two strings have the same letters - that second case
+  being a transposition, `Tuscon` for `Tucson`, the commonest typo of all. It applies only to the
+  whole remaining text, only at five characters or more, and only after an exact match has
+  failed. Those limits are what stop it inventing towns: `walmart` is two edits from Balmat, New
+  York, and `central park` ends in a word one edit from Parks. Written twice, in
+  `geocode.town_fuzzy` and `pgeo.api.parse`, with a test that pins the two to the same answers.
+
+- A county no longer outranks a city of the same name. `Albany, New York` returned Albany County
+  and `york` returned York County, on nothing but importance - 1.000 against the city's 0.942,
+  worth 0.003 of score. County and locality now share a deduplication bucket, so the two rows
+  reading `Albany, NY, USA` collapse to one, and the county loses. Ranking between localities and
+  localadmins is untouched.
+
+### Measured
+
+| | Before | After | Cases changed |
+|---|---|---|---|
+| Maine | 95.9% | **96.0%** | 2 improved, 0 regressed |
+| New York | 94.9% | **95.5%** | 1 improved, 0 regressed |
+| Arizona + Nevada | 92.4% | 91.9% | 0 improved, 1 regressed |
+| Known-answer failures (all builds) | 4 | **0** | - |
+
+The single Arizona regression is `Mesaa, Arizona`, a generated case whose ground truth is a venue
+named "Mesa" inside the city of Mesa, scored against a 300 m radius. The query now answers with
+the city, which is what someone typing it means; the case counts it wrong because the city centre
+is further than 300 m from that venue. Recorded rather than argued away - the case set is the
+measure, and one case it gets wrong does not entitle the code to ignore it.
+
 ## [0.12.1] - 2026-09-23
 
 ### Fixed

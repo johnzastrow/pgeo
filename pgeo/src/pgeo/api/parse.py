@@ -68,18 +68,61 @@ def from_libpostal(text: str, components: list[dict] | dict) -> Parsed:
     return p
 
 
+def _edits_within(a: str, b: str, limit: int) -> int | None:
+    """Levenshtein distance between a and b, or None once it is known to exceed `limit`."""
+    if abs(len(a) - len(b)) > limit:
+        return None
+    prev = list(range(len(b) + 1))
+    for i, ca in enumerate(a, 1):
+        cur = [i]
+        for j, cb in enumerate(b, 1):
+            cur.append(min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (ca != cb)))
+        if min(cur) > limit:  # every alignment from here on is already too far
+            return None
+        prev = cur
+    return prev[-1] if prev[-1] <= limit else None
+
+
 class RuleParser:
     """Small US-address parser. Towns are recognized from the loaded admin names."""
 
     def __init__(self, localities: set[str], states: dict[str, str] | None = None) -> None:
         self.localities = localities  # normalized, lowercase
         self.max_words = max((len(x.split()) for x in localities), default=1)
+        # Towns grouped by (word count, length), so the typo search below compares against a
+        # handful of names instead of all of them.
+        self._by_shape: dict[tuple[int, int], list[str]] = {}
+        for t in localities:
+            self._by_shape.setdefault((len(t.split()), len(t)), []).append(t)
         # Lower-case spelling -> postal abbreviation, for every state this build covers: {"me":
         # "ME", "maine": "ME"}. It used to be the literal {"me", "maine"}, which on a New York
         # build left "NY" in the text and the parser then read it as the town, turning
         # "350 5th Ave, New York, NY" into a search for 350 New York Ave.
         self.states = states or {}
         self.max_state_words = max((len(x.split()) for x in self.states), default=1)
+
+    def town_fuzzy(self, cand: str) -> str | None:
+        """The town `cand` is a misspelling of, or None. Mirrors geocode.town_fuzzy in SQL.
+
+        One edit, or two when the two strings have the same letters - that second case is a
+        transposition, "Tuscon" for "Tucson". Same word count and a length within one, and at
+        least five characters, because below that a single edit reaches too far ("park" is one
+        edit from Parks). Only ever called after an exact match has failed.
+        """
+        if len(cand) < 5:
+            return None
+        best: tuple[int, str] | None = None
+        nwords = len(cand.split())
+        for length in (len(cand) - 1, len(cand), len(cand) + 1):
+            for name in self._by_shape.get((nwords, length), ()):
+                d = _edits_within(name, cand, 2)
+                if d is None or d == 0:
+                    continue
+                if d == 2 and sorted(name) != sorted(cand):
+                    continue
+                if best is None or (d, name) < best:
+                    best = (d, name)
+        return best[1] if best else None
 
     def parse(self, text: str) -> Parsed:
         p = Parsed(text=text)
@@ -149,6 +192,19 @@ class RuleParser:
                     p.locality = " ".join(head.split()[-n:])
                     head = " ".join(head.split()[:-n])
                     break
+            else:
+                # No town spelled this way. Try once more allowing a typo, and only when the
+                # misspelling is the whole remaining text: loosed on a trailing word it turns
+                # "central park" into the town of Parks. Without this the query parses to
+                # nothing and the raw string goes to name matching, where venues carrying their
+                # own town in their name ("Albany, NY - Albany.com") beat the town itself.
+                fixed = self.town_fuzzy(" ".join(lw)) if lw else None
+                if fixed:
+                    # the corrected spelling, not what was typed: downstream matching is by
+                    # trigram, and a transposition shares almost no trigrams with the word it
+                    # came from, so "Tuscon" would never reach Tucson on its own
+                    p.locality = fixed
+                    head = ""
         head = head.strip(" ,")
         m = HN_RE.match(head)
         if m:

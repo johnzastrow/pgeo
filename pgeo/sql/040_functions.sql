@@ -307,9 +307,17 @@ BEGIN
   hits AS (
   SELECT d.h FROM (
   SELECT z.h, row_number() OVER (
+           -- A county joins the locality bucket, so a county and a city of the same name collapse
+           -- to one result instead of two rows reading "Albany, NY, USA".
            PARTITION BY (z.h).label,
-                        CASE (z.h).layer WHEN 'localadmin' THEN 'locality' ELSE (z.h).layer END
-           ORDER BY (z.h).score DESC, CASE (z.h).layer WHEN 'locality' THEN 0 ELSE 1 END,
+                        CASE (z.h).layer WHEN 'localadmin' THEN 'locality'
+                                         WHEN 'county' THEN 'locality' ELSE (z.h).layer END
+           -- and the county loses. It ranked first on importance alone - Albany County scores
+           -- 1.000 against the city's 0.942, worth 0.003 of score - and "Albany, New York" means
+           -- the city. This key sits ahead of score so that margin cannot decide it; everything
+           -- below is unchanged, so locality against localadmin still ranks as it did.
+           ORDER BY CASE (z.h).layer WHEN 'county' THEN 1 ELSE 0 END,
+                    (z.h).score DESC, CASE (z.h).layer WHEN 'locality' THEN 0 ELSE 1 END,
                     CASE (z.h).source WHEN 'whosonfirst' THEN 0 WHEN 'openaddresses' THEN 1 ELSE 2 END) AS dup
   FROM final fi
   -- The spheroidal distance to the focus, once. It was computed twice per row: for the reported

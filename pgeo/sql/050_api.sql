@@ -24,6 +24,37 @@ RETURNS boolean LANGUAGE sql STABLE PARALLEL SAFE AS $$
   )
 $$;
 
+-- The letters of a string, sorted: two strings share it exactly when one is an anagram of the
+-- other, which is what a transposed pair of characters leaves behind.
+CREATE OR REPLACE FUNCTION geocode.letters(t text) RETURNS text
+LANGUAGE sql IMMUTABLE PARALLEL SAFE AS $$
+  SELECT string_agg(c, '' ORDER BY c) FROM regexp_split_to_table(lower(coalesce(t, '')), '') AS c
+$$;
+
+-- The town this text is a misspelling of, or NULL. Used only after an exact match has failed,
+-- so a correctly spelled town is never routed through here.
+--
+-- A geocoder is typed into by people, so a misspelled town has to reach the town it means. What
+-- it must not do is turn a query that was never a town into one: "walmart" is within two edits
+-- of Balmat, New York. The rule that separates them is one edit, or two when the two strings
+-- have the same letters - that second case is a transposition, "Tuscon" for "Tucson", which is
+-- the most common typo of all and the one a trigram index cannot see (the two share almost no
+-- trigrams). Requiring the same word count and a length within one rejects the rest:
+-- "west end" / "westwind", "hudson river" / "indian river", "central park" / "central islip".
+CREATE OR REPLACE FUNCTION geocode.town_fuzzy(cand text) RETURNS text
+LANGUAGE sql STABLE PARALLEL SAFE AS $$
+  SELECT t.name FROM pgeo.town t
+  -- Below five characters a single edit reaches too far: "park" is one from Parks, "bath" one
+  -- from Bethel's neighbours. Short names must be spelled correctly.
+  WHERE length(cand) >= 5
+    AND abs(length(t.name) - length(cand)) <= 1
+    AND array_length(string_to_array(t.name, ' '), 1) = array_length(string_to_array(cand, ' '), 1)
+    AND (levenshtein(t.name, cand) <= 1
+         OR (levenshtein(t.name, cand) = 2 AND geocode.letters(t.name) = geocode.letters(cand)))
+  ORDER BY levenshtein(t.name, cand), t.name
+  LIMIT 1
+$$;
+
 CREATE OR REPLACE FUNCTION geocode.parse_rule(p_text text,
     OUT name text, OUT housenumber text, OUT street text, OUT locality text,
     OUT postcode text, OUT state text)
@@ -119,6 +150,25 @@ BEGIN
         EXIT;
       END IF;
     END LOOP;
+    -- No town spelled the way this query spells it. Try once more allowing a typo, so "Albny,
+    -- NY" reaches Albany instead of parsing to nothing at all - in which case the whole raw
+    -- string goes to name matching, where venues carrying their own town in their name
+    -- ("Albany, NY - Albany.com") beat the town itself.
+    --
+    -- Only when the misspelling is the entire remaining text. A typo rule loosed on a trailing
+    -- word turns "central park" into the town of Parks, and the query was never about a town;
+    -- when a real town does trail real text, the exact pass above has already found it.
+    IF locality IS NULL AND cardinality(words) > 0 THEN
+      cand := lower(array_to_string(words, ' '));
+      tail := geocode.town_fuzzy(cand);
+      IF tail IS NOT NULL THEN
+        -- the corrected spelling, not what was typed: downstream matching is by trigram, and a
+        -- transposition shares almost no trigrams with the word it came from, so "Tuscon" would
+        -- never reach Tucson on its own
+        locality := tail;
+        head := '';
+      END IF;
+    END IF;
   END IF;
   head := trim(both ' ,' from coalesce(head, ''));
   m := regexp_match(head, '^\s*(\d{1,6}[a-zA-Z]?)(?:\s*-\s*\d{1,6})?\s+(.+)$');

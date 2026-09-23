@@ -151,3 +151,44 @@ def test_a_five_digit_house_number_is_not_a_postcode():
     assert (q.housenumber, q.postcode, q.state) == ("13023", "86314", "AZ")
     # and a bare postcode is still a postcode
     assert az.parse("86314").postcode == "86314"
+
+
+def test_a_misspelled_town_still_parses_as_the_town():
+    """"Albny, NY" used to parse to nothing but the state, so the raw text went to name
+    matching, where venues that carry their own town in their name beat the town itself."""
+    ny = RuleParser({"albany", "schenectady", "rochester", "parks", "new york"},
+                    {"ny": "NY", "new york": "NY"})
+    # the corrected spelling is what comes out, because the search matches towns by trigram
+    for typo, want in (("Albny, NY", "albany"), ("Schenctady, NY", "schenectady"),
+                       ("Rochestr, NY", "rochester")):
+        assert ny.parse(typo).locality == want, typo
+    # a transposition is two edits but the same letters, and is the commonest typo of all - and
+    # the one that most needs correcting, since it shares almost no trigrams with its own word
+    az = RuleParser({"tucson", "phoenix"}, {"az": "AZ", "arizona": "AZ"})
+    assert az.parse("Tuscon, AZ").locality == "tucson"
+    # correct spellings are unaffected
+    assert ny.parse("Albany, NY").locality == "Albany"
+
+
+def test_a_typo_rule_does_not_invent_towns():
+    """The risk of accepting a misspelling is turning a query that was never a town into one."""
+    ny = RuleParser({"albany", "balmat", "parks", "central islip", "new york"},
+                    {"ny": "NY", "new york": "NY"})
+    # two edits from Balmat, but not a transposition of it
+    assert ny.parse("walmart").locality is None
+    # only the whole remaining text is tried, so a trailing word is not a town
+    assert ny.parse("central park").locality is None
+    # below five characters one edit reaches too far
+    assert ny.parse("park").locality is None
+
+
+def test_the_fuzzy_town_rule_matches_the_sql_one():
+    """geocode.town_fuzzy in sql/050_api.sql must agree with this; the two front ends each
+    carry their own parser and have drifted apart before."""
+    p = RuleParser({"albany", "tucson", "balmat", "parks", "westwind", "central islip"})
+    assert p.town_fuzzy("albny") == "albany"       # one edit
+    assert p.town_fuzzy("tuscon") == "tucson"      # two edits, same letters
+    assert p.town_fuzzy("walmart") is None         # two edits, different letters
+    assert p.town_fuzzy("west end") is None        # two edits, and a different word count
+    assert p.town_fuzzy("park") is None            # too short to risk an edit
+    assert p.town_fuzzy("albany") is None          # an exact match is not this function's job
