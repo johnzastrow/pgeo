@@ -131,26 +131,27 @@ Handling it means carrying two boxes through every bbox step - the Overture S3 f
 pmtiles extract, prep's validation - or working in a projected space. Nobody has asked for
 Alaska; the refusal is honest until they do. Hawaii is fine: islands, but one box.
 
-## 6. An explicit tie-break rule, at query time and at build time
+## 6. ~~An explicit tie-break rule at build time~~ Done 2026-09-22; query time still open
 
-Where candidates tie on score, the winner is currently decided by physical row order (report
-Section 3.16.3). It is deterministic per build but not chosen, and it puts about one case of
-noise into the accuracy figure between builds and hosts ("Stevenns Corner", Section 5.7 of
-`docs/PERFORMANCE_OPTIMIZATION.md`). Any rule - source priority, then id - changes some
-current outputs, so it is a deliberate change with its own accuracy run.
+**Build time, done.** The address dedupe kept one row per house number, street and town and
+ordered only by source, so the winner was whichever the table happened to hold first. Two builds
+of the same data disagreed on 10,769 rows, and a reverse-geocoding case that had passed for
+months began to fail because 101 Hancock St, Rumford landed 25 m from its seven agreeing
+siblings.
 
-The same arbitrariness exists in the **build**, which matters more, and the rebuild of
-2026-09-22 caught it. The address dedupe keeps one row per (house number, street, town) and
-orders only by source, so among several OpenAddresses rows for one address the winner is
-whichever the table happens to hold first. OpenAddresses has eight rows for 101 Hancock St,
-Rumford: seven agree on 44.5490971,-70.5485485 and one sits 25 m away. The rebuild kept the
-outlier, and a reverse-geocoding case that had passed for months began to fail - not because
-anything got worse, but because nothing ever chose.
+Chasing that found the larger bug: normalisation makes "18 N St" and "18 North St" one key, and
+Bangor has both, 5 km apart, so the dedupe was merging two real addresses and discarding one.
+Rows sharing a key are now clustered at about 200 m first, and each cluster keeps one row -
+Maine gains 4,088 addresses. Within a cluster the majority point wins, and the source id settles
+the rest.
 
-The fix is better than a tie-break: keep the point the rows agree on. Group the duplicates,
-take the modal coordinate, and fall back to the lowest hash only when there is no majority.
-That is deterministic *and* more accurate, and it costs one aggregate in the dedupe. It
-changes some current outputs, so it needs its own accuracy run and a note in the report.
+Two consecutive builds now produce 908,347 rows with identical gids, against 10,769 differing
+before.
+
+**Query time, still open.** Where candidates tie on score the winner is still decided by physical
+row order (report Section 3.16.3), which is about one case of noise in the accuracy figure
+("Stevenns Corner"). Any rule - source priority, then id - changes some current outputs, so it
+needs its own accuracy run.
 
 ## 7. ~~Rewrite history before publishing to GitHub~~ Done 2026-09-22
 
