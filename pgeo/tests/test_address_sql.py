@@ -103,3 +103,30 @@ def test_rejects_ambiguous_or_bad_input():
         # input errors come back as a Pelias-style envelope (HTTP 400 through the front ends)
         doc = address_doc(**kw)
         assert doc["geocoding"]["errors"] and doc["features"] == []
+
+
+def test_a_county_carries_its_own_suffix_not_an_appended_one():
+    """Counties are not all called "County".
+
+    Both front ends used to append the word to every county name, which is right for Maine and
+    wrong for Louisiana's parishes, Alaska's boroughs and census areas, and the District of
+    Columbia. The suffixed form comes from Who's on First (label:eng_x_preferred_longname) through
+    admin.longname, so what the feature carries must be exactly what admin holds - never the bare
+    name with something glued on.
+    """
+    rows = q(
+        "SELECT a.name, a.longname, count(*) AS features "
+        "FROM pgeo.admin a JOIN pgeo.feature f ON f.county = a.longname "
+        "WHERE a.placetype = 'county' AND a.longname IS NOT NULL "
+        "GROUP BY 1, 2 ORDER BY 3 DESC LIMIT 5"
+    )
+    if not rows:
+        pytest.skip("no counties with a long name in this build")
+    for r in rows:
+        # the long name genuinely extends the bare one, and the feature carries it verbatim
+        assert r["longname"].startswith(r["name"]), (r["name"], r["longname"])
+        assert r["features"] > 0
+    # and nothing carries a doubled suffix, which is what appending produced on a name that
+    # already ended in one
+    doubled = q("SELECT count(*) AS n FROM pgeo.feature WHERE county ~* ' County County$'")
+    assert doubled[0]["n"] == 0
