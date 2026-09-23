@@ -1,0 +1,2973 @@
+[
+ {
+  "id": 1,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "344 WINN RD HALIFAX Vermont"
+  },
+  "truth": {
+   "lat": 42.7771325,
+   "lon": -72.7952929,
+   "radius_m": 150,
+   "housenumber": "344",
+   "locality": "HALIFAX"
+  }
+ },
+ {
+  "id": 2,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "9 PINE ST, SWAANTON, VT"
+  },
+  "truth": {
+   "lat": 44.92143,
+   "lon": -73.1157305,
+   "radius_m": 150,
+   "housenumber": "9",
+   "locality": "SWANTON"
+  }
+ },
+ {
+  "id": 3,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "15 HUMBBBERT ST, BARRE CITY, VT"
+  },
+  "truth": {
+   "lat": 44.2024097,
+   "lon": -72.5127924,
+   "radius_m": 150,
+   "housenumber": "15",
+   "locality": "BARRE CITY"
+  }
+ },
+ {
+  "id": 4,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "195 HARVEST HILLS DR, SHAFTSBURY, VT"
+  },
+  "truth": {
+   "lat": 42.9399876,
+   "lon": -73.2455335,
+   "radius_m": 150,
+   "housenumber": "195",
+   "locality": "SHAFTSBURY"
+  }
+ },
+ {
+  "id": 5,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "299 CAMP FRNSWORTH RD, THETFORD, VT"
+  },
+  "truth": {
+   "lat": 43.8287933,
+   "lon": -72.2377005,
+   "radius_m": 150,
+   "housenumber": "299",
+   "locality": "THETFORD"
+  }
+ },
+ {
+  "id": 6,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "3796 WESTMINSTER WEST RD, WESTMINSTER, VT"
+  },
+  "truth": {
+   "lat": 43.0703289,
+   "lon": -72.5406887,
+   "radius_m": 150,
+   "housenumber": "3796",
+   "locality": "WESTMINSTER"
+  }
+ },
+ {
+  "id": 7,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "101 OLD SILO RD, WATERFORD, VT"
+  },
+  "truth": {
+   "lat": 44.3721818,
+   "lon": -72.0136171,
+   "radius_m": 150,
+   "housenumber": "101",
+   "locality": "WATERFORD"
+  }
+ },
+ {
+  "id": 8,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "101 N   PLEASANT ST, TROY, VT"
+  },
+  "truth": {
+   "lat": 44.994284,
+   "lon": -72.405862,
+   "radius_m": 150,
+   "housenumber": "101",
+   "locality": "TROY"
+  }
+ },
+ {
+  "id": 9,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "169 SCHOOL ST, PAWLET, VT"
+  },
+  "truth": {
+   "lat": 43.345361,
+   "lon": -73.1798796,
+   "radius_m": 150,
+   "housenumber": "169",
+   "locality": "PAWLET"
+  }
+ },
+ {
+  "id": 10,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "1342 LAKE DUNMORE RD, LEICESTER, VT"
+  },
+  "truth": {
+   "lat": 43.8621566,
+   "lon": -73.06869,
+   "radius_m": 150,
+   "housenumber": "1342",
+   "locality": "LEICESTER"
+  }
+ },
+ {
+  "id": 11,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "0 MARLBORO RD BRATTLEBORO Vermont"
+  },
+  "truth": {
+   "lat": 42.8658299,
+   "lon": -72.6118978,
+   "radius_m": 150,
+   "housenumber": "0",
+   "locality": "BRATTLEBORO"
+  }
+ },
+ {
+  "id": 12,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "197 AVENUE, BAKERSFIELD, VT"
+  },
+  "truth": {
+   "lat": 44.7865806,
+   "lon": -72.8029341,
+   "radius_m": 150,
+   "housenumber": "197",
+   "locality": "BAKERSFIELD"
+  }
+ },
+ {
+  "id": 13,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "8231 JACKSONVILLE STAGE RD, HALIFAX, VT"
+  },
+  "truth": {
+   "lat": 42.7695113,
+   "lon": -72.7375307,
+   "radius_m": 150,
+   "housenumber": "8231",
+   "locality": "HALIFAX"
+  }
+ },
+ {
+  "id": 14,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "25 SCHOkL ST, RANDOLPH, VT"
+  },
+  "truth": {
+   "lat": 43.9258336,
+   "lon": -72.6714052,
+   "radius_m": 150,
+   "housenumber": "25",
+   "locality": "RANDOLPH"
+  }
+ },
+ {
+  "id": 15,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "12 BURNELL TER, SAINT ALBANS CITY, VT"
+  },
+  "truth": {
+   "lat": 44.8031136,
+   "lon": -73.0781624,
+   "radius_m": 150,
+   "housenumber": "12",
+   "locality": "SAINT ALBANS CITY"
+  }
+ },
+ {
+  "id": 16,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "589 NORTy RD, MANCESTER, VT"
+  },
+  "truth": {
+   "lat": 43.2018978,
+   "lon": -73.0430616,
+   "radius_m": 150,
+   "housenumber": "589",
+   "locality": "MANCHESTER"
+  }
+ },
+ {
+  "id": 17,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "41 KINGSLAND TER, BURLINGTON, VT"
+  },
+  "truth": {
+   "lat": 44.4714797,
+   "lon": -73.2069415,
+   "radius_m": 150,
+   "housenumber": "41",
+   "locality": "BURLINGTON"
+  }
+ },
+ {
+  "id": 18,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "16 FURNACE RD, PITTSFORD, VT"
+  },
+  "truth": {
+   "lat": 43.7067747,
+   "lon": -73.0167001,
+   "radius_m": 150,
+   "housenumber": "16",
+   "locality": "PITTSFORD"
+  }
+ },
+ {
+  "id": 19,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "304 GREENDALE RD, WESTON, VT"
+  },
+  "truth": {
+   "lat": 43.332312,
+   "lon": -72.8031069,
+   "radius_m": 150,
+   "housenumber": "304",
+   "locality": "WESTON"
+  }
+ },
+ {
+  "id": 20,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "120 WILLOW DR, CRAFTSBURY"
+  },
+  "truth": {
+   "lat": 44.6364816,
+   "lon": -72.4172464,
+   "radius_m": 150,
+   "housenumber": "120",
+   "locality": "CRAFTSBURY"
+  }
+ },
+ {
+  "id": 21,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "392 VAIL DR, LYNDON, VT"
+  },
+  "truth": {
+   "lat": 44.5402331,
+   "lon": -72.028827,
+   "radius_m": 150,
+   "housenumber": "392",
+   "locality": "LYNDON"
+  }
+ },
+ {
+  "id": 22,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "78 CIRCLE ST, WILpIAMSTOWN, VT"
+  },
+  "truth": {
+   "lat": 44.1265959,
+   "lon": -72.5361111,
+   "radius_m": 150,
+   "housenumber": "78",
+   "locality": "WILLIAMSTOWN"
+  }
+ },
+ {
+  "id": 23,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "38 HULL AVE, WALLINGFORD, VT"
+  },
+  "truth": {
+   "lat": 43.4738057,
+   "lon": -72.9761137,
+   "radius_m": 150,
+   "housenumber": "38",
+   "locality": "WALLINGFORD"
+  }
+ },
+ {
+  "id": 24,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "293 PARIZO RD Vermont"
+  },
+  "truth": {
+   "lat": 44.9262669,
+   "lon": -73.090354,
+   "radius_m": 150,
+   "housenumber": "293",
+   "locality": "HIGHGATE"
+  }
+ },
+ {
+  "id": 25,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "0 HARBOR VIEW DR, SAINT ALBANS TOWN, VT"
+  },
+  "truth": {
+   "lat": 44.7867369,
+   "lon": -73.0885296,
+   "radius_m": 150,
+   "housenumber": "0",
+   "locality": "SAINT ALBANS TOWN"
+  }
+ },
+ {
+  "id": 26,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "5273 SNAKE MOUNTAIN RD, WEYBRIDGE"
+  },
+  "truth": {
+   "lat": 44.0660642,
+   "lon": -73.2634292,
+   "radius_m": 150,
+   "housenumber": "5273",
+   "locality": "WEYBRIDGE"
+  }
+ },
+ {
+  "id": 27,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "13 TURNPIKE RD Jaffrey "
+  },
+  "truth": {
+   "lat": 42.8140094,
+   "lon": -72.0211094,
+   "radius_m": 150,
+   "housenumber": "13",
+   "locality": "Jaffrey"
+  }
+ },
+ {
+  "id": 28,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "134 SMITH DR Apt 11, NEWPORT TOWN, VT"
+  },
+  "truth": {
+   "lat": 44.9740653,
+   "lon": -72.2429489,
+   "radius_m": 150,
+   "housenumber": "134",
+   "locality": "NEWPORT TOWN"
+  }
+ },
+ {
+  "id": 29,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "28 CROSS COUNTRY CIR Apt 12, WILMINGTON, VT"
+  },
+  "truth": {
+   "lat": 42.9102527,
+   "lon": -72.8412488,
+   "radius_m": 150,
+   "housenumber": "28",
+   "locality": "WILMINGTON"
+  }
+ },
+ {
+  "id": 30,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "9785 V ROUTE 25, CORINTH, VT"
+  },
+  "truth": {
+   "lat": 44.0657263,
+   "lon": -72.2436126,
+   "radius_m": 150,
+   "housenumber": "9785",
+   "locality": "CORINTH"
+  }
+ },
+ {
+  "id": 31,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "0 HOWLAND FARM RD, MOUNT HOLLY, VT"
+  },
+  "truth": {
+   "lat": 43.3929971,
+   "lon": -72.7996912,
+   "radius_m": 150,
+   "housenumber": "0",
+   "locality": "MOUNT HOLLY"
+  }
+ },
+ {
+  "id": 32,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "344 ALPINE DR, MOUNT HOLLY, VT"
+  },
+  "truth": {
+   "lat": 43.4371141,
+   "lon": -72.7691357,
+   "radius_m": 150,
+   "housenumber": "344",
+   "locality": "MOUNT HOLLY"
+  }
+ },
+ {
+  "id": 33,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "0 LOCUST HTS, DOVER, VT"
+  },
+  "truth": {
+   "lat": 42.9644225,
+   "lon": -72.7795285,
+   "radius_m": 150,
+   "housenumber": "0",
+   "locality": "DOVER"
+  }
+ },
+ {
+  "id": 34,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "3009 EVANSVILLE RD, BROWNuNGTON, VT"
+  },
+  "truth": {
+   "lat": 44.7949746,
+   "lon": -72.0880164,
+   "radius_m": 150,
+   "housenumber": "3009",
+   "locality": "BROWNINGTON"
+  }
+ },
+ {
+  "id": 35,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "287 WESTON HTS, WINDSOR, VT"
+  },
+  "truth": {
+   "lat": 43.4409306,
+   "lon": -72.3995449,
+   "radius_m": 150,
+   "housenumber": "287",
+   "locality": "WINDSOR"
+  }
+ },
+ {
+  "id": 36,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "777 SKYHAWK LN Apt 12, WEST WINDSOR, VT"
+  },
+  "truth": {
+   "lat": 43.4613319,
+   "lon": -72.4721739,
+   "radius_m": 150,
+   "housenumber": "777",
+   "locality": "WEST WINDSOR"
+  }
+ },
+ {
+  "id": 37,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "247 DIGGINS RD, HYDE PARK, VT"
+  },
+  "truth": {
+   "lat": 44.6295977,
+   "lon": -72.5538788,
+   "radius_m": 150,
+   "housenumber": "247",
+   "locality": "HYDE PARK"
+  }
+ },
+ {
+  "id": 38,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "6629 east bakersfield rd bakersfield vt"
+  },
+  "truth": {
+   "lat": 44.8365049,
+   "lon": -72.7286733,
+   "radius_m": 150,
+   "housenumber": "6629",
+   "locality": "BAKERSFIELD"
+  }
+ },
+ {
+  "id": 39,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "159 RIEVR ST, RUTLAND CITY, VT"
+  },
+  "truth": {
+   "lat": 43.6013615,
+   "lon": -72.9893583,
+   "radius_m": 150,
+   "housenumber": "159",
+   "locality": "RUTLAND CITY"
+  }
+ },
+ {
+  "id": 40,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "11 FAWN LN, DOVER, VT"
+  },
+  "truth": {
+   "lat": 42.9580766,
+   "lon": -72.834479,
+   "radius_m": 150,
+   "housenumber": "11",
+   "locality": "DOVER"
+  }
+ },
+ {
+  "id": 41,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "809 ROY MOUNTAIN RD, BARNET, VT"
+  },
+  "truth": {
+   "lat": 44.3033711,
+   "lon": -72.1147417,
+   "radius_m": 150,
+   "housenumber": "809",
+   "locality": "BARNET"
+  }
+ },
+ {
+  "id": 42,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "309 mason point rd castleton vt"
+  },
+  "truth": {
+   "lat": 43.6419766,
+   "lon": -73.2080397,
+   "radius_m": 150,
+   "housenumber": "309",
+   "locality": "CASTLETON"
+  }
+ },
+ {
+  "id": 43,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "179 CRESTVIEW DR "
+  },
+  "truth": {
+   "lat": 42.8404631,
+   "lon": -72.0172761,
+   "radius_m": 150,
+   "housenumber": "179",
+   "locality": "Jaffrey"
+  }
+ },
+ {
+  "id": 44,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "266 E   HILL RD, RICHMOND, VT"
+  },
+  "truth": {
+   "lat": 44.4030967,
+   "lon": -73.0468146,
+   "radius_m": 150,
+   "housenumber": "266",
+   "locality": "RICHMOND"
+  }
+ },
+ {
+  "id": 45,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "261 old route 12 barnard vt"
+  },
+  "truth": {
+   "lat": 43.7891244,
+   "lon": -72.6479883,
+   "radius_m": 150,
+   "housenumber": "261",
+   "locality": "BARNARD"
+  }
+ },
+ {
+  "id": 46,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "3 CEDAR ST, WINOOSKI, VT"
+  },
+  "truth": {
+   "lat": 44.5013992,
+   "lon": -73.1904546,
+   "radius_m": 150,
+   "housenumber": "3",
+   "locality": "WINOOSKI"
+  }
+ },
+ {
+  "id": 47,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "30 THIRD ST, ENOSBURGH, VT"
+  },
+  "truth": {
+   "lat": 44.9084477,
+   "lon": -72.8146,
+   "radius_m": 150,
+   "housenumber": "30",
+   "locality": "ENOSBURGH"
+  }
+ },
+ {
+  "id": 48,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "100 MACDONOUGH DR Vermont"
+  },
+  "truth": {
+   "lat": 44.169234,
+   "lon": -73.2674634,
+   "radius_m": 150,
+   "housenumber": "100",
+   "locality": "VERGENNES"
+  }
+ },
+ {
+  "id": 49,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "580 WEST HILL RD, MIDDLESEX, VT"
+  },
+  "truth": {
+   "lat": 44.3661028,
+   "lon": -72.6084508,
+   "radius_m": 150,
+   "housenumber": "580",
+   "locality": "MIDDLESEX"
+  }
+ },
+ {
+  "id": 50,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "13 HAYDEN ST, ESSEX JUUNCTION VILLAGE, VTT"
+  },
+  "truth": {
+   "lat": 44.4934643,
+   "lon": -73.1301979,
+   "radius_m": 150,
+   "housenumber": "13",
+   "locality": "ESSEX JUNCTION VILLAGE"
+  }
+ },
+ {
+  "id": 51,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "2999 BALTIMOR RD, BALTIMORE, VT"
+  },
+  "truth": {
+   "lat": 43.3723274,
+   "lon": -72.56313,
+   "radius_m": 150,
+   "housenumber": "2999",
+   "locality": "BALTIMORE"
+  }
+ },
+ {
+  "id": 52,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "232 LOWERY RD",
+   "locality": "BARRE TOWN",
+   "postalcode": "05641",
+   "region": "VT"
+  },
+  "truth": {
+   "lat": 44.1479384,
+   "lon": -72.4579736,
+   "radius_m": 150,
+   "housenumber": "232",
+   "locality": "BARRE TOWN"
+  }
+ },
+ {
+  "id": 53,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "815 WHITCOMB ISLAND RD",
+   "locality": "JOHNSON",
+   "postalcode": "05656",
+   "region": "VT"
+  },
+  "truth": {
+   "lat": 44.6420149,
+   "lon": -72.6253983,
+   "radius_m": 150,
+   "housenumber": "815",
+   "locality": "JOHNSON"
+  }
+ },
+ {
+  "id": 54,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "502 ACORN LN",
+   "locality": "SHELBURNE",
+   "postalcode": "05482",
+   "region": "VT"
+  },
+  "truth": {
+   "lat": 44.382703,
+   "lon": -73.2162054,
+   "radius_m": 150,
+   "housenumber": "502",
+   "locality": "SHELBURNE"
+  }
+ },
+ {
+  "id": 55,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "200 BUTTON HILL RD",
+   "locality": "TUNBRIDGE",
+   "postalcode": "05077",
+   "region": "VT"
+  },
+  "truth": {
+   "lat": 43.8490116,
+   "lon": -72.4707955,
+   "radius_m": 150,
+   "housenumber": "200",
+   "locality": "TUNBRIDGE"
+  }
+ },
+ {
+  "id": 56,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "974 SHELBURNE RD",
+   "locality": "SOUTH BURLINGTON",
+   "postalcode": "05403",
+   "region": "VT"
+  },
+  "truth": {
+   "lat": 44.4421147,
+   "lon": -73.2091755,
+   "radius_m": 150,
+   "housenumber": "974",
+   "locality": "SOUTH BURLINGTON"
+  }
+ },
+ {
+  "id": 57,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "109 S   MAIN ST",
+   "locality": "SAINT ALBANS CITY",
+   "postalcode": "05478",
+   "region": "VT"
+  },
+  "truth": {
+   "lat": 44.8060029,
+   "lon": -73.0848229,
+   "radius_m": 150,
+   "housenumber": "109",
+   "locality": "SAINT ALBANS CITY"
+  }
+ },
+ {
+  "id": 58,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "693 MESSIER RD",
+   "locality": "FRANKLIN",
+   "postalcode": "05457",
+   "region": "VT"
+  },
+  "truth": {
+   "lat": 44.9902912,
+   "lon": -72.9486662,
+   "radius_m": 150,
+   "housenumber": "693",
+   "locality": "FRANKLIN"
+  }
+ },
+ {
+  "id": 59,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "3814 HIGHBRIDGE RD",
+   "locality": "GEORGIA",
+   "postalcode": "05454",
+   "region": "VT"
+  },
+  "truth": {
+   "lat": 44.6883826,
+   "lon": -73.0962233,
+   "radius_m": 150,
+   "housenumber": "3814",
+   "locality": "GEORGIA"
+  }
+ },
+ {
+  "id": 60,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "159 BERLIN ST",
+   "locality": "BARRE CITY",
+   "postalcode": "05641",
+   "region": "VT"
+  },
+  "truth": {
+   "lat": 44.1977088,
+   "lon": -72.5163664,
+   "radius_m": 150,
+   "housenumber": "159",
+   "locality": "BARRE CITY"
+  }
+ },
+ {
+  "id": 61,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "25 LAFAYETTE ST",
+   "locality": "RUTLAND CITY",
+   "postalcode": "05701",
+   "region": "VT"
+  },
+  "truth": {
+   "lat": 43.610347,
+   "lon": -72.9667268,
+   "radius_m": 150,
+   "housenumber": "25",
+   "locality": "RUTLAND CITY"
+  }
+ },
+ {
+  "id": 62,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "7 GRANDVIEW DR",
+   "locality": "SOUTH BURLINGTON",
+   "postalcode": "05403",
+   "region": "VT"
+  },
+  "truth": {
+   "lat": 44.4513494,
+   "lon": -73.1763714,
+   "radius_m": 150,
+   "housenumber": "7",
+   "locality": "SOUTH BURLINGTON"
+  }
+ },
+ {
+  "id": 63,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "1927 HILL WEST RD",
+   "locality": "MONTGOMERY",
+   "postalcode": "05471",
+   "region": "VT"
+  },
+  "truth": {
+   "lat": 44.8748793,
+   "lon": -72.6436871,
+   "radius_m": 150,
+   "housenumber": "1927",
+   "locality": "MONTGOMERY"
+  }
+ },
+ {
+  "id": 64,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "2424 N  HOLLOW RD",
+   "locality": "ROCHESTER",
+   "postalcode": "05767",
+   "region": "VT"
+  },
+  "truth": {
+   "lat": 43.9112414,
+   "lon": -72.7828455,
+   "radius_m": 150,
+   "housenumber": "2424",
+   "locality": "ROCHESTER"
+  }
+ },
+ {
+  "id": 65,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "105 LOALDO DR",
+   "locality": "BURLINGTON",
+   "postalcode": "05408",
+   "region": "VT"
+  },
+  "truth": {
+   "lat": 44.5126928,
+   "lon": -73.257961,
+   "radius_m": 150,
+   "housenumber": "105",
+   "locality": "BURLINGTON"
+  }
+ },
+ {
+  "id": 66,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "143 GOOSE PT",
+   "locality": "ALBURGH",
+   "postalcode": "05440",
+   "region": "VT"
+  },
+  "truth": {
+   "lat": 44.9208197,
+   "lon": -73.2786016,
+   "radius_m": 150,
+   "housenumber": "143",
+   "locality": "ALBURGH"
+  }
+ },
+ {
+  "id": 67,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "168 NORTH ST",
+   "locality": "WINOOSKI",
+   "postalcode": "05404",
+   "region": "VT"
+  },
+  "truth": {
+   "lat": 44.49805,
+   "lon": -73.1900725,
+   "radius_m": 150,
+   "housenumber": "168",
+   "locality": "WINOOSKI"
+  }
+ },
+ {
+  "id": 68,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "32 LITTLE EAGLE BAY RD",
+   "locality": "BURLINGTON",
+   "postalcode": "05408",
+   "region": "VT"
+  },
+  "truth": {
+   "lat": 44.5013437,
+   "lon": -73.2453109,
+   "radius_m": 150,
+   "housenumber": "32",
+   "locality": "BURLINGTON"
+  }
+ },
+ {
+  "id": 69,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "816 WAKE ROBIN DR",
+   "locality": "SHELBURNE",
+   "postalcode": "05482",
+   "region": "VT"
+  },
+  "truth": {
+   "lat": 44.3549796,
+   "lon": -73.2478904,
+   "radius_m": 150,
+   "housenumber": "816",
+   "locality": "SHELBURNE"
+  }
+ },
+ {
+  "id": 70,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "505 WASHINGTON RD",
+   "locality": "WILLIAMSTOWN",
+   "postalcode": "05679",
+   "region": "VT"
+  },
+  "truth": {
+   "lat": 44.1033145,
+   "lon": -72.4745038,
+   "radius_m": 150,
+   "housenumber": "505",
+   "locality": "WILLIAMSTOWN"
+  }
+ },
+ {
+  "id": 71,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 44.7332272,
+   "point.lon": -72.3783468,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 44.7332272,
+   "lon": -72.3783468,
+   "radius_m": 60,
+   "housenumber": "695"
+  }
+ },
+ {
+  "id": 72,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 42.8621287,
+   "point.lon": -72.8282683,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 42.8621287,
+   "lon": -72.8282683,
+   "radius_m": 60,
+   "housenumber": "179"
+  }
+ },
+ {
+  "id": 73,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 43.2426235,
+   "point.lon": -72.7963803,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 43.2426235,
+   "lon": -72.7963803,
+   "radius_m": 60,
+   "housenumber": "7113"
+  }
+ },
+ {
+  "id": 74,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 44.8328332,
+   "point.lon": -72.1722643,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 44.8328332,
+   "lon": -72.1722643,
+   "radius_m": 60,
+   "housenumber": "1169"
+  }
+ },
+ {
+  "id": 75,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 44.2833647,
+   "point.lon": -73.0793166,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 44.2833647,
+   "lon": -73.0793166,
+   "radius_m": 60,
+   "housenumber": "572"
+  }
+ },
+ {
+  "id": 76,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 44.1580506,
+   "point.lon": -72.4980717,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 44.1580506,
+   "lon": -72.4980717,
+   "radius_m": 60,
+   "housenumber": "250"
+  }
+ },
+ {
+  "id": 77,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 44.4714182,
+   "point.lon": -73.1673432,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 44.4714182,
+   "lon": -73.1673432,
+   "radius_m": 60,
+   "housenumber": "34"
+  }
+ },
+ {
+  "id": 78,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 42.9025597,
+   "point.lon": -71.1940592,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 42.9025597,
+   "lon": -71.1940592,
+   "radius_m": 60,
+   "housenumber": "186"
+  }
+ },
+ {
+  "id": 79,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 44.4670367,
+   "point.lon": -73.1571511,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 44.4670367,
+   "lon": -73.1571511,
+   "radius_m": 60,
+   "housenumber": "50"
+  }
+ },
+ {
+  "id": 80,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 44.0245356,
+   "point.lon": -73.3656433,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 44.0245356,
+   "lon": -73.3656433,
+   "radius_m": 60,
+   "housenumber": "3600"
+  }
+ },
+ {
+  "id": 81,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 42.9963609,
+   "point.lon": -72.4653183,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 42.9963609,
+   "lon": -72.4653183,
+   "radius_m": 60,
+   "housenumber": "68"
+  }
+ },
+ {
+  "id": 82,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 44.6261173,
+   "point.lon": -73.1455573,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 44.6261173,
+   "lon": -73.1455573,
+   "radius_m": 60,
+   "housenumber": "520"
+  }
+ },
+ {
+  "id": 83,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 43.9253403,
+   "point.lon": -73.1507228,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 43.9253403,
+   "lon": -73.1507228,
+   "radius_m": 60,
+   "housenumber": "146"
+  }
+ },
+ {
+  "id": 84,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 44.2943155,
+   "point.lon": -73.2246021,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 44.2943155,
+   "lon": -73.2246021,
+   "radius_m": 60,
+   "housenumber": "102"
+  }
+ },
+ {
+  "id": 85,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 42.9950299,
+   "point.lon": -72.6216169,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 42.9950299,
+   "lon": -72.6216169,
+   "radius_m": 60,
+   "housenumber": "301"
+  }
+ },
+ {
+  "id": 86,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 44.1864065,
+   "point.lon": -72.1362544,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 44.1864065,
+   "lon": -72.1362544,
+   "radius_m": 60,
+   "housenumber": "2360"
+  }
+ },
+ {
+  "id": 87,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 44.2538656,
+   "point.lon": -73.2806335,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 44.2538656,
+   "lon": -73.2806335,
+   "radius_m": 60,
+   "housenumber": "94"
+  }
+ },
+ {
+  "id": 88,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 44.9059765,
+   "point.lon": -73.1437292,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 44.9059765,
+   "lon": -73.1437292,
+   "radius_m": 60,
+   "housenumber": "146"
+  }
+ },
+ {
+  "id": 89,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 44.933496,
+   "point.lon": -72.2097256,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 44.933496,
+   "lon": -72.2097256,
+   "radius_m": 60,
+   "housenumber": "32"
+  }
+ },
+ {
+  "id": 90,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 43.6377829,
+   "point.lon": -72.9839805,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 43.6377829,
+   "lon": -72.9839805,
+   "radius_m": 60,
+   "housenumber": "516"
+  }
+ },
+ {
+  "id": 91,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 44.4196571,
+   "point.lon": -72.896131,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 44.4196571,
+   "lon": -72.896131,
+   "radius_m": 60,
+   "housenumber": "2990"
+  }
+ },
+ {
+  "id": 92,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 43.6153028,
+   "point.lon": -73.1607032,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 43.6153028,
+   "lon": -73.1607032,
+   "radius_m": 60,
+   "housenumber": "101"
+  }
+ },
+ {
+  "id": 93,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 44.8714095,
+   "point.lon": -73.2836901,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 44.8714095,
+   "lon": -73.2836901,
+   "radius_m": 60,
+   "housenumber": "122"
+  }
+ },
+ {
+  "id": 94,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 44.5927866,
+   "point.lon": -72.3868094,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 44.5927866,
+   "lon": -72.3868094,
+   "radius_m": 60,
+   "housenumber": "469"
+  }
+ },
+ {
+  "id": 95,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 43.6639644,
+   "point.lon": -72.8009095,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 43.6639644,
+   "lon": -72.8009095,
+   "radius_m": 60,
+   "housenumber": "308"
+  }
+ },
+ {
+  "id": 96,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 43.9520925,
+   "point.lon": -72.645593,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 43.9520925,
+   "lon": -72.645593,
+   "radius_m": 60,
+   "housenumber": "1201"
+  }
+ },
+ {
+  "id": 97,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Grotoon"
+  },
+  "truth": {
+   "lat": 44.212159,
+   "lon": -72.196525,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 98,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "West Rtuland"
+  },
+  "truth": {
+   "lat": 43.600999,
+   "lon": -73.045418,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 99,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Big Rock Coener"
+  },
+  "truth": {
+   "lat": 43.78118,
+   "lon": -71.44924,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 100,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Meredtih"
+  },
+  "truth": {
+   "lat": 43.654908,
+   "lon": -71.449679,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 101,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Steewartstown Hollow"
+  },
+  "truth": {
+   "lat": 44.94866,
+   "lon": -71.45258,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 102,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Derfield"
+  },
+  "truth": {
+   "lat": 43.134354,
+   "lon": -71.256886,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 103,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "East Wallingfordd"
+  },
+  "truth": {
+   "lat": 43.44952,
+   "lon": -72.87593,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 104,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Cambridgepor"
+  },
+  "truth": {
+   "lat": 43.15147,
+   "lon": -72.56037,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 105,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "town",
+  "params": {
+   "text": "waltham"
+  },
+  "truth": {
+   "lat": 44.135311,
+   "lon": -73.231517,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 106,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "town",
+  "params": {
+   "text": "farmington"
+  },
+  "truth": {
+   "lat": 43.34439,
+   "lon": -71.076601,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 107,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Irsabrg"
+  },
+  "truth": {
+   "lat": 44.803144,
+   "lon": -72.2861,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 108,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Willistonn"
+  },
+  "truth": {
+   "lat": 44.43755,
+   "lon": -73.06818,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 109,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "town",
+  "params": {
+   "text": "white river junction"
+  },
+  "truth": {
+   "lat": 43.648893,
+   "lon": -72.323657,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 110,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Irassburg"
+  },
+  "truth": {
+   "lat": 44.835544,
+   "lon": -72.300344,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 111,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Barmarrd"
+  },
+  "truth": {
+   "lat": 43.72868,
+   "lon": -72.61899,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 112,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Lymee"
+  },
+  "truth": {
+   "lat": 43.80951,
+   "lon": -72.15592,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 113,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Lower Viplage"
+  },
+  "truth": {
+   "lat": 43.03813,
+   "lon": -72.26981,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 114,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "town",
+  "params": {
+   "text": "hollis"
+  },
+  "truth": {
+   "lat": 42.74314,
+   "lon": -71.59174,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 115,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Bevdiere Center"
+  },
+  "truth": {
+   "lat": 44.75005,
+   "lon": -72.69123,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 116,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Little Loon Pond"
+  },
+  "truth": {
+   "lat": 44.041242,
+   "lon": -71.634924,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 117,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Bean Mountain, East Lempster"
+  },
+  "truth": {
+   "lat": 43.2270121,
+   "lon": -72.1381397,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 118,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Liberty Hill, Henniker"
+  },
+  "truth": {
+   "lat": 43.2028279,
+   "lon": -71.8605926,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 119,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Bragg Pond"
+  },
+  "truth": {
+   "lat": 44.7666794,
+   "lon": -71.250787,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 120,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Buzzell Hil, Bloomfield"
+  },
+  "truth": {
+   "lat": 44.8135705,
+   "lon": -71.6009003,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 121,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Beech Hill, Northumberland"
+  },
+  "truth": {
+   "lat": 44.5506328,
+   "lon": -71.5526671,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 122,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Oak Hill, Peterborough"
+  },
+  "truth": {
+   "lat": 42.8674445,
+   "lon": -71.906043,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 123,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "The Pinnacle, Hooksett"
+  },
+  "truth": {
+   "lat": 43.0966039,
+   "lon": -71.4706854,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 124,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Leech Hill"
+  },
+  "truth": {
+   "lat": 44.072061,
+   "lon": -72.3199659,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 125,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Spruce Knob"
+  },
+  "truth": {
+   "lat": 43.5383488,
+   "lon": -73.1241645,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 126,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Colleague Pond"
+  },
+  "truth": {
+   "lat": 43.2232048,
+   "lon": -71.818128,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 127,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Crane Mountain, Harmonyville"
+  },
+  "truth": {
+   "lat": 43.0450473,
+   "lon": -72.6323304,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 128,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Sky Rnch Pond"
+  },
+  "truth": {
+   "lat": 43.5874353,
+   "lon": -72.3192401,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 129,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Shaker Hill, Chase Village"
+  },
+  "truth": {
+   "lat": 43.1571837,
+   "lon": -71.7433032,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 130,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Naohr Hill"
+  },
+  "truth": {
+   "lat": 43.0185089,
+   "lon": -71.9555098,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 131,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Mount Joseph Whipple"
+  },
+  "truth": {
+   "lat": 44.4414063,
+   "lon": -71.4568539,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 132,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Aenikii Mountain"
+  },
+  "truth": {
+   "lat": 44.8771971,
+   "lon": -71.3070486,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 133,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Morse Mountain, Groveton"
+  },
+  "truth": {
+   "lat": 44.6253429,
+   "lon": -71.5248964,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 134,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Mount Pickering, Rogers Crossing"
+  },
+  "truth": {
+   "lat": 44.0988555,
+   "lon": -71.2399644,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 135,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "C4 Automotive"
+  },
+  "truth": {
+   "lat": 44.8895389,
+   "lon": -71.50495839,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 136,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Advanced Excavating & Paving"
+  },
+  "truth": {
+   "lat": 43.12590105,
+   "lon": -71.43156573,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 137,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "BoxLucnh, Salem"
+  },
+  "truth": {
+   "lat": 42.767551,
+   "lon": -71.230731,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 138,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "Te Wild Rove"
+  },
+  "truth": {
+   "lat": 42.99400608,
+   "lon": -71.4617097,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 139,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Ruth Ganev Photography"
+  },
+  "truth": {
+   "lat": 43.00932905,
+   "lon": -70.80502192,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 140,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Bernie's Restaurant"
+  },
+  "truth": {
+   "lat": 44.87815240444348,
+   "lon": -72.60890544104103,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 141,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Mount Snow Grand Summit Resort"
+  },
+  "truth": {
+   "lat": 42.965848196836,
+   "lon": -72.89399206638338,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 142,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Mark B Arsenault"
+  },
+  "truth": {
+   "lat": 42.9655278,
+   "lon": -70.8342754,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 143,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "Tried and Tru Barbershop"
+  },
+  "truth": {
+   "lat": 42.993806934984256,
+   "lon": -71.46574795246126,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 144,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Mountain View Service Center"
+  },
+  "truth": {
+   "lat": 43.883665,
+   "lon": -71.22529,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 145,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Bonita S Libman, Md"
+  },
+  "truth": {
+   "lat": 44.479211,
+   "lon": -73.19425,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 146,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Town of Winchester NH"
+  },
+  "truth": {
+   "lat": 42.772833517587,
+   "lon": -72.38334774971,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 147,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "Workk 'N Gear, Manchester"
+  },
+  "truth": {
+   "lat": 42.9602796,
+   "lon": -71.4392785,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 148,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Lucas Willson Acres"
+  },
+  "truth": {
+   "lat": 42.99413156235191,
+   "lon": -72.58201578381467,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 149,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "Walreens, Rutland"
+  },
+  "truth": {
+   "lat": 43.610443,
+   "lon": -72.97131,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 150,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "The Burger Den"
+  },
+  "truth": {
+   "lat": 43.627016,
+   "lon": -72.3232501,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 151,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Jet Service Envelope Co"
+  },
+  "truth": {
+   "lat": 44.168806,
+   "lon": -72.571967,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 152,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Aroma Joe's, Somersworth"
+  },
+  "truth": {
+   "lat": 43.26760862203791,
+   "lon": -70.90914670391899,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 153,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Green Mountain Insulated Glass"
+  },
+  "truth": {
+   "lat": 43.60331859,
+   "lon": -73.00374271,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 154,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "05352"
+  },
+  "truth": {
+   "lat": 42.80825,
+   "lon": -73.076331,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 155,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "05845"
+  },
+  "truth": {
+   "lat": 44.800059,
+   "lon": -72.331931,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 156,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "05655"
+  },
+  "truth": {
+   "lat": 44.624262,
+   "lon": -72.570417,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 157,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "05042"
+  },
+  "truth": {
+   "lat": 44.244001,
+   "lon": -72.110803,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 158,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "03070"
+  },
+  "truth": {
+   "lat": 42.976408,
+   "lon": -71.686737,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 159,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "03583"
+  },
+  "truth": {
+   "lat": 44.4028,
+   "lon": -71.456598,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 160,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "03256"
+  },
+  "truth": {
+   "lat": 43.623436,
+   "lon": -71.632547,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 161,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "05405"
+  },
+  "truth": {
+   "lat": 44.474157,
+   "lon": -73.196366,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 162,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Grot"
+  },
+  "truth": {
+   "lat": 44.212159,
+   "lon": -72.196525,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 163,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "West Rut"
+  },
+  "truth": {
+   "lat": 43.600999,
+   "lon": -73.045418,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 164,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Big Rock "
+  },
+  "truth": {
+   "lat": 43.78118,
+   "lon": -71.44924,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 165,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Mered"
+  },
+  "truth": {
+   "lat": 43.654908,
+   "lon": -71.449679,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 166,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Stewartstown "
+  },
+  "truth": {
+   "lat": 44.94866,
+   "lon": -71.45258,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 167,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Deerfi"
+  },
+  "truth": {
+   "lat": 43.134354,
+   "lon": -71.256886,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 168,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "East Walli"
+  },
+  "truth": {
+   "lat": 43.44952,
+   "lon": -72.87593,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 169,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Cambridgep"
+  },
+  "truth": {
+   "lat": 43.15147,
+   "lon": -72.56037,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 170,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Walt"
+  },
+  "truth": {
+   "lat": 44.135311,
+   "lon": -73.231517,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 171,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Strictly Moose Luxury Vacati"
+  },
+  "truth": {
+   "lat": 44.38938203,
+   "lon": -71.17874976,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 172,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Hydro-Pro Pow"
+  },
+  "truth": {
+   "lat": 43.61235942,
+   "lon": -71.52903772,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 173,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Camp Pemigewa"
+  },
+  "truth": {
+   "lat": 43.88970394,
+   "lon": -71.96933627,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 174,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Moon"
+  },
+  "truth": {
+   "lat": 43.172878,
+   "lon": -73.062591,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 175,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Wrr Enterprises Llc-sba Smal"
+  },
+  "truth": {
+   "lat": 43.2938029,
+   "lon": -70.9552105,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 176,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Westford Public"
+  },
+  "truth": {
+   "lat": 44.61209805,
+   "lon": -73.0113646,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 177,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Samuel E. Paul Communi"
+  },
+  "truth": {
+   "lat": 42.81945809,
+   "lon": -72.18175229,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 178,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Tim's Cy"
+  },
+  "truth": {
+   "lat": 44.60310414433479,
+   "lon": -73.16244564950466,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 179,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Zen Glow Wellness - zen "
+  },
+  "truth": {
+   "lat": 43.58452925,
+   "lon": -71.21449815,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 180,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Fenyuxdran Mountain"
+  },
+  "truth": null
+ },
+ {
+  "id": 181,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "wrxmbttmtw"
+  },
+  "truth": null
+ },
+ {
+  "id": 182,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "hdhrppjvkztp"
+  },
+  "truth": null
+ },
+ {
+  "id": 183,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Chicago Union Station"
+  },
+  "truth": null
+ },
+ {
+  "id": 184,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "xvksqd"
+  },
+  "truth": null
+ },
+ {
+  "id": 185,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Fenpel Pond"
+  },
+  "truth": null
+ },
+ {
+  "id": 186,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Pelzor Brewing Co"
+  },
+  "truth": null
+ },
+ {
+  "id": 187,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Austin, TX"
+  },
+  "truth": null
+ },
+ {
+  "id": 188,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Pelfenfen Plaza"
+  },
+  "truth": null
+ },
+ {
+  "id": 189,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Chicago Union Station"
+  },
+  "truth": null
+ },
+ {
+  "id": 190,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Pelblaxtrum Brewing Co"
+  },
+  "truth": null
+ },
+ {
+  "id": 191,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Pelmib Plaza"
+  },
+  "truth": null
+ },
+ {
+  "id": 192,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Vancouver"
+  },
+  "truth": null
+ },
+ {
+  "id": 193,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Zorkrokro Brewing Co"
+  },
+  "truth": null
+ },
+ {
+  "id": 194,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Chicago Union Station"
+  },
+  "truth": null
+ },
+ {
+  "id": 195,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Quendrankro Street"
+  },
+  "truth": null
+ },
+ {
+  "id": 196,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "96963 CENTER OF TOWN RD"
+  },
+  "truth": null
+ },
+ {
+  "id": 197,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Pelmib Pond"
+  },
+  "truth": null
+ },
+ {
+  "id": 198,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Lake Tahoe"
+  },
+  "truth": null
+ }
+]

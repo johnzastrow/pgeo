@@ -303,3 +303,33 @@ shows as `Cattaraugus, NY` returning the county rather than the village. A user 
 **The fix** for the second is a layer priority in the tie-break: locality before county before
 venue at equal confidence. The first is harder and needs its own accuracy run, since boosting
 localities on fuzzy matches will change what many queries return.
+
+## 13. Two builds against one database destroy each other silently
+
+Running `scripts/pgeo_rebuild.sh --build vt-nh` twice at once (my own mistake on 2026-09-23, a
+backgrounded job I believed had failed) produced a build that reported success and was missing
+40% of its streets: Vermont came out with 193 against New Hampshire's 40,300, and there was no
+Main Street in Burlington.
+
+The mechanism is that each build does `DROP SCHEMA IF EXISTS pgeo_build CASCADE; CREATE SCHEMA
+pgeo_build`. The second build dropped the first one's schema mid-load, so the first extract's
+`ogr2ogr` lost its table underneath it:
+
+```
+ERROR 1: CREATE TABLE "pgeo_build"."osm_lines" (...)
+ERROR:  duplicate key value violates unique constraint "pg_type_typname_nsp_index"
+ERROR 1: Terminating translation prematurely after failed translation of layer lines
+```
+
+One process raised and died; the other carried on and printed `build complete in 206s`. A clean
+single rebuild of the same region gives 67,901 streets, so nothing is wrong with the data or the
+loader - only with what happens when two of them meet.
+
+**The fix** is a session-level advisory lock on the database, taken for the length of a build:
+`SELECT pg_try_advisory_lock(...)` at the start, refuse with "a build is already running against
+this database" when it is not granted. Cheap, and it releases itself if the process dies.
+
+Worth doing at the same time: the build should fail when `ogr2ogr` writes `ERROR 1` even where
+the exit status is zero, and the per-source counts at the end should be compared against the
+staged counts, so an extract that silently contributed nothing is caught by the build rather than
+by someone noticing a missing street months later.
