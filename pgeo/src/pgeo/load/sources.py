@@ -50,6 +50,11 @@ def wof_admin(out: Path, reg: Region) -> int:
         con.execute(f"ATTACH '{path}' AS {alias} (TYPE sqlite, READ_ONLY)")
     select = """
       SELECT s.id, 'whosonfirst' AS source, CAST(s.id AS VARCHAR) AS source_id, s.placetype, s.name,
+             -- The name carrying whatever suffix the place actually has. Louisiana's county
+             -- equivalents are parishes and Alaska's are boroughs, municipalities and census
+             -- areas, and Who's on First files all of them under placetype 'county' with the
+             -- bare name - "Acadia", not "Acadia Parish". The suffix exists only here.
+             json_extract_string(g.body, '$.properties."label:eng_x_preferred_longname"[0]') AS longname,
              json_extract_string(g.body, '$.properties."wof:abbreviation"') AS abbr,
              TRY_CAST(coalesce(json_extract_string(g.body, '$.properties."wof:population"'),
                                json_extract_string(g.body, '$.properties."gn:population"')) AS BIGINT) AS population,
@@ -165,7 +170,7 @@ def osm_to_postgis(
     for i, pbf in enumerate(pbfs):
         log(f"ogr2ogr {pbf.name} ({i + 1}/{len(pbfs)})")
         for layer, table in layers:
-            subprocess.run(  # noqa: S603 - fixed argv, our own paths, no shell
+            proc = subprocess.run(  # noqa: S603 - fixed argv, our own paths, no shell
                 [
                     ogr2ogr,
                     # The first extract creates the tables; later ones add to them.
@@ -191,4 +196,18 @@ def osm_to_postgis(
                 ],  # fmt: skip
                 check=True,
                 env=env,
+                stderr=subprocess.PIPE,
+                text=True,
             )
+            # ogr2ogr can abandon a layer and still exit zero: "Terminating translation
+            # prematurely after failed translation of layer lines" left a build with New
+            # Hampshire's streets and none of Vermont's, and nothing downstream noticed. Treat
+            # its own error lines as failure, since a partly loaded extract is worse than none.
+            errs = [ln for ln in (proc.stderr or "").splitlines()
+                    if ln.startswith("ERROR") or "Terminating translation" in ln]
+            if errs:
+                detail = "\n  ".join(errs[:6])
+                raise RuntimeError(
+                    f"ogr2ogr reported errors loading layer {layer!r} from {pbf.name} "
+                    f"(exit status {proc.returncode}):\n  {detail}"
+                )

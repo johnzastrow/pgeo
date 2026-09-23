@@ -10,6 +10,47 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-09-23
+
+**Requires a rebuild.** `admin` gains a column, so an existing database keeps the old behaviour
+until `pgeo-load build` runs again.
+
+### Fixed
+- A county carries its own name. Both front ends appended the word " County" to every county
+  name, on the strength of a comment reading "Pelias (WOF) names counties 'Cumberland County'" -
+  true of Maine, and of most states. Louisiana's county equivalents are parishes, Alaska's are
+  boroughs, municipalities and census areas, and the District of Columbia's is itself; Who's on
+  First files all of them under placetype `county` with the bare name, so Louisiana would have
+  answered `Acadia County`. The suffixed form lives in the `label:eng_x_preferred_longname`
+  property, which is now carried through `admin.longname` into the feature, and neither front end
+  appends anything. Found by writing up the next four regions rather than by building one.
+
+- Every point source is clipped to the region, not only OpenStreetMap. The clip of 2026-09-22
+  assumed the others could not stray - "GNIS from the state's own file, Overture clipped in prep"
+  - and measurement said otherwise: a box around Arizona and Nevada admitted 297 GNIS features up
+  to 66 km outside them, in Utah, New Mexico and Sonora, plus 240 OpenAddresses rows. In a
+  single-state build the missing-county fallback then labelled every one with the build's own
+  state, so New York answered `Ringwood River, NY, USA` for a river in New Jersey and held the
+  Canadian side of the Akwesasne reserve. `region_clip` moved to `022_stage.sql`, where it is
+  built whether or not OpenStreetMap is loaded, and `025_osm.sql` now reuses it.
+
+  ZCTAs are deliberately exempt: a ZCTA belongs to the state holding most of its land area, not
+  the state holding its internal point - Maine owns 03579 on 846 km2 against New Hampshire's 611 -
+  so clipping them by point would undo the rule that assigns them.
+
+### Added
+- A build takes a session-level advisory lock and refuses to start when one is already running
+  against the same database, naming the backend that holds it. Two builds at once drop and
+  recreate each other's staging schema: one started twice on 2026-09-23 finished with 193 Vermont
+  streets against New Hampshire's 40,300, no Main Street in Burlington, and still printed "build
+  complete", because one process died with a traceback while the other carried on. The lock is
+  released by PostgreSQL when the connection goes, however the process ends.
+
+- `ogr2ogr` errors fail the build. It can abandon a layer and still exit zero - "Terminating
+  translation prematurely after failed translation of layer lines" was the line that preceded
+  Vermont losing its streets - so its own error output is now treated as failure. A partly loaded
+  extract is worse than none, because it looks like a build.
+
 ## [0.13.0] - 2026-09-23
 
 ### Changed

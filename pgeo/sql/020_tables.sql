@@ -9,6 +9,10 @@ CREATE TABLE admin (
     source_id   text NOT NULL,
     placetype   text NOT NULL,              -- region, county, localadmin, locality, neighbourhood, postalcode
     name        text NOT NULL,
+    -- The name carrying its own suffix, as Who's on First writes it: "Cumberland County", but
+    -- "Acadia Parish" in Louisiana, a borough or census area in Alaska, and plain "District of
+    -- Columbia". The API used to append " County" to all of them on a Maine assumption.
+    longname    text,
     abbr        text,
     population  bigint,
     parent_id   bigint,
@@ -103,7 +107,7 @@ CREATE TABLE build_info (
 
 -- Staging (filled by the loaders with COPY; transformed by 022_stage.sql / 025_osm.sql).
 CREATE UNLOGGED TABLE stage_admin (
-    id bigint, source text, source_id text, placetype text, name text, abbr text,
+    id bigint, source text, source_id text, placetype text, name text, longname text, abbr text,
     population bigint, parent_id bigint, geom_hex text,
     lon double precision, lat double precision,
     minlon double precision, minlat double precision, maxlon double precision, maxlat double precision

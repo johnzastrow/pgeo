@@ -14,10 +14,7 @@
 -- while this keeps all 276 features on Peaks Island, Cliff Island and the Cranberry Isles. The
 -- buffer keeps piers and shoreline; 2,007 features are dropped, almost all of them within 2 km
 -- of the border.
-CREATE TEMP TABLE region_clip AS
-SELECT ST_Buffer(ST_Union(geom), 0.003) AS clip FROM admin WHERE placetype = 'region';
-CREATE INDEX region_clip_gix ON region_clip USING gist (clip);
-ANALYZE region_clip;
+-- region_clip is built in 022_stage.sql, which clips the point sources with the same polygon.
 
 -- Venues from nodes and from areas (point on surface).
 WITH poi AS (

@@ -15,7 +15,7 @@ ANALYZE admin;
 -- `full_area` is the original polygon's area, because "smallest containing polygon" has to mean
 -- the smallest whole one, not the smallest piece. Dropped before the swap: build-time only.
 CREATE TABLE admin_parts AS
-SELECT a.id, a.placetype, a.name, a.source_id, a.parent_id,
+SELECT a.id, a.placetype, a.name, a.longname, a.source_id, a.parent_id,
        ST_Area(a.geom) AS full_area, ST_Subdivide(a.geom, 128) AS geom
 FROM admin a
 WHERE a.placetype IN ('neighbourhood', 'locality', 'localadmin', 'county');
@@ -35,7 +35,11 @@ WITH sole AS (
 )
 SELECT r.rid,
   pip.nb_name AS neighbourhood, pip.lo_name AS locality, pip.la_name AS localadmin,
-  pip.co_name AS county,
+  -- the county's own name, suffix and all: "Cumberland County", but "Acadia Parish" in
+  -- Louisiana and a borough or census area in Alaska. Both front ends used to append the
+  -- word " County" here on the strength of Maine. Falls back to the bare name when Who's on
+  -- First has no long form.
+  coalesce(pip.co_longname, pip.co_name) AS county,
   coalesce(rg.name, (SELECT name FROM sole)) AS region,
   coalesce(rg.abbr, (SELECT abbr FROM sole)) AS region_a,
   coalesce(rg.wof_id, (SELECT wof_id FROM sole)) AS region_wof,
@@ -60,9 +64,10 @@ LEFT JOIN LATERAL (
          max(name)      FILTER (WHERE placetype = 'localadmin')    AS la_name,
          max(source_id) FILTER (WHERE placetype = 'localadmin')    AS la_id,
          max(name)      FILTER (WHERE placetype = 'county')        AS co_name,
+         max(longname)  FILTER (WHERE placetype = 'county')        AS co_longname,
          max(source_id) FILTER (WHERE placetype = 'county')        AS co_id,
          max(parent_id) FILTER (WHERE placetype = 'county')        AS co_parent
-  FROM (SELECT DISTINCT ON (p.placetype) p.placetype, p.name, p.source_id, p.parent_id
+  FROM (SELECT DISTINCT ON (p.placetype) p.placetype, p.name, p.longname, p.source_id, p.parent_id
         FROM admin_parts p
         WHERE ST_Intersects(p.geom, r.geom)
         ORDER BY p.placetype, p.full_area) one_each

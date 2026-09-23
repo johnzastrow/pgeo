@@ -212,7 +212,8 @@ AS $$
       'country', 'United States', 'country_gid', 'whosonfirst:country:85633793', 'country_a', 'USA',
       'country_code', 'US', 'region', h.region, 'region_a', h.region_a,
       -- Pelias (WOF) names counties "Cumberland County"
-      'county', CASE WHEN h.county IS NULL OR h.county ~* ' County$' THEN h.county ELSE h.county || ' County' END,
+      -- already carries its own suffix from Who's on First (Parish, Borough, Census Area)
+      'county', h.county,
       'localadmin', h.localadmin, 'locality', h.locality,
       'neighbourhood', h.neighbourhood, 'label', h.label,
       'category', to_jsonb(h.category), 'addendum', h.addendum) || coalesce(h.hier, '{}'::jsonb),

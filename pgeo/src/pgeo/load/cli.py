@@ -78,6 +78,36 @@ async def ensure_api_role(con: asyncpg.Connection) -> None:
     await con.execute(f"{verb} ROLE pgeo_api LOGIN PASSWORD '{pw}'")  # noqa: S608
 
 
+# Any fixed 64-bit number; it only has to be the same one in every build process. "pgeo" in
+# ASCII, so a stray holder is recognisable in pg_locks.
+BUILD_LOCK_ID = 0x7067656F
+
+
+async def take_build_lock(con: asyncpg.Connection) -> None:
+    """Refuse to start when another build is already running against this database.
+
+    A build begins by dropping and recreating pgeo_build, so two at once pull the staging schema
+    out from under each other, and the damage is silent: on 2026-09-23 a Vermont/New Hampshire
+    build started twice finished with 193 Vermont streets against New Hampshire's 40,300 - no
+    Main Street in Burlington - and still printed "build complete". One process had died with a
+    traceback while the other carried on and reported success.
+
+    A session-level advisory lock is the cheapest fix that cannot be left behind: PostgreSQL
+    releases it when the connection goes, however the process ends.
+    """
+    if not await con.fetchval("SELECT pg_try_advisory_lock($1)", BUILD_LOCK_ID):
+        holder = await con.fetchval(
+            "SELECT pid FROM pg_locks WHERE locktype = 'advisory' AND objid = $1 AND granted",
+            BUILD_LOCK_ID & 0xFFFFFFFF,
+        )
+        raise SystemExit(
+            "a build is already running against this database"
+            + (f" (backend pid {holder})" if holder else "")
+            + "\n      Two builds at once destroy each other's staging schema, silently: wait"
+            "\n      for it to finish, or stop it, and run this again."
+        )
+
+
 async def build(settings: Settings, selected: list[str], reg: Region) -> None:
     STAGE_DIR.mkdir(parents=True, exist_ok=True)
     log(f"build {reg.build}: {', '.join(reg.states)}")
@@ -85,6 +115,7 @@ async def build(settings: Settings, selected: list[str], reg: Region) -> None:
     counts: dict[str, int] = {}
     con = await asyncpg.connect(settings.dsn, timeout=30)
     try:
+        await take_build_lock(con)
         t0 = time.time()
         await run_sql(con, "010_base.sql")
         # Which states this build holds, for the region name, abbreviation and gid that every

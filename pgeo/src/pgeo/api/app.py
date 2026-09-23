@@ -258,8 +258,9 @@ def feature_json(r: asyncpg.Record) -> dict:
         "country_code": "US",
         "region": r["region"],
         "region_a": r["region_a"],
-        # Pelias (WOF) names counties "Cumberland County"
-        "county": r["county"] if not r["county"] or r["county"].endswith(" County") else f"{r['county']} County",
+        # Already carries its own suffix from Who's on First. This used to append " County"
+        # to every county name, which made Louisiana's parishes "Acadia County".
+        "county": r["county"],
         "localadmin": r["localadmin"],
         "locality": r["locality"],
         "neighbourhood": r["neighbourhood"],
