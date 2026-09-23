@@ -85,20 +85,35 @@ WITH joined AS (
            ELSE r.source || r.layer || r.source_id END AS dup_key
   FROM feature_raw r JOIN hier h USING (rid)
 ),
--- How many of an address's duplicates agree on this exact point. OpenAddresses publishes one
--- row per unit, so a block of flats arrives as eight rows at one coordinate and occasionally one
--- row somewhere else; the majority is the building. Ordering only by source left the winner to
--- whatever the table happened to hold first, which put 101 Hancock St, Rumford 25 m off its
--- seven agreeing siblings and made two builds of the same data disagree on 10,769 rows.
-voted AS (
+-- Two things share this step.
+--
+-- Rows that key alike but are far apart are not duplicates at all. Normalisation makes "18 N St"
+-- and "18 North St" the same string, and Bangor has both, 5 km apart; merging them threw one
+-- real address away. Clustering within the key at ~200 m keeps them as the separate buildings
+-- they are, and still collects the copies of one address.
+--
+-- Among true duplicates, the majority point wins. OpenAddresses publishes one row per unit, so a
+-- block of flats arrives as several rows at one coordinate and occasionally one row somewhere
+-- else. Ordering only by source left the winner to whatever the table happened to hold first,
+-- which put 101 Hancock St, Rumford 25 m off its seven agreeing siblings and made two builds of
+-- the same data disagree on 10,769 rows.
+clustered AS (
   SELECT j.*,
-         count(*) OVER (PARTITION BY dup_key, round(ST_Y(geom)::numeric, 6),
-                        round(ST_X(geom)::numeric, 6)) AS point_votes
+         CASE WHEN layer = 'address'
+              THEN ST_ClusterDBSCAN(geom, eps := 0.002, minpoints := 1)
+                     OVER (PARTITION BY dup_key)
+         END AS dup_cluster
   FROM joined j
+),
+voted AS (
+  SELECT c.*,
+         count(*) OVER (PARTITION BY dup_key, dup_cluster, round(ST_Y(geom)::numeric, 6),
+                        round(ST_X(geom)::numeric, 6)) AS point_votes
+  FROM clustered c
 )
 SELECT v.*,
        row_number() OVER (
-         PARTITION BY dup_key
+         PARTITION BY dup_key, dup_cluster
          ORDER BY CASE source WHEN 'openaddresses' THEN 0 WHEN 'openstreetmap' THEN 1 ELSE 2 END,
                   point_votes DESC,
                   source_id          -- last resort, so the same data always builds the same way
