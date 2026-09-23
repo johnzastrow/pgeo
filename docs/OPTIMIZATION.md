@@ -6,7 +6,7 @@ found**
 
 John Zastrow · 2026-09-23
 
-pgeo 0.7.0, project 0.20.0, commit `46455fa (with uncommitted changes)`.
+pgeo 0.7.0, project 0.20.0, commit `8c6eabc (with uncommitted changes)`.
 Companion to [REPORT.md](REPORT.md), which measured pgeo against Pelias, Photon and Nominatim on
 data for the State of Maine. This document covers what changed afterwards.
 
@@ -22,6 +22,7 @@ data for the State of Maine. This document covers what changed afterwards.
   - [4.2 Null island](#42-null-island)
   - [4.3 Two real addresses merged into one](#43-two-real-addresses-merged-into-one)
   - [4.4 Determinism](#44-determinism)
+  - [4.5 Not every county is called a county](#45-not-every-county-is-called-a-county)
 - [5. Accuracy](#5-accuracy)
   - [5.1 New York: 88.4% to 95.5%, with no New York setting](#51-new-york-884-to-955-with-no-new-york-setting)
   - [5.2 Maine was not disturbed](#52-maine-was-not-disturbed)
@@ -60,8 +61,9 @@ The headline results:
 | Maine accuracy | 95.8% | **96.0%** |
 | Known-answer failures across four builds | 4, unseen | **0** |
 | Two builds of the same data | differed on 10,769 rows | **identical** |
-| Maine features outside Maine | 4,270, labelled ", ME, USA" | 2,516, none foreign, none beyond 16 km |
+| Maine features outside Maine | 4,270, labelled ", ME, USA" | none beyond the 300 m buffer but streets |
 | Commands to build a region by hand | 25 | **1** |
+| Two builds at once against one database | silent corruption | **refused** |
 
 Nothing in this work tunes anything per region. That was the constraint throughout, and it is
 the reason the accuracy gap between New York and Maine closed: every fix replaced a fact about
@@ -170,14 +172,38 @@ OpenStreetMap was taken to be the only source that needed clipping: Who's on Fir
 region's own descendants, GNIS from the state's own file, Overture is clipped during preparation,
 and ZCTAs are assigned by land area, so only OpenStreetMap arrives as a rectangle.
 
-That reasoning was checked afterwards and is wrong at the edges. A state's own GNIS file includes
+That reasoning was checked afterwards and was wrong at the edges. A state's own GNIS file includes
 features on its border whose recorded point falls just outside the polygon, and OpenAddresses
-admits a similar margin. Measured across the four builds, between 1,689 and 3,322 features sit
-outside the region - and in a single-state build the fallback that fills in a missing county
-labels every one of them with the build's state, which is the defect this section describes,
-returning at a twentieth of its old size. New York holds `Ringwood River, NY, USA` for a river in
-New Jersey, and Canadian parts of the Akwesasne reserve. The numbers, the distinction between
-single- and multi-state builds, and the fix are in `TODO.md` section 10.
+admits a similar margin - up to 66 km of it, in Utah, New Mexico and Sonora. In a single-state
+build the fallback that fills in a missing county then labelled every one of them with the
+build's state, so New York answered `Ringwood River, NY, USA` for a river in New Jersey.
+
+The clip now runs over every point source rather than OpenStreetMap alone, built once in the
+staging step so it applies whether or not OpenStreetMap is loaded:
+
+| Source | Furthest stray before | After |
+|---|---|---|
+| GNIS | 66.5 km | **0.3 km** |
+| OpenAddresses | 9.8 km | **0.3 km** |
+| Overture | 0.3 km | 0.3 km |
+| OpenStreetMap streets | 17.2 km | 17.2 km, kept on purpose |
+
+Beyond the buffer nothing survives but streets - 270 in New York, 276 in Arizona plus Nevada, all
+of them streets - and that is the case worth keeping: a street crossing the line is kept whole,
+and its representative point is the centroid of the whole thing. All four accuracy sets are
+unchanged to the case across 2,154 cases, which is what removing wrong data should look like.
+
+ZCTAs are deliberately exempt. A ZCTA belongs to the state holding most of its land area, not the
+state holding its internal point, and that is the rule section 2.1 argues for: Maine owns 03579
+on 846 km² against New Hampshire's 611. Clipping them by point would undo it.
+
+What is left is the buffer itself, and it is honest to name it. The clip is the region buffered by
+about 300 m, because an unbuffered clip drops piers and island shoreline. At a coast that is
+right; at an international land border it admits a strip of the other country. New York still
+holds `Akwesasne Canada Post` 77 m outside the polygon, labelled `, NY, USA`, on a Mohawk
+territory the border runs through - the defect of this section reduced from 118 km to 300 m
+rather than removed. Subtracting Canada and Mexico from the buffer would fix it and needs their
+polygons, which the US-only Who's on First distribution does not carry (`TODO.md` section 15).
 
 The clip uses Who's on First's region polygon, buffered by about 300 m, and the choice of
 polygon matters for the same reason it mattered for ZCTAs. Verified, not assumed:
@@ -219,6 +245,32 @@ That "whichever the table happened to hold first" had a second consequence. Two 
 same data disagreed on **10,769 rows**, so a rebuild could silently move an address with nothing
 to show why. With the source id as a final tie-break, two consecutive builds now produce 908,347
 rows with **identical** gids.
+
+### 4.5 Not every county is called a county
+
+This one was found by writing documentation, which makes it the cheapest defect in this document
+and the only one caught before the region that would have exposed it was built.
+
+Both front ends appended the word " County" to every county name. The comment above the line read
+"Pelias (WOF) names counties 'Cumberland County'" - true of Maine, and of forty-odd other states.
+It is not true of Louisiana, whose county equivalents are parishes; of Alaska, whose are boroughs,
+municipalities and census areas; or of the District of Columbia, which is its own. Who's on First
+files all of them under placetype `county` with the bare name, so a Louisiana build would have
+answered `Acadia County`, which is not a thing anyone has ever called it.
+
+The suffixed form was in the data the whole time, in a property nothing read:
+
+| State | `name` | `label:eng_x_preferred_longname` |
+|---|---|---|
+| Texas | Anderson | Anderson **County** |
+| Louisiana | Acadia | Acadia **Parish** |
+| District of Columbia | District of Columbia | District of Columbia |
+
+It now travels through `admin.longname` into the feature, and neither front end appends anything.
+Maine still answers `Cumberland County` on both paths, so nothing about Pelias compatibility
+changes; Louisiana will answer `Acadia Parish` when it is built. The same assumption had been
+written twice, once in Python and once in SQL, which by this point in the document is the
+expected shape of a defect rather than a surprise.
 
 ## 5. Accuracy
 
