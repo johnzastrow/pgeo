@@ -193,7 +193,12 @@ dump_dir="data/pgeo$([[ "$build" == me ]] || echo "-${build}")/dumps"
 latest="$(ls -t "${dump_dir}"/*.dump 2>/dev/null | head -1 || true)"
 [[ -z "$latest" ]] || printf '   %s%s\n' "$(printf '%-16s' dump)" "$latest"
 
-sql_port=$((4700 + offset))
+# The port this build's Pelias-compatible API listens on. pgeo_setup.sh chose it and wrote it
+# down; build_region.sh never knew it (`offset` is that script's variable, not this one's).
+sql_port=4700
+if [[ "$build" != "me" ]]; then
+  sql_port=$(( 4700 + $(sed -n 's/^PGEO_API_PORT=//p' "pgeo/builds/${build}.env") - 4500 ))
+fi
 cat <<EOF
 
 Next, in the order most people want them:

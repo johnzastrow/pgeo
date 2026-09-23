@@ -121,7 +121,34 @@ The same trick would help reverse geocoding, which does its own point-in-polygon
 `admin` at query time. Not done: it needs the subdivided table kept rather than dropped, and
 its own measurement.
 
-## 5. Alaska crosses the antimeridian
+## 5. Who's on First loses places that have no region ancestor
+
+Admin places are selected as descendants of the build's region id, which is authoritative when
+the ancestry is complete. It is not always complete: Jarbidge, Nevada is in Who's on First as a
+current locality at 41.87, -115.43, and its only ancestors are the United States and itself. No
+region, so the build never sees it.
+
+Places inside a build's box with no region ancestor at all:
+
+| Build | Missed |
+|---|---|
+| Maine | 1 |
+| New York | 5 |
+| Nevada | 62 |
+| Arizona | 72 |
+
+Small, but not evenly spread, and not evenly important. The Arizona list is Allenville, Aripine,
+Artesa, Chutum Vaya, Cibecue Creek, Bradshaw City and their like - unincorporated settlements,
+historic camps and tribal communities, which is the category a rural geocoder is most asked
+about and the category with the most Indigenous names.
+
+**The fix** is a point-in-polygon fallback: a current US locality or localadmin whose point falls
+inside the build's region polygon, and which the ancestry did not already bring in, is part of the
+build. That also excludes the ones a bounding box would wrongly add - about half the Nevada list
+is actually in California, because the box overlaps it. It needs its own accuracy run, because
+adding places changes what a search can return.
+
+## 6. Alaska crosses the antimeridian
 
 Its box runs -179.3 to 179.95, so as min/max longitude it spans the planet: the Overture
 prefilter would pull the world, the basemap extract would be the world, and the coordinate check
@@ -131,7 +158,7 @@ Handling it means carrying two boxes through every bbox step - the Overture S3 f
 pmtiles extract, prep's validation - or working in a projected space. Nobody has asked for
 Alaska; the refusal is honest until they do. Hawaii is fine: islands, but one box.
 
-## 6. ~~An explicit tie-break rule at build time~~ Done 2026-09-22; query time still open
+## 7. ~~An explicit tie-break rule at build time~~ Done 2026-09-22; query time still open
 
 **Build time, done.** The address dedupe kept one row per house number, street and town and
 ordered only by source, so the winner was whichever the table happened to hold first. Two builds
@@ -153,7 +180,7 @@ row order (report Section 3.16.3), which is about one case of noise in the accur
 ("Stevenns Corner"). Any rule - source priority, then id - changes some current outputs, so it
 needs its own accuracy run.
 
-## 7. ~~Rewrite history before publishing to GitHub~~ Done 2026-09-22
+## 8. ~~Rewrite history before publishing to GitHub~~ Done 2026-09-22
 
 The local inventory file had been tracked for a day, and the sanitisation of 2026-09-21 had left
 every earlier commit's copies of the private details in place (some twenty files: the plan, the
@@ -165,7 +192,7 @@ Commit hashes before this date changed; a backup bundle of the old history is ke
 repository. Three tokens the original sanitisation had missed at HEAD (a tailnet address, the
 VM's MAC, the internal DNS name) went in the same pass.
 
-## 8. Authorization: single sign-on
+## 9. Authorization: single sign-on
 
 API keys at the edge are done (0.19.0, report Section 3.13.2). A key names a client - the
 dispatch application, the demo - not a person. Single sign-on for the people behind the clients
