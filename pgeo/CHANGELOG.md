@@ -29,9 +29,22 @@ docs/PGEO_TUNING.md.
 
   Nothing inside the state can be lost this way, and that was checked rather than assumed: the
   Who's on First polygons for Maine and Canada meet at the border with **zero** overlapping area.
-  Maine's accuracy is unchanged at 96.0% with no case altered in either direction, and the
-  islands the buffer exists for - Peaks, Cliff, the Cranberry Isles, Isle au Haut, Monhegan - all
-  survive.
+  The islands the buffer exists for - Peaks, Cliff, the Cranberry Isles, Isle au Haut, Monhegan -
+  all survive, and all four builds re-measured with **no case altered in either direction**:
+  Maine 96.0%, New York 95.5%, Vermont plus New Hampshire 92.4%, Arizona plus Nevada 91.9%.
+
+| Build | Features outside the region, before | After |
+|---|---|---|
+| Maine | 2,492 | **235** |
+| Vermont + New Hampshire | 2,365 | **1,506** |
+| Arizona + Nevada | 1,214 | **772** |
+| New York | 3,208 | **2,825** |
+
+  New York is the one that does not finish the job, and the cause is in the data rather than the
+  clip: Who's on First's Canada polygon has a hole over Akwesasne, so 58 features north of the
+  45th parallel - among them `Akwesasne Canada Post` - sit in a strip assigned to neither New York
+  nor Canada and are still labelled `, NY, USA`. The polygon is exact everywhere else it was
+  checked. See `TODO.md` section 16.
 
 ### Added
 - `scripts/fetch_data.sh neighbours` fetches the two country polygons as single Who's on First
