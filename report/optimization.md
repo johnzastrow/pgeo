@@ -312,7 +312,7 @@ through the single documented command:
 | features with no state | 2,861 | 1,689 |
 | Database | 792 MB | 4.7 GB |
 | Build time | 993 s | **1,787 s** |
-| Known answers | 16 of 16 | 8 of 10 |
+| Known answers | 16 of 16 | 9 of 10 |
 
 The split is the check that matters. A multi-state build that quietly attributed everything to
 the first state would still answer most queries plausibly; 3.7 M against 1.3 M, in a build whose
@@ -320,8 +320,17 @@ region boundaries were never told which state is which, is the evidence that it 
 features carrying no state at all - 1,689 of five million - are the border margin described in
 section 10, not a misattribution between the two states.
 
-The two failing known answers are the venue-outranks-locality case described in section 5.3, not
-multi-state defects.
+The one failing known answer is the venue-outranks-locality case described in section 5.3, not a
+multi-state defect.
+
+Vermont plus New Hampshire's 16 of 16 deserves a caveat, because verifying this section found the
+check to be weaker than it looks. Known answers are matched as substrings, so when that build's
+API container was left on an older image and answered "Burlington, Vermont" with a venue named
+`Burlington Vermont`, the check passed: the word "Burlington" was in the label. Three of its four
+town queries were returning venues while the build reported full marks. The image is now current
+and the answers are genuinely localities, but the lesson belongs in the record - a substring test
+cannot tell a town from a shop named after it, and the two front ends hold two copies of the
+parser with nothing checking they agree (`TODO.md` section 11).
 
 ## 7. Corner cases across the fifty states
 
