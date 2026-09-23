@@ -457,3 +457,43 @@ was measured rather than assumed.
 One thing to know for later: the fetch verifies each file's `iso:country` after downloading,
 because the URL is built from an id and a wrong id returns a perfectly valid polygon for
 somewhere else. 85633057 looks like Mexico's id and is Chile's; the right one is 85633293.
+
+## 16. Who's on First's Canada polygon has a hole over Akwesasne
+
+Section 15 subtracts Canada and Mexico from the clip's buffer, and it works: Maine lost 2,255
+Canadian features, Vermont and New Hampshire lost the Quebec islands, Arizona and Nevada lost
+every Sonoran stray. New York is the exception. It still holds
+
+```
+Akwesasne Canada Post              -> "Akwesasne Canada Post, NY, USA"
+Akwesasne Mohawk Police Service    -> "..., NY, USA"
+Rue Akwesasne                      -> "Rue Akwesasne, NY, USA"
+```
+
+and 58 features in total north of the 45th parallel, 15 of them streets whose centroid crosses
+the line and 43 of them not.
+
+The reason is not imprecision. Who's on First's Canada polygon was checked against four places
+and is exact at all of them - Cornwall, Ontario ten kilometres away, Montreal, Niagara Falls, and
+open farmland immediately north of the 45th parallel are all inside it, at zero distance. It has
+a **hole** over Akwesasne, and these points sit about a kilometre inside that hole, in a strip
+that Who's on First assigns to neither New York nor Canada.
+
+That is likely deliberate rather than broken. Akwesasne is a Mohawk territory straddling Ontario,
+Quebec and New York whose jurisdiction is genuinely contested, and a gazetteer declining to
+assign it to a country is making a defensible choice. The geocoder is not: it labels the strip
+`, NY, USA` because the single-state fallback fills in a missing county with the build's own
+state.
+
+**Options**, none obviously right:
+
+- Subtract the Akwesasne polygon too, by name or id. Fixes this instance and nothing else, and
+  names a place in the code, which is what this whole body of work has been removing.
+- Stop the single-state fallback claiming features that fall outside the region polygon. They
+  would then carry no state - the honest answer, and what a multi-state build already does - and
+  the label would read `Akwesasne Canada Post` with no state. This is general, small, and is
+  probably the right one.
+- Leave it. 43 features in one place, already down from 3,322 before the clip.
+
+The second option is worth costing: it is one condition on the fallback, and it would also clean
+up whatever other holes exist along the border without knowing about them in advance.
