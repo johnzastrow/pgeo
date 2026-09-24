@@ -41,7 +41,7 @@ The headline results:
 | Maine accuracy | 95.8% | **96.0%** |
 | Known-answer failures across four builds | 4, unseen | **0** |
 | Two builds of the same data | differed on 10,769 rows | **identical** |
-| Maine features outside Maine | 4,270, labelled ", ME, USA" | none beyond the 300 m buffer but streets |
+| Maine features outside Maine | 4,270, labelled ", ME, USA" | 235, and **none of them labelled Maine** |
 | Commands to build a region by hand | 25 | **1** |
 | Two builds at once against one database | silent corruption | **refused** |
 
@@ -201,6 +201,36 @@ The polygons cost 5.6 MB, as two single Who's on First records rather than the `
 `admin-mx` distributions at 176 MB and 230 MB compressed for two shapes. The fetch checks each
 file's `iso:country` afterwards, because the URL is built from an id and a wrong id returns a
 perfectly valid polygon for somewhere else - 85633057 looks like Mexico's and is Chile's.
+
+Subtracting the neighbours did not finish it, and the last step is the interesting one. New York
+went on answering `Akwesasne Canada Post, NY, USA`, and the polygon was not at fault: Who's on
+First's Canada is exact at Cornwall ten kilometres away, at Montreal, at Niagara and in farmland
+immediately north of the 45th parallel. It has a **hole** over Akwesasne, a Mohawk territory
+straddling Ontario, Quebec and New York whose jurisdiction is genuinely contested. A gazetteer
+declining to assign that to a country is defensible. A geocoder calling it New York is not.
+
+What was actually wrong was older and more general: a feature with no county fell back to the
+build's own state whenever the build had exactly one. That is right for a sliver between two
+county polygons and wrong for everything past the boundary, and it is the same rule that had New
+York answering for a river in New Jersey. The state now comes from the county's parent as before
+and failing that from whichever region polygon contains the point - the same probe answers it, so
+it costs one more placetype and no extra pass - and a feature inside no region carries no state.
+There is nothing larger loaded to fall back to, the build holding states rather than countries,
+so null is where it stops, which is what a multi-state build always did.
+
+Three things were checked rather than assumed, and the third is the one that could have broken
+it:
+
+- the Akwesasne points are outside New York's **outer ring**, not in a hole, and no build's region
+  polygon has any interior ring or holds any feature in one, so the enclave case does not arise;
+- a concave hull of New York *does* contain them, which is the argument against using one - it
+  would claim the far bank of the river as readily as the near shoreline;
+- **islands keep their state**. A state's bounds include them, and a generalised coastline is
+  exactly what the buffer exists to survive. Peaks, Chebeague, the Cranberry Isles, Islesboro,
+  Vinalhaven, North Haven, Monhegan and Isle au Haut are 100% Maine across 7,145 features.
+
+Maine loses the state on 235 features, every one of them on the New Hampshire line - Salmon Falls
+River, Hiltons Lane, Upton Road - and none of them Maine's.
 
 The clip uses Who's on First's region polygon, buffered by about 300 m, and the choice of
 polygon matters for the same reason it mattered for ZCTAs. Verified, not assumed:
