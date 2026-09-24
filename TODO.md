@@ -512,3 +512,30 @@ including them and the coastline being exactly what the clip's buffer exists to 
 Chebeague, Cranberry Isles, Islesboro, Vinalhaven, North Haven, Monhegan and Isle au Haut are
 100% Maine across 7,145 features. The Who's on First region polygon includes them, which is why
 it was chosen over the Census cartographic one to begin with.
+
+## 17. A feature with no state is still labelled ", USA"
+
+Section 16 stopped a build claiming a state for features outside it. The country is still claimed
+unconditionally, on exactly the assumption that turned out to be wrong about the state - that
+everything in a US build is in the US:
+
+```
+Akwesasne Canada Post   ->  "Akwesasne Canada Post, USA"     (region_a is null, correctly)
+Rue Akwesasne           ->  "Rue Akwesasne, USA"
+```
+
+The label appends `', USA'` with no condition (`sql/030_enrich_index.sql`), and the API's
+`country`, `country_a`, `country_code` and `country_gid` are literals in `api/app.py`. For the
+5,338 features across the four builds that now carry no state - 235 in Maine, 1,506 in Vermont
+plus New Hampshire, 772 in Arizona plus Nevada, 2,825 in New York - the country is asserted on no
+evidence, and for the ones in Canada and Mexico it is wrong.
+
+**The fix** is the same shape as section 16: append the country only when the feature has a
+region, since the region is the only evidence the build has that it is in the United States. The
+label then reads `Akwesasne Canada Post`, which claims nothing untrue. The API's country fields
+want the same treatment, with a caveat worth checking first - Pelias always returns a country for
+a US build, so dropping it may be a compatibility difference rather than a fix, and the
+contract tests of section 11 are where that should be settled.
+
+Cheap in code, but it is materialised at build time, so it costs a rebuild of all four to take
+effect. Worth folding into the next rebuild rather than spending one of its own.
