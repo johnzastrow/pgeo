@@ -229,6 +229,14 @@ it:
   exactly what the buffer exists to survive. Peaks, Chebeague, the Cranberry Isles, Islesboro,
   Vinalhaven, North Haven, Monhegan and Isle au Haut are 100% Maine across 7,145 features.
 
+And the water between the islands is Maine too, which is the strongest argument for the polygon
+over the hull rather than against it. Who's on First's region is a territorial boundary, not a
+land outline: Casco Bay between Peaks and Long Island, Penobscot Bay between Vinalhaven and
+Islesboro, Frenchman Bay, Blue Hill Bay and Muscongus Bay are all inside it, while open water 20
+and 60 km offshore is not. A concave hull adds nothing there and costs a great deal elsewhere -
+at a tolerance loose enough to be worth having it swallows Campobello Island and St. Stephen, and
+would claim 135 of Maine's 235 stateless features for a state none of them is in.
+
 Maine loses the state on 235 features, every one of them on the New Hampshire line - Salmon Falls
 River, Hiltons Lane, Upton Road - and none of them Maine's.
 
