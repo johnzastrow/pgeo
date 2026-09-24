@@ -513,7 +513,7 @@ Chebeague, Cranberry Isles, Islesboro, Vinalhaven, North Haven, Monhegan and Isl
 100% Maine across 7,145 features. The Who's on First region polygon includes them, which is why
 it was chosen over the Census cartographic one to begin with.
 
-## 17. A feature with no state is still labelled ", USA"
+## 17. ~~A feature with no state is still labelled ", USA"~~ Done 2026-09-24
 
 Section 16 stopped a build claiming a state for features outside it. The country is still claimed
 unconditionally, on exactly the assumption that turned out to be wrong about the state - that
@@ -530,12 +530,51 @@ The label appends `', USA'` with no condition (`sql/030_enrich_index.sql`), and 
 plus New Hampshire, 772 in Arizona plus Nevada, 2,825 in New York - the country is asserted on no
 evidence, and for the ones in Canada and Mexico it is wrong.
 
-**The fix** is the same shape as section 16: append the country only when the feature has a
-region, since the region is the only evidence the build has that it is in the United States. The
-label then reads `Akwesasne Canada Post`, which claims nothing untrue. The API's country fields
-want the same treatment, with a caveat worth checking first - Pelias always returns a country for
-a US build, so dropping it may be a compatibility difference rather than a fix, and the
-contract tests of section 11 are where that should be settled.
+**Done** in 0.17.0. The country now follows the state, in the label and in both front ends'
+`country`, `country_gid`, `country_a` and `country_code`.
 
-Cheap in code, but it is materialised at build time, so it costs a rebuild of all four to take
-effect. Worth folding into the next rebuild rather than spending one of its own.
+The Pelias caveat above was worth checking and turned out to point the other way. Asked about the
+same places, Pelias answers with the bare name and nulls:
+
+```
+Charleys Point        label "Charleys Point"        country_a null  region_a null
+Saint Stephen Drive   label "Saint Stephen Drive"   country_a null  region_a null
+```
+
+It omits the country, and leaves it out of the label, when it has no hierarchy for a document.
+So asserting `, USA` was the divergence and dropping it is the compatibility fix; pgeo and Pelias
+now return identical labels and country fields for both a normal address and a stateless one.
+Pelias also returns `county: "Cumberland County"`, confirming the form 0.14.0 moved to.
+
+Maine is rebuilt on it: zero stateless labels mention USA, accuracy unchanged at 96.0% with no
+case altered. The other three builds carry the API half already, the functions being applied at
+runtime, and pick up the label half at their next rebuild.
+
+## 18. The Pelias stack's DATA_DIR still points at the pre-rename path
+
+Starting Pelias to settle section 17 turned up a live misconfiguration. The repository was renamed
+from `pelia_maine` to `pgeo`, and `projects/pelias_maine/.env` still reads
+
+    DATA_DIR=/home/jcz/Forge/pelia_maine/data/pelias
+
+which is now a different directory: an empty, root-owned tree left behind by the rename. The real
+1.5 GB Elasticsearch index is under `pgeo/data/pelias/elasticsearch`. With the stale path
+Elasticsearch fails to start at all - `AccessDeniedException: /usr/share/elasticsearch/data/nodes`
+against a root-owned directory it cannot write - and the API answers every query with no results,
+which reads like an empty index rather than a wrong path.
+
+This is the same hazard that bit `PGEO_DATA_DIR` on 2026-09-22, where running containers survived
+on the open inode and only a recreate would have exposed it. Pelias has now been recreated, so it
+is exposed.
+
+**The fix** is one line in `projects/pelias_maine/.env`, which is not edited here because it holds
+secrets and is deny-listed. Starting the stack meanwhile takes an override:
+
+    DATA_DIR=/home/jcz/Forge/pgeo/data/pelias DOCKER_USER="$(id -u):$(id -g)" docker compose up -d
+
+`DOCKER_USER` matters too: unset, the containers fall back to their image users and cannot read
+files owned by the operator. The Pelias CLI normally sets it, plain `docker compose` does not.
+
+Checked for others: nothing live. The only files outside this one carrying the old absolute path
+are load-test overrides under `data/loadtest/`, which are records of runs that really did use it
+and are right to keep saying so.
