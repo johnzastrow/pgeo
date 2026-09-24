@@ -18,21 +18,22 @@ CREATE TABLE admin_parts AS
 SELECT a.id, a.placetype, a.name, a.longname, a.source_id, a.parent_id,
        ST_Area(a.geom) AS full_area, ST_Subdivide(a.geom, 128) AS geom
 FROM admin a
-WHERE a.placetype IN ('neighbourhood', 'locality', 'localadmin', 'county');
+WHERE a.placetype IN ('neighbourhood', 'locality', 'localadmin', 'county', 'region');
 CREATE INDEX admin_parts_geom_idx ON admin_parts USING gist (geom);
 ANALYZE admin_parts;
 
 -- Smallest containing polygon per placetype for each raw point: its name, and its WOF id
 -- for the Pelias hierarchy fields (locality_gid, county_gid, ...).
--- The state a feature is in comes from its county's parent, which is how Who's on First
--- records it, so no extra point-in-polygon pass is needed for it. A feature with no county -
--- offshore, or outside every county polygon - falls back to the build's own state when the
--- build has exactly one; on a multi-state build it is left unset rather than guessed.
+-- The state a feature is in comes from its county's parent, which is how Who's on First records
+-- it. A feature with no county - offshore, or in a sliver between county polygons - falls back to
+-- whichever region polygon actually contains it, which the same probe answers.
+--
+-- It used to fall back to the build's own state whenever the build had exactly one, and that was
+-- wrong for anything outside the state: New York labelled a New Jersey river and the Canadian
+-- side of Akwesasne ", NY, USA" on the strength of being a single-state build. A feature outside
+-- every region polygon now carries no state, which is the true answer. Nothing larger is loaded
+-- to fall back to - the build holds states, not countries - so null is where it stops.
 CREATE TEMP TABLE hier AS
-WITH sole AS (
-  SELECT wof_id, name, abbr FROM geocode.region_ref
-  WHERE (SELECT count(*) FROM geocode.region_ref) = 1
-)
 SELECT r.rid,
   pip.nb_name AS neighbourhood, pip.lo_name AS locality, pip.la_name AS localadmin,
   -- the county's own name, suffix and all: "Cumberland County", but "Acadia Parish" in
@@ -40,9 +41,9 @@ SELECT r.rid,
   -- word " County" here on the strength of Maine. Falls back to the bare name when Who's on
   -- First has no long form.
   coalesce(pip.co_longname, pip.co_name) AS county,
-  coalesce(rg.name, (SELECT name FROM sole)) AS region,
-  coalesce(rg.abbr, (SELECT abbr FROM sole)) AS region_a,
-  coalesce(rg.wof_id, (SELECT wof_id FROM sole)) AS region_wof,
+  coalesce(rg.name, pip_rg.name) AS region,
+  coalesce(rg.abbr, pip_rg.abbr) AS region_a,
+  coalesce(rg.wof_id, pip_rg.wof_id) AS region_wof,
   jsonb_strip_nulls(jsonb_build_object(
     'neighbourhood_gid', 'whosonfirst:neighbourhood:' || pip.nb_id,
     'locality_gid', 'whosonfirst:locality:' || pip.lo_id,
@@ -66,13 +67,16 @@ LEFT JOIN LATERAL (
          max(name)      FILTER (WHERE placetype = 'county')        AS co_name,
          max(longname)  FILTER (WHERE placetype = 'county')        AS co_longname,
          max(source_id) FILTER (WHERE placetype = 'county')        AS co_id,
-         max(parent_id) FILTER (WHERE placetype = 'county')        AS co_parent
+         max(parent_id) FILTER (WHERE placetype = 'county')        AS co_parent,
+         max(source_id) FILTER (WHERE placetype = 'region')        AS rg_id
   FROM (SELECT DISTINCT ON (p.placetype) p.placetype, p.name, p.longname, p.source_id, p.parent_id
         FROM admin_parts p
         WHERE ST_Intersects(p.geom, r.geom)
         ORDER BY p.placetype, p.full_area) one_each
 ) pip ON true
-LEFT JOIN geocode.region_ref rg ON rg.wof_id = pip.co_parent;
+LEFT JOIN geocode.region_ref rg ON rg.wof_id = pip.co_parent
+-- the region the point is actually inside, for features whose county lookup found nothing
+LEFT JOIN geocode.region_ref pip_rg ON pip_rg.wof_id = pip.rg_id::bigint;
 
 -- Address dedupe: OpenAddresses and OSM carry most Maine addresses twice. Keep one row per
 -- (house number, street, town), preferring OpenAddresses (authoritative E911 points). Pelias removes such

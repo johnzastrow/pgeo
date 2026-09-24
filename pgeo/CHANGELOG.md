@@ -10,6 +10,32 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-09-23
+
+**Requires a rebuild.**
+
+### Fixed
+- A single-state build no longer claims whatever falls outside the state. The rule was "a feature
+  with no county falls back to the build's own state when the build has exactly one", which is
+  right for a sliver between county polygons and wrong for anything past the boundary: New York
+  answered `Ringwood River, NY, USA` for a river in New Jersey, and Maine's border strip along the
+  Salmon Falls River came out as Maine.
+
+  The state now comes from the county's parent as before, and failing that from whichever region
+  polygon actually contains the point - the same probe answers it, so there is no extra pass. A
+  feature inside no region carries no state. Nothing larger is loaded to fall back to, the build
+  holding states rather than countries, so null is where it stops, which is what a multi-state
+  build already did.
+
+  On Maine 235 features lose their state, all of them on the New Hampshire line - Salmon Falls
+  River, Hiltons Lane, Upton Road - and none of them Maine's. Accuracy unchanged at 96.0% with no
+  case altered either way.
+
+  Islands keep their state, which was the thing to check rather than assume: Peaks Island,
+  Chebeague, Cranberry Isles, Islesboro, Vinalhaven, North Haven, Monhegan and Isle au Haut are
+  100% Maine across 7,145 features. The Who's on First region polygon includes them, which is why
+  it was chosen over the Census cartographic one in the first place.
+
 ## [0.15.0] - 2026-09-23
 
 **Requires a rebuild**, and `scripts/fetch_data.sh neighbours` before it (5.6 MB).
