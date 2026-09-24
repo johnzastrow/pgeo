@@ -2,6 +2,32 @@
 
 The report's Section 6 is the full future-work table with effort and payoff. This file holds the
 items with enough design behind them to start, and the designs themselves where they are short.
+Closed items are kept rather than deleted: several of them record why a thing was done a
+particular way, and two record measurements that would otherwise have to be taken again.
+
+| | Item | State |
+|---|---|---|
+| 1 | Published container images | open, designed |
+| 2 | Data-image transport | open, deferred alternative |
+| 3 | Multi-region builds | done in the pipeline; images still to do |
+| 4 | Point-in-polygon cost | done 2026-09-22 |
+| 5 | Who's on First places with no region ancestor | open |
+| 6 | Alaska crosses the antimeridian | open, refused with a reason |
+| 7 | Tie-break rule | done at build time; query time still open |
+| 8 | History rewrite before publication | done 2026-09-22 |
+| 9 | Authorization: single sign-on | **on hold** |
+| 10 | Clip every source to the region | done 2026-09-23 |
+| 11 | Two parsers, nothing checking they agree | open |
+| 12 | Misspelled town answers with a venue | done 2026-09-23 |
+| 13 | Two builds against one database | done 2026-09-23 |
+| 14 | The next four regions | open, next up |
+| 15 | The clip's buffer crossing a land border | done 2026-09-23 |
+| 16 | The hole over Akwesasne | done 2026-09-23 |
+| 17 | A stateless feature still labelled ", USA" | done 2026-09-24 |
+| 18 | Pelias DATA_DIR pointing at the pre-rename path | fixed 2026-09-24 |
+
+Six open, one on hold, eleven done - two of those eleven (3 and 7) with a remainder noted in
+their entries.
 
 ## 1. Published container images
 
@@ -192,11 +218,13 @@ Commit hashes before this date changed; a backup bundle of the old history is ke
 repository. Three tokens the original sanitisation had missed at HEAD (a tailnet address, the
 VM's MAC, the internal DNS name) went in the same pass.
 
-## 9. Authorization: single sign-on
+## 9. Authorization: single sign-on - ON HOLD 2026-09-24
 
-API keys at the edge are done (0.19.0, report Section 3.13.2). A key names a client - the
-dispatch application, the demo - not a person. Single sign-on for the people behind the clients
-is the remaining half; it costs a component and is not needed for three users in one department.
+**Not being pursued.** API keys at the edge are done (0.19.0, report Section 3.13.2) and are the
+half that matters: a key names a client - the dispatch application, the demo - and every request
+carries one. Single sign-on would name the person behind the client, which costs a component to
+run and is not worth it for three users in one department. Revisit if the service is opened
+beyond them, or if an audit needs per-person attribution rather than per-client.
 
 ## 10. ~~Only OpenStreetMap is clipped to the region polygon~~ Done 2026-09-23 (the border strip it left is section 15)
 
@@ -274,7 +302,7 @@ any disagreement, run as part of the build gate. It would have caught all of thi
 the image went stale rather than three regions later. The deeper fix - one parser, called from
 both - is a larger change worth costing separately.
 
-## 12. A misspelled town name answers with a venue
+## 12. ~~A misspelled town name answers with a venue~~ Done 2026-09-23
 
 Pinning the expected layer in the known answers (2026-09-23) turned four passes into failures.
 They are two distinct defects, and neither was visible while the check compared labels as
@@ -300,9 +328,15 @@ city of Albany, both at confidence 1.0 - a tie broken by physical row order (sec
 shows as `Cattaraugus, NY` returning the county rather than the village. A user typing a bare
 "Name, State" means the populated place far more often than the county.
 
-**The fix** for the second is a layer priority in the tie-break: locality before county before
-venue at equal confidence. The first is harder and needs its own accuracy run, since boosting
-localities on fuzzy matches will change what many queries return.
+**Done** in 0.13.0, and the first turned out not to need the boost it looked like it needed. The
+cause was in the parser rather than the ranking: a town was recognised only by exact spelling, so
+a misspelling parsed to nothing and the raw string went to name matching. A typo fallback over
+the build's towns - one edit, or two when the letters match, which is a transposition - sends
+`Albny` to Albany before ranking is consulted at all. The second was the layer priority as
+described, done by putting county in the same deduplication bucket as locality.
+
+Maine 95.9% -> 96.0% and New York 94.9% -> 95.5%, with one Arizona case regressing: `Mesaa,
+Arizona`, whose generated ground truth is a venue named Mesa inside the city of Mesa.
 
 ## 13. ~~Two builds against one database destroy each other silently~~ Done 2026-09-23
 
