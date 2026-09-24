@@ -198,7 +198,7 @@ API keys at the edge are done (0.19.0, report Section 3.13.2). A key names a cli
 dispatch application, the demo - not a person. Single sign-on for the people behind the clients
 is the remaining half; it costs a component and is not needed for three users in one department.
 
-## 10. ~~Only OpenStreetMap is clipped to the region polygon~~ Done 2026-09-23; a border strip remains
+## 10. ~~Only OpenStreetMap is clipped to the region polygon~~ Done 2026-09-23 (the border strip it left is section 15)
 
 The Maine build held 4,270 OpenStreetMap features outside Maine, labelled `, ME, USA`, and the
 fix of 2026-09-22 clips OpenStreetMap to the region polygon. The other sources are still filtered
@@ -304,7 +304,7 @@ shows as `Cattaraugus, NY` returning the county rather than the village. A user 
 venue at equal confidence. The first is harder and needs its own accuracy run, since boosting
 localities on fuzzy matches will change what many queries return.
 
-## 13. Two builds against one database destroy each other silently
+## 13. ~~Two builds against one database destroy each other silently~~ Done 2026-09-23
 
 Running `scripts/pgeo_rebuild.sh --build vt-nh` twice at once (my own mistake on 2026-09-23, a
 backgrounded job I believed had failed) produced a build that reported success and was missing
@@ -324,6 +324,10 @@ ERROR 1: Terminating translation prematurely after failed translation of layer l
 One process raised and died; the other carried on and printed `build complete in 206s`. A clean
 single rebuild of the same region gives 67,901 streets, so nothing is wrong with the data or the
 loader - only with what happens when two of them meet.
+
+**Done** in 0.14.0: a session-level advisory lock on the database, taken for the length of a
+build, and `ogr2ogr` errors now fail the build instead of exiting zero over a half-loaded
+extract. The original plan follows.
 
 **The fix** is a session-level advisory lock on the database, taken for the length of a build:
 `SELECT pg_try_advisory_lock(...)` at the start, refuse with "a build is already running against
@@ -458,7 +462,7 @@ One thing to know for later: the fetch verifies each file's `iso:country` after 
 because the URL is built from an id and a wrong id returns a perfectly valid polygon for
 somewhere else. 85633057 looks like Mexico's id and is Chile's; the right one is 85633293.
 
-## 16. Who's on First's Canada polygon has a hole over Akwesasne
+## 16. ~~Who's on First's Canada polygon has a hole over Akwesasne~~ Done 2026-09-23
 
 Section 15 subtracts Canada and Mexico from the clip's buffer, and it works: Maine lost 2,255
 Canadian features, Vermont and New Hampshire lost the Quebec islands, Arizona and Nevada lost
@@ -485,15 +489,26 @@ assign it to a country is making a defensible choice. The geocoder is not: it la
 `, NY, USA` because the single-state fallback fills in a missing county with the build's own
 state.
 
-**Options**, none obviously right:
+**Done** in 0.16.0, by the second of the three options considered - and it turned out to cost one
+join rather than the redesign it looked like.
 
-- Subtract the Akwesasne polygon too, by name or id. Fixes this instance and nothing else, and
-  names a place in the code, which is what this whole body of work has been removing.
-- Stop the single-state fallback claiming features that fall outside the region polygon. They
-  would then carry no state - the honest answer, and what a multi-state build already does - and
-  the label would read `Akwesasne Canada Post` with no state. This is general, small, and is
-  probably the right one.
-- Leave it. 43 features in one place, already down from 3,322 before the clip.
+The question was whether the strip is an enclave inside New York or simply beyond it. Measured:
+the points are outside New York's **outer ring**, not in a hole, and across all four builds the
+region polygons have zero interior rings and hold zero features in holes, so the enclave case
+does not arise at all. A concave hull of New York does contain them, and that is the reason not
+to use one: it would claim Cornwall's side of the river as readily as the state's own shoreline.
 
-The second option is worth costing: it is one condition on the fallback, and it would also clean
-up whatever other holes exist along the border without knowing about them in advance.
+So the rule is the plain one. Land outside the official boundary is not in the state. The state
+comes from the county's parent as before, and failing that from whichever region polygon contains
+the point - the same probe answers it, so there is no extra pass, only one more placetype in
+`admin_parts`. A feature inside no region carries no state, because the build holds states and
+not countries, and there is nothing larger loaded to fall back to.
+
+`Akwesasne Canada Post` now answers with no state rather than `, NY, USA`. On Maine 235 features
+lose theirs, every one on the New Hampshire line - Salmon Falls River, Hiltons Lane, Upton Road.
+
+Islands keep their state, which was the thing to verify rather than assume, a state's bounds
+including them and the coastline being exactly what the clip's buffer exists to survive: Peaks,
+Chebeague, Cranberry Isles, Islesboro, Vinalhaven, North Haven, Monhegan and Isle au Haut are
+100% Maine across 7,145 features. The Who's on First region polygon includes them, which is why
+it was chosen over the Census cartographic one to begin with.
