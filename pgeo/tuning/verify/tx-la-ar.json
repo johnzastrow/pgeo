@@ -1,0 +1,27 @@
+{
+  "build": "tx-la-ar",
+  "note": "Known answers for a Texas-plus-Louisiana-plus-Arkansas build. Facts about the region, not about the engine. Two of them ask for the state in the label because that is what a three-state build has to get right. The middle group is the orthography this region tests and the others could not: Spanish across Texas, French and Cajun across Louisiana, and Caddo in both. Texarkana sits on the Texas-Arkansas line, which is the case a build covering both has to resolve rather than duplicate. The layer is pinned because a substring match cannot tell a town from a shop named after it.",
+  "cases": [
+    { "path": "search", "params": { "text": "Houston, Texas" }, "want": "Houston, TX", "layer": "locality" },
+    { "path": "search", "params": { "text": "New Orleans, Louisiana" }, "want": "New Orleans, LA", "layer": "locality" },
+    { "path": "search", "params": { "text": "Little Rock, Arkansas" }, "want": "Little Rock, AR", "layer": "locality" },
+    { "path": "search", "params": { "text": "Hosuton, TX" }, "want": "Houston", "layer": "locality" },
+    {
+      "path": "search",
+      "params": { "text": "main st", "focus.point.lat": "30.2672", "focus.point.lon": "-97.7431" },
+      "want": "TX",
+      "layer": "street"
+    },
+    { "path": "autocomplete", "params": { "text": "shrevep" }, "want": "Shreveport", "layer": "locality" },
+    {
+      "path": "reverse",
+      "params": { "point.lat": "29.9511", "point.lon": "-90.0715" },
+      "want": "New Orleans"
+    },
+    { "path": "search", "params": { "text": "Natchitoches, LA" }, "want": "Natchitoches", "layer": "locality" },
+    { "path": "search", "params": { "text": "Nacogdoches, TX" }, "want": "Nacogdoches", "layer": "locality" },
+    { "path": "search", "params": { "text": "Thibodaux, Louisiana" }, "want": "Thibodaux", "layer": "locality" },
+    { "path": "search", "params": { "text": "Texarkana, AR" }, "want": "Texarkana, AR", "layer": "locality" },
+    { "path": "search", "params": { "text": "Texarkana, TX" }, "want": "Texarkana, TX", "layer": "locality" }
+  ]
+}
