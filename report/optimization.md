@@ -240,6 +240,32 @@ would claim 135 of Maine's 235 stateless features for a state none of them is in
 Maine loses the state on 235 features, every one of them on the New Hampshire line - Salmon Falls
 River, Hiltons Lane, Upton Road - and none of them Maine's.
 
+The country had to follow, and it took one more round to see it. With the state gone, the label
+still read `Akwesasne Canada Post, USA`: the country was appended unconditionally and the API's
+country fields were literals, which is the same assumption that had just been wrong about the
+state, standing one level up. The state is the only evidence a build has of the country, since it
+holds states and not countries, so the two now travel together and the 5,338 features across the
+four builds that carry no state carry no country either.
+
+This was recorded as a possible Pelias compatibility difference - Pelias always returns a country
+for a US build, so dropping it might be a break rather than a fix - and the way to settle that
+was to ask Pelias. It answers:
+
+| Query | pgeo | Pelias |
+|---|---|---|
+| `389 Congress St Portland ME` | `389 Congress St, Portland, ME, USA` | `389 Congress Street, Portland, ME, USA` |
+| `Charleys Point` | `Charleys Point`, country null | `Charleys Point`, country null |
+
+Pelias omits the country, and leaves it out of the label, when it has no hierarchy for a document.
+Asserting `, USA` was the divergence; dropping it is the compatibility fix. The same comparison
+confirms `county: "Cumberland County"`, the form section 4.5 moved to.
+
+Starting Pelias to ask it also found something else, which is recorded rather than fixed because
+the file holds secrets: its `DATA_DIR` still points at the path the repository had before it was
+renamed, now an empty directory beside the real one. Elasticsearch will not start against it, and
+the API then answers every query with no results - which reads like an empty index rather than a
+wrong path (`TODO.md` section 18).
+
 The clip uses Who's on First's region polygon, buffered by about 300 m, and the choice of
 polygon matters for the same reason it mattered for ZCTAs. Verified, not assumed:
 
