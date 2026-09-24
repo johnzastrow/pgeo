@@ -252,10 +252,13 @@ def feature_json(r: asyncpg.Record) -> dict:
         "match_type": r["match_type"],
         "accuracy": r["accuracy"],
         "distance": None if r["distance_km"] is None else round(float(r["distance_km"]), 3),
-        "country": "United States",
-        "country_gid": "whosonfirst:country:85633793",
-        "country_a": "USA",
-        "country_code": "US",
+        # The country follows the state: the state is the only evidence this build has that a
+        # feature is in the United States, since the build holds states and not countries. A
+        # feature outside every region polygon carries neither.
+        "country": "United States" if r["region_a"] else None,
+        "country_gid": "whosonfirst:country:85633793" if r["region_a"] else None,
+        "country_a": "USA" if r["region_a"] else None,
+        "country_code": "US" if r["region_a"] else None,
         "region": r["region"],
         "region_a": r["region_a"],
         # Already carries its own suffix from Who's on First. This used to append " County"

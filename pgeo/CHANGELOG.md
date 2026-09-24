@@ -10,6 +10,30 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-09-24
+
+**Requires a rebuild** for the label half; the API half applies as soon as the functions are.
+
+### Fixed
+- The country follows the state. 0.16.0 stopped a build claiming a state for features outside it
+  and left the same assumption standing one level up: the label appended `, USA` unconditionally
+  and the API's `country`, `country_gid`, `country_a` and `country_code` were literals. So
+  `Akwesasne Canada Post` came out with no state, correctly, and a country it is not in. The
+  state is the only evidence a build has of the country - it holds states, not countries - so
+  both now travel together, and 5,338 features across the four builds carry neither.
+
+  This was recorded as a possible Pelias compatibility difference and turned out to be the
+  opposite. Pelias, asked about the same places, answers:
+
+  ```
+  Charleys Point        label "Charleys Point"        country_a null  region_a null
+  Saint Stephen Drive   label "Saint Stephen Drive"   country_a null  region_a null
+  ```
+
+  It omits the country and leaves it out of the label when it has no hierarchy for a document.
+  Asserting `, USA` was the divergence; dropping it is the compatibility fix. Pelias also returns
+  `county: "Cumberland County"` for 389 Congress Street, which is the form 0.14.0 moved to.
+
 ## [0.16.0] - 2026-09-23
 
 **Requires a rebuild.**

@@ -143,15 +143,21 @@ SELECT
     r.localadmin, r.county, r.region, r.region_a,
     -- Pelias-style label. The state segment is the feature's own, so a build covering several
     -- states labels each one correctly; it is dropped rather than guessed when unknown.
+    --
+    -- So is the country, and for the same reason. The state is the only evidence a build has that
+    -- a feature is in the United States - it holds states, not countries - so a feature outside
+    -- every region polygon has no evidence of either. It used to read ", USA" regardless, which
+    -- left "Akwesasne Canada Post, USA" for a post office in Quebec: the state dropped, the
+    -- country asserted on exactly the assumption that had just been wrong about the state.
     CASE r.layer
       WHEN 'region' THEN r.name || ', USA'
       WHEN 'postalcode' THEN r.name || coalesce(', ' || coalesce(r.pip_locality, r.localadmin), '')
-                             || coalesce(', ' || r.region_a, '') || ', USA'
-      WHEN 'county' THEN r.name || coalesce(', ' || r.region_a, '') || ', USA'
-      WHEN 'locality' THEN r.name || coalesce(', ' || r.region_a, '') || ', USA'
-      WHEN 'localadmin' THEN r.name || coalesce(', ' || r.region_a, '') || ', USA'
+                             || coalesce(', ' || r.region_a || ', USA', '')
+      WHEN 'county' THEN r.name || coalesce(', ' || r.region_a || ', USA', '')
+      WHEN 'locality' THEN r.name || coalesce(', ' || r.region_a || ', USA', '')
+      WHEN 'localadmin' THEN r.name || coalesce(', ' || r.region_a || ', USA', '')
       ELSE r.name || coalesce(', ' || coalesce(r.pip_locality, r.localadmin, r.locality_hint, r.county), '')
-           || coalesce(', ' || r.region_a, '') || ', USA'
+           || coalesce(', ' || r.region_a || ', USA', '')
     END,
     r.category, r.addendum, r.geom, r.bbox, r.admin_id,
     -- the country is the same for every feature; the region is the feature's own

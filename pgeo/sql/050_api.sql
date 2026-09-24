@@ -209,9 +209,16 @@ AS $$
       'name', h.name, 'housenumber', h.housenumber, 'street', h.street, 'postalcode', h.postcode,
       'confidence', round(h.confidence::numeric, 3), 'match_type', h.match_type, 'accuracy', h.accuracy,
       'distance', round(h.distance_km::numeric, 3),
-      'country', 'United States', 'country_gid', 'whosonfirst:country:85633793', 'country_a', 'USA',
-      'country_code', 'US', 'region', h.region, 'region_a', h.region_a,
-      -- Pelias (WOF) names counties "Cumberland County"
+      -- The country follows the state: the state is the only evidence this build has that a
+      -- feature is in the United States, since the build holds states and not countries. A
+      -- feature outside every region polygon carries neither, rather than a country asserted on
+      -- the assumption that a US build contains only US places - which is how "Akwesasne Canada
+      -- Post" came to read ", NY, USA" and then ", USA".
+      'country', CASE WHEN h.region_a IS NOT NULL THEN 'United States' END,
+      'country_gid', CASE WHEN h.region_a IS NOT NULL THEN 'whosonfirst:country:85633793' END,
+      'country_a', CASE WHEN h.region_a IS NOT NULL THEN 'USA' END,
+      'country_code', CASE WHEN h.region_a IS NOT NULL THEN 'US' END,
+      'region', h.region, 'region_a', h.region_a,
       -- already carries its own suffix from Who's on First (Parish, Borough, Census Area)
       'county', h.county,
       'localadmin', h.localadmin, 'locality', h.locality,
