@@ -550,7 +550,7 @@ Maine is rebuilt on it: zero stateless labels mention USA, accuracy unchanged at
 case altered. The other three builds carry the API half already, the functions being applied at
 runtime, and pick up the label half at their next rebuild.
 
-## 18. The Pelias stack's DATA_DIR still points at the pre-rename path
+## 18. ~~The Pelias stack's DATA_DIR still points at the pre-rename path~~ Fixed 2026-09-24
 
 Starting Pelias to settle section 17 turned up a live misconfiguration. The repository was renamed
 from `pelia_maine` to `pgeo`, and `projects/pelias_maine/.env` still reads
@@ -567,14 +567,17 @@ This is the same hazard that bit `PGEO_DATA_DIR` on 2026-09-22, where running co
 on the open inode and only a recreate would have exposed it. Pelias has now been recreated, so it
 is exposed.
 
-**The fix** is one line in `projects/pelias_maine/.env`, which is not edited here because it holds
-secrets and is deny-listed. Starting the stack meanwhile takes an override:
+**Fixed** 2026-09-24 by the owner, in `projects/pelias_maine/.env` (not edited here: it holds
+secrets and is deny-listed). Verified afterwards with a plain `docker compose up -d elasticsearch
+api placeholder libpostal pip` and no overrides at all: five containers up, 1,649,644 documents,
+search, reverse and the stateless case all answering.
 
-    DATA_DIR=/home/jcz/Forge/pgeo/data/pelias DOCKER_USER="$(id -u):$(id -g)" docker compose up -d
+Two things learned in passing, both worth keeping:
 
-`DOCKER_USER` matters too: unset, the containers fall back to their image users and cannot read
-files owned by the operator. The Pelias CLI normally sets it, plain `docker compose` does not.
-
-Checked for others: nothing live. The only files outside this one carrying the old absolute path
-are load-test overrides under `data/loadtest/`, which are records of runs that really did use it
-and are right to keep saying so.
+- `DOCKER_USER` has to be set for plain `docker compose`. The Pelias CLI injects it; compose does
+  not, and without it the containers run as their image users and cannot read files the operator
+  owns. Elasticsearch fails with `AccessDeniedException` on its own data directory and the API
+  cannot open `pelias.json`.
+- The failure mode of a wrong `DATA_DIR` is quiet. Elasticsearch dies, and the API then answers
+  every query with an empty feature list rather than an error, which reads like an empty index
+  instead of a missing one.
