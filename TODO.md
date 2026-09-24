@@ -615,3 +615,42 @@ Two things learned in passing, both worth keeping:
 - The failure mode of a wrong `DATA_DIR` is quiet. Elasticsearch dies, and the API then answers
   every query with an empty feature list rather than an error, which reads like an empty index
   instead of a missing one.
+## 19. The state in a query is parsed and then thrown away
+
+Texas plus Louisiana plus Arkansas is the first build with towns of the same name in more than one
+of its states, and it found this on the first run of its known answers.
+
+```
+Texarkana, AR   ->  Texarkana, TX, USA      Texarkana, TX  ->  Texarkana, TX, USA
+Crowley, LA     ->  Crowley, TX, USA        (Crowley is in Acadia Parish and in Tarrant County)
+```
+
+Both Texarkana queries return the identical ordering, TX first and AR second, both at confidence
+0.741. The state is parsed correctly - `parse_rule('Texarkana, AR')` yields locality Texarkana and
+state AR - and is stripped from the text so it cannot pollute name matching, and is then dropped:
+`grep` finds no reference to it anywhere in `sql/040_functions.sql`. In a single-state build that
+is harmless, because there is only one answer it could mean. With three states it means the one
+thing the user said explicitly is the one thing ignored.
+
+A second defect rides along, in the typo fallback of section 12:
+
+```
+Hosuton, TX  ->  Hosston, LA, USA
+```
+
+`geocode.town_fuzzy` searches `pgeo.town` across the whole build with no notion of state, and
+Hosston (a real village in Webster Parish) is one edit from "Hosuton" while Houston is two - a
+transposition. The rule orders by edit distance, so the wrong state's town wins. `pgeo.town` holds
+only `name`, so the function could not filter by state even if it wanted to.
+
+**The fix** is two parts, and the first is the general one:
+
+- Rank a candidate whose `region_a` matches the parsed state above one that does not. A boost
+  rather than a filter: a wrong or ambiguous state should reorder results, not empty them. The
+  Texarkana pair ties at 0.741, so a small term settles it.
+- Give `pgeo.town` a `region_a` column and let `town_fuzzy` prefer a town in the queried state,
+  falling back to any state when the query gives none. Houston then beats Hosston on state even
+  though it loses on edit distance.
+
+Both need measuring across all five builds: the first four cannot show the defect, so any change
+in them is a regression rather than a fix.
