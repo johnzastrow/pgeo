@@ -86,8 +86,12 @@ def _edits_within(a: str, b: str, limit: int) -> int | None:
 class RuleParser:
     """Small US-address parser. Towns are recognized from the loaded admin names."""
 
-    def __init__(self, localities: set[str], states: dict[str, str] | None = None) -> None:
+    def __init__(self, localities: set[str], states: dict[str, str] | None = None,
+                 town_states: dict[str, set[str]] | None = None) -> None:
         self.localities = localities  # normalized, lowercase
+        # town name -> the states it is in, for the typo fallback. Empty is fine: the fallback
+        # then behaves as it did before, preferring the closest spelling in any state.
+        self.town_states = town_states or {}
         self.max_words = max((len(x.split()) for x in localities), default=1)
         # Towns grouped by (word count, length), so the typo search below compares against a
         # handful of names instead of all of them.
@@ -101,17 +105,21 @@ class RuleParser:
         self.states = states or {}
         self.max_state_words = max((len(x.split()) for x in self.states), default=1)
 
-    def town_fuzzy(self, cand: str) -> str | None:
+    def town_fuzzy(self, cand: str, want_state: str | None = None) -> str | None:
         """The town `cand` is a misspelling of, or None. Mirrors geocode.town_fuzzy in SQL.
 
         One edit, or two when the two strings have the same letters - that second case is a
         transposition, "Tuscon" for "Tucson". Same word count and a length within one, and at
         least five characters, because below that a single edit reaches too far ("park" is one
         edit from Parks). Only ever called after an exact match has failed.
+
+        A town in `want_state` wins over a closer spelling elsewhere: "Hosuton, TX" is one edit
+        from Hosston, Louisiana and two from Houston, Texas, so edit distance alone picks the
+        wrong state's village.
         """
         if len(cand) < 5:
             return None
-        best: tuple[int, str] | None = None
+        best: tuple[int, int, str] | None = None
         nwords = len(cand.split())
         for length in (len(cand) - 1, len(cand), len(cand) + 1):
             for name in self._by_shape.get((nwords, length), ()):
@@ -120,9 +128,11 @@ class RuleParser:
                     continue
                 if d == 2 and sorted(name) != sorted(cand):
                     continue
-                if best is None or (d, name) < best:
-                    best = (d, name)
-        return best[1] if best else None
+                in_state = bool(want_state and want_state.upper() in self.town_states.get(name, ()))
+                key = (0 if in_state else 1, d, name)
+                if best is None or key < best:
+                    best = key
+        return best[2] if best else None
 
     def parse(self, text: str) -> Parsed:
         p = Parsed(text=text)
@@ -198,7 +208,7 @@ class RuleParser:
                 # "central park" into the town of Parks. Without this the query parses to
                 # nothing and the raw string goes to name matching, where venues carrying their
                 # own town in their name ("Albany, NY - Albany.com") beat the town itself.
-                fixed = self.town_fuzzy(" ".join(lw)) if lw else None
+                fixed = self.town_fuzzy(" ".join(lw), p.state) if lw else None
                 if fixed:
                     # the corrected spelling, not what was typed: downstream matching is by
                     # trigram, and a transposition shares almost no trigrams with the word it

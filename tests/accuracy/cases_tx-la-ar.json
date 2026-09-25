@@ -1,0 +1,2968 @@
+[
+ {
+  "id": 1,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "232 renee denise ct theriot "
+  },
+  "truth": {
+   "lat": 29.4114424,
+   "lon": -90.7862774,
+   "radius_m": 150,
+   "housenumber": "232",
+   "locality": "THERIOT"
+  }
+ },
+ {
+  "id": 2,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "191 DENNIS LP, COTTO VALLEY"
+  },
+  "truth": {
+   "lat": 32.7955251,
+   "lon": -93.4095438,
+   "radius_m": 150,
+   "housenumber": "191",
+   "locality": "COTTON VALLEY"
+  }
+ },
+ {
+  "id": 3,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "5711 Bancrroft Drive, New Orleans"
+  },
+  "truth": {
+   "lat": 30.0158409,
+   "lon": -90.082732,
+   "radius_m": 150,
+   "housenumber": "5711",
+   "locality": "New Orleans"
+  }
+ },
+ {
+  "id": 4,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "12107 GLADEWICK  DR, HOUSTON, TX"
+  },
+  "truth": {
+   "lat": 29.7550243,
+   "lon": -95.5938845,
+   "radius_m": 150,
+   "housenumber": "12107",
+   "locality": "HOUSTON"
+  }
+ },
+ {
+  "id": 5,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "26202 HUNTWORTH LN, MONTGOMERY, TX"
+  },
+  "truth": {
+   "lat": 30.3010166,
+   "lon": -95.8007037,
+   "radius_m": 150,
+   "housenumber": "26202",
+   "locality": "MONTGOMERY"
+  }
+ },
+ {
+  "id": 6,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "5711 CONCORD BRIDGE  DR, UNINCORPORATED, TX"
+  },
+  "truth": {
+   "lat": 29.8545884,
+   "lon": -95.6107903,
+   "radius_m": 150,
+   "housenumber": "5711",
+   "locality": "UNINCORPORATED"
+  }
+ },
+ {
+  "id": 7,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "217 PINELAND DR, MANDEVILLE"
+  },
+  "truth": {
+   "lat": 30.4040031,
+   "lon": -90.1257368,
+   "radius_m": 150,
+   "housenumber": "217",
+   "locality": "MANDEVILLE"
+  }
+ },
+ {
+  "id": 8,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "10531 S POST OAK  RD, HOUSTON, TX"
+  },
+  "truth": {
+   "lat": 29.6666709,
+   "lon": -95.462834,
+   "radius_m": 150,
+   "housenumber": "10531",
+   "locality": "HOUSTON"
+  }
+ },
+ {
+  "id": 9,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "22506 ARBORGATE DR, SPRING, TX"
+  },
+  "truth": {
+   "lat": 29.8826236,
+   "lon": -95.7264509,
+   "radius_m": 150,
+   "housenumber": "22506",
+   "locality": "SPRING"
+  }
+ },
+ {
+  "id": 10,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "10422 GLENKIRK  DR, UNINCORPORATED, TX"
+  },
+  "truth": {
+   "lat": 29.5919928,
+   "lon": -95.2420063,
+   "radius_m": 150,
+   "housenumber": "10422",
+   "locality": "UNINCORPORATED"
+  }
+ },
+ {
+  "id": 11,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "613 South CONGRESS AVE Austin Texas"
+  },
+  "truth": {
+   "lat": 30.2554206,
+   "lon": -97.7470814,
+   "radius_m": 150,
+   "housenumber": "613",
+   "locality": "Austin"
+  }
+ },
+ {
+  "id": 12,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "695 HARVEST MOON PKWY, KYLE, TX"
+  },
+  "truth": {
+   "lat": 29.9736018,
+   "lon": -97.8466673,
+   "radius_m": 150,
+   "housenumber": "695",
+   "locality": "KYLE"
+  }
+ },
+ {
+  "id": 13,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "3206 SHARON ST, HOUMA"
+  },
+  "truth": {
+   "lat": 29.5931952,
+   "lon": -90.6808558,
+   "radius_m": 150,
+   "housenumber": "3206",
+   "locality": "HOUMA"
+  }
+ },
+ {
+  "id": 14,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "1903 LAKE LANDIjG DR, LEAGUE CITY, TX"
+  },
+  "truth": {
+   "lat": 29.4954536,
+   "lon": -95.0172703,
+   "radius_m": 150,
+   "housenumber": "1903",
+   "locality": "LEAGUE CITY"
+  }
+ },
+ {
+  "id": 15,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "601 N   FLAG ST, PHARR, TX"
+  },
+  "truth": {
+   "lat": 26.2013131,
+   "lon": -98.1912848,
+   "radius_m": 150,
+   "housenumber": "601",
+   "locality": "PHARR"
+  }
+ },
+ {
+  "id": 16,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "2119 BLEnIRD ST, SLIDELL"
+  },
+  "truth": {
+   "lat": 30.293681,
+   "lon": -89.840104,
+   "radius_m": 150,
+   "housenumber": "2119",
+   "locality": "SLIDELL"
+  }
+ },
+ {
+  "id": 17,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "6302 CROCKETT ST, AMARILLO"
+  },
+  "truth": {
+   "lat": 35.1438918,
+   "lon": -101.8596181,
+   "radius_m": 150,
+   "housenumber": "6302",
+   "locality": "AMARILLO"
+  }
+ },
+ {
+  "id": 18,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "114 MCPHAIL  ST, TOMBALL, TX"
+  },
+  "truth": {
+   "lat": 30.0941432,
+   "lon": -95.612714,
+   "radius_m": 150,
+   "housenumber": "114",
+   "locality": "TOMBALL"
+  }
+ },
+ {
+  "id": 19,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "1914 SPILLERS  LN, HOUSTON, TX"
+  },
+  "truth": {
+   "lat": 29.8065941,
+   "lon": -95.5602359,
+   "radius_m": 150,
+   "housenumber": "1914",
+   "locality": "HOUSTON"
+  }
+ },
+ {
+  "id": 20,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "2737 FONDREN RD, HOUSTON"
+  },
+  "truth": {
+   "lat": 29.7355658,
+   "lon": -95.5207936,
+   "radius_m": 150,
+   "housenumber": "2737",
+   "locality": "HOUSTON"
+  }
+ },
+ {
+  "id": 21,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "14352 Woodrun Blvd, Gonzales"
+  },
+  "truth": {
+   "lat": 30.2789307,
+   "lon": -90.9396333,
+   "radius_m": 150,
+   "housenumber": "14352",
+   "locality": "Gonzales"
+  }
+ },
+ {
+  "id": 22,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "609 N Montz Sf, Gramercy"
+  },
+  "truth": {
+   "lat": 30.0576286,
+   "lon": -90.6955541,
+   "radius_m": 150,
+   "housenumber": "609",
+   "locality": "Gramercy"
+  }
+ },
+ {
+  "id": 23,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "0 EAST PECAN STREET, Ponchatoula, LOUISIANA"
+  },
+  "truth": {
+   "lat": 30.4335768,
+   "lon": -90.4338834,
+   "radius_m": 150,
+   "housenumber": "0",
+   "locality": "Ponchatoula"
+  }
+ },
+ {
+  "id": 24,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "234 LENA DR Texas"
+  },
+  "truth": {
+   "lat": 29.8335979,
+   "lon": -95.3993617,
+   "radius_m": 150,
+   "housenumber": "234",
+   "locality": "HOUSTON"
+  }
+ },
+ {
+  "id": 25,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "5631 Rosemary Place, New Orleans"
+  },
+  "truth": {
+   "lat": 29.992969,
+   "lon": -90.1126627,
+   "radius_m": 150,
+   "housenumber": "5631",
+   "locality": "New Orleans"
+  }
+ },
+ {
+  "id": 26,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "2030 VALLERIA CT Texas"
+  },
+  "truth": {
+   "lat": 29.5823809,
+   "lon": -95.6610124,
+   "radius_m": 150,
+   "housenumber": "2030",
+   "locality": "UNINCORPORATED"
+  }
+ },
+ {
+  "id": 27,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "12119 MURR WAY Texas"
+  },
+  "truth": {
+   "lat": 29.6266277,
+   "lon": -95.3487551,
+   "radius_m": 150,
+   "housenumber": "12119",
+   "locality": "HOUSTON"
+  }
+ },
+ {
+  "id": 28,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "647 DILLARD ST, HOUSTON"
+  },
+  "truth": {
+   "lat": 29.861905,
+   "lon": -95.4115318,
+   "radius_m": 150,
+   "housenumber": "647",
+   "locality": "HOUSTON"
+  }
+ },
+ {
+  "id": 29,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "9823 SAGEBUD LN Apt 8, HOUSTON, TX"
+  },
+  "truth": {
+   "lat": 29.5826597,
+   "lon": -95.2387712,
+   "radius_m": 150,
+   "housenumber": "9823",
+   "locality": "HOUSTON"
+  }
+ },
+ {
+  "id": 30,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "8991 E BUcFALO CIR, WILLIS, TX"
+  },
+  "truth": {
+   "lat": 30.4460557,
+   "lon": -95.451398,
+   "radius_m": 150,
+   "housenumber": "8991",
+   "locality": "WILLIS"
+  }
+ },
+ {
+  "id": 31,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "215 MYRTLE  DR, BAYTOWN, TX"
+  },
+  "truth": {
+   "lat": 29.7855501,
+   "lon": -95.0399677,
+   "radius_m": 150,
+   "housenumber": "215",
+   "locality": "BAYTOWN"
+  }
+ },
+ {
+  "id": 32,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "5400 DEBORAH  LN, BAYTOWN, TX"
+  },
+  "truth": {
+   "lat": 29.7750327,
+   "lon": -95.0056257,
+   "radius_m": 150,
+   "housenumber": "5400",
+   "locality": "BAYTOWN"
+  }
+ },
+ {
+  "id": 33,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "12110 EMBER LAKE  RD, UNINCORPORATED, TX"
+  },
+  "truth": {
+   "lat": 29.9526773,
+   "lon": -95.4991738,
+   "radius_m": 150,
+   "housenumber": "12110",
+   "locality": "UNINCORPORATED"
+  }
+ },
+ {
+  "id": 34,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "5004 AVENjE G, Ausitn, TX"
+  },
+  "truth": {
+   "lat": 30.3145015,
+   "lon": -97.7222931,
+   "radius_m": 150,
+   "housenumber": "5004",
+   "locality": "Austin"
+  }
+ },
+ {
+  "id": 35,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "1219 WALSTON RIDGE DR, SPRING, TX"
+  },
+  "truth": {
+   "lat": 30.050322,
+   "lon": -95.5845134,
+   "radius_m": 150,
+   "housenumber": "1219",
+   "locality": "SPRING"
+  }
+ },
+ {
+  "id": 36,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "2214 BRIMMAGE DR Texas"
+  },
+  "truth": {
+   "lat": 29.9646372,
+   "lon": -95.4525103,
+   "radius_m": 150,
+   "housenumber": "2214",
+   "locality": "UNINCORPORATED"
+  }
+ },
+ {
+  "id": 37,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "2119 LONE STAR, LA MARQUE, TX"
+  },
+  "truth": {
+   "lat": 29.35977,
+   "lon": -94.9669068,
+   "radius_m": 150,
+   "housenumber": "2119",
+   "locality": "LA MARQUE"
+  }
+ },
+ {
+  "id": 38,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "9014 Cohn Street Apt 6, New Orleans, "
+  },
+  "truth": {
+   "lat": 29.9584745,
+   "lon": -90.1322685,
+   "radius_m": 150,
+   "housenumber": "9014",
+   "locality": "New Orleans"
+  }
+ },
+ {
+  "id": 39,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "22506 AROBRGATE De, SPRING, TX"
+  },
+  "truth": {
+   "lat": 29.6603954,
+   "lon": -95.4654881,
+   "radius_m": 150,
+   "housenumber": "22506",
+   "locality": "SPRING"
+  }
+ },
+ {
+  "id": 40,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "13932 EASTRIDGE AVE, BATON ROUGE, LOUISIANA"
+  },
+  "truth": {
+   "lat": 30.401419,
+   "lon": -91.0262293,
+   "radius_m": 150,
+   "housenumber": "13932",
+   "locality": "BATON ROUGE"
+  }
+ },
+ {
+  "id": 41,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "22314 RUSSELL  DR, UNINCORPORATED, TX"
+  },
+  "truth": {
+   "lat": 30.1513408,
+   "lon": -95.225521,
+   "radius_m": 150,
+   "housenumber": "22314",
+   "locality": "UNINCORPORATED"
+  }
+ },
+ {
+  "id": 42,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "2739 Lepage Street "
+  },
+  "truth": {
+   "lat": 29.9785629,
+   "lon": -90.0799101,
+   "radius_m": 150,
+   "housenumber": "2739",
+   "locality": "New Orleans"
+  }
+ },
+ {
+  "id": 43,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "1309 rockridge st round rock tx"
+  },
+  "truth": {
+   "lat": 30.501234,
+   "lon": -97.7079248,
+   "radius_m": 150,
+   "housenumber": "1309",
+   "locality": "ROUND ROCK"
+  }
+ },
+ {
+  "id": 44,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "811 COLONIAL LN, HOUSTON, TX"
+  },
+  "truth": {
+   "lat": 29.6739023,
+   "lon": -95.3685401,
+   "radius_m": 150,
+   "housenumber": "811",
+   "locality": "HOUSTON"
+  }
+ },
+ {
+  "id": 45,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "3203 FAIRHOPE ST HOUSTON Texas"
+  },
+  "truth": {
+   "lat": 29.6911186,
+   "lon": -95.4275573,
+   "radius_m": 150,
+   "housenumber": "3203",
+   "locality": "HOUSTON"
+  }
+ },
+ {
+  "id": 46,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "106 WASHITTA RD, LAFAYETTE"
+  },
+  "truth": {
+   "lat": 30.2174632,
+   "lon": -91.9862877,
+   "radius_m": 150,
+   "housenumber": "106",
+   "locality": "LAFAYETTE"
+  }
+ },
+ {
+  "id": 47,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "456 CHEATHAM RD, HUFFMAN, TX"
+  },
+  "truth": {
+   "lat": 30.0583695,
+   "lon": -95.1248373,
+   "radius_m": 150,
+   "housenumber": "456",
+   "locality": "HUFFMAN"
+  }
+ },
+ {
+  "id": 48,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "address",
+  "params": {
+   "text": "14110 DEER RUN ST UNINCORPORATED Texas"
+  },
+  "truth": {
+   "lat": 30.1339101,
+   "lon": -95.6865967,
+   "radius_m": 150,
+   "housenumber": "14110",
+   "locality": "UNINCORPORATED"
+  }
+ },
+ {
+  "id": 49,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "text": "421 RIDGETOP BND, CEDAR PARK"
+  },
+  "truth": {
+   "lat": 30.5154739,
+   "lon": -97.7631413,
+   "radius_m": 150,
+   "housenumber": "421",
+   "locality": "CEDAR PARK"
+  }
+ },
+ {
+  "id": 50,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "107 HONEY GROOVE DR, LAAF PARISH"
+  },
+  "truth": {
+   "lat": 30.114749,
+   "lon": -92.0499769,
+   "radius_m": 150,
+   "housenumber": "107",
+   "locality": "LAF PARISH"
+  }
+ },
+ {
+  "id": 51,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "address",
+  "params": {
+   "text": "8122 BERWYN  DR, UNNCORPORATED, TX"
+  },
+  "truth": {
+   "lat": 29.8791485,
+   "lon": -95.405336,
+   "radius_m": 150,
+   "housenumber": "8122",
+   "locality": "UNINCORPORATED"
+  }
+ },
+ {
+  "id": 52,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "5216 SUMRALL DR",
+   "locality": "BATON ROUGE",
+   "postalcode": "70811",
+   "region": "LOUISIANA"
+  },
+  "truth": {
+   "lat": 30.5130664,
+   "lon": -91.138776,
+   "radius_m": 150,
+   "housenumber": "5216",
+   "locality": "BATON ROUGE"
+  }
+ },
+ {
+  "id": 53,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "608 W ADOUE ST",
+   "locality": "ALVIN",
+   "postalcode": null,
+   "region": "TX"
+  },
+  "truth": {
+   "lat": 29.4203666,
+   "lon": -95.2491462,
+   "radius_m": 150,
+   "housenumber": "608",
+   "locality": "ALVIN"
+  }
+ },
+ {
+  "id": 54,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "781 BAREFIELD RD",
+   "locality": "RAYVILLE",
+   "postalcode": "71269"
+  },
+  "truth": {
+   "lat": 32.4083011,
+   "lon": -91.7881688,
+   "radius_m": 150,
+   "housenumber": "781",
+   "locality": "RAYVILLE"
+  }
+ },
+ {
+  "id": 55,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "633 ANSLEY PLACE CT",
+   "locality": "HOUMA",
+   "postalcode": "70360"
+  },
+  "truth": {
+   "lat": 29.6168954,
+   "lon": -90.7627248,
+   "radius_m": 150,
+   "housenumber": "633",
+   "locality": "HOUMA"
+  }
+ },
+ {
+  "id": 56,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "20872 IDLE WILD   RD",
+   "locality": "UNINCORPORATED",
+   "postalcode": "77357",
+   "region": "TX"
+  },
+  "truth": {
+   "lat": 30.1364814,
+   "lon": -95.1310528,
+   "radius_m": 150,
+   "housenumber": "20872",
+   "locality": "UNINCORPORATED"
+  }
+ },
+ {
+  "id": 57,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "20211 GOSS HOLLOW LN",
+   "locality": "KATY",
+   "postalcode": "77449",
+   "region": "TX"
+  },
+  "truth": {
+   "lat": 29.8597431,
+   "lon": -95.7245589,
+   "radius_m": 150,
+   "housenumber": "20211",
+   "locality": "KATY"
+  }
+ },
+ {
+  "id": 58,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "3112 WHITESAIL DR",
+   "locality": "LEAGUE CITY",
+   "postalcode": "77573",
+   "region": "TX"
+  },
+  "truth": {
+   "lat": 29.5108928,
+   "lon": -95.0318964,
+   "radius_m": 150,
+   "housenumber": "3112",
+   "locality": "LEAGUE CITY"
+  }
+ },
+ {
+  "id": 59,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "19219 N 4TH ST",
+   "locality": "COVINGTON",
+   "postalcode": "4897"
+  },
+  "truth": {
+   "lat": 30.4692178,
+   "lon": -90.0869947,
+   "radius_m": 150,
+   "housenumber": "19219",
+   "locality": "COVINGTON"
+  }
+ },
+ {
+  "id": 60,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "23510 HARPERGATE  DR",
+   "locality": "UNINCORPORATED",
+   "postalcode": "77373",
+   "region": "TX"
+  },
+  "truth": {
+   "lat": 30.0475123,
+   "lon": -95.3673943,
+   "radius_m": 150,
+   "housenumber": "23510",
+   "locality": "UNINCORPORATED"
+  }
+ },
+ {
+  "id": 61,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "6708 4TH ST",
+   "locality": "LUBBOCK",
+   "postalcode": "79416",
+   "region": "TX"
+  },
+  "truth": {
+   "lat": 33.5929483,
+   "lon": -101.9619555,
+   "radius_m": 150,
+   "housenumber": "6708",
+   "locality": "LUBBOCK"
+  }
+ },
+ {
+  "id": 62,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "2 SUMMER SWING  PL",
+   "locality": "UNINCORPORATED",
+   "postalcode": "77382",
+   "region": "TX"
+  },
+  "truth": {
+   "lat": 30.18994,
+   "lon": -95.578883,
+   "radius_m": 150,
+   "housenumber": "2",
+   "locality": "UNINCORPORATED"
+  }
+ },
+ {
+  "id": 63,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "3923 WALSH RANCH BLVD",
+   "locality": "ROUND ROCK",
+   "postalcode": "78681",
+   "region": "TX"
+  },
+  "truth": {
+   "lat": 30.5373583,
+   "lon": -97.7321904,
+   "radius_m": 150,
+   "housenumber": "3923",
+   "locality": "ROUND ROCK"
+  }
+ },
+ {
+  "id": 64,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "364 HIGH SCHOOL DR",
+   "locality": " ",
+   "postalcode": "75057"
+  },
+  "truth": {
+   "lat": 33.0398661,
+   "lon": -97.0003817,
+   "radius_m": 150,
+   "housenumber": "364",
+   "locality": " "
+  }
+ },
+ {
+  "id": 65,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "6206 BRIAR TERRACE  DR",
+   "locality": "HOUSTON",
+   "postalcode": "77072",
+   "region": "TX"
+  },
+  "truth": {
+   "lat": 29.71277,
+   "lon": -95.5698372,
+   "radius_m": 150,
+   "housenumber": "6206",
+   "locality": "HOUSTON"
+  }
+ },
+ {
+  "id": 66,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "9030 KERRWOOD LN",
+   "locality": "HOUSTON",
+   "postalcode": "77080",
+   "region": "TX"
+  },
+  "truth": {
+   "lat": 29.8124395,
+   "lon": -95.5158714,
+   "radius_m": 150,
+   "housenumber": "9030",
+   "locality": "HOUSTON"
+  }
+ },
+ {
+  "id": 67,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "1018 Music Street",
+   "locality": "New Orleans",
+   "postalcode": null
+  },
+  "truth": {
+   "lat": 29.9683521,
+   "lon": -90.0510929,
+   "radius_m": 150,
+   "housenumber": "1018",
+   "locality": "New Orleans"
+  }
+ },
+ {
+  "id": 68,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "394 CARAWAY",
+   "locality": "KYLE",
+   "postalcode": "78640",
+   "region": "TX"
+  },
+  "truth": {
+   "lat": 30.0150325,
+   "lon": -97.8759072,
+   "radius_m": 150,
+   "housenumber": "394",
+   "locality": "KYLE"
+  }
+ },
+ {
+  "id": 69,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "215 Y STREET",
+   "locality": "LA PORTE",
+   "postalcode": "77571",
+   "region": "TX"
+  },
+  "truth": {
+   "lat": 29.6330792,
+   "lon": -95.0165972,
+   "radius_m": 150,
+   "housenumber": "215",
+   "locality": "LA PORTE"
+  }
+ },
+ {
+  "id": 70,
+  "endpoint": "structured",
+  "qtype": "exact",
+  "kind": "address",
+  "params": {
+   "address": "1678 N   IZARD LN",
+   "locality": "FAYETTEVILLE",
+   "postalcode": "72704",
+   "region": "AR"
+  },
+  "truth": {
+   "lat": 36.0855894,
+   "lon": -94.2165387,
+   "radius_m": 150,
+   "housenumber": "1678",
+   "locality": "FAYETTEVILLE"
+  }
+ },
+ {
+  "id": 71,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 33.2458371,
+   "point.lon": -97.135729,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 33.2458371,
+   "lon": -97.135729,
+   "radius_m": 60,
+   "housenumber": "3217"
+  }
+ },
+ {
+  "id": 72,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 30.3071025,
+   "point.lon": -89.8206435,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 30.3071025,
+   "lon": -89.8206435,
+   "radius_m": 60,
+   "housenumber": "1537"
+  }
+ },
+ {
+  "id": 73,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 29.576458,
+   "point.lon": -90.6872832,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 29.576458,
+   "lon": -90.6872832,
+   "radius_m": 60,
+   "housenumber": "1301"
+  }
+ },
+ {
+  "id": 74,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 30.4107396,
+   "point.lon": -97.761377,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 30.4107396,
+   "lon": -97.761377,
+   "radius_m": 60,
+   "housenumber": "6001"
+  }
+ },
+ {
+  "id": 75,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 30.2773898,
+   "point.lon": -97.7221015,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 30.2773898,
+   "lon": -97.7221015,
+   "radius_m": 60,
+   "housenumber": "1705"
+  }
+ },
+ {
+  "id": 76,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 29.6055854,
+   "point.lon": -90.7262557,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 29.6055854,
+   "lon": -90.7262557,
+   "radius_m": 60,
+   "housenumber": "800"
+  }
+ },
+ {
+  "id": 77,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 29.7895354,
+   "point.lon": -95.378525,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 29.7895354,
+   "lon": -95.378525,
+   "radius_m": 60,
+   "housenumber": "616"
+  }
+ },
+ {
+  "id": 78,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 29.8390801,
+   "point.lon": -95.4255894,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 29.8390801,
+   "lon": -95.4255894,
+   "radius_m": 60,
+   "housenumber": "1107"
+  }
+ },
+ {
+  "id": 79,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 31.5420526,
+   "point.lon": -97.197917,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 31.5420526,
+   "lon": -97.197917,
+   "radius_m": 60,
+   "housenumber": "2113"
+  }
+ },
+ {
+  "id": 80,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 29.8251765,
+   "point.lon": -95.4364806,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 29.8251765,
+   "lon": -95.4364806,
+   "radius_m": 60,
+   "housenumber": "1422"
+  }
+ },
+ {
+  "id": 81,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 29.9961954,
+   "point.lon": -98.0515426,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 29.9961954,
+   "lon": -98.0515426,
+   "radius_m": 60,
+   "housenumber": "300"
+  }
+ },
+ {
+  "id": 82,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 29.7080188,
+   "point.lon": -95.7404552,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 29.7080188,
+   "lon": -95.7404552,
+   "radius_m": 60,
+   "housenumber": "6518"
+  }
+ },
+ {
+  "id": 83,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 29.6601325,
+   "point.lon": -95.0884828,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 29.6601325,
+   "lon": -95.0884828,
+   "radius_m": 60,
+   "housenumber": "9606"
+  }
+ },
+ {
+  "id": 84,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 29.7698221,
+   "point.lon": -95.8581677,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 29.7698221,
+   "lon": -95.8581677,
+   "radius_m": 60,
+   "housenumber": "1207"
+  }
+ },
+ {
+  "id": 85,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 30.1345672,
+   "point.lon": -97.5682286,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 30.1345672,
+   "lon": -97.5682286,
+   "radius_m": 60,
+   "housenumber": "132"
+  }
+ },
+ {
+  "id": 86,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 29.6765623,
+   "point.lon": -94.9939874,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 29.6765623,
+   "lon": -94.9939874,
+   "radius_m": 60,
+   "housenumber": "22506"
+  }
+ },
+ {
+  "id": 87,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 33.5320155,
+   "point.lon": -92.8403132,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 33.5320155,
+   "lon": -92.8403132,
+   "radius_m": 60,
+   "housenumber": "2918"
+  }
+ },
+ {
+  "id": 88,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 30.4648557,
+   "point.lon": -97.6217236,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 30.4648557,
+   "lon": -97.6217236,
+   "radius_m": 60,
+   "housenumber": "501"
+  }
+ },
+ {
+  "id": 89,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 35.0291363,
+   "point.lon": -101.917389,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 35.0291363,
+   "lon": -101.917389,
+   "radius_m": 60,
+   "housenumber": "17601"
+  }
+ },
+ {
+  "id": 90,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 29.8843054,
+   "point.lon": -95.3932942,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 29.8843054,
+   "lon": -95.3932942,
+   "radius_m": 60,
+   "housenumber": "8510"
+  }
+ },
+ {
+  "id": 91,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 33.2328519,
+   "point.lon": -96.8629755,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 33.2328519,
+   "lon": -96.8629755,
+   "radius_m": 60,
+   "housenumber": "3831"
+  }
+ },
+ {
+  "id": 92,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 29.8322309,
+   "point.lon": -95.7087391,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 29.8322309,
+   "lon": -95.7087391,
+   "radius_m": 60,
+   "housenumber": "4202"
+  }
+ },
+ {
+  "id": 93,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 30.5267509,
+   "point.lon": -97.5482661,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 30.5267509,
+   "lon": -97.5482661,
+   "radius_m": 60,
+   "housenumber": "407"
+  }
+ },
+ {
+  "id": 94,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 29.9994412,
+   "point.lon": -95.5706416,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 29.9994412,
+   "lon": -95.5706416,
+   "radius_m": 60,
+   "housenumber": "9607"
+  }
+ },
+ {
+  "id": 95,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 30.4258313,
+   "point.lon": -91.1579749,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 30.4258313,
+   "lon": -91.1579749,
+   "radius_m": 60,
+   "housenumber": "2941"
+  }
+ },
+ {
+  "id": 96,
+  "endpoint": "reverse",
+  "qtype": "exact",
+  "kind": "reverse_address",
+  "params": {
+   "point.lat": 33.2613641,
+   "point.lon": -96.9382962,
+   "layers": "address"
+  },
+  "truth": {
+   "lat": 33.2613641,
+   "lon": -96.9382962,
+   "radius_m": 60,
+   "housenumber": "3717"
+  }
+ },
+ {
+  "id": 97,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Red Hilll"
+  },
+  "truth": {
+   "lat": 32.09654,
+   "lon": -97.33696,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 98,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Chritsoval"
+  },
+  "truth": {
+   "lat": 31.197974,
+   "lon": -100.493456,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 99,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Cisneros Estatew Colonia"
+  },
+  "truth": {
+   "lat": 25.86036,
+   "lon": -97.43331,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 100,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Lead Hill"
+  },
+  "truth": {
+   "lat": 36.413071,
+   "lon": -92.903527,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 101,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Piine Harbor"
+  },
+  "truth": {
+   "lat": 32.771622,
+   "lon": -94.504415,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 102,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Ngley"
+  },
+  "truth": {
+   "lat": 33.76011,
+   "lon": -95.08523,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 103,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Taylorown"
+  },
+  "truth": {
+   "lat": 32.98653,
+   "lon": -92.60071,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 104,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Lone Pi"
+  },
+  "truth": {
+   "lat": 35.97313,
+   "lon": -92.56266,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 105,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "town",
+  "params": {
+   "text": "rotan"
+  },
+  "truth": {
+   "lat": 35.62508,
+   "lon": -89.99203,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 106,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "town",
+  "params": {
+   "text": "red springs"
+  },
+  "truth": {
+   "lat": 33.61287,
+   "lon": -99.41202,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 107,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Roibnwood"
+  },
+  "truth": {
+   "lat": 30.47519,
+   "lon": -90.50565,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 108,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Beauukiss"
+  },
+  "truth": {
+   "lat": 30.44298,
+   "lon": -97.24444,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 109,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "town",
+  "params": {
+   "text": "reedwoods"
+  },
+  "truth": {
+   "lat": 29.6467,
+   "lon": -95.3785,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 110,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Wooddloch"
+  },
+  "truth": {
+   "lat": 30.217398,
+   "lon": -95.413208,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 111,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Nina Stationn"
+  },
+  "truth": {
+   "lat": 30.3052,
+   "lon": -91.84123,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 112,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Gracetton"
+  },
+  "truth": {
+   "lat": 32.71458,
+   "lon": -94.7891,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 113,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Spanisj Fort"
+  },
+  "truth": {
+   "lat": 33.94566,
+   "lon": -97.61697,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 114,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "town",
+  "params": {
+   "text": "chenango"
+  },
+  "truth": {
+   "lat": 29.25413,
+   "lon": -95.45883,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 115,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "town",
+  "params": {
+   "text": "Pecn Esttaes Number 5 Colonia"
+  },
+  "truth": {
+   "lat": 26.2173,
+   "lon": -98.10723,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 116,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Big Hill, Center Point"
+  },
+  "truth": {
+   "lat": 29.9823401,
+   "lon": -99.0120298,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 117,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Three Island Ponds"
+  },
+  "truth": {
+   "lat": 30.2499357,
+   "lon": -95.3549371,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 118,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Powelldale Mountains"
+  },
+  "truth": {
+   "lat": 32.0282443,
+   "lon": -97.5065324,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 119,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Chatlin Lake"
+  },
+  "truth": {
+   "lat": 31.1268543,
+   "lon": -92.356244,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 120,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Shelly Paeks"
+  },
+  "truth": {
+   "lat": 30.01283,
+   "lon": -102.9418857,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 121,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Big Hill, Blewett"
+  },
+  "truth": {
+   "lat": 29.142757,
+   "lon": -100.072518,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 122,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Lake Wesley"
+  },
+  "truth": {
+   "lat": 30.4224,
+   "lon": -95.50864,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 123,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Brushy Lake, Cross Keys"
+  },
+  "truth": {
+   "lat": 31.8979376,
+   "lon": -91.3731714,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 124,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Salt Lake, Mims"
+  },
+  "truth": {
+   "lat": 29.0398682,
+   "lon": -95.2544807,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 125,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Hope Pond, Douglas"
+  },
+  "truth": {
+   "lat": 32.3599109,
+   "lon": -95.0904436,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 126,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Adler Lake"
+  },
+  "truth": {
+   "lat": 28.6680832,
+   "lon": -97.0331258,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 127,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Spice Pond"
+  },
+  "truth": {
+   "lat": 33.2465332,
+   "lon": -92.3178753,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 128,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "lake_summit",
+  "params": {
+   "text": "High Prak, Dllas"
+  },
+  "truth": {
+   "lat": 34.5103694,
+   "lon": -94.1885044,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 129,
+  "endpoint": "search",
+  "qtype": "variant",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Keith Lake, Sabine Pass"
+  },
+  "truth": {
+   "lat": 29.7585501,
+   "lon": -93.9529463,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 130,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Bay Jaqeu"
+  },
+  "truth": {
+   "lat": 29.3005133,
+   "lon": -90.1403418,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 131,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Ford Lake, Adams Oaks"
+  },
+  "truth": {
+   "lat": 30.0897937,
+   "lon": -95.1980469,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 132,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Big Holel, Rutland"
+  },
+  "truth": {
+   "lat": 31.1918211,
+   "lon": -94.8455071,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 133,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Cerrito Prieto, Los Huisaches Number 2 Colonia"
+  },
+  "truth": {
+   "lat": 27.9205128,
+   "lon": -99.4456887,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 134,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "lake_summit",
+  "params": {
+   "text": "Pintail Flat"
+  },
+  "truth": {
+   "lat": 29.6756129,
+   "lon": -89.6764111,
+   "radius_m": 4000
+  }
+ },
+ {
+  "id": 135,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Everything That Blings"
+  },
+  "truth": {
+   "lat": 32.38684334,
+   "lon": -94.87520384,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 136,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Waller County Juvenile Probation Office"
+  },
+  "truth": {
+   "lat": 30.09852492,
+   "lon": -96.07714841,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 137,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "Brmont Nursing Center"
+  },
+  "truth": {
+   "lat": 31.123596,
+   "lon": -97.337219,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 138,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "Evvnt Space Unlimited, Houston"
+  },
+  "truth": {
+   "lat": 29.77210382,
+   "lon": -95.34770504,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 139,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Ryan Overseas"
+  },
+  "truth": {
+   "lat": 32.927814,
+   "lon": -96.818628,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 140,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Eunice Computer Solutions LLC"
+  },
+  "truth": {
+   "lat": 30.4913213,
+   "lon": -92.41995967,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 141,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Hall Insurance"
+  },
+  "truth": {
+   "lat": 32.721209,
+   "lon": -97.451324,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 142,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Above and Beyond Eurowerks"
+  },
+  "truth": {
+   "lat": 29.61207895,
+   "lon": -98.3334105,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 143,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "Farm Bureau Insuranc, Crosset"
+  },
+  "truth": {
+   "lat": 33.1347192,
+   "lon": -91.9598896,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 144,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "UH Bauer Graduate & Professional Programs"
+  },
+  "truth": {
+   "lat": 29.72074111,
+   "lon": -95.33900469,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 145,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "New Orleans Lawn Tennis Club"
+  },
+  "truth": {
+   "lat": 29.9188598,
+   "lon": -90.11469358,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 146,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Ozark Howler Tattoo"
+  },
+  "truth": {
+   "lat": 36.33612543,
+   "lon": -94.12596437,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 147,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "Ciny Roebrtson"
+  },
+  "truth": {
+   "lat": 32.97865762,
+   "lon": -96.77106708,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 148,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Central City Excelsior Brazilian Jiu Jitsu"
+  },
+  "truth": {
+   "lat": 30.514629,
+   "lon": -91.028358,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 149,
+  "endpoint": "search",
+  "qtype": "typo",
+  "kind": "venue",
+  "params": {
+   "text": "Corner Theatre, Msequite"
+  },
+  "truth": {
+   "lat": 32.76632405836696,
+   "lon": -96.60132408293467,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 150,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Talented Technologies At Pilot, Bordersville"
+  },
+  "truth": {
+   "lat": 29.992504,
+   "lon": -95.2979911,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 151,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "OYO Midland Intl Air & Space Port"
+  },
+  "truth": {
+   "lat": 31.95188572,
+   "lon": -102.1434854,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 152,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Conoco, Mineola"
+  },
+  "truth": {
+   "lat": 32.663423,
+   "lon": -95.487753,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 153,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Funding Pipes"
+  },
+  "truth": {
+   "lat": 30.34155858,
+   "lon": -97.75495159,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 154,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "79072"
+  },
+  "truth": {
+   "lat": 34.171907,
+   "lon": -101.744828,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 155,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "75491"
+  },
+  "truth": {
+   "lat": 33.486324,
+   "lon": -96.39593,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 156,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "78671"
+  },
+  "truth": {
+   "lat": 30.218956,
+   "lon": -98.629901,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 157,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "79070"
+  },
+  "truth": {
+   "lat": 36.236595,
+   "lon": -100.786511,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 158,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "76890"
+  },
+  "truth": {
+   "lat": 31.694189,
+   "lon": -98.766342,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 159,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "77474"
+  },
+  "truth": {
+   "lat": 29.77406,
+   "lon": -96.190029,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 160,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "77477"
+  },
+  "truth": {
+   "lat": 29.624274,
+   "lon": -95.568008,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 161,
+  "endpoint": "search",
+  "qtype": "exact",
+  "kind": "zip",
+  "params": {
+   "text": "72668"
+  },
+  "truth": {
+   "lat": 36.418465,
+   "lon": -92.772377,
+   "radius_m": 12000
+  }
+ },
+ {
+  "id": 162,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Red H"
+  },
+  "truth": {
+   "lat": 32.09654,
+   "lon": -97.33696,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 163,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Christo"
+  },
+  "truth": {
+   "lat": 31.197974,
+   "lon": -100.493456,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 164,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Cisneros Estat"
+  },
+  "truth": {
+   "lat": 25.86036,
+   "lon": -97.43331,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 165,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Lead H"
+  },
+  "truth": {
+   "lat": 36.413071,
+   "lon": -92.903527,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 166,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Pine Har"
+  },
+  "truth": {
+   "lat": 32.771622,
+   "lon": -94.504415,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 167,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Negl"
+  },
+  "truth": {
+   "lat": 33.76011,
+   "lon": -95.08523,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 168,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Taylor"
+  },
+  "truth": {
+   "lat": 32.98653,
+   "lon": -92.60071,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 169,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Lone Pi"
+  },
+  "truth": {
+   "lat": 35.97313,
+   "lon": -92.56266,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 170,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "town",
+  "params": {
+   "text": "Rot"
+  },
+  "truth": {
+   "lat": 35.62508,
+   "lon": -89.99203,
+   "radius_m": 8000
+  }
+ },
+ {
+  "id": 171,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Teamsters Local Uni"
+  },
+  "truth": {
+   "lat": 32.72962941,
+   "lon": -96.70976926,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 172,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "The Lofts "
+  },
+  "truth": {
+   "lat": 29.56882455,
+   "lon": -97.96351421,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 173,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Texas Insurance "
+  },
+  "truth": {
+   "lat": 29.69698323,
+   "lon": -95.21904244,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 174,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Brooks Medical of M"
+  },
+  "truth": {
+   "lat": 36.33310308,
+   "lon": -92.38023198,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 175,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Wells Fargo "
+  },
+  "truth": {
+   "lat": 31.75473135,
+   "lon": -106.31829288,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 176,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Moore Financial Ser"
+  },
+  "truth": {
+   "lat": 30.15849746437408,
+   "lon": -95.4689125648963,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 177,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Regional Fi"
+  },
+  "truth": {
+   "lat": 30.49871252047312,
+   "lon": -97.67560802834792,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 178,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Bond Colle"
+  },
+  "truth": {
+   "lat": 30.26097467,
+   "lon": -97.72799729,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 179,
+  "endpoint": "autocomplete",
+  "qtype": "exact",
+  "kind": "venue",
+  "params": {
+   "text": "Western U"
+  },
+  "truth": {
+   "lat": 29.9340094,
+   "lon": -97.8186781,
+   "radius_m": 300
+  }
+ },
+ {
+  "id": 180,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Fenyuxdran Mountain"
+  },
+  "truth": null
+ },
+ {
+  "id": 181,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "wrxmbttmtw"
+  },
+  "truth": null
+ },
+ {
+  "id": 182,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Miami Beach"
+  },
+  "truth": null
+ },
+ {
+  "id": 183,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Grand Canyon"
+  },
+  "truth": null
+ },
+ {
+  "id": 184,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Toronto"
+  },
+  "truth": null
+ },
+ {
+  "id": 185,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "znqrfjk"
+  },
+  "truth": null
+ },
+ {
+  "id": 186,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Miami Beach"
+  },
+  "truth": null
+ },
+ {
+  "id": 187,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Golden Gate Bridge"
+  },
+  "truth": null
+ },
+ {
+  "id": 188,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Pelpel Plaza"
+  },
+  "truth": null
+ },
+ {
+  "id": 189,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Vizorblax Mountain"
+  },
+  "truth": null
+ },
+ {
+  "id": 190,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Mibdranquen Brewing Co"
+  },
+  "truth": null
+ },
+ {
+  "id": 191,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "ncwlszj"
+  },
+  "truth": null
+ },
+ {
+  "id": 192,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Dranblax Mountain"
+  },
+  "truth": null
+ },
+ {
+  "id": 193,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Pelmib Pond"
+  },
+  "truth": null
+ },
+ {
+  "id": 194,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Trumyuxzor Pond"
+  },
+  "truth": null
+ },
+ {
+  "id": 195,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Mount Rainier"
+  },
+  "truth": null
+ },
+ {
+  "id": 196,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "96963 ACRES DR"
+  },
+  "truth": null
+ },
+ {
+  "id": 197,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "zlqwnr"
+  },
+  "truth": null
+ },
+ {
+  "id": 198,
+  "endpoint": "search",
+  "qtype": "miss",
+  "kind": "miss",
+  "params": {
+   "text": "Miami Beach"
+  },
+  "truth": null
+ }
+]

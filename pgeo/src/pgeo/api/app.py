@@ -58,8 +58,11 @@ async def lifespan(app: FastAPI):
     )
     app.state.http = httpx.AsyncClient(base_url=s.libpostal_url, timeout=5.0)
     async with app.state.pool.acquire() as con:
+        # The state each town is in, so the typo fallback can prefer one in the state the query
+        # named: "Hosuton, TX" is one edit from Hosston, Louisiana and two from Houston, Texas.
         names = await con.fetch(
-            "SELECT DISTINCT lower(name) AS n FROM pgeo.feature WHERE layer IN ('locality', 'localadmin')"
+            "SELECT DISTINCT lower(name) AS n, region_a FROM pgeo.feature "
+            "WHERE layer IN ('locality', 'localadmin')"
         )
         # The states this build covers, so the parser can strip a trailing one whatever it is.
         regions = await con.fetch("SELECT lower(name) AS name, lower(abbr) AS abbr, abbr AS code "
@@ -68,7 +71,11 @@ async def lifespan(app: FastAPI):
     for r in regions:
         states[r["abbr"]] = r["code"]
         states[r["name"]] = r["code"]
-    app.state.rules = RuleParser({r["n"] for r in names}, states)
+    town_states: dict[str, set[str]] = {}
+    for r in names:
+        if r["region_a"]:
+            town_states.setdefault(r["n"], set()).add(r["region_a"])
+    app.state.rules = RuleParser({r["n"] for r in names}, states, town_states)
     yield
     await app.state.http.aclose()
     await app.state.pool.close()

@@ -4,9 +4,9 @@
 **Making a Maine geocoder into a geocoder for any US state, and what building a second one
 found**
 
-John Zastrow · 2026-09-23
+John Zastrow · 2026-09-25
 
-pgeo 0.7.0, project 0.20.0, commit `531826e (with uncommitted changes)`.
+pgeo 0.7.0, project 0.20.0, commit `ba04c35 (with uncommitted changes)`.
 Companion to [REPORT.md](REPORT.md), which measured pgeo against Pelias, Photon and Nominatim on
 data for the State of Maine. This document covers what changed afterwards.
 
@@ -28,6 +28,7 @@ data for the State of Maine. This document covers what changed afterwards.
   - [5.2 Maine was not disturbed](#52-maine-was-not-disturbed)
   - [5.3 Arizona and Nevada: a bug two regions could not see](#53-arizona-and-nevada-a-bug-two-regions-could-not-see)
   - [5.4 The test that was passing four wrong answers](#54-the-test-that-was-passing-four-wrong-answers)
+  - [5.5 Texas, Louisiana and Arkansas: the largest build, and the last](#55-texas-louisiana-and-arkansas-the-largest-build-and-the-last)
 - [6. Multi-state builds](#6-multi-state-builds)
 - [7. Corner cases across the fifty states](#7-corner-cases-across-the-fifty-states)
 - [8. Resource requirements](#8-resource-requirements)
@@ -45,9 +46,11 @@ survives contact. It did not, and neither did the code. A build is now a named s
 rather than a hardwired Maine, and getting there surfaced eleven defects, four of which would
 have shipped wrong answers rather than failing loudly.
 
-Four regions have now been built: Maine, New York, Vermont plus New Hampshire, and Arizona plus
-Nevada. Each new one has found at least one general defect that the previous ones could not,
-which is the argument for building a fourth rather than asserting the third was enough.
+Five regions have now been built: Maine, New York, Vermont plus New Hampshire, Arizona plus
+Nevada, and Texas plus Louisiana plus Arkansas. Every one of them found at least one general
+defect the previous ones could not, which is the argument for building the next rather than
+asserting the last was enough - and the argument, eventually, for stopping: by the fifth the
+defects it found were in the same family as the fourth's rather than a new kind.
 
 The headline results:
 
@@ -59,9 +62,9 @@ The headline results:
 | New York accuracy | 88.4% | **95.5%** |
 | Arizona + Nevada accuracy | 84.8% | **91.9%** |
 | Maine accuracy | 95.8% | **96.0%** |
-| Known-answer failures across four builds | 4, unseen | **0** |
+| Known-answer failures across five builds | 4, unseen | **0** |
 | Two builds of the same data | differed on 10,769 rows | **identical** |
-| Maine features outside Maine | 4,270, labelled ", ME, USA" | none beyond the 300 m buffer but streets |
+| Maine features outside Maine | 4,270, labelled ", ME, USA" | 235, and **none of them labelled Maine** |
 | Commands to build a region by hand | 25 | **1** |
 | Two builds at once against one database | silent corruption | **refused** |
 
@@ -222,6 +225,70 @@ The polygons cost 5.6 MB, as two single Who's on First records rather than the `
 file's `iso:country` afterwards, because the URL is built from an id and a wrong id returns a
 perfectly valid polygon for somewhere else - 85633057 looks like Mexico's and is Chile's.
 
+Subtracting the neighbours did not finish it, and the last step is the interesting one. New York
+went on answering `Akwesasne Canada Post, NY, USA`, and the polygon was not at fault: Who's on
+First's Canada is exact at Cornwall ten kilometres away, at Montreal, at Niagara and in farmland
+immediately north of the 45th parallel. It has a **hole** over Akwesasne, a Mohawk territory
+straddling Ontario, Quebec and New York whose jurisdiction is genuinely contested. A gazetteer
+declining to assign that to a country is defensible. A geocoder calling it New York is not.
+
+What was actually wrong was older and more general: a feature with no county fell back to the
+build's own state whenever the build had exactly one. That is right for a sliver between two
+county polygons and wrong for everything past the boundary, and it is the same rule that had New
+York answering for a river in New Jersey. The state now comes from the county's parent as before
+and failing that from whichever region polygon contains the point - the same probe answers it, so
+it costs one more placetype and no extra pass - and a feature inside no region carries no state.
+There is nothing larger loaded to fall back to, the build holding states rather than countries,
+so null is where it stops, which is what a multi-state build always did.
+
+Three things were checked rather than assumed, and the third is the one that could have broken
+it:
+
+- the Akwesasne points are outside New York's **outer ring**, not in a hole, and no build's region
+  polygon has any interior ring or holds any feature in one, so the enclave case does not arise;
+- a concave hull of New York *does* contain them, which is the argument against using one - it
+  would claim the far bank of the river as readily as the near shoreline;
+- **islands keep their state**. A state's bounds include them, and a generalised coastline is
+  exactly what the buffer exists to survive. Peaks, Chebeague, the Cranberry Isles, Islesboro,
+  Vinalhaven, North Haven, Monhegan and Isle au Haut are 100% Maine across 7,145 features.
+
+And the water between the islands is Maine too, which is the strongest argument for the polygon
+over the hull rather than against it. Who's on First's region is a territorial boundary, not a
+land outline: Casco Bay between Peaks and Long Island, Penobscot Bay between Vinalhaven and
+Islesboro, Frenchman Bay, Blue Hill Bay and Muscongus Bay are all inside it, while open water 20
+and 60 km offshore is not. A concave hull adds nothing there and costs a great deal elsewhere -
+at a tolerance loose enough to be worth having it swallows Campobello Island and St. Stephen, and
+would claim 135 of Maine's 235 stateless features for a state none of them is in.
+
+Maine loses the state on 235 features, every one of them on the New Hampshire line - Salmon Falls
+River, Hiltons Lane, Upton Road - and none of them Maine's.
+
+The country had to follow, and it took one more round to see it. With the state gone, the label
+still read `Akwesasne Canada Post, USA`: the country was appended unconditionally and the API's
+country fields were literals, which is the same assumption that had just been wrong about the
+state, standing one level up. The state is the only evidence a build has of the country, since it
+holds states and not countries, so the two now travel together and the 5,338 features across the
+four builds that carry no state carry no country either.
+
+This was recorded as a possible Pelias compatibility difference - Pelias always returns a country
+for a US build, so dropping it might be a break rather than a fix - and the way to settle that
+was to ask Pelias. It answers:
+
+| Query | pgeo | Pelias |
+|---|---|---|
+| `389 Congress St Portland ME` | `389 Congress St, Portland, ME, USA` | `389 Congress Street, Portland, ME, USA` |
+| `Charleys Point` | `Charleys Point`, country null | `Charleys Point`, country null |
+
+Pelias omits the country, and leaves it out of the label, when it has no hierarchy for a document.
+Asserting `, USA` was the divergence; dropping it is the compatibility fix. The same comparison
+confirms `county: "Cumberland County"`, the form section 4.5 moved to.
+
+Starting Pelias to ask it also found something else, which is recorded rather than fixed because
+the file holds secrets: its `DATA_DIR` still points at the path the repository had before it was
+renamed, now an empty directory beside the real one. Elasticsearch will not start against it, and
+the API then answers every query with no results - which reads like an empty index rather than a
+wrong path (`TODO.md` section 18).
+
 The clip uses Who's on First's region polygon, buffered by about 300 m, and the choice of
 polygon matters for the same reason it mattered for ZCTAs. Verified, not assumed:
 
@@ -296,19 +363,19 @@ OpenAddresses points, Who's on First town labels, GNIS features, Overture places
 Maine's set is 1,560 cases; each of the other three is 198, built the same way. Where all four
 stand at the end of this work:
 
-| Group | Maine | New York | VT + NH | AZ + NV |
-|---|---|---|---|---|
-| **Overall** | **96.0%** | **95.5%** | **92.4%** | **91.9%** |
-| addresses | 97.8% | 92.9% | 91.4% | 98.6% |
-| towns | 96.4% | 92.9% | 85.7% | 89.3% |
-| venues | 94.2% | 96.4% | 92.9% | 82.1% |
-| reverse | 100.0% | 100.0% | 96.2% | 92.3% |
-| lakes and summits | 86.7% | 100.0% | 89.5% | 78.9% |
-| ZIP codes | 98.3% | 100.0% | 100.0% | 87.5% |
-| misses | 94.7% | 94.7% | 100.0% | 100.0% |
+| Group | Maine | New York | VT + NH | AZ + NV | TX + LA + AR |
+|---|---|---|---|---|---|
+| **Overall** | **96.0%** | **94.9%** | **91.9%** | **91.9%** | **83.8%** |
+| addresses | 97.8% | 92.9% | 91.4% | 98.6% | 85.7% |
+| towns | 96.4% | 92.9% | 85.7% | 89.3% | 75.0% |
+| venues | 94.2% | 92.9% | 89.3% | 82.1% | 75.0% |
+| reverse | 100.0% | 100.0% | 96.2% | 92.3% | 96.2% |
+| ZIP codes | 98.3% | 100.0% | 100.0% | 87.5% | 100.0% |
 
-Maine is highest because Maine is where the tuning was measured, and the spread between the four
-is now four points rather than eleven. No setting in the engine names a region.
+Maine is highest because Maine is where the tuning was measured. The first four sit within four
+points of each other, against eleven before this work. Texas plus Louisiana plus Arkansas is
+twelve points below Maine and is discussed in section 5.5: part of that gap is understood and
+part is not, and saying which is which is more use than an average.
 
 ### 5.1 New York: 88.4% to 95.5%, with no New York setting
 
@@ -453,6 +520,62 @@ the city, which is what someone typing it means, and the case counts that wrong 
 centre is further than 300 m from that venue. It is reported here rather than argued away: the
 case set is the measure, and being confident about one of its cases is not a reason to edit it.
 
+### 5.5 Texas, Louisiana and Arkansas: the largest build, and the last
+
+The fifth region was chosen to be unlike the first four: 12,176,571 features against New York's
+7.2 million, 393 county equivalents against 62, Spanish across Texas and French and Cajun across
+Louisiana, and the longest stretch of the Mexican border of any state. It built in 3,608 s.
+
+It proved two fixes that had never met the data that motivated them:
+
+- **Parishes.** Section 4.5 changed the county name to whatever Who's on First actually calls it,
+  on the strength of a property nobody was reading, and until this build there was no parish to
+  try it on. Louisiana stores `Acadia Parish` and `Allen Parish`; Arkansas beside it stores
+  `Arkansas County` and `Ashley County`; nothing anywhere reads "Parish County".
+- **The border clip** held on the longest land border in the set: GNIS strays at most 0.30 km,
+  OpenAddresses 0.12 km, Overture 0.28 km, all inside the 300 m buffer, with only OpenStreetMap
+  street centroids beyond it.
+
+And it found the defect that only a build holding the same town name in more than one of its
+states can find. The state in a query was parsed, stripped from the text so it could not pollute
+name matching, and then **discarded** - referenced nowhere in the query functions:
+
+```
+Texarkana, AR  ->  Texarkana, TX, USA        Texarkana, TX  ->  Texarkana, TX, USA
+Crowley, LA    ->  Crowley, TX, USA          Hosuton, TX    ->  Hosston, LA, USA
+```
+
+Both Texarkana queries returned the same row, both at confidence 0.741, the order falling to
+importance. With one state that is harmless, which is why four regions did not show it. The
+search now takes the state and adds 0.06 to a candidate in it - above the 0.05 the importance
+term can span, below a real difference in match quality - and the typo fallback prefers a town in
+it, Hosston being one edit from "Hosuton" and Houston two.
+
+Chasing it turned up two more hardcoded Maine facts that had survived the generalisation of
+section 2:
+
+- Every **interpolated** address on every build was labelled `, ME, USA`. Texas answered
+  `1001 THATCHAM, NEW CANEY, ME, USA`. Interpolation is the one path the region tests never
+  exercised, because an accuracy set is built from real OpenAddresses points and those match
+  exactly rather than interpolate.
+- The whole-string form of a query stripped a trailing state with the literals `me|maine`, so on
+  every build but Maine the state word survived into name matching.
+
+**What the 83.8% is.** Two of the five failing address shapes are understood: a query like
+`12119 MURR WAY Texas` parses "Texas" as the town, because Texas is an unincorporated community
+in Louisiana, and the address is then penalised for not being in it. That is the same rule that
+correctly keeps New York as the city in "350 5th Ave, New York", and separating the two would
+take a rule about which places are prominent - a fact about a region, and the thing this document
+has spent itself removing. It is left alone.
+
+The rest is not understood, and it is worth being plain about that rather than rounding it into
+the explanation. The obvious hypothesis was ambiguity: three states hold 14,852 localities against
+Maine's 1,591, `lone pine` names seven places across them, and the failing queries give no state.
+Tested by re-asking each failing case with the right state appended, that hypothesis accounts for
+**2 of 13**. `Shelly Paeks` is still 727 km out with the state supplied. The remaining weakness is
+in typo and variant matching on venues and minor named features at a scale where far more near
+matches compete, and it has a cause that has not yet been found.
+
 ## 6. Multi-state builds
 
 A build may cover several states. Vermont plus New Hampshire was built through the documented
@@ -531,18 +654,22 @@ accept anything. Handling it means carrying two boxes through every step.
 
 Measured on the same workstation the study used.
 
-| | Maine | New York |
-|---|---|---|
-| Features | 908,347 | 7,213,395 |
-| Downloads | 0.6 GB | 3.0 GB |
-| Database | 1.0 GB | 7.1 GB |
-| On disk including WAL | 3.6 GB | 11 GB |
-| Deployable dump | 117 MB | 890 MB |
-| Build time | 5 min | ~30 min |
+| | Maine | New York | TX + LA + AR |
+|---|---|---|---|
+| Features | 906,068 | 7,246,426 | **12,176,571** |
+| Downloads | 0.6 GB | 3.0 GB | 4.1 GB |
+| Database | 1.0 GB | 7.0 GB | 11 GB |
+| Deployable dump | 120 MB | 897 MB | **1.5 GB** |
+| Build time | 5 min | 41 min | **60 min** |
 
 Who's on First adds a one-off 5.2 GB shared by every build. A server restores the dump rather
 than building, so it needs the database plus room for the restore: 10 GB for a state the size of
-Maine, 20 GB for one the size of New York.
+Maine, 20 GB for one the size of New York, 30 GB for three the size of Texas, Louisiana and
+Arkansas together.
+
+Build time scales with the number of admin polygons rather than the area, because the
+point-in-polygon pass is per feature: Texas alone has 254 counties against New York's 62, and the
+three-state build takes 60 minutes against New York's 41 for two thirds again as many features.
 
 The capacity figures in the study - 32 concurrent users on one vCPU and 1 GB - are Maine's. New
 York has not been load-tested. What changes with size is the working set: New York's indexes
@@ -570,30 +697,39 @@ Three things the study said should now be read differently:
 
 ## 10. What is not done
 
-- **The border margin.** Section 4.1 clipped OpenStreetMap to the region polygon, but the other
-  sources are still filtered by the build's bounding box alone, so a margin of out-of-region
-  features survives: 1,689 in Arizona plus Nevada, 514 of them more than a kilometre out. GNIS is
-  the worst at 297 features up to 66 km outside, in Utah, New Mexico and Sonora; OpenAddresses
-  adds 240. They carry no state, so they label honestly rather than falsely - the Maine defect of
-  section 4.1 was worse precisely because those features claimed to be in Maine - but they are
-  still findable and should not be there. The same polygon clip already written for OpenStreetMap
-  applies unchanged. A separate 1,037 OpenStreetMap streets are an artifact rather than a leak:
-  a street that crosses the border is kept whole and its representative point is its centroid,
-  which can fall outside.
-- **The Who's on First ancestry gap.** Some places carry no region ancestor in Who's on First and
-  are dropped: 1 in Maine, 5 in New York, 62 in Nevada, 72 in Arizona. The loss is not evenly
-  distributed - it falls on unincorporated and tribal communities (Chutum Vaya, Allenville,
-  Cibecue Creek, Jarbidge), which is the population least well served by every other geocoder
-  too. A point-in-polygon fallback against the region geometry would recover them.
-- **Venues outrank the localities they are named after.** "Tuscon, AZ" answers `One Hope -
-  Tuscon` and "Albany, New York" answers `Sims Metal - Albany`. This is the only known-answer
-  failure left in any build, and it is a ranking question: a near-exact name match on a venue
-  currently beats an exact match on a locality.
+Two entries that stood here in the first draft have since been closed, and the numbers they
+carried are now in sections 4.1 and 5.4: the border margin is clipped on every source and the
+neighbouring countries are subtracted from the buffer, and venues no longer outrank the localities
+they are named after. What remains:
+
+- **Two front ends hold two copies of the parser, and nothing checks they agree.** This has now
+  caused two escapes in one working period. A misspelled town reached the right city on the SQL
+  edge and the wrong one on FastAPI, because only the SQL half had been made state-aware; earlier,
+  a container left on a stale image served an older parser while the database served a newer one,
+  and the known answers passed anyway because they matched on a substring. A contract test that
+  puts the same queries through both and fails on disagreement is the cheapest remaining
+  improvement in this document, and the one most likely to catch the next mistake.
+- **Typo and variant matching at the largest scale.** Texas plus Louisiana plus Arkansas scores
+  75% on towns and venues against 82-96% elsewhere, and the obvious explanation - ambiguity across
+  three states - accounts for 2 of 13 failing cases when tested. The cause of the rest has not
+  been found. See section 5.5.
+- **The Who's on First ancestry gap.** Some places carry no region ancestor and are dropped: 1 in
+  Maine, 5 in New York, 62 in Nevada, 72 in Arizona. The loss falls on unincorporated and tribal
+  communities - Chutum Vaya, Allenville, Cibecue Creek, Jarbidge - which is the population least
+  well served by every other geocoder too. A point-in-polygon fallback against the region geometry
+  would recover them.
 - **Query-time tie-breaking** is still by physical row order, worth about one case of accuracy
   noise between builds.
-- **Alaska** is refused rather than handled.
+- **Alaska** is refused rather than handled, its bounding box spanning the antimeridian.
 - **A bounding-box build** - part of a state, or the adjoining parts of several - would scale
   every cost down together. The plumbing is already threaded, since every step reads the build's
   box.
 - **Container images** remain designed and unpublished.
-- **New York has not been load-tested**, so its capacity is unknown.
+- **Only Maine has been load-tested.** The capacity figures in the study are Maine's; nothing
+  larger has been measured under concurrency.
+
+Three further regions were planned - Michigan plus Wisconsin plus Minnesota for disjoint geometry,
+Washington plus Idaho for the hardest name ambiguity in the country, and the District of Columbia
+for a place that is its own state, county and city at once. They are on hold. By the fifth region
+the defects being found were variations on the fourth's rather than a new kind, which is the point
+at which more regions stop paying for themselves.

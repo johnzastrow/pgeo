@@ -192,3 +192,18 @@ def test_the_fuzzy_town_rule_matches_the_sql_one():
     assert p.town_fuzzy("west end") is None        # two edits, and a different word count
     assert p.town_fuzzy("park") is None            # too short to risk an edit
     assert p.town_fuzzy("albany") is None          # an exact match is not this function's job
+
+
+def test_the_typo_fallback_prefers_the_state_the_query_named():
+    """"Hosuton, TX" is one edit from Hosston, Louisiana and two from Houston, Texas - a
+    transposition - so edit distance alone picks the wrong state's village."""
+    towns = {"houston", "hosston", "texarkana"}
+    states = {"tx": "TX", "texas": "TX", "la": "LA", "louisiana": "LA", "ar": "AR", "arkansas": "AR"}
+    where = {"houston": {"TX", "AR"}, "hosston": {"LA"}, "texarkana": {"TX", "AR"}}
+    p = RuleParser(towns, states, where)
+    assert p.town_fuzzy("hosuton") == "hosston"          # closest spelling, no state given
+    assert p.town_fuzzy("hosuton", "TX") == "houston"    # the state the query named wins
+    assert p.town_fuzzy("hosuton", "LA") == "hosston"
+    assert p.parse("Hosuton, TX").locality == "houston"
+    # with no state map at all it behaves as it did before
+    assert RuleParser(towns, states).town_fuzzy("hosuton", "TX") == "hosston"
