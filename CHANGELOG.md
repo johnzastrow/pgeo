@@ -27,8 +27,18 @@ commits where each milestone was complete.
 - `docs/screenshots/`: seven captures of the demo page against the Maine deployment - search,
   reverse, batch, confidence, nearby and the two form-filler steps - showing the restyled page and
   the pgeo engine label. Page captures, no browser chrome. Taken before the Reset button existed,
-  so they do not show it. The 2026-09-20 `desktop-*` and `mobile-*` set is still what
-  `slides/slides.md` embeds.
+  so they do not show it - except `search-in-box.png`, which does, and shows the Area tool's
+  rectangle and "search inside" working in the same frame.
+
+### Changed
+- The slide deck is rebuilt on the new UI. Six of its seven demo-page images are the captures
+  above, renamed on the way into `slides/public/` so a slide refers to what it shows rather than
+  to the order the screenshots were taken in. Two captions changed with them, since the queries
+  on screen are not the ones the old captions described. The seventh, the Compare tab with Pelias
+  and pgeo side by side, is still the 2026-09-20 image: that tab needs a deployment announcing
+  both engines, which the pgeo-only one cannot do.
+- The 2026-09-20 `desktop-*` and `mobile-*` captures are removed, from `docs/screenshots/` and
+  from the deck's own copies, apart from the Compare one still in use.
 
 
 ## [0.22.0] - 2026-09-25

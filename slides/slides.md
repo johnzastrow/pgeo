@@ -443,12 +443,13 @@ layout: two-cols
 
 # The demo app
 
-One page, both engines, switchable at the top.
+One page, whichever engines are announced: the switch appears only when there is more than one,
+so a pgeo-only deployment names what is answering instead.
 
 - **Search** with map-centre bias and filters
 - **Address** — type-ahead, then a formatted USPS address
 - **Structured**, **Reverse**, **Batch** (CSV)
-- **Compare** — the same query on both engines
+- **Compare** — the same query on both engines, when both are present
 - **Form filler**, **Confidence**, **Area**, **Nearby** — next slide
 
 Served same-origin with a strict CSP: no CDN, no remote script, every value written with
@@ -456,9 +457,9 @@ Served same-origin with a strict CSP: no CDN, no remote script, every value writ
 
 ::right::
 
-<img src="/desktop-light-06-engine.png" class="rounded shadow" />
+<img src="/ui-search.png" class="rounded shadow" />
 
-<img src="/desktop-light-07-address.png" class="rounded shadow mt-3" />
+<img src="/ui-reverse.png" class="rounded shadow mt-3" />
 
 ---
 
@@ -467,13 +468,13 @@ Served same-origin with a strict CSP: no CDN, no remote script, every value writ
 <div grid="~ cols-2 gap-4">
 
 <div>
-<img src="/desktop-light-10-form-filled.png" class="rounded shadow" />
+<img src="/ui-form-filled.png" class="rounded shadow" />
 <p class="text-xs opacity-70 mt-1"><b>Form filler.</b> The map follows the single best candidate as you type, with its confidence; Confirm fills a contact form from <code>/v1/address</code> (USPS Pub 28). Confirm is disabled while the engine is unsure.</p>
 </div>
 
 <div>
-<img src="/desktop-light-11-confidence.png" class="rounded shadow" />
-<p class="text-xs opacity-70 mt-1"><b>Confidence.</b> "Mud Pond": pgeo finds ten and divides the score, <b>0.36 each</b>. Switch to Pelias: eight at <b>1.00</b>, no doubt expressed. The calibration finding, live.</p>
+<img src="/ui-confidence.png" class="rounded shadow" />
+<p class="text-xs opacity-70 mt-1"><b>Confidence.</b> A typo, <i>"rodger ro lube"</i>, scored <b>0.45 — weak</b>, and said so in words. pgeo expresses doubt; the same class of query on Pelias comes back at <b>1.00</b> or not at all. The calibration finding, live.</p>
 </div>
 
 </div>
@@ -485,12 +486,12 @@ Served same-origin with a strict CSP: no CDN, no remote script, every value writ
 <div grid="~ cols-2 gap-4">
 
 <div>
-<img src="/desktop-light-12-area.png" class="rounded shadow" />
-<p class="text-xs opacity-70 mt-1"><b>Area.</b> Drag a rectangle or click a circle; "Main Street" inside it, against what the statewide answer would have been. The <code>boundary.*</code> parameters, which nothing else on the page exercised.</p>
+<img src="/ui-area.png" class="rounded shadow" />
+<p class="text-xs opacity-70 mt-1"><b>Area.</b> Drag a rectangle or click a circle, then search inside it: <i>"mosc"</i> in this box is Moscow, Maine and two things named after it, out of a statewide list many times longer. The <code>boundary.*</code> parameters, which nothing else on the page exercised.</p>
 </div>
 
 <div>
-<img src="/desktop-light-13-nearby.png" class="rounded shadow" />
+<img src="/ui-nearby.png" class="rounded shadow" />
 <p class="text-xs opacity-70 mt-1"><b>Nearby.</b> Click: the address at that point, then everything around it by distance, grouped by kind. Reverse geocoding the way a dispatcher uses it.</p>
 </div>
 

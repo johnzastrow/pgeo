@@ -42,8 +42,22 @@ change a slide underneath you. To refresh them after new figures or screenshots:
 
 ```bash
 cp docs/report_figures/fig_{architecture,query_pipeline,frontier,accuracy_category}.png slides/public/
-cp docs/screenshots/desktop-light-0{1,4,6,7,8}-*.png slides/public/
+
+# Demo-page captures. They are renamed on the way in, so a slide refers to what it shows rather
+# than to the order the screenshots happened to be taken in.
+cp docs/screenshots/search.png        slides/public/ui-search.png
+cp docs/screenshots/reverse.png       slides/public/ui-reverse.png
+cp docs/screenshots/form2.png         slides/public/ui-form-filled.png
+cp docs/screenshots/confidence.png    slides/public/ui-confidence.png
+cp docs/screenshots/search-in-box.png slides/public/ui-area.png
+cp docs/screenshots/nearby.png        slides/public/ui-nearby.png
 ```
+
+`desktop-light-08-compare.png` is the one image still from the 2026-09-20 set, and the only one
+in the older styling. It is the Compare tab with Pelias and pgeo answering side by side, which
+needs a deployment announcing both engines - see `docs/DEMO_ENGINES.md`. The pgeo-only deployment
+the rest of these came from cannot show that tab at all, so it has to be captured from a
+development stack.
 
 ## A note on `npm audit`
 
