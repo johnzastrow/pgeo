@@ -59,8 +59,47 @@ machine bigger rather than by adding machines, and the report's section 4 says w
 * Ansible roles that take a bare Debian host to a hardened, rate-limited, API-key-protected
   service
 * A test suite that measures accuracy against independent ground truth, not against itself
-* Docker images for the pre-processor and the server are designed but not yet published
-  ([DOCKER-DEPLOY.md](DOCKER-DEPLOY.md), [docs/DOCKER_IMAGES.md](docs/DOCKER_IMAGES.md))
+* A pre-processor image and a three-container serving bundle, built from this repository and not
+  yet published to a registry ([DOCKER-DEPLOY.md](DOCKER-DEPLOY.md),
+  [deploy/README.md](deploy/README.md), [docs/DOCKER_IMAGES.md](docs/DOCKER_IMAGES.md))
+
+## The demo page
+
+Served same-origin under a strict CSP: no CDN, no remote script, a self-hosted MapLibre and a
+PMTiles basemap cut to the region. Every capture below is the Maine build answering for itself.
+
+<table>
+<tr>
+<td width="50%"><img src="docs/screenshots/search.png" alt="Search tab: autocomplete results for a venue, with the map following"></td>
+<td width="50%"><img src="docs/screenshots/confidence.png" alt="Confidence tab: every candidate with its score, and a plain-words reading of it"></td>
+</tr>
+<tr>
+<td><b>Search.</b> Type-ahead over addresses, venues, streets and places, biased to the map centre and filterable by layer and source.</td>
+<td><b>Confidence.</b> Every candidate with its score, and a sentence saying what the score means. A weak match says so instead of pretending.</td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/search-in-box.png" alt="Area tab: a rectangle drawn on the map and the results found inside it"></td>
+<td><img src="docs/screenshots/nearby.png" alt="Nearby tab: the address at a clicked point and everything around it by distance"></td>
+</tr>
+<tr>
+<td><b>Area.</b> Drag a rectangle or click a circle, then search inside it. Here <i>"mosc"</i> in the box is Moscow, Maine and two things named after it, out of a much longer statewide list.</td>
+<td><b>Nearby.</b> Click the map: the address at that point, then everything around it by distance, grouped by kind.</td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/form2.png" alt="Form filler: a contact form completed from the chosen address"></td>
+<td><img src="docs/screenshots/batch.png" alt="Batch tab: a CSV of addresses geocoded, with a match and confidence per row"></td>
+</tr>
+<tr>
+<td><b>Form filler.</b> The map follows the best candidate as you type; Confirm fills a contact form from <code>/v1/address</code>, formatted to USPS Publication 28.</td>
+<td><b>Batch.</b> Paste or upload a CSV - forward or reverse - and get a match, a confidence and a note per row, throttled client-side.</td>
+</tr>
+</table>
+
+Also there and not pictured: **Structured** search by field, **Reverse** geocoding with a layer
+and radius filter, and **Compare**, which runs the same query against two engines side by side
+where both are configured. Which geocoder the page talks to is a one-line file -
+see [docs/DEMO_ENGINES.md](docs/DEMO_ENGINES.md). Full set in
+[docs/screenshots/](docs/screenshots/).
 
 ## Documentation
 
