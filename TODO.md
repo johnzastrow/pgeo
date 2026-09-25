@@ -654,3 +654,42 @@ only `name`, so the function could not filter by state even if it wanted to.
 
 Both need measuring across all five builds: the first four cannot show the defect, so any change
 in them is a regression rather than a fix.
+
+## 20. A state name that is also a town, with an address in front of it
+
+Texas plus Louisiana plus Arkansas scores 83.8% on its first accuracy set, against 91.9% to 96.0%
+for the other four. Five of its 32 failures are one query shape, and they miss by 410 to 440 km:
+
+```
+12119 MURR WAY Texas  ->  parse: housenumber 12119, street MURR WAY, locality "Texas", state none
+                          1st  "Texas, LA, USA"                      conf 0.45
+                          2nd  "12119 MURR WAY, Houston, TX, USA"    conf 0.40
+12119 MURR WAY        ->  1st  "12119 MURR WAY, Houston, TX, USA"    conf 1.00
+```
+
+Texas is an unincorporated community in Louisiana, so the parser's ambiguity rule applies: a state
+name that is also a town is only read as the state when what precedes it ends in a known town.
+Here what precedes it is a house number and a street, so "Texas" stays the locality, the address
+is then penalised for not being in that locality, and a village of a few dozen people outranks it.
+
+**No fix is proposed, deliberately.** The rule that produces this is the one protecting
+"350 5th Ave, New York", where keeping New York as the city is right, and the two queries are
+structurally identical - house number, street, ambiguous name. Any rule that separates them would
+be a rule about which places are prominent, which is a fact about a region and the thing this
+whole body of work has been removing.
+
+It is also worth being clear about what these five cases are: the accuracy generator builds a
+"variant" by substituting the state name for the city, so "12119 MURR WAY Texas" is a shape it
+produces and a person rarely types. The remaining gap in this build is mostly not this:
+
+| Group | tx-la-ar | others |
+|---|---|---|
+| addresses | 85.7% | 91.4-98.6% |
+| towns | 75.0% | 85.7-96.4% |
+| venues | 75.0% | 82.1-96.4% |
+| lakes and summits | 73.7% | 78.9-100% |
+
+Town failures are ambiguity rather than error: `lone pine` names seven places across the three
+states, `red hill` five, `taylortown` three, and the queries that miss give no state. Three states
+holding 14,852 localities is a harder problem than Maine's 1,591, and some of that gap is the
+region and not the engine. Worth measuring how much before treating any of it as a defect.
