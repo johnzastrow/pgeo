@@ -31,6 +31,11 @@
       <label class="select engine" id="engine-pick" hidden>Engine <select id="engine"></select>
         <span id="engine-only" hidden></span>
         <span class="engine-note" id="engine-note"></span></label>
+      <!-- Every tool here can leave something behind - a drawn area, a dropped pin, a filter set
+           three tabs ago - and the map tools take over the cursor while they are active. One way
+           back to a clean page and a plain pan cursor, without a reload. -->
+      <button type="button" class="btn btn-reset" id="reset-all"
+              title="Clear every filter, result and drawn area, and return the map to panning">Reset</button>
       <!-- The API requires a key (X-API-Key). Kept for this tab only, sent in a header, never in
            a URL. The form is shown until a key is accepted, and again if one stops being. -->
       <form class="apikey" id="apikey-form" autocomplete="off" hidden>

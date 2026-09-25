@@ -239,6 +239,7 @@ function buildChips(container, items, name) {
     container.append(lab);
   }
 }
+$('#reset-all').addEventListener('click', resetAll);
 buildChips($('#layer-chips'), LAYERS.map((l) => [l, l]), 'layer');
 buildChips($('#source-chips'), SOURCES, 'source');
 const checked = (name) => [...document.querySelectorAll(`input[name="${name}"]:checked`)].map((i) => i.value);
@@ -397,6 +398,53 @@ function select(feature, { fly = true, reverse = false } = {}) {
   } else {
     map.flyTo({ center: [lon, lat], zoom: ZOOM[feature.properties?.layer] ?? 14, padding: panelPadding(), duration: 1200 });
   }
+}
+
+// ---- Reset --------------------------------------------------------------------------------
+// One way back to a clean page. Every tool can leave something behind - a drawn area, a dropped
+// pin, a filter set three tabs ago - and the map tools take the cursor and, while drawing, the
+// pan handler. Reloading works but loses the map position, so this puts the controls back to the
+// defaults written in the markup and hands the map back to plain panning.
+function resetAll() {
+  // Whatever a tool disabled, turn back on. Drawing a rectangle suspends dragPan, and a drag that
+  // ended badly used to leave it off for good; this is the blunt recovery even if that happens
+  // again somewhere else.
+  for (const h of ['dragPan', 'scrollZoom', 'boxZoom', 'dragRotate', 'keyboard', 'doubleClickZoom',
+    'touchZoomRotate']) map[h]?.enable();
+
+  // Controls are restored from their own markup defaults rather than a hand-kept list, which
+  // would drift the first time a filter is added and nobody remembers to update it here.
+  const panel = document.querySelector('.cartouche');
+  for (const i of panel.querySelectorAll('input')) {
+    if (i.type === 'checkbox' || i.type === 'radio') i.checked = i.defaultChecked;
+    else if (!['button', 'submit', 'reset', 'file'].includes(i.type)) i.value = i.defaultValue;
+  }
+  for (const t of panel.querySelectorAll('textarea')) t.value = t.defaultValue;
+  for (const sel of panel.querySelectorAll('select')) {
+    if (sel.id === 'engine') continue;       // which engine answers is the deployment's, not a filter
+    for (const o of sel.options) o.selected = o.defaultSelected;
+  }
+  for (const d of panel.querySelectorAll('details')) d.open = false;
+  for (const list of panel.querySelectorAll('ol, ul, tbody')) list.replaceChildren();
+  for (const t of panel.querySelectorAll('.status, .area-chosen, .compare-summary, .batch-progress')) {
+    t.textContent = '';
+  }
+  $('#area-clear').hidden = true;
+  $('#area-chosen').hidden = true;
+  $('#area-list').hidden = true;
+  areaGid = null;
+
+  // Tell every tab module to drop its own state and overlays. 'reset' is stronger than a tab
+  // change: leaving the Area tab only hides the drawn shape, this forgets it.
+  for (const fn of tabListeners) fn('reset');
+
+  // Search is the one tab with no map tool attached, so activating it also restores the cursor.
+  clearSelection();
+  clearAddress();
+  map.getSource('compare')?.setData(EMPTY);
+  activate($('#tab-search'));
+  drawCircle();
+  $('#search').focus();
 }
 
 function clearSelection() {

@@ -23,6 +23,32 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-09-25
+
+### Fixed
+- Drawing a rectangle on the Area tab could disable panning permanently. The drag suspends
+  `dragPan` on mousedown and restores it on mouseup, but MapLibre's `mouseup` only fires over the
+  canvas - and dragging a rectangle out towards a corner is exactly how you release the button
+  somewhere else. When that happened the drag never ended: the rectangle followed the cursor for
+  ever, the map could not be panned again on any tab, and the Area tool was unusable. The drag now
+  also ends on a window-level `mouseup` and on `blur`, through one idempotent `endDrag()`, and
+  commits using the last position seen rather than discarding the drag. The area search itself was
+  never broken - `boundary.rect.*` and `boundary.circle.*` both worked at the API throughout - it
+  was unreachable because the map was wedged.
+
+### Added
+- A **Reset** button in the header. Every tool can leave something behind - a drawn area, a
+  dropped pin, a filter set three tabs ago - and the map tools take over the cursor, so the only
+  way back was a reload, which loses the map position. Reset restores every control to the default
+  written in the markup (rather than a hand-kept list that would drift as filters are added),
+  tells each tab module to drop its own state and overlays, re-enables every map interaction
+  handler, and returns to the Search tab, whose cursor is the plain pan cursor. The engine
+  selection is deliberately left alone: which backend answers is the deployment's business, not a
+  search filter.
+
+### Changed
+- The drawn-area overlay uses the accent blue rather than the pre-restyle `#1f5f8b`.
+
 ## [0.21.0] - 2026-09-25
 
 ### Fixed

@@ -228,7 +228,7 @@ function setupConfidence({ map, client, meter, row, panelPadding, onTab }) {
   });
   onTab((id) => {
     if (id !== 'tab-confidence') src()?.setData(EMPTY);
-    if (id === 'engine-change') { src()?.setData(EMPTY); out.replaceChildren(); note.textContent = ''; }
+    if (id === 'engine-change' || id === 'reset') { src()?.setData(EMPTY); out.replaceChildren(); note.textContent = ''; }
   });
 }
 
@@ -247,11 +247,11 @@ function setupBoundary({ map, client, meter, current, panelPadding, onTab }) {
   const dots = () => map.getSource('bnd-dots');
   map.on('load', () => {
     map.addSource('bnd-shape', { type: 'geojson', data: EMPTY });
-    map.addLayer({ id: 'bnd-fill', type: 'fill', source: 'bnd-shape', paint: { 'fill-color': '#1f5f8b', 'fill-opacity': 0.08 } });
-    map.addLayer({ id: 'bnd-line', type: 'line', source: 'bnd-shape', paint: { 'line-color': '#1f5f8b', 'line-width': 2 } });
+    map.addLayer({ id: 'bnd-fill', type: 'fill', source: 'bnd-shape', paint: { 'fill-color': '#0264a4', 'fill-opacity': 0.08 } });
+    map.addLayer({ id: 'bnd-line', type: 'line', source: 'bnd-shape', paint: { 'line-color': '#0264a4', 'line-width': 2 } });
     map.addSource('bnd-dots', { type: 'geojson', data: EMPTY });
     map.addLayer({ id: 'bnd-dots', type: 'circle', source: 'bnd-dots',
-      paint: { 'circle-radius': 5.5, 'circle-color': '#1f5f8b', 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 1.5 } });
+      paint: { 'circle-radius': 5.5, 'circle-color': '#0264a4', 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 1.5 } });
   });
 
   function rectFeature(a, b) {
@@ -268,6 +268,11 @@ function setupBoundary({ map, client, meter, current, panelPadding, onTab }) {
     }
     return { type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [pts] } };
   }
+  function shapeFeature(sh) {
+    return sh.kind === 'circle'
+      ? circleFeature(sh.lat, sh.lon, sh.radiusKm)
+      : rectFeature({ lng: sh.minLon, lat: sh.minLat }, { lng: sh.maxLon, lat: sh.maxLat });
+  }
   function describe() {
     if (!shape) return 'No area yet.';
     if (shape.kind === 'circle') return `Circle: ${shape.radiusKm} km around ${fixed(shape.lat, 4)}, ${fixed(shape.lon, 4)}`;
@@ -276,24 +281,48 @@ function setupBoundary({ map, client, meter, current, panelPadding, onTab }) {
 
   // Drawing. Rectangle: drag with the pointer while this tab is active (map panning is suspended
   // during the drag). Circle: click a centre; radius from the select.
+  //
+  // The drag has to be able to end anywhere. MapLibre's own 'mouseup' only fires over the canvas,
+  // so releasing the button off the edge of the map - which is exactly what happens when you drag
+  // a rectangle out to the corner - left dragStart set and dragPan disabled: the rectangle then
+  // followed the cursor for ever and the map could never be panned again, on any tab. The window
+  // listener below is the one that always runs; endDrag is idempotent so whichever fires first
+  // wins and the second does nothing.
   const active = () => current() === 'tab-boundary';
+  let dragLast = null;
+
+  function endDrag(at) {
+    if (!dragStart) return;
+    const a = dragStart;
+    const b = at || dragLast;
+    dragStart = null;
+    dragLast = null;
+    map.dragPan.enable();
+    // Too small to be a deliberate rectangle, or released with no position ever recorded: leave
+    // whatever shape was already set alone rather than replacing it with a sliver.
+    if (!b || Math.abs(a.lng - b.lng) < 1e-4 || Math.abs(a.lat - b.lat) < 1e-4) {
+      src()?.setData(shape ? shapeFeature(shape) : EMPTY);
+      return;
+    }
+    shape = { kind: 'rect', minLon: Math.min(a.lng, b.lng), maxLon: Math.max(a.lng, b.lng),
+      minLat: Math.min(a.lat, b.lat), maxLat: Math.max(a.lat, b.lat) };
+    src()?.setData(rectFeature(a, b));
+    status.textContent = describe();
+  }
+
   map.on('mousedown', (e) => {
     if (!active() || modeSel.value !== 'rect' || e.originalEvent.button !== 0) return;
-    dragStart = e.lngLat; map.dragPan.disable();
+    dragStart = e.lngLat; dragLast = e.lngLat; map.dragPan.disable();
   });
   map.on('mousemove', (e) => {
     if (!dragStart) return;
+    dragLast = e.lngLat;
     src()?.setData(rectFeature(dragStart, e.lngLat));
   });
-  map.on('mouseup', (e) => {
-    if (!dragStart) return;
-    const a = dragStart; dragStart = null; map.dragPan.enable();
-    if (Math.abs(a.lng - e.lngLat.lng) < 1e-4 || Math.abs(a.lat - e.lngLat.lat) < 1e-4) return;
-    shape = { kind: 'rect', minLon: Math.min(a.lng, e.lngLat.lng), maxLon: Math.max(a.lng, e.lngLat.lng),
-      minLat: Math.min(a.lat, e.lngLat.lat), maxLat: Math.max(a.lat, e.lngLat.lat) };
-    src()?.setData(rectFeature(a, e.lngLat));
-    status.textContent = describe();
-  });
+  map.on('mouseup', (e) => endDrag(e.lngLat));
+  // Released off the canvas, or the window lost focus mid-drag (alt-tab, a dialog): same recovery.
+  window.addEventListener('mouseup', () => endDrag(null));
+  window.addEventListener('blur', () => endDrag(null));
   map.on('click', (e) => {
     if (!active() || modeSel.value !== 'circle') return;
     shape = { kind: 'circle', lat: e.lngLat.lat, lon: e.lngLat.lng, radiusKm: Number($('#bnd-radius').value) };
@@ -344,8 +373,15 @@ function setupBoundary({ map, client, meter, current, panelPadding, onTab }) {
     }
   });
   onTab((id) => {
+    if (id === 'reset') {
+      // A drawn area is state the user set, so Reset drops it - switching tabs only hides it.
+      shape = null; dragStart = null; dragLast = null; map.dragPan.enable();
+      src()?.setData(EMPTY); dots()?.setData(EMPTY); out.replaceChildren();
+      status.textContent = describe();
+      return;
+    }
     if (id === 'engine-change') { dots()?.setData(EMPTY); out.replaceChildren(); status.textContent = describe(); return; }
-    if (id !== 'tab-boundary') { src()?.setData(EMPTY); dots()?.setData(EMPTY); if (dragStart) { dragStart = null; map.dragPan.enable(); } }
+    if (id !== 'tab-boundary') { src()?.setData(EMPTY); dots()?.setData(EMPTY); endDrag(null); }
     else status.textContent = describe();
   });
 }
@@ -428,6 +464,7 @@ function setupNearby({ map, client, current, panelPadding, onTab }) {
     }
   });
   onTab((id) => {
+    if (id === 'reset') { out.replaceChildren(); status.textContent = ''; pin.remove(); src()?.setData(EMPTY); ring()?.setData(EMPTY); return; }
     if (id === 'engine-change') { out.replaceChildren(); status.textContent = ''; src()?.setData(EMPTY); return; }
     if (id !== 'tab-nearby') { pin.remove(); src()?.setData(EMPTY); ring()?.setData(EMPTY); }
   });
