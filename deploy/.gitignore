@@ -1,0 +1,6 @@
+.env
+pgdata/
+dumps/
+tiles/
+web/
+pgeo_swap.sh

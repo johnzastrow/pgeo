@@ -24,7 +24,7 @@ Everything below is packaging and a transport around those pieces; no new engine
 | The pre-processor's database | **Self-contained** - the image carries its own PostgreSQL | A workstation needs only Docker. |
 | Architectures | **amd64 only** to start | Ship what is measured; arm64 when someone needs it. |
 | The push command | **One command in the build image** | `pgeo-build push` dumps, rsyncs, and triggers the swap. Ansible keeps working for this project's own VM 120 but is not required of adopters. |
-| Applying a new dump on the VPS | **Atomic online swap** | Restore into a build schema, rename, drop the old - the loader's own trick. A refresh is a non-event. This delivers the "atomic online restore" future-work item. |
+| Applying a new dump on the VPS | **Atomic online swap** | Restore into a staging *database*, verify it, rename it into place (see the correction below). A refresh is a non-event. This delivers the "atomic online restore" future-work item. |
 | Raw sources | **The image fetches them**, into a cache volume | One flow for a first-timer; the volume makes the second build cheap. |
 | Regions | **Parameterised** (`PGEO_BUILD`, as the scripts already are), **one or several** | A New Hampshire build becomes a flag, not a fork; a three-state build is a list. Ranking stays tuned on Maine, as the report says. |
 
@@ -69,18 +69,36 @@ compose run build swap`. That is the "all-in-one": the same bundle, with the pre
 switched on, for the slower-but-central deployment.
 
 The bundle starts empty and serves a clear 503 with a one-line hint until a dump has arrived.
-The swap is a script in the `db` image's `/docker-entrypoint-initdb.d`-adjacent tooling:
+
+**Corrected on implementation (2026-09-25): the unit of swap is the database, not the schema.**
+The sketch below was to restore into a `pgeo_incoming` *schema* and rename it into place, which
+is what a local *build* does. A dump cannot: `pg_dump` writes its schema names into the archive
+and `pg_restore` has no way to rewrite them - `-n` selects a schema, it does not rename one.
+Renaming the live schemas out of the way first would leave the service without them for the
+whole restore, which is the outage the swap exists to avoid.
+
+What `scripts/pgeo_swap.sh` actually does:
 
 ```
-pgeo-swap <dump>:  pg_restore into schema pgeo_incoming
-                   -> run pgeo/sql 040-060 (functions are versioned with the dump)
-                   -> BEGIN; ALTER SCHEMA pgeo RENAME TO pgeo_old; ALTER SCHEMA pgeo_incoming
-                      RENAME TO pgeo; COMMIT; DROP SCHEMA pgeo_old CASCADE
-                   -> NOTIFY pgrst, 'reload schema'
+pgeo_swap.sh --dump <file>:  CREATE DATABASE pgeo_incoming; pg_restore into it
+                             -> rebuild pgeo.feature_ac in this host's physical row order
+                                (excluded from the dump; tie-breaks depend on ctid order)
+                             -> VACUUM ANALYZE
+                             -> check: engine version, feature count, a query that must match
+                             -> terminate connections; ALTER DATABASE pgeo RENAME TO pgeo_previous;
+                                ALTER DATABASE pgeo_incoming RENAME TO pgeo
+                             -> NOTIFY pgrst, 'reload schema'; DROP DATABASE pgeo_previous
 ```
 
-The rename is one transaction; PostgREST's connections see the old schema until it commits and
-the new one after. This is what the loader does locally today.
+Everything before the rename happens while the old database is still answering, and every check
+is made before anything is switched. The two renames are not one transaction - PostgreSQL will
+not rename a database inside one - so the switch drops connections and PostgREST reconnects by
+itself.
+
+Measured through a real deployment's TLS terminator, one request a second across the swap: 135 of
+136 returned 200 and one returned 503, in the rename window. An earlier run against a local vt-nh
+stack saw 110 of 110, which was luck rather than a guarantee - the switch is brief, not atomic
+from a client's point of view, and a caller that cannot tolerate one failed request should retry.
 
 ### 3. The pipeline between them
 

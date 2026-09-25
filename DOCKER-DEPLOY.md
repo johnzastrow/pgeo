@@ -1,9 +1,12 @@
 # Deploying pgeo with Docker
 
-> **Status: the images described here are designed, not yet published.** This page is the
-> operator's interface they are being built to; commands will work as written once the images
-> ship (tracked in `docs/DOCKER_IMAGES.md` and `TODO.md`). Until then, deploy from the repository
-> as `docs/DEPLOY_PGEO.md` describes.
+> **Status (2026-09-25): both sides exist and one deployment is running; neither image is
+> published to a registry yet.** `pgeo-build` is built from `pgeo/docker/build/`, and the serving
+> bundle is `deploy/` - three stock images, so only its configuration needs shipping. The
+> commands below that pull `git.wharf.example/jcz/pgeo-build` are therefore still aspirational;
+> build it locally with `docker build -f pgeo/docker/build/Dockerfile .` and see `deploy/README.md`
+> for how the bundle is actually shipped. Registry publication is what remains of `TODO.md`
+> section 1.
 
 pgeo is a geocoder that runs inside PostgreSQL. Two images cover everything:
 

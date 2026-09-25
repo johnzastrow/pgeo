@@ -1,0 +1,69 @@
+# pgeo, serving. Three stock images and this file: the database, the pure-SQL API, and an edge
+# that serves the demo page and maps the Pelias paths onto it. No data is built here - a dump
+# made by pgeo-build (or scripts/pgeo_dump.sh) is restored, and refreshed later with
+# scripts/pgeo_swap.sh, which keeps the service up while it works.
+#
+#   cp .env.example .env && edit it        # two passwords
+#   docker compose up -d
+#   ./pgeo_swap.sh --dump dumps/pgeo-<build>-<version>-<date>.dump
+#
+# The edge listens on 127.0.0.1:8090 by default. Put your own TLS terminator in front of it; it
+# deliberately does not terminate TLS or hold a certificate.
+# The stack name prefixes the project and every container. It defaults to "pgeo", which is right
+# on a host dedicated to serving - but a machine that also runs this repository's development
+# stack already has containers by those names, and compose will take them over. Set PGEO_STACK to
+# something else there.
+name: ${PGEO_STACK:-pgeo}
+services:
+  db:
+    # The same base pgeo-build uses, so a dump from one restores into the other by construction.
+    # The query side needs core and contrib extensions only - libpostal is an optional arm that
+    # lives in the larger pgeo-db image, and carrying its 1.9 GB of models here would be waste.
+    image: postgis/postgis:18-3.6@sha256:60f6ad1d21ea86a67d47780b9a0d1e1d200500f62b19293fa834d0dea80b8677
+    container_name: ${PGEO_STACK:-pgeo}_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pgeo
+      POSTGRES_USER: pgeo
+      POSTGRES_PASSWORD: ${PGEO_DB_PASSWORD:?set PGEO_DB_PASSWORD in .env}
+      # Read by db/init/10-api-role.sh on the cluster's first boot; see that file.
+      PGEO_API_PASSWORD: ${PGEO_API_PASSWORD:?set PGEO_API_PASSWORD in .env}
+    shm_size: 512m
+    volumes:
+      - ./pgdata:/var/lib/postgresql/18/docker
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+      - ./dumps:/dumps:ro
+    # No published port: only PostgREST talks to it, over the compose network.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pgeo -d pgeo"]
+      interval: 5s
+      retries: 30
+
+  rest:
+    image: postgrest/postgrest:v16.3@sha256:ec0e25a4e24b0a3bc5e4f011369bfc736bd1b19f513bd01079b86329a7636962
+    container_name: ${PGEO_STACK:-pgeo}_rest
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      # pgeo_api is read-only and owns nothing; the dump grants it what it needs.
+      PGRST_DB_URI: "postgres://pgeo_api:${PGEO_API_PASSWORD:?set PGEO_API_PASSWORD in .env}@db:5432/pgeo"
+      PGRST_DB_SCHEMAS: "geocode_api"
+      PGRST_DB_ANON_ROLE: "pgeo_api"
+      PGRST_DB_POOL: "${PGEO_REST_POOL:-10}"
+      PGRST_SERVER_PORT: "3000"
+      PGRST_OPENAPI_MODE: "disabled"
+      PGRST_DB_MAX_ROWS: "40"
+    # No published port either: the edge is the only way in.
+
+  edge:
+    image: nginx:1.29-alpine
+    container_name: ${PGEO_STACK:-pgeo}_edge
+    restart: unless-stopped
+    depends_on: [rest]
+    volumes:
+      - ./edge/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./edge/pgeo.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./web:/srv/web:ro
+      - ./tiles:/srv/tiles:ro
+    ports: ["${PGEO_EDGE_BIND:-127.0.0.1}:${PGEO_EDGE_PORT:-8090}:8090"]

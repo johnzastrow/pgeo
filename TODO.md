@@ -7,7 +7,7 @@ particular way, and two record measurements that would otherwise have to be take
 
 | | Item | State |
 |---|---|---|
-| 1 | Published container images | open, designed |
+| 1 | Published container images | done 2026-09-25 (registry publication still open) |
 | 2 | Data-image transport | open, deferred alternative |
 | 3 | Multi-region builds | done in the pipeline; images still to do |
 | 4 | Point-in-polygon cost | done 2026-09-22 |
@@ -26,7 +26,7 @@ particular way, and two record measurements that would otherwise have to be take
 | 17 | A stateless feature still labelled ", USA" | done 2026-09-24 |
 | 18 | Pelias DATA_DIR pointing at the pre-rename path | fixed 2026-09-24 |
 
-Four open, three on hold, thirteen done - two of those twelve (3 and 7) with a remainder noted
+Three open, three on hold, fourteen done - two of those twelve (3 and 7) with a remainder noted
 in their entries. Sections 14 and 20 went on hold on 2026-09-25: five regions were built and the
 testing is judged to have covered the cases that matter.
 
@@ -37,6 +37,30 @@ Design: `docs/DOCKER_IMAGES.md`. Operator's page: `DOCKER-DEPLOY.md`. Decided 20
 build profile as the all-in-one, SSH/rsync push from workstation to server, atomic online swap on
 arrival, sources fetched into a cache volume, region-parameterised including multi-region builds.
 3-5 days.
+
+**Done 2026-09-25.** `pgeo/docker/build/` is the `pgeo-build` image (1.57 GB, carries its own
+PostgreSQL; `fetch|build|dump|push|shell`). `deploy/` is the serving bundle: three stock images -
+postgis, PostgREST, nginx - and nothing built locally. `scripts/pgeo_swap.sh` is the atomic
+online swap. The first real deployment is a LAN host behind Caddy, serving Maine at 0.19.3;
+its hostname is local and stays out of this repository (see `deploy/README.md` for the shape).
+
+Publishing the images to a registry is *not* done - both are built from the repository. That is
+what remains of this item, and item 2 is the data half of the same question.
+
+Four things the first deployment found, all now fixed in the bundle rather than on the host:
+
+- The bundle's compose project and containers were called `pgeo`, `pgeo_db`, `pgeo_rest` - the
+  same names this repository's development stack uses. Bringing the bundle up on the workstation
+  took the development stack's containers over and removed them. Everything is now prefixed by
+  `PGEO_STACK`, which still defaults to `pgeo` because that is right on a dedicated host.
+- Nothing ever set `pgeo_api`'s password. The role is cluster-wide and no dump carries a
+  password, so PostgREST could not log in on a first bring-up. `deploy/db/init/10-api-role.sh`
+  sets it at initdb and `pgeo_swap.sh` re-applies it on every restore.
+- nginx resolves an upstream name once, at startup, and refuses to start when it is missing - so
+  a PostgREST that was restarting took the edge down with it, permanently. The edge now names
+  its upstream through a variable and resolves per request.
+- `pgeo_swap.sh` lived in `scripts/` and the bundle referred to it as `../scripts/`; a deployed
+  host has no checkout. It ships inside the bundle now.
 
 ## 2. The data-image variant of the transport (kept as an option)
 
