@@ -20,14 +20,15 @@ particular way, and two record measurements that would otherwise have to be take
 | 11 | Two parsers, nothing checking they agree | open |
 | 12 | Misspelled town answers with a venue | done 2026-09-23 |
 | 13 | Two builds against one database | done 2026-09-23 |
-| 14 | The next four regions | open, next up |
+| 14 | The next four regions | **on hold** (Texas built; three batches not pursued) |
 | 15 | The clip's buffer crossing a land border | done 2026-09-23 |
 | 16 | The hole over Akwesasne | done 2026-09-23 |
 | 17 | A stateless feature still labelled ", USA" | done 2026-09-24 |
 | 18 | Pelias DATA_DIR pointing at the pre-rename path | fixed 2026-09-24 |
 
-Six open, one on hold, eleven done - two of those eleven (3 and 7) with a remainder noted in
-their entries.
+Five open, three on hold, twelve done - two of those twelve (3 and 7) with a remainder noted
+in their entries. Sections 14 and 20 went on hold on 2026-09-25: five regions were built and the
+testing is judged to have covered the cases that matter.
 
 ## 1. Published container images
 
@@ -372,13 +373,19 @@ the exit status is zero, and the per-source counts at the end should be compared
 staged counts, so an extract that silently contributed nothing is caught by the build rather than
 by someone noticing a missing street months later.
 
-## 14. The next four regions, in order
+## 14. The next four regions, in order - ON HOLD 2026-09-25
 
 Every region built so far has found at least one general defect the previous ones could not, and
 the rate is falling but not zero: Maine defined the rules, New York found eleven, Vermont plus
 New Hampshire found one, Arizona plus Nevada found one, and sharpening the known answers for the
 fourth found two more. These four batches are chosen to keep that going - each one probes
 something the first four could not.
+
+**On hold.** Texas plus Louisiana plus Arkansas was built (see below) and the testing across five
+regions is judged to have covered the cases that matter. The three remaining batches - Michigan
+plus Wisconsin plus Minnesota, Washington plus Idaho, and the District of Columbia - are not being
+pursued for now. What each would probe is left below, because it is the reason to pick them up
+again if the question ever changes.
 
 All nine states are already in `regions/regions.json` with a bounding box, FIPS code, Geofabrik
 slug, Who's on First region id and OpenAddresses sources, so each is one `scripts/build_region.sh
@@ -663,7 +670,7 @@ The original plan follows.
 Both need measuring across all five builds: the first four cannot show the defect, so any change
 in them is a regression rather than a fix.
 
-## 20. A state name that is also a town, with an address in front of it
+## 20. A state name that is also a town, with an address in front of it - ON HOLD 2026-09-25
 
 Texas plus Louisiana plus Arkansas scores 83.8% on its first accuracy set, against 91.9% to 96.0%
 for the other four. Five of its 32 failures are one query shape, and they miss by 410 to 440 km:
@@ -680,7 +687,7 @@ name that is also a town is only read as the state when what precedes it ends in
 Here what precedes it is a house number and a street, so "Texas" stays the locality, the address
 is then penalised for not being in that locality, and a village of a few dozen people outranks it.
 
-**No fix is proposed, deliberately.** The rule that produces this is the one protecting
+**On hold, and no fix is proposed.** The rule that produces this is the one protecting
 "350 5th Ave, New York", where keeping New York as the city is right, and the two queries are
 structurally identical - house number, street, ambiguous name. Any rule that separates them would
 be a rule about which places are prominent, which is a fact about a region and the thing this
