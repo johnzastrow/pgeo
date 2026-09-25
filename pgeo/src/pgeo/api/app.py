@@ -382,6 +382,24 @@ async def structured(request: Request):
     if not fields["address"]:
         p.name = p.locality or fields["county"] or p.postcode
     async with request.app.state.pool.acquire() as con:
+        # Nothing but a region: that asks for the region itself, and the two front ends used to
+        # answer it differently. Everywhere else region is a filter, not text, but p.text above
+        # joins every field - so "region=ME" alone searched the free text for "ME" and came back
+        # with venues called "Mrs & Me", while the SQL edge, which leaves region out of its text
+        # entirely, had no name to search for and returned nothing. Resolve it to the region's
+        # own name through the same helper the SQL edge calls, and pin the answer to the region
+        # layer unless the caller asked for particular layers.
+        if fields["region"] and not any(
+            v for k, v in fields.items() if k not in ("region", "country")
+        ):
+            name = await con.fetchval("SELECT geocode.region_name($1)", fields["region"])
+            # A region this build does not cover resolves to nothing, and the query then has no
+            # subject at all - which is an empty answer, not a free-text search for the word.
+            # "region=Vermont" against a Maine build otherwise found Vermont Avenue in Bangor.
+            p.name = name
+            p.text = name or ""
+            if name and c["layers"] is None:
+                c["layers"] = ["region"]
         rows = await con.fetch(
             SEARCH_SQL,
             p.text,

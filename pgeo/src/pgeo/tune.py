@@ -417,6 +417,36 @@ async def parser_probes(build: str, limit: int = 60) -> list[tuple[str, dict]]:
     return probes
 
 
+def shape_probes() -> list[tuple[str, dict]]:
+    """Queries chosen for their *shape* rather than their text.
+
+    The accuracy cases and the parser probes are all well-formed free-text searches, which is why
+    neither caught a structured query carrying no address at all: the SQL front end read a plpgsql
+    record it had only assigned on the address branch and raised 55000, while FastAPI answered
+    normally. Every case below leaves out something a caller is allowed to leave out.
+
+    The place names are Maine's and are not looked up in the build: what is being compared is that
+    both front ends do the same thing with the same shape, and two empty answers agree just as
+    well as two matching ones.
+    """
+    return [
+        # structured, in the subsets Pelias accepts - the address is optional in all of them
+        ("search/structured", {"locality": "Portland", "region": "ME"}),
+        ("search/structured", {"locality": "Portland"}),
+        ("search/structured", {"region": "ME"}),
+        ("search/structured", {"county": "Penobscot"}),
+        ("search/structured", {"postalcode": "04401"}),
+        ("search/structured", {"address": "100 Broad St", "locality": "Bangor"}),
+        ("search/structured", {"address": "Broad St", "locality": "Bangor"}),
+        ("search/structured", {"neighbourhood": "Bangor", "region": "ME"}),
+        # free text carrying nothing but a filter
+        ("search", {"text": "Bangor", "layers": "locality"}),
+        ("search", {"text": "Bangor", "sources": "whosonfirst"}),
+        ("autocomplete", {"text": "Bango", "layers": "locality"}),
+        ("reverse", {"point.lat": 44.8, "point.lon": -68.77, "layers": "address"}),
+    ]
+
+
 def _installed_version() -> str | None:
     """The pgeo being tested. None when it cannot be determined, which disables the comparison
     rather than failing every check."""
@@ -467,7 +497,8 @@ def cmd_contract(args: argparse.Namespace) -> int:
     import httpx
 
     api, sql = args.api.rstrip("/"), args.sql.rstrip("/")
-    cases = contract_cases(args.build, args.n) + asyncio.run(parser_probes(args.build))
+    cases = (contract_cases(args.build, args.n) + shape_probes()
+             + asyncio.run(parser_probes(args.build)))
     disagreements = []
     for path, params in cases:
         answers = []

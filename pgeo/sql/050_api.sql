@@ -444,7 +444,15 @@ RETURNS jsonb LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
 DECLARE
   a     record;
+  -- Kept apart from the record deliberately. `a` is assigned only when an address was given, and
+  -- an unassigned plpgsql record cannot be read at all - even for a field that would be NULL, it
+  -- raises 55000. A structured query is allowed to carry no address (locality and region alone
+  -- are a valid Pelias query), so the two fields the search needs are held as scalars that are
+  -- simply NULL in that case.
+  hn    text;
+  st    text;
   nm    text;
+  lay   text[];
   full_text text := concat_ws(' ', address, locality, county, postalcode);
   cats  text[];
   feats jsonb;
@@ -459,14 +467,31 @@ BEGIN
   cats := geocode.check_extras(CASE WHEN country ~ '^[A-Za-z]{2,3}$' THEN country END, gid, categories, lang, api_key);
   IF address IS NOT NULL THEN
     a := geocode.parse_rule(geocode.check_text(address, 'address'));
-    nm := CASE WHEN a.housenumber IS NULL THEN address END;
+    hn := a.housenumber;
+    st := a.street;
+    nm := CASE WHEN hn IS NULL THEN address END;
   ELSE
     nm := coalesce(locality, county, postalcode);
   END IF;
+  lay := geocode.check_list(layers, ARRAY['address','venue','street','neighbourhood','locality','localadmin','county','region','postalcode'], 'layers');
+  -- Nothing but a region: that asks for the region itself, and the two front ends used to
+  -- answer it differently. region is otherwise a filter and never part of the text, so the SQL
+  -- edge had no name to search for and returned nothing, while FastAPI folded the bare "ME" into
+  -- the free text and matched venues called "Mrs & Me". Resolve it to the region's own name and
+  -- pin the answer to the region layer, unless the caller asked for particular layers.
+  -- "nothing but a region" has to name the fields: nm above ignores neighbourhood (it is passed
+  -- to the search as a locality, not as the subject), so testing nm alone sent
+  -- neighbourhood=Bangor&region=ME down this path and answered with the state.
+  IF region IS NOT NULL AND address IS NULL AND neighbourhood IS NULL AND locality IS NULL
+     AND county IS NULL AND postalcode IS NULL THEN
+    nm := geocode.region_name(region);
+    full_text := coalesce(nm, full_text);
+    IF nm IS NOT NULL AND lay IS NULL THEN lay := ARRAY['region']; END IF;
+  END IF;
   SELECT jsonb_agg(geocode.feature_json(h) ORDER BY h.score DESC) INTO feats
-  FROM geocode.search(full_text, nm, a.housenumber, a.street, coalesce(locality, neighbourhood), postalcode,
+  FROM geocode.search(full_text, nm, hn, st, coalesce(locality, neighbourhood), postalcode,
                       lon, lat,
-                      geocode.check_list(layers, ARRAY['address','venue','street','neighbourhood','locality','localadmin','county','region','postalcode'], 'layers'),
+                      lay,
                       geocode.check_list(sources, ARRAY['openaddresses','openstreetmap','whosonfirst','gnis','zcta','overture','interpolation'], 'sources'),
                       geocode.check_rect(min_lon, min_lat, max_lon, max_lat),
                       least(greatest(coalesce(size, 10), 1), 40),

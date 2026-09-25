@@ -10,6 +10,38 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+## [0.19.3] - 2026-09-25
+
+### Fixed
+- A structured query carrying nothing but a `region` was answered differently by the two front
+  ends, in both cases wrongly. `region` is a filter and never part of the searched text, so the
+  SQL edge had no subject and returned nothing; FastAPI joins every structured field into the
+  free text, so `region=ME` searched for "ME" and answered "Mrs & Me, Kittery". Both now resolve
+  the region through the new `geocode.region_name()` - which accepts "ME" or "Maine" - and pin
+  the answer to the region layer unless the caller asked for particular layers. A region the
+  build does not cover returns nothing on both, rather than `region=Vermont` finding Vermont
+  Avenue in Bangor. Found by the shape probes added in 0.19.2, on their first run.
+
+### Added
+- `geocode.region_name(text)`: the canonical name of a region named by abbreviation or in full,
+  NULL for one this build does not cover. Shared by both front ends.
+
+## [0.19.2] - 2026-09-25
+
+### Fixed
+- `v1_search_structured` raised `55000 record "a" is not assigned yet` for any structured query
+  that carried no `address` - `locality=Portland&region=ME` alone, for instance. The plpgsql
+  record holding the parsed address was assigned only on the address branch, but its
+  `housenumber` and `street` were read unconditionally, and an unassigned record cannot be read
+  even for a field that would be NULL. The two fields are now scalars. FastAPI was unaffected,
+  so this was a front-end disagreement that returned HTTP 500 from the SQL edge only.
+
+### Added
+- `pgeo-tune contract` now also runs a fixed set of *shape* probes (`shape_probes`) - queries
+  that leave out parts a caller may leave out - alongside the accuracy cases and parser probes.
+  Both existing corpora are well-formed free-text searches, which is why neither caught the bug
+  above. The new probes cover structured search in each accepted subset and filter-only queries.
+
 ## [0.19.1] - 2026-09-25
 
 ### Added

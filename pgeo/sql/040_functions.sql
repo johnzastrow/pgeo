@@ -81,6 +81,16 @@ AS $$ SELECT ROW(f.id, f.gid, f.source, f.layer, f.source_id, f.name, f.housenum
 --   p_text full query, p_name place/venue name part, p_hn house number, p_street street,
 --   p_locality town, p_postcode ZIP.
 -- ---------------------------------------------------------------------------------------
+-- The canonical name of a region named either way round - "ME" or "Maine" - or NULL for anything
+-- this build does not cover. A structured query carrying nothing but a region is a request for
+-- the region itself, and both front ends need the same answer to what that region is called.
+CREATE OR REPLACE FUNCTION geocode.region_name(p_region text)
+RETURNS text LANGUAGE sql STABLE PARALLEL SAFE AS $$
+  SELECT r.name FROM geocode.region_ref r
+   WHERE upper(btrim(coalesce(p_region, ''))) IN (upper(r.abbr), upper(r.name))
+   LIMIT 1
+$$;
+
 CREATE OR REPLACE FUNCTION geocode.search(
     p_text text, p_name text, p_hn text, p_street text, p_locality text, p_postcode text,
     p_focus_lon double precision DEFAULT NULL, p_focus_lat double precision DEFAULT NULL,
