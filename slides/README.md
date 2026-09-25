@@ -54,10 +54,12 @@ cp docs/screenshots/nearby.png        slides/public/ui-nearby.png
 ```
 
 `desktop-light-08-compare.png` is the one image still from the 2026-09-20 set, and the only one
-in the older styling. It is the Compare tab with Pelias and pgeo answering side by side, which
-needs a deployment announcing both engines - see `docs/DEMO_ENGINES.md`. The pgeo-only deployment
-the rest of these came from cannot show that tab at all, so it has to be captured from a
-development stack.
+in the older styling. **Kept deliberately - do not replace it.** It is the Compare tab, Pelias and
+pgeo answering the same typo side by side, and that tab appears only where both engines are
+announced (see `docs/DEMO_ENGINES.md`). The deployment the other six came from serves pgeo alone
+and cannot show it at all, so there is nothing current to recapture: the slide's argument is
+Pelias against pgeo, and the picture that makes it is this one. It stays until there is a
+two-engine deployment worth recapturing from.
 
 ## A note on `npm audit`
 

@@ -35,8 +35,9 @@ commits where each milestone was complete.
   above, renamed on the way into `slides/public/` so a slide refers to what it shows rather than
   to the order the screenshots were taken in. Two captions changed with them, since the queries
   on screen are not the ones the old captions described. The seventh, the Compare tab with Pelias
-  and pgeo side by side, is still the 2026-09-20 image: that tab needs a deployment announcing
-  both engines, which the pgeo-only one cannot do.
+  and pgeo side by side, is deliberately left as the 2026-09-20 image: that tab needs a deployment
+  announcing both engines, which the pgeo-only one cannot do, so there is nothing current to
+  recapture and the slide keeps the picture that makes its argument.
 - The 2026-09-20 `desktop-*` and `mobile-*` captures are removed, from `docs/screenshots/` and
   from the deck's own copies, apart from the Compare one still in use.
 
