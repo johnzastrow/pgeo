@@ -17,7 +17,7 @@ particular way, and two record measurements that would otherwise have to be take
 | 8 | History rewrite before publication | done 2026-09-22 |
 | 9 | Authorization: single sign-on | **on hold** |
 | 10 | Clip every source to the region | done 2026-09-23 |
-| 11 | Two parsers, nothing checking they agree | open |
+| 11 | Two parsers, nothing checking they agree | done 2026-09-25 |
 | 12 | Misspelled town answers with a venue | done 2026-09-23 |
 | 13 | Two builds against one database | done 2026-09-23 |
 | 14 | The next four regions | **on hold** (Texas built; three batches not pursued) |
@@ -26,7 +26,7 @@ particular way, and two record measurements that would otherwise have to be take
 | 17 | A stateless feature still labelled ", USA" | done 2026-09-24 |
 | 18 | Pelias DATA_DIR pointing at the pre-rename path | fixed 2026-09-24 |
 
-Five open, three on hold, twelve done - two of those twelve (3 and 7) with a remainder noted
+Four open, three on hold, thirteen done - two of those twelve (3 and 7) with a remainder noted
 in their entries. Sections 14 and 20 went on hold on 2026-09-25: five regions were built and the
 testing is judged to have covered the cases that matter.
 
@@ -278,7 +278,7 @@ and Overture staging paths, on the point rather than the line, leaving the stree
 alone. It needs its own accuracy run: the border margin includes places a query near the state
 line might legitimately want.
 
-## 11. Two front ends, two copies of the parser, and no check that they agree
+## 11. ~~Two front ends, two copies of the parser, and no check that they agree~~ Done 2026-09-25
 
 The FastAPI front end parses in Python (`pgeo/api/parse.py`, baked into the container image);
 the pure-SQL front end parses in PL/pgSQL (`geocode.parse_rule`, stored in the database). The
@@ -298,10 +298,16 @@ behind it:
 - **The accuracy runner did not record which endpoint it measured**, so a score could not be
   traced to a front end. Fixed 2026-09-23: the result file now carries `base`.
 
-**The fix** is a contract test that puts the same queries through both front ends and fails on
-any disagreement, run as part of the build gate. It would have caught all of this at the point
-the image went stale rather than three regions later. The deeper fix - one parser, called from
-both - is a larger change worth costing separately.
+**Done** in 0.19.0: `pgeo-tune contract`, run by `pgeo_rebuild.sh` beside the known answers. It
+asks both front ends the same questions and fails on disagreement, comparing the top result's gid.
+
+Two things are worth keeping from building it. The corpus cannot be the accuracy cases alone - with
+a fix deliberately removed from one front end, a 198-case sample still reported agreement, because
+only six of its cases pair a typo with a state and all six are addresses naming the city too. It is
+now those cases plus probes generated from the build's own ambiguous towns, and the same negative
+control is then caught in nine queries. And on its first honest run it found a parser bug five
+regions of accuracy testing had missed: the unit-designator pattern matched "ste" inside Steawrt,
+Stewart, Sterling, Stephens, Steuben, Unity and Apthorp, deleting the word.
 
 ## 12. ~~A misspelled town name answers with a venue~~ Done 2026-09-23
 

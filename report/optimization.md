@@ -555,6 +555,50 @@ Tested by re-asking each failing case with the right state appended, that hypoth
 in typo and variant matching on venues and minor named features at a scale where far more near
 matches compete, and it has a cause that has not yet been found.
 
+### 5.6 The test the two front ends needed
+
+Two front ends answer the same API: FastAPI parses in Python and carries its parser in a container
+image, the pure-SQL edge parses in PL/pgSQL and carries it in the database. They are separate
+implementations of one contract, and over this work they drifted three times without anything
+reporting it - a container left on an image older than the database, a parser fix applied to one
+and not the other, and the same again a week later. Section 5.4's known answers could not see it:
+they compare a label as a substring, and both front ends were returning *something* containing
+the right word.
+
+`pgeo-tune contract` asks both the same questions and fails on any disagreement, comparing the top
+result's gid - the identity of the answer rather than its presentation. Two empty answers agree,
+because the contract is that they behave alike and not that they always find something. The
+rebuild script runs it beside the known answers.
+
+The corpus took two attempts, and the first would have been worse than nothing. Sampling the
+build's accuracy cases looks obviously right, and it is not sufficient: with the state-aware typo
+fallback deliberately removed from one front end, a 198-case sample of Texas plus Louisiana plus
+Arkansas **still reported agreement**. Only six of those cases pair a misspelling with a state and
+all six are addresses that name the city too, so the path that had actually drifted was never
+asked. The corpus is now those cases plus probes generated from the build's own ambiguous towns -
+each spelled correctly and with one transposition, with and without each state it belongs to -
+and the same negative control is caught in nine queries.
+
+On its first honest run it found two things. Four of the five builds were serving an API image
+older than their database. And a bug no case set had found in five regions:
+
+| Query | Python parser | should be |
+|---|---|---|
+| `Stewart` | *deleted entirely* | Stewart |
+| `Sterling Ave` | ` Ave` | Sterling Ave |
+| `Apthorp Ave` | ` Ave` | Apthorp Ave |
+| `#12` | not matched | a unit |
+
+The unit-designator pattern had a word boundary only at its start, so "ste" matched inside
+"Steawrt" - and inside Stewart, Sterling, Stephens, Steuben, Unity and Apthorp, any street or
+town beginning apt, ste or unit. `geocode.parse_rule` has always had it right, using `\m...\M`.
+
+That is the argument for this kind of test in one line: it does not need to know the right answer.
+An accuracy set can only find what its ground truth covers, and five regions of ground truth had
+not covered a town beginning "Ste". Two implementations disagreeing is evidence on its own.
+
+All five builds now agree across 2,286 queries.
+
 ## 6. Multi-state builds
 
 A build may cover several states. Vermont plus New Hampshire was built through the documented
@@ -676,18 +720,12 @@ Three things the study said should now be read differently:
 
 ## 10. What is not done
 
-Two entries that stood here in the first draft have since been closed, and the numbers they
-carried are now in sections 4.1 and 5.4: the border margin is clipped on every source and the
-neighbouring countries are subtracted from the buffer, and venues no longer outrank the localities
-they are named after. What remains:
+Three entries that stood here in earlier drafts have since been closed, and what they carried is
+now in sections 4.1, 5.4 and 5.6: the border margin is clipped on every source and the
+neighbouring countries are subtracted from the buffer, venues no longer outrank the localities
+they are named after, and the two front ends are held to each other by a contract test. What
+remains:
 
-- **Two front ends hold two copies of the parser, and nothing checks they agree.** This has now
-  caused two escapes in one working period. A misspelled town reached the right city on the SQL
-  edge and the wrong one on FastAPI, because only the SQL half had been made state-aware; earlier,
-  a container left on a stale image served an older parser while the database served a newer one,
-  and the known answers passed anyway because they matched on a substring. A contract test that
-  puts the same queries through both and fails on disagreement is the cheapest remaining
-  improvement in this document, and the one most likely to catch the next mistake.
 - **Typo and variant matching at the largest scale.** Texas plus Louisiana plus Arkansas scores
   75% on towns and venues against 82-96% elsewhere, and the obvious explanation - ambiguity across
   three states - accounts for 2 of 13 failing cases when tested. The cause of the rest has not
