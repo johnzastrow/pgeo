@@ -16,7 +16,13 @@ from dataclasses import dataclass, field
 ZIP_RE = re.compile(r"\b(\d{5})(?:-\d{4})?\b")
 HN_RE = re.compile(r"^\s*(\d{1,6}[a-zA-Z]?)(?:\s*-\s*\d{1,6})?\s+(.+)$")
 HN_LEAD_RE = re.compile(r"^\s*\d{1,6}[a-zA-Z]?(?:\s*-\s*\d{1,6})?\s")
-UNIT_RE = re.compile(r"\b(?:apt|apartment|unit|ste|suite|#)\s*[\w-]+", re.I)
+# The keyword has to be a whole word. With a boundary only at the start this matched "ste"
+# inside "Steawrt" and deleted the word, and with it Stewart, Sterling, Stephens, Unity and
+# Apthorp - any street or town beginning apt/ste/unit. The "#" form is separate because a
+# word boundary before "#" never holds at the start of a string, so "#12" matched nothing.
+# geocode.parse_rule has always had this right, using \m...\M; the contract test between
+# the two front ends is what found the difference.
+UNIT_RE = re.compile(r"\b(?:apt|apartment|unit|ste|suite)\b\.?\s*[\w-]+|#\s*[\w-]+", re.I)
 
 
 @dataclass

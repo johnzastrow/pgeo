@@ -10,6 +10,36 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-09-25
+
+### Added
+- `pgeo-tune contract` puts the same queries through both front ends and fails on any
+  disagreement, and `pgeo_rebuild.sh` runs it beside the known answers. The two are separate
+  implementations of one contract - FastAPI parses in Python and carries its parser in the
+  container image, the pure-SQL edge parses in PL/pgSQL and carries it in the database - and they
+  had drifted twice without anything reporting it. Answers are compared on the top result's gid;
+  two empty answers agree, because the contract is that they behave alike, not that they always
+  find something.
+
+  The corpus is the build's accuracy cases plus queries generated from its own towns. The second
+  half is not decoration: with the state-aware typo fallback removed from one front end on
+  purpose, a 198-case sample of Texas plus Louisiana plus Arkansas still reported agreement,
+  because only six of its cases pair a typo with a state and all six are addresses naming the
+  city too. The generated probes - each ambiguous town, spelled correctly and with one
+  transposition, with and without each of its states - caught the same drift in 9 queries.
+
+### Fixed
+- A unit keyword has to be a whole word. `UNIT_RE` in the Python parser had a word boundary only
+  at the start, so it matched "ste" inside "Steawrt" and deleted the word - and with it Stewart,
+  Sterling, Stephens, Steuben, Unity and Apthorp, any street or town beginning apt, ste or unit.
+  Separately `#12` matched nothing, a word boundary before "#" never holding at the start of a
+  field. `geocode.parse_rule` has always had this right, using `\m...\M`.
+
+  Found by the contract test on its first real run, not by a case set: the two front ends
+  answered `steawrt, AZ` differently, and the reason was that one of them had silently eaten the
+  town name. Four of the five builds were also serving an API image older than their database,
+  which the same run caught.
+
 ## [0.18.0] - 2026-09-24
 
 **Requires a rebuild**: `pgeo.town` gains a column.

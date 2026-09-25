@@ -9,7 +9,8 @@
 #                          (040_functions.sql, 050_api.sql), VACUUM ANALYZE, atomic swap
 #   2. pgeo-tune apply     server + front-end profile (pgeo/tuning/profiles/NAME.toml);
 #                          default: the active profile, else "workstation"
-#   3. pgeo-tune verify    known-answer queries through FastAPI and the pure-SQL edge
+#   3. pgeo-tune verify    known-answer queries through FastAPI and the pure-SQL edge,
+#      pgeo-tune contract  then the same queries through both, which must agree
 #   4. accuracy + gate     1,560 cases and 1,800 fuzz cases against the pure-SQL API,
 #                          compared with tests/accuracy/baseline.json
 #
@@ -100,6 +101,13 @@ fi
 step "3/4 known-answer checks"
 pgeo pgeo-tune verify --build "$build" \
   --url "http://127.0.0.1:${api_port}" --url "http://127.0.0.1:${sql_port}"
+
+# The two front ends are separate implementations of one contract and have drifted twice: a
+# parser fix applied to one and not the other, and a container left on an image older than the
+# database. Neither was reported by anything. This asks both the same questions and fails on a
+# disagreement, which is the only check that can see that class of mistake.
+pgeo pgeo-tune contract --build "$build" \
+  --api "http://127.0.0.1:${api_port}" --sql "http://127.0.0.1:${sql_port}"
 
 if [[ $skip_gate -eq 1 ]]; then
   echo "accuracy gate skipped (--skip-gate)"

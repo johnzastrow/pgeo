@@ -23,6 +23,8 @@ import argparse
 import asyncio
 import json
 import math
+import os
+import random
 import re
 import subprocess
 import sys
@@ -359,6 +361,128 @@ def verify_cases(build: str) -> list[tuple[str, dict, str, str | None]]:
 
 
 
+# The accuracy case sets double as the contract corpus: they are per build, already shaped like
+# real queries, and cost nothing to maintain.
+CASES_DIR = PGEO_ROOT.parent / "tests" / "accuracy"
+PATHS = {"search": "search", "structured": "search/structured",
+         "autocomplete": "autocomplete", "reverse": "reverse"}
+
+
+async def parser_probes(build: str, limit: int = 60) -> list[tuple[str, dict]]:
+    """Queries aimed at the decisions the two parsers make differently.
+
+    The accuracy set is not enough on its own, and that was measured rather than assumed: with
+    the state-aware typo fallback removed from one front end, a 198-case sample of Texas plus
+    Louisiana plus Arkansas still reported agreement, because only six of its cases pair a typo
+    with a state and all six are addresses that name the city too. The path that actually drifted
+    - a misspelled town, with a state, and no other clue - was never asked.
+
+    So these are generated from the build's own towns: the ambiguous ones first, since a name in
+    two states is where the state has to be consulted at all.
+    """
+    import asyncpg
+
+    from pgeo.regions import stack_env
+
+    # A build other than the default has its own database on its own port; without this the
+    # probes come from whichever build is the default and say nothing about this one.
+    for key, value in stack_env(build).items():
+        os.environ.setdefault(key, value)   # an explicit PGEO_DSN still wins, as in pgeo-load
+    con = await asyncpg.connect(Settings.load().dsn, timeout=30)
+    try:
+        rows = await con.fetch(
+            """SELECT name, array_agg(DISTINCT region_a) AS states
+               FROM pgeo.town WHERE region_a IS NOT NULL AND length(name) >= 6
+               GROUP BY name
+               ORDER BY count(DISTINCT region_a) DESC, name
+               LIMIT $1""",
+            limit,
+        )
+    finally:
+        await con.close()
+
+    def typo(name: str) -> str:
+        """One transposition in the middle - the commonest real typo, and the case the fallback
+        treats specially."""
+        i = len(name) // 2
+        return name[:i] + name[i + 1] + name[i] + name[i + 2:] if i + 2 <= len(name) else name
+
+    probes: list[tuple[str, dict]] = []
+    for r in rows:
+        name, states = r["name"], list(r["states"])
+        probes.append(("search", {"text": name}))
+        for st in states:
+            probes.append(("search", {"text": f"{name}, {st}"}))
+            probes.append(("search", {"text": f"{typo(name)}, {st}"}))
+    return probes
+
+
+def contract_cases(build: str, n: int) -> list[tuple[str, dict]]:
+    """A sample of this build's accuracy queries, as (path, params). Seeded, so a disagreement
+    found on one run can be reproduced on the next."""
+    f = CASES_DIR / ("cases.json" if build == "me" else f"cases_{build}.json")
+    if not f.exists():
+        raise SystemExit(
+            f"no case set for build {build!r}: {f.relative_to(PGEO_ROOT.parent)} is missing. "
+            f"Build one with tests/accuracy/build_cases.py --build {build}"
+        )
+    cases = json.loads(f.read_text())
+    # Seeded on purpose and not security-relevant: the sample has to be the same on every run,
+    # or a disagreement found today cannot be reproduced tomorrow.
+    rng = random.Random(20260925)  # noqa: S311
+    if 0 < n < len(cases):
+        cases = rng.sample(cases, n)
+    return [(PATHS.get(c["endpoint"], c["endpoint"]), c["params"]) for c in cases]
+
+
+def cmd_contract(args: argparse.Namespace) -> int:
+    """Put the same queries through both front ends and fail on any disagreement.
+
+    The two are separate implementations of one contract - FastAPI parses in Python and carries
+    its parser in the container image, the pure-SQL edge parses in PL/pgSQL and carries it in the
+    database - so they drift, and they have: a fix applied to one parser and not the other sent
+    "Hosuton, TX" to Houston on one and to Hosston, Louisiana on the other, and before that a
+    container left on an older image served a parser the database had already replaced. Nothing
+    reported either; the known answers matched on a substring and passed.
+
+    The corpus is this build's accuracy cases plus queries generated from its own towns to hit
+    the places the parsers decide things - see parser_probes, and the measurement there for why
+    the accuracy cases alone were not enough.
+
+    Compared on the top result's gid, which is the identity of the answer rather than its
+    presentation. An empty answer from both is agreement: the contract is that they behave alike,
+    not that they always find something.
+    """
+    import httpx
+
+    api, sql = args.api.rstrip("/"), args.sql.rstrip("/")
+    cases = contract_cases(args.build, args.n) + asyncio.run(parser_probes(args.build))
+    disagreements = []
+    for path, params in cases:
+        answers = []
+        for base in (api, sql):
+            try:
+                r = httpx.get(f"{base}/v1/{path}", params=params | {"size": 1}, timeout=20)
+                feats = r.json().get("features", []) if r.status_code == 200 else None
+                if feats is None:
+                    answers.append(f"<HTTP {r.status_code}>")
+                else:
+                    answers.append(feats[0]["properties"].get("gid", "?") if feats else "<none>")
+            except (httpx.HTTPError, ValueError) as e:
+                answers.append(f"<error {type(e).__name__}>")
+        if answers[0] != answers[1]:
+            disagreements.append((path, params, answers[0], answers[1]))
+
+    for path, params, a, b in disagreements[:20]:
+        print(f"DIFFER {path} {params}\n         fastapi {a}\n         sql     {b}")
+    n = len(cases)
+    if disagreements:
+        print(f"contract: {len(disagreements)} of {n} queries disagree between the two front ends")
+        return 1
+    print(f"contract: {n} queries, both front ends agree")
+    return 0
+
+
 def cmd_verify(args: argparse.Namespace) -> int:
     import httpx
 
@@ -418,6 +542,12 @@ def main() -> None:
     v.add_argument("--url", action="append", default=None)
     v.add_argument("--build", default="me", help="which known-answer set to use")
     v.set_defaults(fn=cmd_verify)
+    c = sub.add_parser("contract", help="the two front ends must answer alike")
+    c.add_argument("--api", required=True, help="FastAPI base URL")
+    c.add_argument("--sql", required=True, help="pure-SQL edge base URL")
+    c.add_argument("--build", default="me", help="whose accuracy case set to sample")
+    c.add_argument("--n", type=int, default=200, help="how many queries (0 = all)")
+    c.set_defaults(fn=cmd_contract)
     args = ap.parse_args()
     if args.cmd == "verify" and not args.url:
         args.url = ["http://127.0.0.1:4500", "http://127.0.0.1:4700"]

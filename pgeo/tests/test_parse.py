@@ -207,3 +207,19 @@ def test_the_typo_fallback_prefers_the_state_the_query_named():
     assert p.parse("Hosuton, TX").locality == "houston"
     # with no state map at all it behaves as it did before
     assert RuleParser(towns, states).town_fuzzy("hosuton", "TX") == "hosston"
+
+
+def test_a_unit_keyword_must_be_a_whole_word():
+    """"Ste" is a unit designator and also the first three letters of Stewart, Sterling and
+    Stephens. With a word boundary only at the start, the unit pattern ate all of them."""
+    p = RuleParser({"stewart", "sterling", "unity"}, {"az": "AZ", "arizona": "AZ"})
+    for town in ("Stewart", "Sterling", "Unity"):
+        assert p.parse(f"{town}, AZ").locality is not None, town
+    # a misspelling of one still reaches it
+    assert p.parse("Steawrt, AZ").locality == "stewart"
+    # and real unit designators are still removed
+    q = p.parse("123 Main St Apt 5B, Stewart")
+    assert (q.housenumber, q.street, q.locality) == ("123", "Main St", "Stewart")
+    assert p.parse("123 Main St Ste. 200, Stewart").street == "Main St"
+    # "#12" at the start of a field is matched now; a word boundary before "#" never holds
+    assert p.parse("123 Main St #4B, Stewart").street == "Main St"
