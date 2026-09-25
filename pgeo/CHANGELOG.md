@@ -10,6 +10,22 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+## [0.19.1] - 2026-09-25
+
+### Added
+- `pgeo-tune verify` fails when a front end reports a version other than the one being tested. It
+  already rejected an unstamped database; it now compares as well as validates.
+
+  The two front ends take their version from different places - FastAPI from the package inside
+  its container image, the pure-SQL edge from `geocode.engine_version()` stamped into the database
+  - so either can be left behind on its own, by an image not rebuilt or by functions not
+  re-applied. That happened three times during this work, each time a stack serving new behaviour
+  while reporting an old version, and each time noticed by chance. The message names the remedy
+  that fits the front end that failed, since the two are fixed differently.
+
+  `--expect` overrides the version to compare against, and `--expect ''` restores the old
+  behaviour of accepting any well-formed version.
+
 ## [0.19.0] - 2026-09-25
 
 ### Added

@@ -417,6 +417,17 @@ async def parser_probes(build: str, limit: int = 60) -> list[tuple[str, dict]]:
     return probes
 
 
+def _installed_version() -> str | None:
+    """The pgeo being tested. None when it cannot be determined, which disables the comparison
+    rather than failing every check."""
+    from importlib.metadata import PackageNotFoundError, version
+
+    try:
+        return version("pgeo")
+    except PackageNotFoundError:
+        return None
+
+
 def contract_cases(build: str, n: int) -> list[tuple[str, dict]]:
     """A sample of this build's accuracy queries, as (path, params). Seeded, so a disagreement
     found on one run can be reproduced on the next."""
@@ -505,20 +516,36 @@ def cmd_verify(args: argparse.Namespace) -> int:
             if not ok and want_layer is not None and want in label and layer != want_layer:
                 shown += f"  <- wanted layer {want_layer}"
             print(f"{'ok  ' if ok else 'FAIL'} {base} {path} {params} -> {shown}")
-    # the build stamps geocode.engine_version(); an unstamped database reports "0+unknown" and
-    # every response then carries a meaningless engine version, so treat it as a failure
+    # The version each front end reports has to be the one being tested, and the two get it from
+    # different places: FastAPI from the package inside its container image, the pure-SQL edge
+    # from geocode.engine_version() stamped into the database. Either can be left behind - an
+    # image not rebuilt, or functions not re-applied - and three times in this project a stack
+    # served new behaviour while reporting an old version, each time noticed by chance rather
+    # than by a check. An unstamped database reports "0+unknown" and fails here too.
+    expect = args.expect or None   # --expect '' accepts any well-formed version
     for base in args.url:
+        name = ""
         try:
             # any query from this build's own set: only the stamped version is being read
             probe = cases[0][1] | {"size": 1}
             r = httpx.get(f"{base.rstrip('/')}/v1/{cases[0][0]}", params=probe, timeout=10)
-            ver = (r.json().get("geocoding", {}).get("engine", {}) or {}).get("version", "")
+            engine = (r.json().get("geocoding", {}).get("engine", {}) or {})
+            ver, name = engine.get("version", ""), engine.get("name", "")
         except (httpx.HTTPError, ValueError) as e:
             ver = f"<error {type(e).__name__}>"
-        ok = bool(re.fullmatch(r"\d+\.\d+\.\d+", str(ver)))
+        shaped = bool(re.fullmatch(r"\d+\.\d+\.\d+", str(ver)))
+        ok = shaped and (expect is None or ver == expect)
         failures += not ok
-        print(f"{'ok  ' if ok else 'FAIL'} {base} engine version -> {ver}"
-              + ("" if ok else "  (run pgeo-load build, or re-stamp geocode.engine_version())"))
+        note = ""
+        if not shaped:
+            note = "  (run pgeo-load build, or re-stamp geocode.engine_version())"
+        elif not ok:
+            # the two are behind for different reasons, so say which one applies
+            fix = ("rebuild this build's api image: docker compose ... build api && ... up -d api"
+                   if name == "pgeo" else
+                   "re-apply the functions: pgeo-load functions --build <build>")
+            note = f"  != {expect} being tested\n       {fix}"
+        print(f"{'ok  ' if ok else 'FAIL'} {base} engine version -> {ver}{note}")
     print("verify:", "passed" if not failures else f"{failures} failure(s)")
     return 1 if failures else 0
 
@@ -541,6 +568,9 @@ def main() -> None:
     v = sub.add_parser("verify")
     v.add_argument("--url", action="append", default=None)
     v.add_argument("--build", default="me", help="which known-answer set to use")
+    v.add_argument("--expect", default=_installed_version(),
+                   help="engine version both front ends must report (default: the installed "
+                        "pgeo; pass an empty string to accept any well-formed version)")
     v.set_defaults(fn=cmd_verify)
     c = sub.add_parser("contract", help="the two front ends must answer alike")
     c.add_argument("--api", required=True, help="FastAPI base URL")
