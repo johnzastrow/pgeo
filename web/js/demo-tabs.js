@@ -363,10 +363,10 @@ function setupNearby({ map, client, current, panelPadding, onTab }) {
   let ctl = null;
   map.on('load', () => {
     map.addSource('near-ring', { type: 'geojson', data: EMPTY });
-    map.addLayer({ id: 'near-ring', type: 'line', source: 'near-ring', paint: { 'line-color': '#8a5a00', 'line-width': 1.5, 'line-dasharray': [3, 2] } });
+    map.addLayer({ id: 'near-ring', type: 'line', source: 'near-ring', paint: { 'line-color': '#3f8f63', 'line-width': 1.5, 'line-dasharray': [3, 2] } });
     map.addSource('near-dots', { type: 'geojson', data: EMPTY });
     map.addLayer({ id: 'near-dots', type: 'circle', source: 'near-dots',
-      paint: { 'circle-radius': 5, 'circle-color': ['match', ['get', 'layer'], 'address', '#8a5a00', 'venue', '#2e8b57', '#1f5f8b'],
+      paint: { 'circle-radius': 5, 'circle-color': ['match', ['get', 'layer'], 'address', '#0264a4', 'venue', '#3f8f63', '#76808d'],
         'circle-stroke-color': '#ffffff', 'circle-stroke-width': 1.2 } });
   });
   function circleFeature(lat, lon, km) {

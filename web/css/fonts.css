@@ -1,11 +1,12 @@
-/* Self-hosted fonts (SIL OFL 1.1; see vendor/fonts/LICENSE-*). Latin subsets only. */
-@font-face { font-family: 'Fraunces'; font-style: normal; font-weight: 400; font-display: swap; src: url('../vendor/fonts/fraunces-latin-400-normal.woff2') format('woff2'); }
-@font-face { font-family: 'Fraunces'; font-style: italic; font-weight: 400; font-display: swap; src: url('../vendor/fonts/fraunces-latin-400-italic.woff2') format('woff2'); }
-@font-face { font-family: 'Fraunces'; font-style: normal; font-weight: 600; font-display: swap; src: url('../vendor/fonts/fraunces-latin-600-normal.woff2') format('woff2'); }
-@font-face { font-family: 'Fraunces'; font-style: italic; font-weight: 600; font-display: swap; src: url('../vendor/fonts/fraunces-latin-600-italic.woff2') format('woff2'); }
+/* Self-hosted fonts (SIL OFL 1.1; see vendor/fonts/LICENSE-*). Latin subsets only.
+   IBM Plex Sans throughout, Plex Mono for coordinates and identifiers. The condensed cut
+   stays for the few places that have to fit a lot into the panel's width. */
+@font-face { font-family: 'Plex Sans'; font-style: normal; font-weight: 400; font-display: swap; src: url('../vendor/fonts/ibm-plex-sans-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Plex Sans'; font-style: italic; font-weight: 400; font-display: swap; src: url('../vendor/fonts/ibm-plex-sans-latin-400-italic.woff2') format('woff2'); }
+@font-face { font-family: 'Plex Sans'; font-style: normal; font-weight: 500; font-display: swap; src: url('../vendor/fonts/ibm-plex-sans-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Plex Sans'; font-style: normal; font-weight: 600; font-display: swap; src: url('../vendor/fonts/ibm-plex-sans-latin-600-normal.woff2') format('woff2'); }
 
 @font-face { font-family: 'Plex Condensed'; font-style: normal; font-weight: 400; font-display: swap; src: url('../vendor/fonts/ibm-plex-sans-condensed-latin-400-normal.woff2') format('woff2'); }
-@font-face { font-family: 'Plex Condensed'; font-style: italic; font-weight: 400; font-display: swap; src: url('../vendor/fonts/ibm-plex-sans-condensed-latin-400-italic.woff2') format('woff2'); }
 @font-face { font-family: 'Plex Condensed'; font-style: normal; font-weight: 500; font-display: swap; src: url('../vendor/fonts/ibm-plex-sans-condensed-latin-500-normal.woff2') format('woff2'); }
 @font-face { font-family: 'Plex Condensed'; font-style: normal; font-weight: 600; font-display: swap; src: url('../vendor/fonts/ibm-plex-sans-condensed-latin-600-normal.woff2') format('woff2'); }
 

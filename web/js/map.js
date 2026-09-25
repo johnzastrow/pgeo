@@ -29,27 +29,29 @@ export async function loadRegion() {
   }
 }
 
-// "Chart paper" flavor: buff land, chart-blue water, magenta boundaries, ink labels.
+// Map flavor to match the page: a light neutral ground, cool grey-blue water, and the logo's
+// blue for boundaries and labels of consequence. Everything is low-contrast on purpose - the
+// markers and the result panel are what should carry colour, not the basemap.
 function chartFlavor() {
   const base = window.basemaps.namedFlavor('light');
   return {
     ...base,
-    background: '#e9dfc3', earth: '#f3ead2', water: '#b7d0df',
-    park_a: '#e4e5c8', park_b: '#d4dcb4', wood_a: '#e8e6cb', wood_b: '#dcdcb5',
-    scrub_a: '#e9e5c9', scrub_b: '#dedbb8', sand: '#efe3c2', beach: '#f2e4bd',
-    buildings: '#e3d7b9', pier: '#e3d7b9',
-    other: '#fbf6e9', minor_service: '#fbf6e9', minor_a: '#fbf6e9', minor_b: '#fffaf0',
-    link: '#fffaf0', major: '#fffaf0', highway: '#f7ecd2',
-    minor_service_casing: '#dccfae', minor_casing: '#dccfae', link_casing: '#d3c39d',
-    major_casing_early: '#d3c39d', major_casing_late: '#d3c39d',
-    highway_casing_early: '#c7b186', highway_casing_late: '#c7b186',
-    railway: '#9a8f78', boundaries: '#b3246b',
-    roads_label_minor: '#6b6250', roads_label_minor_halo: '#f3ead2',
-    roads_label_major: '#4f4636', roads_label_major_halo: '#f3ead2',
-    city_label: '#14213d', city_label_halo: '#f3ead2',
-    subplace_label: '#3d4a66', subplace_label_halo: '#f3ead2',
-    state_label: '#8a7d64', state_label_halo: '#f3ead2',
-    ocean_label: '#3f6592',
+    background: '#e7eaee', earth: '#f2f4f6', water: '#cfdde8',
+    park_a: '#e4ebe2', park_b: '#dae4d8', wood_a: '#e5ebe3', wood_b: '#dbe3d8',
+    scrub_a: '#e8ece7', scrub_b: '#dfe4dd', sand: '#efeee7', beach: '#f0eee4',
+    buildings: '#e2e6ea', pier: '#e2e6ea',
+    other: '#ffffff', minor_service: '#ffffff', minor_a: '#ffffff', minor_b: '#ffffff',
+    link: '#ffffff', major: '#ffffff', highway: '#f7f8fa',
+    minor_service_casing: '#dde1e6', minor_casing: '#dde1e6', link_casing: '#d3d8de',
+    major_casing_early: '#d3d8de', major_casing_late: '#d3d8de',
+    highway_casing_early: '#c3cad2', highway_casing_late: '#c3cad2',
+    railway: '#a8b0b9', boundaries: '#0264a4',
+    roads_label_minor: '#76808d', roads_label_minor_halo: '#f2f4f6',
+    roads_label_major: '#56606d', roads_label_major_halo: '#f2f4f6',
+    city_label: '#16202c', city_label_halo: '#f2f4f6',
+    subplace_label: '#44505f', subplace_label_halo: '#f2f4f6',
+    state_label: '#8a939d', state_label_halo: '#f2f4f6',
+    ocean_label: '#4a7fa5',
   };
 }
 

@@ -1,27 +1,45 @@
-/* pgeo demo page: "Chart Room".
-   A nautical-chart vocabulary: chart-paper ground, navy ink, chart magenta for aids,
-   a graduated neatline around the frame, DMS coordinates in the margin. */
+/* pgeo demo page.
+   A quiet instrument: a light neutral ground, white panels that float rather than frame,
+   and the logo's two colours doing all the signalling - deep blue for anything the user
+   can act on, green for a confident answer. One typeface, IBM Plex Sans, with Plex Mono
+   wherever digits have to line up. No ornament: the map is the picture. */
 
 :root {
-  --paper: #f3ead2;
-  --paper-2: #ebe0c1;
-  --paper-3: #e1d3ad;
-  --ink: #14213d;
-  --ink-2: #33415f;
-  --muted: #74694f;
-  --rule: rgba(20, 33, 61, 0.85);
-  --hair: rgba(20, 33, 61, 0.22);
-  --magenta: #b3246b;
-  --magenta-soft: rgba(179, 36, 107, 0.12);
-  --sounding: #3f6592;
-  --buoy-red: #b8322f;
-  --buoy-green: #2f7a58;
-  --shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset, 0 18px 40px -18px rgba(20, 33, 61, 0.55);
-  --display: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
-  --ui: 'Plex Condensed', 'Arial Narrow', 'Roboto Condensed', sans-serif;
+  /* Surfaces, lightest to deepest. --paper is the page ground, --card the panels on it. */
+  --paper: #eef0f3;
+  --paper-2: #e4e7ec;
+  --paper-3: #d8dce3;
+  --card: #ffffff;
+
+  /* Text */
+  --ink: #16202c;
+  --ink-2: #44505f;
+  --muted: #76808d;
+
+  /* Lines. Hairlines do most of the separating; --rule is for a deliberate edge. */
+  --rule: #cbd2da;
+  --hair: rgba(22, 32, 44, 0.09);
+
+  /* From the logo (web/pgeo.svg): the deep blue of the mark and its lighter face, and the
+     green of the leaf. Blue is interactive, green is affirmative. */
+  --accent: #0264a4;
+  --accent-bright: #298ec9;
+  --accent-soft: rgba(2, 100, 164, 0.09);
+  --ok: #3f8f63;
+  --info: #298ec9;
+  --danger: #c0392b;
+
+  --shadow: 0 1px 2px rgba(22, 32, 44, 0.06), 0 12px 28px -12px rgba(22, 32, 44, 0.28);
+  --shadow-sm: 0 1px 2px rgba(22, 32, 44, 0.08);
+  --radius: 12px;
+  --radius-sm: 8px;
+
+  --display: 'Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --ui: 'Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --narrow: 'Plex Condensed', 'Arial Narrow', sans-serif;
   --mono: 'Plex Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
   --panel-w: 392px;
-  --edge: 7px;
+  --edge: 0px;              /* the chart neatline is gone; kept so offsets still resolve */
   color-scheme: light;
 }
 
@@ -44,42 +62,26 @@ code { font-family: var(--mono); font-size: 0.88em; background: var(--paper-2); 
 #map { position: fixed; inset: 0; }
 .maplibregl-canvas { outline: none; }
 
-/* Graduated neatline: alternating ink/paper bars like a chart's latitude border. */
-.neatline {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 3;
-  --bar: repeating-linear-gradient(90deg, var(--ink) 0 56px, var(--paper) 56px 112px);
-  --bar-v: repeating-linear-gradient(180deg, var(--ink) 0 56px, var(--paper) 56px 112px);
-  background:
-    var(--bar) top / 100% var(--edge) no-repeat,
-    var(--bar) bottom / 100% var(--edge) no-repeat,
-    var(--bar-v) left / var(--edge) 100% no-repeat,
-    var(--bar-v) right / var(--edge) 100% no-repeat;
-  box-shadow:
-    inset 0 0 0 var(--edge) transparent,
-    inset 0 0 0 calc(var(--edge) + 1px) var(--rule);
-}
+/* The neatline - a chart's graduated border - is gone with the rest of the ornament.
+   The element stays in the markup so nothing has to change there; it draws nothing. */
+.neatline { display: none; }
 
 /* ---- Cartouche (panel) -------------------------------------------------------------- */
 
 .cartouche {
   position: fixed;
   z-index: 4;
-  top: calc(var(--edge) + 16px);
-  left: calc(var(--edge) + 16px);
+  top: 16px;
+  left: 16px;
   width: var(--panel-w);
-  max-height: calc(100dvh - 2 * var(--edge) - 32px);
+  max-height: calc(100dvh - 32px);
   display: flex;
   flex-direction: column;
-  background:
-    radial-gradient(120% 80% at 0% 0%, rgba(255, 255, 255, 0.35), transparent 60%),
-    var(--paper);
+  background: var(--card);
   border: 1px solid var(--rule);
-  outline: 3px double var(--rule);
-  outline-offset: 3px;
+  border-radius: var(--radius);
   box-shadow: var(--shadow);
+  overflow: hidden;              /* so the header's fill follows the corner radius */
   animation: rise 520ms cubic-bezier(.2, .7, .2, 1) both;
 }
 .cartouche > * { animation: fade 480ms ease both; }
@@ -91,20 +93,13 @@ code { font-family: var(--mono); font-size: 0.88em; background: var(--paper-2); 
 @keyframes fade { from { opacity: 0; } }
 
 .title {
-  padding: 18px 22px 12px;
-  border-bottom: 1px solid var(--rule);
-  position: relative;
-}
-.title::after { /* thin second rule, as under a chart title */
-  content: '';
-  position: absolute;
-  left: 0; right: 0; bottom: -4px;
+  padding: 18px 22px 14px;
   border-bottom: 1px solid var(--hair);
 }
 .kicker {
-  margin: 0 0 2px;
+  margin: 0 0 4px;
   font: 500 11px/1 var(--ui);
-  letter-spacing: 0.22em;
+  letter-spacing: 0.10em;         /* a hint of tracking, not the chart's wide engraving */
   text-transform: uppercase;
   color: var(--muted);
 }
@@ -112,11 +107,11 @@ h1 {
   margin: 0;
   font-family: var(--display);
   font-weight: 600;
-  font-size: 40px;
-  line-height: 1.05;
-  letter-spacing: -0.01em;
+  font-size: 34px;
+  line-height: 1.1;
+  letter-spacing: -0.021em;      /* a large sans needs the tracking pulled in */
 }
-.t-sub { font-weight: 400; font-style: italic; color: var(--magenta); }
+.t-sub { font-weight: 400; color: var(--accent); }
 .edition {
   margin: 8px 0 0;
   font: 400 10.5px/1.4 var(--mono);
@@ -138,7 +133,7 @@ h1 {
   background: none;
   color: var(--ink-2);
   font: 500 12px/1 var(--ui);
-  letter-spacing: 0.16em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 12px 4px 11px;
   cursor: pointer;
@@ -153,9 +148,9 @@ h1 {
   position: absolute;
   left: 18%; right: 18%; bottom: -1px;
   height: 3px;
-  background: var(--magenta);
+  background: var(--accent);
 }
-.tabs button:focus-visible { outline: 2px solid var(--magenta); outline-offset: -3px; }
+.tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; }
 
 .panel {
   padding: 16px 22px 10px;
@@ -179,14 +174,14 @@ h1 {
   transition: border-color 160ms;
 }
 .ps-input::placeholder { color: var(--muted); font-style: italic; }
-.ps-input:focus { border-bottom-color: var(--magenta); }
+.ps-input:focus { border-bottom-color: var(--accent); }
 .ps-input::-webkit-search-cancel-button { appearance: none; display: none; }
 .ps.ps-busy::after { /* sweeping sounding line while a request is in flight */
   content: '';
   position: absolute;
   left: 0; right: 0; top: 40px;
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--magenta), transparent) 0 0 / 40% 100% no-repeat;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent) 0 0 / 40% 100% no-repeat;
   animation: sweep 900ms linear infinite;
 }
 @keyframes sweep { from { background-position: -40% 0; } to { background-position: 140% 0; } }
@@ -214,8 +209,8 @@ h1 {
   border-left: 3px solid transparent;
 }
 .ps-option[aria-selected='true'], .ps-option:hover {
-  background: var(--magenta-soft);
-  border-left-color: var(--magenta);
+  background: var(--accent-soft);
+  border-left-color: var(--accent);
 }
 .ps-tag { grid-row: span 2; align-self: start; margin-top: 2px; }
 .ps-name { font-weight: 600; }
@@ -234,11 +229,11 @@ h1 {
   text-align: center;
   white-space: nowrap;
 }
-.ps-tag-address, .tag-address { color: var(--sounding); }
-.ps-tag-venue, .tag-venue { color: var(--magenta); }
+.ps-tag-address, .tag-address { color: var(--info); }
+.ps-tag-venue, .tag-venue { color: var(--accent); }
 .ps-tag-street, .tag-street { color: var(--muted); }
-.ps-tag-locality, .ps-tag-localadmin, .tag-locality, .tag-localadmin { color: var(--buoy-green); }
-.ps-tag-postalcode, .tag-postalcode { color: var(--buoy-red); }
+.ps-tag-locality, .ps-tag-localadmin, .tag-locality, .tag-localadmin { color: var(--ok); }
+.ps-tag-postalcode, .tag-postalcode { color: var(--danger); }
 
 /* ---- Options, switches, chips ---------------------------------------------------------- */
 
@@ -263,9 +258,9 @@ h1 {
   background: var(--ink);
   transition: transform 160ms;
 }
-.switch input:checked { background: var(--magenta); border-color: var(--magenta); }
+.switch input:checked { background: var(--accent); border-color: var(--accent); }
 .switch input:checked::before { transform: translateX(13px); background: var(--paper); }
-.switch input:focus-visible, .chip input:focus-visible + span { outline: 2px solid var(--magenta); outline-offset: 2px; }
+.switch input:focus-visible, .chip input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .select { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
 .engine { margin-top: 8px; font-size: 13px; }
@@ -278,12 +273,12 @@ select, .grid-form input, textarea {
   padding: 6px 8px;
   border-radius: 0;
 }
-select:focus, .grid-form input:focus, textarea:focus { outline: none; border-bottom-color: var(--magenta); }
+select:focus, .grid-form input:focus, textarea:focus { outline: none; border-bottom-color: var(--accent); }
 
 .chips { border: 0; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 5px; }
 .chips legend {
   font: 500 10.5px/1 var(--ui);
-  letter-spacing: 0.2em;
+  letter-spacing: 0.10em;
   text-transform: uppercase;
   color: var(--muted);
   margin-bottom: 6px;
@@ -306,34 +301,36 @@ select:focus, .grid-form input:focus, textarea:focus { outline: none; border-bot
 
 .btn {
   appearance: none;
-  font: 600 12px/1 var(--ui);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  padding: 10px 14px 9px;
-  border: 1.5px solid var(--ink);
-  background: transparent;
+  font: 500 13px/1 var(--ui);
+  letter-spacing: 0;              /* the engraved small-caps look went with the chart */
+  padding: 9px 14px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  background: var(--card);
   color: var(--ink);
   cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
 }
-.btn:hover:not(:disabled) { background: var(--paper-2); }
-.btn-ink { background: var(--ink); color: var(--paper); }
-.btn-ink:hover:not(:disabled) { background: var(--magenta); border-color: var(--magenta); }
-.btn:disabled { opacity: 0.4; cursor: default; }
-.btn:focus-visible { outline: 2px solid var(--magenta); outline-offset: 2px; }
+.btn:hover:not(:disabled) { background: var(--paper-2); border-color: var(--paper-3); }
+/* the one strong colour on the page: the logo blue, for the action that does the work */
+.btn-ink { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-ink:hover:not(:disabled) { background: var(--accent-bright); border-color: var(--accent-bright); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.btn:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 2px; }
 
 .grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
-.grid-form label { display: grid; gap: 4px; font: 500 11px/1 var(--ui); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.grid-form label { display: grid; gap: 5px; font: 500 11.5px/1 var(--ui); letter-spacing: 0.02em; color: var(--muted); }
 .grid-form input { text-transform: none; letter-spacing: 0; font-size: 15px; }
 .grid-form .wide { grid-column: 1 / -1; }
-.grid-form input:invalid:not(:placeholder-shown) { border-bottom-color: var(--buoy-red); }
+.grid-form input:invalid:not(:placeholder-shown) { border-bottom-color: var(--danger); }
 
 .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 10px 0 0; }
 textarea { width: 100%; resize: vertical; font-family: var(--mono); font-size: 12.5px; }
 input[type='file'] { font: 12px var(--mono); color: var(--muted); max-width: 230px; }
-progress { width: 100%; height: 6px; margin-top: 12px; appearance: none; border: 1px solid var(--hair); background: var(--paper-2); }
+progress { width: 100%; height: 6px; margin-top: 12px; appearance: none; border: 0; border-radius: 3px; overflow: hidden; background: var(--paper-2); }
 progress::-webkit-progress-bar { background: var(--paper-2); }
-progress::-webkit-progress-value { background: var(--magenta); }
-progress::-moz-progress-bar { background: var(--magenta); }
+progress::-webkit-progress-value { background: var(--accent); }
+progress::-moz-progress-bar { background: var(--accent); }
 .status { font: 12px/1.6 var(--mono); color: var(--ink-2); margin: 6px 0; min-height: 1.6em; }
 
 .table-wrap { max-height: 220px; overflow: auto; border-top: 1px solid var(--rule); }
@@ -343,7 +340,7 @@ progress::-moz-progress-bar { background: var(--magenta); }
   background: var(--paper);
   text-align: left;
   font: 500 10px/1 var(--ui);
-  letter-spacing: 0.16em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
   padding: 7px 6px;
@@ -351,7 +348,7 @@ progress::-moz-progress-bar { background: var(--magenta); }
 }
 .batch-table td { padding: 5px 6px; border-bottom: 1px solid var(--hair); vertical-align: top; }
 .batch-table td:nth-child(3) { font-family: var(--mono); }
-.batch-miss td { color: var(--buoy-red); }
+.batch-miss td { color: var(--danger); }
 
 /* ---- Result lists ---------------------------------------------------------------------- */
 
@@ -367,8 +364,8 @@ progress::-moz-progress-bar { background: var(--magenta); }
   border-top: 1px solid var(--hair);
   cursor: pointer;
 }
-.results li::before { content: counter(r); font: 500 11px var(--mono); color: var(--magenta); }
-.results li:hover, .results li:focus-visible { background: var(--magenta-soft); outline: none; }
+.results li::before { content: counter(r); font: 500 11px var(--mono); color: var(--accent); }
+.results li:hover, .results li:focus-visible { background: var(--accent-soft); outline: none; }
 .results .r-label { font-weight: 500; }
 .results .r-meta { grid-column: 2 / -1; font: 11px/1.4 var(--mono); color: var(--muted); }
 
@@ -377,7 +374,7 @@ progress::-moz-progress-bar { background: var(--magenta); }
 .result {
   border-top: 1px solid var(--rule);
   padding: 14px 22px 18px;
-  background: linear-gradient(var(--paper-2), var(--paper));
+  background: var(--paper);      /* a flat tint; the paper gradient went with the chart */
   animation: fade 300ms ease both;
   overflow-y: auto;
   flex-shrink: 0;
@@ -396,21 +393,22 @@ progress::-moz-progress-bar { background: var(--magenta); }
 }
 .result dt {
   font: 500 10px/1.9 var(--ui);
-  letter-spacing: 0.18em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
 }
 .result dd { margin: 0; font-family: var(--mono); font-size: 12.5px; word-break: break-word; }
 .meter { display: inline-grid; grid-template-columns: repeat(10, 9px); gap: 2px; vertical-align: -1px; margin-right: 8px; }
-.meter i { height: 10px; border: 1px solid var(--ink); }
-.meter i.on { background: var(--ink); }
-.meter.hi i.on { background: var(--buoy-green); border-color: var(--buoy-green); }
-.meter.lo i.on { background: var(--buoy-red); border-color: var(--buoy-red); }
+/* Confidence: the logo blue for a normal reading, green when it is high, red when low. */
+.meter i { height: 10px; border: 1px solid var(--rule); border-radius: 1px; }
+.meter i.on { background: var(--accent); border-color: var(--accent); }
+.meter.hi i.on { background: var(--ok); border-color: var(--ok); }
+.meter.lo i.on { background: var(--danger); border-color: var(--danger); }
 .result details { margin-top: 10px; }
 .result summary {
   cursor: pointer;
   font: 500 10.5px/1 var(--ui);
-  letter-spacing: 0.18em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ink-2);
 }
@@ -434,7 +432,7 @@ progress::-moz-progress-bar { background: var(--magenta); }
   cursor: pointer;
   padding: 0 2px;
 }
-.close:hover { color: var(--magenta); }
+.close:hover { color: var(--accent); }
 
 /* ---- Map furniture ------------------------------------------------------------------- */
 
@@ -457,24 +455,9 @@ progress::-moz-progress-bar { background: var(--magenta); }
 }
 #ro-zoom { color: var(--muted); }
 
-.compass {
-  position: fixed;
-  z-index: 2;
-  right: calc(var(--edge) + 20px);
-  bottom: calc(var(--edge) + 64px);
-  width: 118px;
-  height: 118px;
-  opacity: 0.72;
-  pointer-events: none;
-  transition: transform 120ms linear;
-}
-.compass .c-ring { fill: none; stroke: var(--magenta); stroke-width: 1.2; }
-.compass .c-thin { stroke-width: 0.6; stroke-dasharray: 1 3.2; }
-.compass .c-ticks line { stroke: var(--magenta); stroke-width: 0.8; }
-.compass .c-ns, .compass .c-ew { fill: var(--paper); stroke: var(--magenta); stroke-width: 1; }
-.compass .c-ew { transform: scale(0.72); }
-.compass .c-dark { fill: var(--magenta); }
-.compass .c-n { font: 600 11px var(--display); fill: var(--magenta); text-anchor: middle; }
+/* The compass rose is gone with the rest of the nautical vocabulary; the map's own
+   controls say which way is up. */
+.compass { display: none; }
 
 /* Selected-result marker: a magenta light flare over a position ring. */
 .chart-mark { width: 26px; height: 34px; position: relative; pointer-events: none; }
@@ -482,7 +465,7 @@ progress::-moz-progress-bar { background: var(--magenta); }
   position: absolute;
   left: 7px; top: 0;
   width: 13px; height: 22px;
-  background: var(--magenta);
+  background: var(--accent);
   border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
   transform: rotate(18deg);
   transform-origin: 50% 100%;
@@ -497,7 +480,7 @@ progress::-moz-progress-bar { background: var(--magenta); }
   border-radius: 50%;
   background: var(--paper);
 }
-.chart-mark-probe .chart-mark-flare { background: var(--sounding); animation: none; }
+.chart-mark-probe .chart-mark-flare { background: var(--info); animation: none; }
 @keyframes flare { 50% { opacity: 0.55; } }
 
 .maplibregl-ctrl-group {
@@ -553,7 +536,7 @@ progress::-moz-progress-bar { background: var(--magenta); }
 .more > summary {
   cursor: pointer;
   font: 500 10.5px/1.8 var(--ui);
-  letter-spacing: 0.18em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ink-2);
 }
@@ -569,15 +552,15 @@ progress::-moz-progress-bar { background: var(--magenta); }
   border-radius: 0;
   min-width: 0;
 }
-.field input:focus, .area-row input:focus, #compare-text:focus { outline: none; border-bottom-color: var(--magenta); }
+.field input:focus, .area-row input:focus, #compare-text:focus { outline: none; border-bottom-color: var(--accent); }
 .area-pick { margin-top: 10px; font-size: 13px; }
 .area-pick > label { display: block; margin-bottom: 4px; }
 .area-row { display: flex; gap: 6px; }
 .area-row input { flex: 1; }
 .area-list { list-style: none; margin: 4px 0 0; padding: 0; border: 1px solid var(--hair); background: var(--paper); }
 .area-list li { padding: 6px 8px; cursor: pointer; font-size: 13px; }
-.area-list li:hover, .area-list li:focus-visible { background: var(--magenta-soft); outline: none; }
-.area-chosen { margin: 6px 0 0; font: 12px/1.4 var(--mono); color: var(--magenta); }
+.area-list li:hover, .area-list li:focus-visible { background: var(--accent-soft); outline: none; }
+.area-chosen { margin: 6px 0 0; font: 12px/1.4 var(--mono); color: var(--accent); }
 
 /* ---- Address tab ---------------------------------------------------------------------- */
 
@@ -593,27 +576,27 @@ progress::-moz-progress-bar { background: var(--magenta); }
   text-align: left;
   margin-top: 6px;
   padding: 8px 10px;
-  border: 1px solid var(--magenta);
-  background: var(--magenta-soft);
+  border: 1px solid var(--accent);
+  background: var(--accent-soft);
   color: var(--ink);
   cursor: pointer;
   font: 13px/1.3 var(--ui);
 }
 .best:hover, .best:focus-visible { background: var(--paper-2); outline: none; }
-.best-k { font: 600 10px/1 var(--ui); letter-spacing: 0.16em; text-transform: uppercase; color: var(--magenta); }
+.best-k { font: 600 10px/1 var(--ui); letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
 .best-c { font: 11px/1 var(--mono); color: var(--ink-2); }
 .usps { margin-top: 12px; border-top: 1px solid var(--rule); padding-top: 12px; animation: fade 300ms ease both; }
 .usps h2 { margin: 6px 0 10px; font: 600 19px/1.2 var(--display); }
 .usps-head .badge {
   display: inline-block;
   font: 600 10px/1 var(--ui);
-  letter-spacing: 0.16em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 4px 6px;
   border: 1px solid currentColor;
 }
-.badge.exact { color: var(--buoy-green); }
-.badge.nearest { color: #8a5a00; }
+.badge.exact { color: var(--ok); }
+.badge.nearest { color: var(--ok); }
 .badge.place { color: var(--muted); }
 .usps-wrap { position: relative; margin: 0 0 12px; }
 .usps-block {
@@ -635,12 +618,12 @@ progress::-moz-progress-bar { background: var(--magenta); }
   margin: 0 0 10px;
   font-size: 13px;
 }
-.usps dt { font: 500 10px/1.9 var(--ui); letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+.usps dt { font: 500 10px/1.9 var(--ui); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 .usps dd { margin: 0; font-family: var(--mono); font-size: 12.5px; word-break: break-word; }
 .usps details summary {
   cursor: pointer;
   font: 500 10.5px/1 var(--ui);
-  letter-spacing: 0.18em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ink-2);
 }
@@ -653,7 +636,7 @@ progress::-moz-progress-bar { background: var(--magenta); }
 .cmp-col h3 {
   margin: 0;
   font: 600 11px/1.6 var(--ui);
-  letter-spacing: 0.16em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   border-bottom: 3px solid;
 }

@@ -150,23 +150,23 @@ const EMPTY = { type: 'FeatureCollection', features: [] };
 map.on('load', () => {
   map.addSource('filter-circle', { type: 'geojson', data: EMPTY });
   map.addLayer({ id: 'filter-circle-fill', type: 'fill', source: 'filter-circle',
-    paint: { 'fill-color': '#b3246b', 'fill-opacity': 0.06 } });
+    paint: { 'fill-color': '#0264a4', 'fill-opacity': 0.07 } });
   map.addLayer({ id: 'filter-circle-line', type: 'line', source: 'filter-circle',
-    paint: { 'line-color': '#b3246b', 'line-width': 1.2, 'line-dasharray': [3, 2] } });
+    paint: { 'line-color': '#0264a4', 'line-width': 1.2, 'line-dasharray': [3, 2] } });
   map.addSource('addr-link', { type: 'geojson', data: EMPTY });
   map.addLayer({ id: 'addr-link', type: 'line', source: 'addr-link',
-    paint: { 'line-color': '#8a5a00', 'line-width': 2, 'line-dasharray': [2, 2] } });
+    paint: { 'line-color': '#3f8f63', 'line-width': 2, 'line-dasharray': [2, 2] } });
   map.addSource('compare', { type: 'geojson', data: EMPTY });
   map.addLayer({ id: 'compare-dot', type: 'circle', source: 'compare',
     paint: { 'circle-radius': ['case', ['==', ['get', 'rank'], 1], 7, 4.5],
-      'circle-color': ['match', ['get', 'engine'], 'pelias', '#1f5f8b', '#c0392b'],
+      'circle-color': ['match', ['get', 'engine'], 'pelias', '#76808d', '#0264a4'],
       'circle-stroke-color': '#ffffff', 'circle-stroke-width': 1.5, 'circle-opacity': 0.9 } });
   map.addSource('results', { type: 'geojson', data: EMPTY });
   map.addLayer({
     id: 'results-halo',
     type: 'circle',
     source: 'results',
-    paint: { 'circle-radius': 7, 'circle-color': '#f3ead2', 'circle-opacity': 0.9 },
+    paint: { 'circle-radius': 7, 'circle-color': '#ffffff', 'circle-opacity': 0.95 },
   });
   map.addLayer({
     id: 'results-dot',
@@ -176,7 +176,7 @@ map.on('load', () => {
       'circle-radius': 4.5,
       'circle-color': 'rgba(0,0,0,0)',
       'circle-stroke-width': 2,
-      'circle-stroke-color': '#b3246b',
+      'circle-stroke-color': '#0264a4',
     },
   });
   map.on('click', 'results-dot', (e) => {
