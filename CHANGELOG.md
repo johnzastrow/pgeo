@@ -23,6 +23,14 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+### Added
+- `docs/screenshots/`: seven captures of the demo page against the Maine deployment - search,
+  reverse, batch, confidence, nearby and the two form-filler steps - showing the restyled page and
+  the pgeo engine label. Page captures, no browser chrome. Taken before the Reset button existed,
+  so they do not show it. The 2026-09-20 `desktop-*` and `mobile-*` set is still what
+  `slides/slides.md` embeds.
+
+
 ## [0.22.0] - 2026-09-25
 
 ### Fixed
