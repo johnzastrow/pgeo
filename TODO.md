@@ -615,7 +615,7 @@ Two things learned in passing, both worth keeping:
 - The failure mode of a wrong `DATA_DIR` is quiet. Elasticsearch dies, and the API then answers
   every query with an empty feature list rather than an error, which reads like an empty index
   instead of a missing one.
-## 19. The state in a query is parsed and then thrown away
+## 19. ~~The state in a query is parsed and then thrown away~~ Done 2026-09-24
 
 Texas plus Louisiana plus Arkansas is the first build with towns of the same name in more than one
 of its states, and it found this on the first run of its known answers.
@@ -642,6 +642,14 @@ Hosuton, TX  ->  Hosston, LA, USA
 Hosston (a real village in Webster Parish) is one edit from "Hosuton" while Houston is two - a
 transposition. The rule orders by edit distance, so the wrong state's town wins. `pgeo.town` holds
 only `name`, so the function could not filter by state even if it wanted to.
+
+**Done** in 0.18.0, both parts, plus two hardcoded Maine facts found while chasing them: every
+interpolated address on every build was labelled ", ME, USA", and the whole-string form of a query
+stripped a trailing state with the literals me|maine. Maine and Arizona-plus-Nevada re-measured
+with zero changed cases; Vermont-plus-New Hampshire and New York each moved one, both on entities
+recorded several times by several sources, and neither was worked around.
+
+The original plan follows.
 
 **The fix** is two parts, and the first is the general one:
 
