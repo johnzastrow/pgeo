@@ -10,6 +10,38 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-09-24
+
+**Requires a rebuild**: `pgeo.town` gains a column.
+
+### Fixed
+- The state a query names is used. It was parsed, stripped from the text so it could not pollute
+  name matching, and then dropped - referenced nowhere in the query functions. With one state
+  that is harmless. Texas plus Louisiana plus Arkansas is the first build holding towns of the
+  same name in more than one of its states, and it answered `Texarkana, AR` and `Texarkana, TX`
+  with the same row, both at confidence 0.741, and `Crowley, LA` with Crowley, Texas.
+
+  `geocode.search` takes the state as a seventeenth parameter and adds 0.06 to the score of a
+  candidate in it. That sits above the 0.05 the importance term can span, so the state the user
+  named beats mere prominence, and below a real difference in match quality, so it reorders ties
+  rather than overriding a better answer. It ranks, and does not filter: a wrong state should
+  reorder results, not empty them. `"TX"` and `"Texas"` both resolve through `region_ref`.
+
+- The typo fallback prefers a town in the state the query named. `Hosuton, TX` corrected to
+  Hosston, a village in Webster Parish one edit away, rather than Houston, two edits away by
+  transposition. `pgeo.town` now carries `region_a` and `geocode.town_fuzzy` takes the state.
+
+- Two more hardcoded Maine facts, both in the query path and both surviving the generalisation of
+  0.12.0:
+  - An **interpolated** address was labelled `, ME, USA` on every build. Texas answered
+    `1001 THATCHAM, NEW CANEY, ME, USA`. Interpolation is the one path the region tests never
+    exercised, because an accuracy set is built from real OpenAddresses points and those match
+    exactly rather than interpolate. It now uses the feature's own state.
+  - The whole-string form of the query stripped a trailing state with the literals `me|maine`, so
+    on any other build the state word survived and venues carrying it in their own name matched
+    the full string better than the city did. `geocode.strip_trailing_state` now reads the
+    build's own states.
+
 ## [0.17.0] - 2026-09-24
 
 **Requires a rebuild** for the label half; the API half applies as soon as the functions are.

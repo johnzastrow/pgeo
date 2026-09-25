@@ -416,7 +416,8 @@ BEGIN
       unit_q := (SELECT m[1] FROM regexp_match(text, '#\s*([a-z0-9-]+)', 'i') m);
     END IF;
     SELECT * INTO h FROM geocode.search(text, p.name, p.housenumber, p.street, p.locality, p.postcode,
-                                         NULL, NULL, NULL, NULL, NULL, 1);
+                                         NULL, NULL, NULL, NULL, NULL, 1,
+                                         NULL, NULL, NULL, NULL, p.state);
     IF h.gid IS NOT NULL AND h.id IS NOT NULL THEN
       SELECT * INTO f FROM pgeo.feature WHERE id = h.id;
       feats := feats || geocode.address_result(f,

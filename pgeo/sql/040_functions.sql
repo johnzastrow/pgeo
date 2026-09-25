@@ -87,15 +87,17 @@ CREATE OR REPLACE FUNCTION geocode.search(
     p_layers text[] DEFAULT NULL, p_sources text[] DEFAULT NULL,
     p_rect double precision[] DEFAULT NULL, p_size integer DEFAULT 10,
     p_circle double precision[] DEFAULT NULL, p_gid text DEFAULT NULL,
-    p_categories text[] DEFAULT NULL, p_country text DEFAULT NULL)
+    p_categories text[] DEFAULT NULL, p_country text DEFAULT NULL,
+    p_state text DEFAULT NULL)
 RETURNS SETOF geocode.hit
 LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
 DECLARE
   -- full query without a trailing state/country ("portlnd me"): venues literally named
-  -- "Portland, ME" otherwise match the state word better than the town does
-  qf    text := nullif(regexp_replace(geocode.norm(coalesce(p_text, '')),
-                                      '(\s+(me|maine))?(\s+(us|usa|united states))?$', ''), '');
+  -- "Portland, ME" otherwise match the state word better than the town does. The states are the
+  -- build's own; this used to be the literals me|maine, so on a Texas build "houston tx" kept
+  -- its "tx" and venues named "Houston TX" outranked the city.
+  qf    text := geocode.strip_trailing_state(geocode.norm(coalesce(p_text, '')));
   qn    text := nullif(geocode.norm(p_name), '');                     -- parser's name part
   st    text := nullif(geocode.norm(p_street), '');
   loc   text := nullif(geocode.norm(p_locality), '');
@@ -103,6 +105,15 @@ DECLARE
   -- A parsed house number + street means address intent: the full text is then not searched
   -- as a place name (it would match the town and outrank the address).
   addr_intent boolean := hn IS NOT NULL AND st IS NOT NULL;
+  -- the state the query named, if any. Texarkana is a city in Texas and a city in Arkansas, and
+  -- the two tie on confidence to three decimals, so without this the answer to "Texarkana, AR"
+  -- and "Texarkana, TX" is the same row. Ranked, not filtered: a wrong state should reorder
+  -- results rather than empty them.
+  -- resolved through region_ref, so "TX" and "Texas" both arrive as TX and anything this build
+  -- does not cover arrives as NULL and ranks nothing
+  stt   text := (SELECT r.abbr FROM geocode.region_ref r
+                  WHERE upper(btrim(coalesce(p_state, ''))) IN (upper(r.abbr), upper(r.name))
+                  LIMIT 1);
   targets text[];
   hni   integer := geocode.hn_int(p_hn);
   pc    text := substring(p_postcode from '\d{5}');
@@ -331,17 +342,27 @@ BEGIN
     SELECT CASE WHEN fi.ihn IS NULL THEN
       geocode.to_hit(fi.f, fi.conf, fi.mt, fi.acc, g.dm / 1000,
                      (fi.conf + 0.05 * (fi.f).importance + 0.1 * g.boost
-                      + CASE (fi.f).source WHEN 'openaddresses' THEN 0.01 ELSE 0 END)::real)
+                      + CASE (fi.f).source WHEN 'openaddresses' THEN 0.01 ELSE 0 END
+                      -- 0.06 sits above the 0.05 the importance term can span, so the state the
+                      -- user named beats mere prominence, and below a real difference in match
+                      -- quality, so it reorders ties rather than overriding a better answer.
+                      + CASE WHEN stt IS NOT NULL AND (fi.f).region_a = stt THEN 0.06 ELSE 0 END)::real)
     ELSE
       -- interpolated address: synthesize the row at the interpolated position
       ROW(NULL, 'interpolation:address:' || (fi.f).street_norm || ':' || fi.ihn || ':' || coalesce((fi.f).locality_norm, ''),
           'interpolation', 'address', (fi.f).street_norm || ':' || fi.ihn,
           fi.ihn || ' ' || (fi.f).street, fi.ihn::text, (fi.f).street, (fi.f).postcode,
           (fi.f).neighbourhood, (fi.f).locality, (fi.f).localadmin, (fi.f).county, (fi.f).region, (fi.f).region_a,
-          fi.ihn || ' ' || (fi.f).street || coalesce(', ' || coalesce((fi.f).locality, (fi.f).localadmin), '') || ', ME, USA',
+          -- the feature's own state, not Maine's. Interpolation is the one path the region
+          -- tests never exercised - an accuracy set is built from real OpenAddresses points,
+          -- which match exactly - so this label said ", ME, USA" on every build until
+          -- "1001 THATCHAM, NEW CANEY, ME, USA" turned up in Texas.
+          fi.ihn || ' ' || (fi.f).street || coalesce(', ' || coalesce((fi.f).locality, (fi.f).localadmin), '')
+            || coalesce(', ' || (fi.f).region_a || ', USA', ''),
           NULL, NULL, ST_X(fi.igeom), ST_Y(fi.igeom), NULL, fi.conf, 'interpolated', 'point',
           g.dm / 1000,
-          (fi.conf + 0.05 * (fi.f).importance + 0.1 * g.boost)::real,
+          (fi.conf + 0.05 * (fi.f).importance + 0.1 * g.boost
+           + CASE WHEN stt IS NOT NULL AND (fi.f).region_a = stt THEN 0.06 ELSE 0 END)::real,
           (fi.f).hier)::geocode.hit
     END AS h
   ) z

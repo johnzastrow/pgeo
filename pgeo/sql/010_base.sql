@@ -87,6 +87,19 @@ INSERT INTO geocode.county_ref (county, abbr, fips) VALUES
   ('piscataquis','PI','23021'),('sagadahoc','SA','23023'),('somerset','SO','23025'),
   ('waldo','WL','23027'),('washington','WS','23029'),('york','YO','23031');
 
+-- The query text with a trailing state and country removed, for the whole-string match. The
+-- states are whichever ones this build covers; it was the literals me|maine until 2026-09-24,
+-- so on any other build the state word survived and venues carrying it in their own name
+-- ("Houston TX", "Albany, NY - Albany.com") matched the full string better than the city did.
+CREATE OR REPLACE FUNCTION geocode.strip_trailing_state(t text) RETURNS text
+LANGUAGE sql STABLE PARALLEL SAFE AS $$
+  SELECT nullif(regexp_replace(
+           regexp_replace(coalesce(t, ''), '(\s+(us|usa|united states))?$', ''),
+           coalesce((SELECT '(\s+(' || string_agg(lower(abbr) || '|' || lower(name), '|') || '))?$'
+                     FROM geocode.region_ref), '$'),
+           ''), '')
+$$;
+
 -- Pelias reverse-geocoding confidence bands by distance.
 CREATE OR REPLACE FUNCTION geocode.distance_confidence(meters double precision) RETURNS real
 LANGUAGE sql IMMUTABLE PARALLEL SAFE

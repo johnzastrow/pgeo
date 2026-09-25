@@ -196,9 +196,13 @@ FROM (
 GROUP BY street_norm, town;
 
 -- Known town names (lowercase), for the SQL rule parser (geocode.parse_rule).
+-- Town names, with the state each one is in: the typo fallback in the parser needs to prefer a
+-- town in the state the query named. Without it "Hosuton, TX" corrects to Hosston, Louisiana,
+-- one edit away, rather than Houston, two edits away by transposition. A name in two states gets
+-- a row for each, so the exact-match tests that read this table are unaffected.
 CREATE TABLE town AS
-SELECT DISTINCT lower(name) AS name FROM feature WHERE layer IN ('locality', 'localadmin');
-ALTER TABLE town ADD PRIMARY KEY (name);
+SELECT DISTINCT lower(name) AS name, region_a FROM feature WHERE layer IN ('locality', 'localadmin');
+CREATE INDEX town_name_idx ON town (name);
 
 -- Top 25 non-address features per 1-3 character prefix of the name.
 INSERT INTO ac_prefix (prefix, rank, feature_id)

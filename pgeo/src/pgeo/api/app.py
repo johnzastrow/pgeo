@@ -316,7 +316,7 @@ def envelope(query: dict, rows: list, errors: list[str] | None = None, parsed: P
 
 # ---- endpoints -----------------------------------------------------------------------------
 
-SEARCH_SQL = "SELECT * FROM geocode.search($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)"
+SEARCH_SQL = "SELECT * FROM geocode.search($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)"
 
 
 async def run_search(request: Request, text: str | None, p: Parsed, c: dict) -> list:
@@ -339,6 +339,8 @@ async def run_search(request: Request, text: str | None, p: Parsed, c: dict) -> 
             c["gid"],
             c["categories"],
             c["country"],
+            # the state the parser found, so "Texarkana, AR" is not answered with Texarkana, TX
+            p.state,
         )
 
 
@@ -391,6 +393,7 @@ async def structured(request: Request):
             c["gid"],
             c["categories"],
             c["country"],
+            fields["region"],
         )
     return envelope({k: v for k, v in fields.items() if v} | {"size": c["size"]}, rows, parsed=p)
 

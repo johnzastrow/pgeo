@@ -32,7 +32,8 @@ LANGUAGE sql IMMUTABLE PARALLEL SAFE AS $$
 $$;
 
 -- The town this text is a misspelling of, or NULL. Used only after an exact match has failed,
--- so a correctly spelled town is never routed through here.
+-- so a correctly spelled town is never routed through here. `want_state` is the state the query
+-- named, and a town in it is preferred over a closer spelling elsewhere.
 --
 -- A geocoder is typed into by people, so a misspelled town has to reach the town it means. What
 -- it must not do is turn a query that was never a town into one: "walmart" is within two edits
@@ -41,7 +42,9 @@ $$;
 -- the most common typo of all and the one a trigram index cannot see (the two share almost no
 -- trigrams). Requiring the same word count and a length within one rejects the rest:
 -- "west end" / "westwind", "hudson river" / "indian river", "central park" / "central islip".
-CREATE OR REPLACE FUNCTION geocode.town_fuzzy(cand text) RETURNS text
+-- the one-argument form from 0.13.0, or CREATE OR REPLACE leaves both and calls are ambiguous
+DROP FUNCTION IF EXISTS geocode.town_fuzzy(text);
+CREATE OR REPLACE FUNCTION geocode.town_fuzzy(cand text, want_state text DEFAULT NULL) RETURNS text
 LANGUAGE sql STABLE PARALLEL SAFE AS $$
   SELECT t.name FROM pgeo.town t
   -- Below five characters a single edit reaches too far: "park" is one from Parks, "bath" one
@@ -51,7 +54,11 @@ LANGUAGE sql STABLE PARALLEL SAFE AS $$
     AND array_length(string_to_array(t.name, ' '), 1) = array_length(string_to_array(cand, ' '), 1)
     AND (levenshtein(t.name, cand) <= 1
          OR (levenshtein(t.name, cand) = 2 AND geocode.letters(t.name) = geocode.letters(cand)))
-  ORDER BY levenshtein(t.name, cand), t.name
+  -- A town in the state the query named wins over a closer spelling in another state. "Hosuton,
+  -- TX" is one edit from Hosston, Louisiana and two from Houston, Texas - a transposition - so
+  -- on edit distance alone the wrong state's village wins.
+  ORDER BY (want_state IS NOT NULL AND t.region_a = upper(want_state)) DESC,
+           levenshtein(t.name, cand), t.name
   LIMIT 1
 $$;
 
@@ -160,7 +167,8 @@ BEGIN
     -- when a real town does trail real text, the exact pass above has already found it.
     IF locality IS NULL AND cardinality(words) > 0 THEN
       cand := lower(array_to_string(words, ' '));
-      tail := geocode.town_fuzzy(cand);
+      -- `state` is already set by the block above when the query named one
+      tail := geocode.town_fuzzy(cand, state);
       IF tail IS NOT NULL THEN
         -- the corrected spelling, not what was typed: downstream matching is by trigram, and a
         -- transposition shares almost no trigrams with the word it came from, so "Tuscon" would
@@ -412,7 +420,8 @@ BEGIN
                       geocode.check_list(sources, ARRAY['openaddresses','openstreetmap','whosonfirst','gnis','zcta','overture','interpolation'], 'sources'),
                       geocode.check_rect(min_lon, min_lat, max_lon, max_lat),
                       least(greatest(coalesce(size, 10), 1), 40),
-                      geocode.check_circle(circle_lat, circle_lon, circle_radius), gid, cats, country) h;
+                      geocode.check_circle(circle_lat, circle_lon, circle_radius), gid, cats, country,
+                      p.state) h;
   RETURN geocode.envelope(jsonb_build_object('text', t, 'size', size, 'parsed_text', jsonb_strip_nulls(to_jsonb(p))), feats);
 EXCEPTION WHEN SQLSTATE '22023' THEN
   RETURN geocode.api_error(jsonb_strip_nulls(jsonb_build_object('text', v1_search.text)), SQLERRM);
@@ -462,7 +471,8 @@ BEGIN
                       geocode.check_rect(min_lon, min_lat, max_lon, max_lat),
                       least(greatest(coalesce(size, 10), 1), 40),
                       geocode.check_circle(circle_lat, circle_lon, circle_radius), gid, cats,
-                      CASE WHEN country IS NULL OR country ~* '^(us|usa|united states( of america)?)$' THEN NULL ELSE country END) h;
+                      CASE WHEN country IS NULL OR country ~* '^(us|usa|united states( of america)?)$' THEN NULL ELSE country END,
+                      region) h;
   RETURN geocode.envelope(q, feats);
 EXCEPTION WHEN SQLSTATE '22023' THEN
   RETURN geocode.api_error(q, SQLERRM);
