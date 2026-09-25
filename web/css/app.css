@@ -459,29 +459,30 @@ progress::-moz-progress-bar { background: var(--accent); }
    controls say which way is up. */
 .compass { display: none; }
 
-/* Selected-result marker: a magenta light flare over a position ring. */
-.chart-mark { width: 26px; height: 34px; position: relative; pointer-events: none; }
-.chart-mark-flare {
-  position: absolute;
-  left: 7px; top: 0;
-  width: 13px; height: 22px;
-  background: var(--accent);
-  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-  transform: rotate(18deg);
-  transform-origin: 50% 100%;
-  box-shadow: 0 0 0 2px var(--paper);
-  animation: flare 1.8s ease-in-out infinite;
+/* Result markers. Two roles, two shapes - see makeMarker() in js/map.js.
+   primary: a pin whose tip is the coordinate, so it reads as an overlay, not as map data.
+   probe:   a dot centred on the coordinate, so it hides nothing underneath. */
+.mark { pointer-events: none; }
+
+.mark-primary { width: 22px; height: 30px; line-height: 0; }
+.mark-primary .mark-body {
+  fill: var(--accent);
+  stroke: var(--paper);
+  stroke-width: 2;
+  /* A cast shadow rather than a flat outline: on a pale ground the pin needs to lift off the
+     map to be read at a glance, and a halo alone disappears over the water fill. */
+  filter: drop-shadow(0 2px 3px rgba(22, 32, 44, 0.32));
 }
-.chart-mark-ring {
-  position: absolute;
-  left: 8px; bottom: 0;
-  width: 10px; height: 10px;
-  border: 2px solid var(--ink);
+.mark-primary .mark-eye { fill: var(--paper); }
+
+.mark-probe {
+  width: 14px; height: 14px;
   border-radius: 50%;
-  background: var(--paper);
+  background: var(--info);
+  /* ring, then halo - one box-shadow does the work of both, so the element stays 14px and the
+     marker anchors exactly on its centre. */
+  box-shadow: 0 0 0 3px var(--paper), 0 0 0 4px rgba(22, 32, 44, 0.22), 0 1px 4px rgba(22, 32, 44, 0.28);
 }
-.chart-mark-probe .chart-mark-flare { background: var(--info); animation: none; }
-@keyframes flare { 50% { opacity: 0.55; } }
 
 .maplibregl-ctrl-group {
   background: var(--paper) !important;

@@ -23,6 +23,46 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-09-25
+
+### Fixed
+- The map could not be panned far enough to uncover the part of the region hidden behind the
+  demo page's own panel. Two causes, both now addressed. `maxBounds` was the region's exact
+  bounding box, so the viewport could never move past the state line; it is now the basemap's
+  extent, which is wider (see below). And the panel floats over the map, so the usable area is
+  not the whole canvas - the map now calls `setPadding()` with the panel's measured inset, which
+  makes the opening fit, `flyTo` on a result and the "bias to map centre" reading all use the
+  part the user can actually see. Recomputed on resize, and switched to a bottom inset at the
+  720px breakpoint where the panel becomes a bottom sheet.
+- `scripts/fetch_data.sh basemap` failed with a Go stack trace when `PROTOMAPS_BUILD` pointed at
+  a build that no longer exists. build.protomaps.com keeps roughly a week of daily builds, so any
+  pin older than that is a 404 - it now checks first and says what to re-pin. The pin is moved to
+  20260925.
+
+### Changed
+- The basemap extract is taken 15% wider than the region on each side (`BASEMAP_MARGIN`), so
+  there is something to pan into and a coastal or border town is shown in its surroundings rather
+  than against a blank edge. For Maine that reaches into New Hampshire, Quebec, New Brunswick and
+  further out into the Gulf of Maine. Only the picture is widened - the geocoder's own data is
+  still clipped to the region, and the same constant is mirrored in `web/js/map.js` as the pan
+  limit so the user can never reach untiled area. **Existing deployments need a re-fetched
+  basemap**; the file is correspondingly larger.
+- The serving bundle declares its engine. The page discovers what it is talking to through
+  `<meta name="demo-engines">` and `/engines.json`; the bundle served neither, so the page fell
+  back to its built-in default and labelled pgeo's own answers "Pelias / Elasticsearch" while
+  hiding the Address tab, which only pgeo can serve. Nothing was ever reaching a Pelias instance -
+  the default's `base` is this origin - but the deployment was misdescribed and a feature short.
+  The edge now injects the tag and `deploy/web/engines.json` names pgeo. New guide,
+  `docs/DEMO_ENGINES.md`, covers pointing the page at pgeo, at Pelias, or at both with a switch.
+- The map attribution no longer claims "Geocoding: Pelias / pgeo". It named whichever engines the
+  development stack happened to run and was wrong on any deployment serving one of them;
+  attribution is owed to the data's publishers, not to the software that queried them, and which
+  engine answered is already stated in the panel where it stays correct as the engine changes.
+- Result markers are a pin for the answer and a dot for probe points, replacing the rotated
+  "light flare" and detached ring left over from the chart-room styling, which read as a smudge
+  at a distance and pulsed without saying anything. The pin's tip is the coordinate and it casts
+  a shadow so it lifts off a pale ground; the probe dot is centred and hides nothing underneath.
+
 ## [0.20.0] - 2026-09-22
 
 ### Added

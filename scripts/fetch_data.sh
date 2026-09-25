@@ -20,7 +20,7 @@
 set -euo pipefail
 
 OVERTURE_RELEASE="${OVERTURE_RELEASE:-2026-08-19.0}"
-PROTOMAPS_BUILD="${PROTOMAPS_BUILD:-20260918}"
+PROTOMAPS_BUILD="${PROTOMAPS_BUILD:-20260925}"
 ZCTA_YEAR="${ZCTA_YEAR:-2025}"
 WOF_DIST="${WOF_DIST:-https://data.geocode.earth/wof/dist/sqlite}"
 OA_RUNS="${OA_RUNS:-https://results.openaddresses.io/latest/run}"
@@ -230,10 +230,33 @@ SQL
   ls -la "$dir"
 }
 
+# How far past the region the basemap reaches, as a fraction of the region's span. The geocoder's
+# own data is NOT widened by this - only the picture is. Without it the extract stopped exactly at
+# the state box, which left nothing to pan into: the demo page floats its panel over the left of
+# the map, and the part of the state underneath could not be moved out from behind it. It also
+# means a coastal or border town is shown in its surroundings rather than against a blank edge.
+# web/js/map.js has the same constant and uses it as the pan limit; keep the two in step.
+BASEMAP_MARGIN=0.15
+
 basemap() {
   local out="${RAW}/basemap/${build}.pmtiles"
   mkdir -p "$(dirname "$out")"
-  pmtiles extract "https://build.protomaps.com/${PROTOMAPS_BUILD}.pmtiles" "${out}.part" --bbox="$(bbox)"
+  local bb
+  bb="$(bbox | awk -F, -v m="$BASEMAP_MARGIN" '{
+        dx=($3-$1)*m; dy=($4-$2)*m;
+        printf "%.4f,%.4f,%.4f,%.4f", $1-dx, $2-dy, $3+dx, $4+dy }')"
+  echo "basemap bbox ${bb} (region widened by ${BASEMAP_MARGIN})"
+  # build.protomaps.com keeps only about a week of daily builds, so a pin that was fine last month
+  # is a 404 today. Say that plainly rather than leaving the operator with a Go stack trace: the
+  # fix is always to re-pin PROTOMAPS_BUILD to a build that still exists.
+  local src="https://build.protomaps.com/${PROTOMAPS_BUILD}.pmtiles"
+  if ! curl -fsS -o /dev/null -r 0-0 "$src"; then
+    echo "fetch_data: the pinned Protomaps build ${PROTOMAPS_BUILD} is not available." >&2
+    echo "  build.protomaps.com keeps roughly the last week. Re-pin PROTOMAPS_BUILD in this" >&2
+    echo "  script (or pass it in the environment) to a recent date, then run this target again." >&2
+    return 1
+  fi
+  pmtiles extract "$src" "${out}.part" --bbox="$bb"
   mv "${out}.part" "$out"
   echo "fetched $(basename "$out") ($(du -h "$out" | cut -f1))"
 }

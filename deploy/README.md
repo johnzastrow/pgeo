@@ -17,7 +17,9 @@ From a checkout, with the build already made:
 cd deploy
 mkdir -p web tiles dumps
 cp -r ../web/. web/                                  # the demo page, already vendored
-cp ../data/pgeo/tiles/me.pmtiles tiles/              # the basemap for this build
+python3 ../scripts/gen_region_json.py --build me > web/region.json
+printf '{"engines":[{"label":"pgeo","base":"","kind":"pgeo"}]}\n' > web/engines.json
+cp ../data/raw/me/basemap/me.pmtiles tiles/          # the basemap for this build
 cp ../data/pgeo/dumps/pgeo-<version>-<date>.dump dumps/
 cp ../scripts/pgeo_swap.sh .                         # one source of truth lives in scripts/
 rsync -a --exclude pgdata/ --exclude .env ./ <host>:~/pgeo/
@@ -35,6 +37,18 @@ docker compose up -d
 and for every refresh after that, only the last two lines of the first block and the
 `pgeo_swap.sh` call. The swap does its work in a staging database while the current one keeps
 answering; see the comments at the top of the script.
+
+`region.json` is not optional and is not in `web/`: it is generated per build and tells the page
+its title, feature count, map extent and which basemap file to load. Without it the page falls
+back to a hard-coded Maine default whose basemap filename does not match what is shipped, and the
+map comes up blank with a 404 for a file nobody asked for. The basemap's own name must match what
+that file says - `me.pmtiles` for the `me` build.
+
+`engines.json` says which geocoder the page is talking to. Without it the page falls back to a
+built-in default that calls this deployment "Pelias / Elasticsearch" and hides the tabs only pgeo
+can serve - it still works, it is just labelled wrong and missing features. The edge injects the
+meta tag that makes the page read it. To point the page at Pelias instead, or at both with a
+switch, see `docs/DEMO_ENGINES.md`.
 
 ## Two things worth knowing before the first run
 
