@@ -2,7 +2,7 @@
 
 # pgeo
 
-PGEO is a feature-rich geocoder that can live entirely inside PostgreSQL. It's a personal, petite
+PGEO is a feature-rich geocoder that can live entirely inside PostgreSQL. Haven't you always wanted a personal geocoding service? PGEO is a personal, petite
 PostgreSQL Geocoder (hence the short name PGEO) for when you need just enough geocoding and a
 simple deployment. It is fast, resource-efficient, easy to deploy, and feature-rich. With 1 CPU
 and 1 GB of RAM it served 32 concurrent users with a median answer in 40 ms and most autocomplete
