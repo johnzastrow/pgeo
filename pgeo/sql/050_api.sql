@@ -371,7 +371,7 @@ BEGIN
   END IF;
   PERFORM geocode.check_range(p_lat, -90, 90, 'boundary.circle.lat');
   PERFORM geocode.check_range(p_lon, -180, 180, 'boundary.circle.lon');
-  PERFORM geocode.check_range(p_radius, 0.001, 100, 'boundary.circle.radius');
+  PERFORM geocode.check_range(p_radius, 0.001, 100, 'boundary.circle.radius (km)');
   RETURN ARRAY[p_lon, p_lat, coalesce(p_radius, 50)];
 END $$;
 
@@ -389,8 +389,13 @@ BEGIN
   PERFORM geocode.check_range(b, -90, 90, 'boundary.rect.min_lat');
   PERFORM geocode.check_range(c, -180, 180, 'boundary.rect.max_lon');
   PERFORM geocode.check_range(d, -90, 90, 'boundary.rect.max_lat');
-  IF a > c OR b > d THEN
-    RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = 'boundary.rect min_lon/min_lat must not exceed max_lon/max_lat';
+  IF a > c THEN
+    RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo',
+      MESSAGE = format('boundary.rect.min_lon (%s) is greater than boundary.rect.max_lon (%s)', a, c);
+  END IF;
+  IF b > d THEN
+    RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo',
+      MESSAGE = format('boundary.rect.min_lat (%s) is greater than boundary.rect.max_lat (%s)', b, d);
   END IF;
   RETURN ARRAY[a, b, c, d];
 END $$;
@@ -599,7 +604,7 @@ BEGIN
   END IF;
   PERFORM geocode.check_range(lat, -90, 90, 'point.lat');
   PERFORM geocode.check_range(lon, -180, 180, 'point.lon');
-  PERFORM geocode.check_range(radius, 0.001, 50, 'boundary.circle.radius');
+  PERFORM geocode.check_range(radius, 0.001, 50, 'boundary.circle.radius (km)');
   cats := geocode.check_extras(country, gid, categories, lang, api_key);
   SELECT jsonb_agg(geocode.feature_json(h)) INTO feats
   FROM geocode.reverse(lon, lat,

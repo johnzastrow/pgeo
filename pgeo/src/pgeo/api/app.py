@@ -126,7 +126,7 @@ def clean_text(v: str | None, name: str = "text", required: bool = True) -> str 
     return v
 
 
-def finite(v: str | None, name: str, lo: float, hi: float) -> float | None:
+def finite(v: str | None, name: str, lo: float, hi: float, unit: str = "") -> float | None:
     if v is None or v == "":
         return None
     try:
@@ -134,7 +134,7 @@ def finite(v: str | None, name: str, lo: float, hi: float) -> float | None:
     except ValueError as e:
         raise BadRequest(f"'{name}' must be a number") from e
     if not math.isfinite(f) or not lo <= f <= hi:
-        raise BadRequest(f"'{name}' must be between {lo} and {hi}")
+        raise BadRequest(f"'{name}' must be between {lo} and {hi}{unit}")
     return f
 
 
@@ -201,7 +201,7 @@ def circle(q: dict) -> list[float] | None:
     """boundary.circle.lat/lon/radius (km, default 50) as [lon, lat, radius], or None."""
     lat = finite(q.get("boundary.circle.lat"), "boundary.circle.lat", -90, 90)
     lon = finite(q.get("boundary.circle.lon"), "boundary.circle.lon", -180, 180)
-    radius = finite(q.get("boundary.circle.radius"), "boundary.circle.radius", 0.001, 100)
+    radius = finite(q.get("boundary.circle.radius"), "boundary.circle.radius", 0.001, 100, " km")
     if lat is None and lon is None:
         if radius is not None:
             raise BadRequest("boundary.circle.radius needs boundary.circle.lat and boundary.circle.lon")
@@ -224,8 +224,10 @@ def common(q: dict) -> dict:
     ]
     if any(r is not None for r in rect) and any(r is None for r in rect):
         raise BadRequest("boundary.rect needs min_lon, min_lat, max_lon, max_lat")
-    if rect[0] is not None and (rect[0] > rect[2] or rect[1] > rect[3]):
-        raise BadRequest("boundary.rect min_lon/min_lat must not exceed max_lon/max_lat")
+    if rect[0] is not None:
+        for lo, hi, axis in ((rect[0], rect[2], "lon"), (rect[1], rect[3], "lat")):
+            if lo > hi:
+                raise BadRequest(f"boundary.rect.min_{axis} ({lo:g}) is greater than boundary.rect.max_{axis} ({hi:g})")
     return {
         "focus_lon": flon,
         "focus_lat": flat,
@@ -474,7 +476,7 @@ async def reverse(request: Request):
     lon = finite(q.get("point.lon"), "point.lon", -180, 180)
     if lat is None or lon is None:
         raise BadRequest("point.lat and point.lon are required")
-    radius = finite(q.get("boundary.circle.radius"), "boundary.circle.radius", 0.001, 50)
+    radius = finite(q.get("boundary.circle.radius"), "boundary.circle.radius", 0.001, 50, " km")
     c = common({k: v for k, v in q.items() if not k.startswith(("focus.", "boundary.rect", "boundary.circle"))})
     async with acquire(request) as con:
         rows = await con.fetch(
@@ -521,7 +523,7 @@ async def address(request: Request):
     q = dict(request.query_params)
     lat = finite(q.get("point.lat"), "point.lat", -90, 90)
     lon = finite(q.get("point.lon"), "point.lon", -180, 180)
-    radius = finite(q.get("radius"), "radius", 0.001, 5)
+    radius = finite(q.get("radius"), "radius", 0.001, 5, " km")
     ids = q.get("ids")
     text = q.get("text")
     unit = q.get("unit")

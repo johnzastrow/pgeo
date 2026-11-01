@@ -67,6 +67,19 @@ commits where each milestone was complete.
   from the deck's own copies, apart from the Compare one still in use.
 
 ### Security
+- Repository process (security review batch 3):
+  - `.github/workflows/ci.yml` runs on every push and pull request to `main`, and weekly. It runs
+    ruff and the unit tests for `pgeo` and `prep`; pip-audit on every Python lockfile; `npm audit`
+    on the slides at critical level (the accepted image-size issue is high); and gitleaks over
+    the pushed commits. Actions are pinned to commit SHAs, and the token is read-only.
+  - `.github/dependabot.yml`: weekly grouped version updates for uv, npm, GitHub Actions,
+    Dockerfiles and compose files. `projects/pelias_maine` is excluded, as the pinned baseline.
+  - Repository settings: Dependabot security updates on, CodeQL code scanning (default setup)
+    on, and `main` protected against force-pushes and deletion, with the CI jobs as required
+    checks.
+- Error messages name the problem precisely: radius errors give the unit (km), and a rectangle
+  error names the coordinate and both values, for example "boundary.rect.min_lon (-69) is
+  greater than boundary.rect.max_lon (-70)".
 - Fixes from the 2026-11-01 security review (no Critical or High findings; these are the
   Medium and Low ones, plus hardening). pgeo's own changes are in pgeo/CHANGELOG.md.
   - **Serving bundle rate limit was shared by every visitor (Medium).** `deploy/edge/pgeo.conf`

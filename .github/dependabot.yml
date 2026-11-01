@@ -1,0 +1,43 @@
+# Dependabot version updates: one weekly pull request per ecosystem and directory, with minor and
+# patch updates grouped so they arrive as one change to review. Security updates are separate:
+# they are enabled in the repository settings and open as soon as an advisory is published.
+#
+# Everything here is pinned exactly (uv.lock, package-lock.json, image digests, action SHAs), so
+# nothing moves until one of these pull requests is merged.
+version: 2
+
+updates:
+  - package-ecosystem: uv
+    directories: ["/pgeo", "/prep", "/report"]
+    schedule: { interval: weekly, day: monday }
+    groups:
+      python-minor-and-patch:
+        update-types: [minor, patch]
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: npm
+    directory: /slides
+    schedule: { interval: weekly, day: monday }
+    groups:
+      slides-minor-and-patch:
+        update-types: [minor, patch]
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly, day: monday }
+    groups:
+      actions:
+        patterns: ["*"]
+
+  # Base images in the Dockerfiles (pinned by digest).
+  - package-ecosystem: docker
+    directories: ["/pgeo/docker/api", "/pgeo/docker/build", "/pgeo/docker/db"]
+    schedule: { interval: weekly, day: monday }
+
+  # Images in the compose files (PostGIS, PostgREST, nginx, libpostal; pinned by digest).
+  # projects/pelias_maine is left out on purpose: it is the measured baseline, pinned to the
+  # images the study used, and moving it would change what the report's numbers describe.
+  - package-ecosystem: docker-compose
+    directories: ["/deploy", "/pgeo"]
+    schedule: { interval: weekly, day: monday }

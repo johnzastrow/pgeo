@@ -1,0 +1,90 @@
+# Continuous integration: lint and unit tests, dependency audit, and secret scanning.
+#
+# Every third-party action is pinned to a full commit SHA (the tag is in the comment), so a moved
+# or compromised tag cannot change what runs here. Dependabot (.github/dependabot.yml) proposes
+# updates to these pins. The workflow token is read-only.
+#
+# Tests that need a database or a deployed host skip themselves when none is configured, so
+# this runs the pure-Python suites. Code scanning (CodeQL) uses GitHub's default setup and
+# needs no workflow here.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 6 * * 1"   # weekly, so a newly published advisory is noticed without a push
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: Python lint and tests (${{ matrix.project }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - project: pgeo
+            tests: pgeo/tests tests/accuracy/test_adapters.py
+          - project: prep
+            tests: prep/tests
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - name: Install (from the lockfile only)
+        run: uv sync --project ${{ matrix.project }} --frozen
+      - name: Ruff (lint, including the bandit-derived S rules)
+        run: uv run --project ${{ matrix.project }} ruff check ${{ matrix.project }}
+      - name: Tests
+        run: uv run --project ${{ matrix.project }} pytest -q ${{ matrix.tests }}
+
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - name: pip-audit on every Python lockfile
+        run: |
+          set -euo pipefail
+          for p in pgeo prep report; do
+            echo "== $p"
+            uv export --project "$p" --frozen --no-hashes --no-emit-project --format requirements-txt > "$RUNNER_TEMP/req-$p.txt"
+            uvx --from pip-audit==2.9.0 pip-audit --no-deps --disable-pip --progress-spinner off -r "$RUNNER_TEMP/req-$p.txt"
+          done
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+      - name: npm audit (slides)
+        # Critical only: the deck is build tooling, and its one accepted high (image-size, via
+        # pptxgenjs, reachable only from a PPTX export) is recorded in CHANGELOG.md.
+        working-directory: slides
+        run: npm audit --audit-level=critical
+
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0   # the scan reads the commits in the push or pull request
+          persist-credentials: false
+      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_COMMENTS: "false"   # report in the job log; the token cannot write to PRs
