@@ -11,6 +11,10 @@ docs/PGEO_TUNING.md.
 ## [Unreleased]
 
 ### Security
+- certifi 2026.7.22 -> 2026.10.23 in `uv.lock` (GHSA-6q48-6c7w-9gw2, critical: the bundle trusted
+  emSign root CAs whose intermediate keys were compromised). It comes in through httpx, so it
+  ships in the FastAPI image. The only outbound HTTP at run time is the plain-HTTP call to the
+  libpostal service on the compose network, so nothing was exposed, but the bundle is now clean.
 - `ensure_api_role` now sets `statement_timeout = '5s'` on `pgeo_api`, so no single API query can
   hold a core for longer than that. The slowest measured query is about 0.5 s. The serving bundle,
   `pgeo_swap.sh` and the Ansible role set the same value.
