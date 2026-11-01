@@ -4,7 +4,7 @@ version = "0.2.1"
 description = "Convert open datasets (GNIS, Census ZCTA, Overture Places) into Pelias CSV-importer files, for any US state"
 requires-python = ">=3.12"
 dependencies = [
-    "duckdb==1.5.5",
+    "duckdb==2.0.0",
 ]
 
 [project.scripts]
