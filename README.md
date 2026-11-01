@@ -99,7 +99,8 @@ geocoding function: search, structured search, autocomplete, reverse, place, `/v
 filters and confidence. Only the internet-facing protections go, so run those shapes on a
 private network or behind a gateway you already have.
 [docs/STACK_COMPARISON.md section 9](docs/STACK_COMPARISON.md#9-how-simple-pgeos-stack-can-be)
-gives the details, parameter names and trade-offs.
+gives the details, parameter names and trade-offs, and section 9.4 shows how to keep full
+Pelias compatibility with Caddy in place of nginx.
 
 Hardware, measured:
 

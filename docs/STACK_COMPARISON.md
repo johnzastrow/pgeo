@@ -215,6 +215,8 @@ and why each layer you remove costs features at the edge, not geocoding.
 | **C. PostgREST direct** | PostgreSQL, PostgREST | `/rpc/v1_search?...` | No (flat parameter names) | Greenfield HTTP clients |
 | **D. SQL only** | PostgreSQL (or a database on a server you already run) | `SELECT geocode_api.v1_search(...)` | No | Greenfield apps that already connect to PostgreSQL |
 
+In shape A, Caddy can replace nginx and also terminate TLS; section 9.4 shows how.
+
 PostgreSQL 18, PostGIS 3.6 and the `pg_trgm`, `fuzzystrmatch` and `unaccent` extensions are the
 floor that no shape removes. libpostal is never required: the SQL rule parser is the default, and
 it measured better than libpostal ([REPORT.md](REPORT.md) section 3.1).
@@ -310,6 +312,125 @@ role settings: `ALTER ROLE pgeo_api SET statement_timeout = '5s'`. Every route i
 repository already sets it: `deploy/db/init/10-api-role.sh`, `scripts/pgeo_swap.sh`, the
 Ansible `pgeo_runtime` role and the loader. A query that hits the cap is cancelled and returns
 an error: HTTP 500 from PostgREST or FastAPI, or SQLSTATE `57014` in shape D.
+
+### 9.4 Pelias compatibility with Caddy instead of nginx
+
+Shape A does not need nginx specifically. Caddy can take the edge's place and terminate TLS as
+well, so the stack is still three processes (PostgreSQL, PostgREST, Caddy), but with automatic
+HTTPS and no separate TLS terminator. Everything nginx does for compatibility is a rewrite of the
+request, and Caddy has a directive for each:
+
+| nginx edge does | Caddy equivalent | Built in? |
+|---|---|---|
+| Maps `/v1/<endpoint>` to `/rpc/v1_<endpoint>` | `rewrite` (the query string is kept) | Yes |
+| Renames `boundary.circle.*` to `circle_*` on search, structured and autocomplete | `uri query { old>new }` | Yes |
+| Asks PostgREST for HTML on `/v1/attribution` | `request_header Accept text/html` | Yes |
+| Returns a Pelias-shaped 400 for unknown `/v1/*` paths | `respond` with a JSON body | Yes |
+| Accepts GET only; caps the body at 1 MB | `not method GET` matcher; `request_body { max_size }` | Yes |
+| Security headers (CSP and others) | `header` | Yes |
+| Serves the demo page and basemap, with range requests | `file_server` | Yes |
+| Checks API keys | `map` on the `X-API-Key` header plus a `vars` matcher | Yes, but the keys are kept in plain text (see below) |
+| Rate-limits each client IP | `rate_limit` | No. Needs the [caddy-ratelimit](https://github.com/mholt/caddy-ratelimit) plugin in a custom build (`xcaddy build --with github.com/mholt/caddy-ratelimit`) |
+| Injects `<meta name="demo-engines">` into the demo page | None (Caddy has no built-in response rewriting) | No. Add the tag to the served copy of `web/index.html` instead |
+
+A complete site block, equivalent to `deploy/edge/pgeo.conf`. It assumes PostgREST is reachable
+as `rest:3000` (for example on the same Compose network) and the demo page is at `/srv/web`.
+
+```caddyfile
+geocoder.example.org {
+	encode zstd gzip
+	request_body {
+		max_size 1MB
+	}
+	header {
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; worker-src 'self' blob:; connect-src 'self'; font-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		X-Frame-Options DENY
+	}
+
+	# API keys: header value -> client name. Keys come from the environment, never this file.
+	# Delete this block and the @nokey lines below to run without keys.
+	map {header.X-API-Key} {api_client} {
+		{$PGEO_KEY_WEBAPP}  webapp
+		{$PGEO_KEY_BATCH}   batch
+		default             none
+	}
+
+	# Everything under /v1 runs in the order written (route), and nothing else reaches PostgREST:
+	# a client that asks for /rpc/... directly falls through to the file server and gets a 404.
+	route /v1/* {
+		@notget not method GET
+		respond @notget 405
+
+		@nokey vars {api_client} none
+		respond @nokey `\{"geocoding":\{"errors":["missing or unknown API key"]},"type":"FeatureCollection","features":[]}` 401
+
+		# Needs the caddy-ratelimit plugin; delete this block on a stock Caddy.
+		rate_limit {
+			zone pgeo_api {
+				key {remote_host}
+				events 100
+				window 10s
+			}
+		}
+
+		# boundary.circle.* would collide with focus.point.* once PostgREST keeps only the last
+		# segment of a dotted name. Reverse is left alone: its radius is already the last segment.
+		@circle path /v1/search /v1/search/structured /v1/autocomplete
+		uri @circle query {
+			boundary.circle.lat>circle_lat
+			boundary.circle.lon>circle_lon
+			boundary.circle.radius>circle_radius
+		}
+
+		@attribution path /v1/attribution
+		request_header @attribution Accept text/html
+
+		# Paths match exactly, so /v1/search does not catch /v1/search/structured.
+		rewrite /v1/search            /rpc/v1_search
+		rewrite /v1/search/structured /rpc/v1_search_structured
+		rewrite /v1/autocomplete      /rpc/v1_autocomplete
+		rewrite /v1/reverse           /rpc/v1_reverse
+		rewrite /v1/place             /rpc/v1_place
+		rewrite /v1/address           /rpc/v1_address
+		rewrite /v1/attribution       /rpc/v1_attribution
+
+		@unknown not path /rpc/*
+		respond @unknown `\{"geocoding":\{"version":"0.2","errors":["unsupported parameter or endpoint: pgeo accepts the documented Pelias parameters"]},"type":"FeatureCollection","features":[]}` 400
+
+		reverse_proxy rest:3000
+	}
+
+	# The demo page and the basemap (file_server handles range requests for PMTiles).
+	handle {
+		root * /srv/web
+		file_server
+	}
+}
+```
+
+Where it differs from the nginx edge:
+
+- **API keys are compared in plain text.** The nginx edge stores only SHA-256 hashes
+  (`docs/API_KEYS.md`). Caddy's `map` compares the header against the key itself, so the real keys
+  must sit in Caddy's environment (`{$PGEO_KEY_...}` is read at startup). Keep that environment
+  file at mode 600, and never write keys into the Caddyfile. If you would rather store hashes,
+  use `forward_auth` to a small checker, at the cost of one more process.
+- **Rate limiting needs a custom build**, as the table says. On a stock Caddy, delete the
+  `rate_limit` block, and the edge then gives no protection against a burst. The 5 s statement
+  timeout on `pgeo_api` still bounds what each query costs.
+- **The circle rename runs before the path rewrite**, because the `@circle` matcher tests the
+  original `/v1/...` path. Inside `route` the directives run in the order written, which is why
+  this block uses `route` rather than Caddy's default directive order.
+- **Braces in the JSON error bodies are escaped** (`\{`) so that Caddy does not read them as
+  placeholders.
+
+This site block has not been run in this repository; the reference front end is
+`infra/wharf/pelias.caddy`, which proxies to the nginx edge rather than replacing it. Check the
+block with `caddy validate --config Caddyfile` before you deploy it, and run the compatibility
+test against the result:
+`uv run --project pgeo python tests/compat/compat_test.py --sql https://geocoder.example.org`.
 
 ---
 
