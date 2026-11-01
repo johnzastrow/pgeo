@@ -30,6 +30,12 @@ commits where each milestone was complete.
   project's own documentation.
 - README: a "Requirements and technology stack" section listing what the serving host and the
   build workstation each need, with versions and measured hardware, and a link to the comparison.
+- `docs/STACK_COMPARISON.md` section 9, "How simple pgeo's stack can be": four deployment shapes,
+  from the full nginx edge down to PostgreSQL alone, each with what it gives up. It includes a
+  greenfield route that keeps every geocoding function without Pelias compatibility (RPC or
+  direct SQL calls, with the parameter-name mapping), and a table of which protections live in
+  nginx and which survive without it. It recommends a `statement_timeout` on `pgeo_api` for the
+  edgeless shapes; the repository does not set one yet. The README summarises the four shapes.
 - `docs/screenshots/`: seven captures of the demo page against the Maine deployment - search,
   reverse, batch, confidence, nearby and the two form-filler steps - showing the restyled page and
   the pgeo engine label. Page captures, no browser chrome. Taken before the Reset button existed,
@@ -46,6 +52,16 @@ commits where each milestone was complete.
   recapture and the slide keeps the picture that makes its argument.
 - The 2026-09-20 `desktop-*` and `mobile-*` captures are removed, from `docs/screenshots/` and
   from the deck's own copies, apart from the Compare one still in use.
+
+### Fixed
+- `docs/OSM_ENGINES.md` and the Photon adapters (`tests/accuracy/run_accuracy_photon.py`,
+  `tests/load/k6/session_photon.js`) said Photon has no structured endpoint. Photon 1.3.0 has
+  `/structured`, which has been always enabled since 1.0.0. Sending structured cases as one line
+  was a harness choice, so the docs now say so: Photon's 88.7% structured score measures its
+  free-text search and may understate it. Only comments and docs changed. The adapters behave
+  as before, and the Photon runs have not been repeated.
+- `GETTING_STARTED.md` gave New York's build database as 8 GB. `docs/SIZING.md` measured 11 GB
+  (7.0 GB of data plus WAL), and the table now says so.
 
 
 ## [0.22.0] - 2026-09-25

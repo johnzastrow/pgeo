@@ -82,7 +82,26 @@ different needs. For how this compares with Pelias, Photon and Nominatim, see
 | Docker Engine + Compose | current | Packaging. Three stock images, pinned by digest: `postgis/postgis`, `postgrest/postgrest`, `nginx` |
 
 It needs no search engine, no JVM, no Node.js and no separate parser or point-in-polygon
-service. Hardware, measured:
+service.
+
+**The stack can be smaller still.** Every endpoint is a SQL function, so nginx and PostgREST only
+carry requests to the database and protect it:
+
+| Shape | What runs | What you give up |
+|---|---|---|
+| Full edge (default) | PostgreSQL + PostgREST + nginx | Nothing. Pelias paths, API keys, rate limits, demo page |
+| FastAPI direct | PostgreSQL + FastAPI | API keys, rate limits, security headers, demo page. Pelias paths stay |
+| PostgREST direct | PostgreSQL + PostgREST | The above, plus Pelias paths: call `/rpc/v1_search?text=...` instead |
+| SQL only | PostgreSQL alone, or a database you already run | All HTTP. Your app runs `SELECT geocode_api.v1_search(text => '...')` |
+
+For a greenfield app that does not need Pelias compatibility, the last two shapes keep every
+geocoding function: search, structured search, autocomplete, reverse, place, `/v1/address`,
+filters and confidence. Only the internet-facing protections go, so run those shapes on a
+private network or behind a gateway you already have.
+[docs/STACK_COMPARISON.md section 9](docs/STACK_COMPARISON.md#9-how-simple-pgeos-stack-can-be)
+gives the details, parameter names and trade-offs.
+
+Hardware, measured:
 
 | Region | vCPU | RAM | Disk |
 |---|---|---|---|

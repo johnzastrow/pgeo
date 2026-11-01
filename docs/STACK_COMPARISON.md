@@ -86,7 +86,8 @@ difference is that Nominatim runs its search in Python, while pgeo's search runs
 What pgeo leaves out matters as much as what it includes. It needs no search engine, no JVM, no
 Node runtime, no message queue and no separate parsing, point-in-polygon or interpolation
 service. Of its seven run-time components, three ship inside PostgreSQL ([REPORT.md](REPORT.md)
-Table 7).
+Table 7). The deployed stack has three containers, but it can go down to PostgreSQL alone.
+[Section 9](#9-how-simple-pgeos-stack-can-be) explains each step down and what it costs.
 
 ### 3.2 Build time (what turns raw data into an index)
 
@@ -179,7 +180,9 @@ Maine's data and wants 2 vCPU, 4 GB and 20 GB of disk ([SIZING.md](SIZING.md)).
 | Response format | GeoJSON, Pelias-shaped | GeoJSON, Pelias-shaped | GeoJSON (GeocodeJSON properties) | JSON, JSONv2, GeoJSON, GeocodeJSON, XML |
 
 pgeo is a drop-in replacement for a Pelias client. Photon and Nominatim each need their own
-client adapter; see `tests/load/k6/session_photon.js` and `session_nominatim.js`.
+client adapter; see `tests/load/k6/session_photon.js` and `session_nominatim.js`. Those adapters
+do not yet use Photon's `/structured` endpoint, so this repository's Photon "structured" figures
+measure one-line search ([OSM_ENGINES.md](OSM_ENGINES.md)).
 
 ---
 
@@ -191,6 +194,116 @@ client adapter; see `tests/load/k6/session_photon.js` and `session_nominatim.js`
 | Many countries or the planet, horizontal scale, many data sources, and a team comfortable running Elasticsearch | **Pelias** |
 | Fast, typo-tolerant type-ahead over OSM, as one simple service, with prebuilt planet dumps | **Photon** |
 | Exact OSM addressing, detailed reverse geocoding and admin polygons, with continuous OSM updates and no autocomplete | **Nominatim** |
+
+---
+
+## 9. How simple pgeo's stack can be
+
+The geocoder is the database. Every endpoint is a SQL function in the `geocode_api` schema that
+returns a ready-made GeoJSON `FeatureCollection` as `jsonb`: `v1_search`,
+`v1_search_structured`, `v1_autocomplete`, `v1_reverse`, `v1_place`, `v1_address` and
+`v1_attribution` (`pgeo/sql/050_api.sql`, `060_address.sql`). Everything outside PostgreSQL only
+carries requests to those functions or protects them. That is why the stack can shrink so far,
+and why each layer you remove costs features at the edge, not geocoding.
+
+### 9.1 The four shapes
+
+| Shape | Processes | URL shape | Pelias-compatible | Suits |
+|---|---|---|---|---|
+| **A. Full edge** (the default) | PostgreSQL, PostgREST, nginx, plus a TLS terminator | `/v1/search?...` | Yes | Public internet; existing Pelias clients; the demo page |
+| **B. FastAPI direct** | PostgreSQL, FastAPI (plus libpostal if wanted) | `/v1/search?...` | Yes | Internal networks; behind a gateway you already run; libpostal parsing |
+| **C. PostgREST direct** | PostgreSQL, PostgREST | `/rpc/v1_search?...` | No (flat parameter names) | Greenfield HTTP clients |
+| **D. SQL only** | PostgreSQL (or a database on a server you already run) | `SELECT geocode_api.v1_search(...)` | No | Greenfield apps that already connect to PostgreSQL |
+
+PostgreSQL 18, PostGIS 3.6 and the `pg_trgm`, `fuzzystrmatch` and `unaccent` extensions are the
+floor that no shape removes. libpostal is never required: the SQL rule parser is the default, and
+it measured better than libpostal ([REPORT.md](REPORT.md) section 3.1).
+
+### 9.2 Greenfield: the smallest stack that keeps every function
+
+If you are writing a new client and do not need Pelias compatibility, **shape C or D keeps every
+geocoding function**. That means forward search, structured search, autocomplete, reverse,
+lookup by ID, the USPS-style `/v1/address`, all the filters and the confidence score. What
+changes is only the address and the parameter names.
+
+**Shape C: two containers.** Run the `db` and `rest` services from `deploy/compose.yml` without
+`edge`, and publish PostgREST's port. Call the functions as RPCs, using the SQL argument names:
+
+```bash
+curl 'http://geo.internal:3000/rpc/v1_search?text=12%20main%20st%20portland&size=5'
+curl 'http://geo.internal:3000/rpc/v1_autocomplete?text=congress%20s&lat=43.66&lon=-70.26'
+curl 'http://geo.internal:3000/rpc/v1_search_structured?address=12%20main%20st&locality=portland&region=me'
+curl 'http://geo.internal:3000/rpc/v1_reverse?lat=43.6591&lon=-70.2568&layers=address&radius=0.2'
+curl 'http://geo.internal:3000/rpc/v1_address?text=12%20main%20st%20portland%20me'
+curl -H 'Accept: text/html' 'http://geo.internal:3000/rpc/v1_attribution'
+```
+
+**Shape D: one container, or none.** An application that already holds a PostgreSQL connection
+calls the functions as ordinary queries, with no HTTP layer at all:
+
+```sql
+SELECT geocode_api.v1_search(text => '12 main st portland', size => 5);
+SELECT geocode_api.v1_reverse(lat => 43.6591, lon => -70.2568, layers => 'address');
+```
+
+You can restore the dump into a database server you already run, so pgeo adds no process at
+all. That server needs PostgreSQL 18 or newer (`pg_restore` does not go to an older major
+version), PostGIS 3.6 and the three contrib extensions. Restore into a dedicated database, because
+the dump brings the schemas `geocode`, `geocode_api` and the build schemas. Create the `pgeo_api`
+login role yourself, as `deploy/db/init/10-api-role.sh` does, because a dump does not carry role
+passwords.
+
+**Parameter names** are the last part of each Pelias parameter, which is also how PostgREST reads
+a dotted key:
+
+| Pelias parameter | Function argument |
+|---|---|
+| `text`, `size`, `layers`, `sources`, `categories` | the same |
+| `focus.point.lat` / `.lon` (search, autocomplete) | `lat` / `lon` |
+| `point.lat` / `.lon` (reverse) | `lat` / `lon` |
+| `boundary.rect.min_lat` ... `max_lon` | `min_lat` ... `max_lon` |
+| `boundary.circle.lat` / `.lon` / `.radius` (search, autocomplete) | `circle_lat` / `circle_lon` / `circle_radius` |
+| `boundary.circle.radius` (reverse) | `radius` |
+| `boundary.country`, `boundary.gid` | `country`, `gid` |
+| structured: `address`, `locality`, `region`, `postalcode`, ... | the same |
+| `ids` (place) | `ids` |
+
+The circle row is the one rename that matters. Search and autocomplete accept both a focus
+point and a circle. Both would end in `.lat` and `.lon`, so the functions name the circle
+`circle_*`, and the nginx edge renames it for Pelias clients. A greenfield client sends
+`circle_*` directly.
+
+### 9.3 What each step down gives up
+
+| Lost when you remove... | Effect | Replacement, if you need it |
+|---|---|---|
+| **nginx: Pelias paths** (C, D) | Pelias clients do not work unchanged | Use the RPC paths, or choose shape B |
+| **nginx: circle renaming** (C) | `boundary.circle.*` collides with `focus.point.*` | Send `circle_lat`, `circle_lon`, `circle_radius` |
+| **nginx: API keys** (B, C, D) | No authentication. FastAPI checks only that `api_key` is short, then ignores it | A gateway that checks keys (Caddy, Traefik, a cloud load balancer or API gateway), or a private network |
+| **nginx: rate limiting** (B, C, D) | Neither front end limits request rates. One client can saturate a 1-core server | Gateway rate limiting. Caddy needs a plugin for this |
+| **nginx: security headers, GET-only, 1 MB body cap** (B, C, D) | Missing on responses | Gateway configuration; not needed for server-to-server calls |
+| **nginx: demo page and basemap** (B, C, D) | Not served. FastAPI serves no static files, and the page expects the `/v1/` paths | Keep the edge if you want the page |
+| **nginx: Pelias-shaped 404s** (C) | Unknown paths get PostgREST's own error | Clients handle PostgREST errors |
+| **PostgREST and its HTTP status codes** (D) | Bad input returns the JSON envelope with `geocoding.errors` filled in, not an HTTP 400. The function sets `response.status`, but only PostgREST reads it | Check `geocoding.errors` in the result |
+| **A separate network hop** (D) | The application holds database credentials and pools its own connections | Connect as the read-only `pgeo_api` role only. Never use the owner role |
+
+These protections survive every shape, because they live in the database or in PostgREST
+configuration, not in nginx:
+
+- The `pgeo_api` role is read-only. It owns nothing and can only `SELECT` and execute the API
+  functions.
+- PostgREST exposes only the `geocode_api` schema, returns at most 40 rows and has the OpenAPI
+  description disabled.
+- Every function validates and bounds its input in SQL: text up to 200 characters, `size` from 1
+  to 40, and at most 40 `ids`.
+
+**The rule.** Shapes B, C and D are fine on a private network, between services or behind a gateway
+you already operate. Do not expose PostgREST, FastAPI or PostgreSQL directly to the internet.
+Whatever faces the internet needs TLS, authentication and rate limits, and in shape A that
+something is the nginx edge plus a TLS terminator. One more safeguard is worth adding in shapes
+B to D: a statement timeout on the API role, for example
+`ALTER ROLE pgeo_api SET statement_timeout = '5s'`. With no edge to absorb a burst of requests,
+that caps how long any single query can hold a core. The repository does not set one today.
 
 ---
 
