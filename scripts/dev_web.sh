@@ -73,4 +73,4 @@ docker run --rm --name "$name" --network host \
   -v "${DEVCONF}:/etc/nginx/conf.d/default.conf:ro" \
   -v "${MAP}:/etc/nginx/conf.d/apikey.map:ro" \
   -v "${ROOT}/infra/ansible/roles/edge/files/apikey.js:/etc/nginx/njs/apikey.js:ro" \
-  nginx:1.29-alpine
+  nginx:1.29-alpine@sha256:5616878291a2eed594aee8db4dade5878cf7edcb475e59193904b198d9b830de

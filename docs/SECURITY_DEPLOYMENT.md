@@ -44,7 +44,12 @@ its `/v1/address` endpoint are this project's own. Bugs there are ours to find.
 | Request bodies | capped at 4 KB |
 | Access log | path only - the query string is **not** logged (fixed 2026-09-20; see below) |
 | Database | `pgeo_api` is a non-superuser with `SELECT` only; the password is percent-encoded into the DSN; `statement_timeout` is 5 s on the role, so no single API query can hold a core for longer |
-| Images | pinned by tag and digest |
+| Images | pinned by tag and digest, including the `nginx` and `uv` images used by the bundle and the Dockerfiles |
+| Containers | PostgREST runs as `nobody` with a read-only filesystem and no capabilities; the bundle's nginx keeps only `CHOWN`, `SETGID`, `SETUID`; every service has `no-new-privileges` |
+| Upstream headers | the edge clears `Authorization` and `Prefer` before PostgREST, so a client can neither present a JWT nor change how a call is counted |
+| Error messages | only pgeo's own validation messages (tagged `HINT 'pgeo'`) reach clients; any other SQLSTATE 22023 text is replaced with "invalid parameter value" |
+| Dumps | the swap and the Ansible restore refuse a dump that does not match the `.sha256` written beside it |
+| SSH | hardening is `sshd_config.d/00-hardening.conf`, so no earlier-sorting drop-in can override it, and the role checks `sshd -T` |
 | Authorization | **API keys at the edge** (Phase 11, done 2026-09-22): `X-API-Key` header, SHA-256 hashes in the inventory, refused in the URL, client name in the log, fails closed. `docs/API_KEYS.md` |
 
 ### Two findings from this assessment

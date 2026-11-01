@@ -67,6 +67,33 @@ commits where each milestone was complete.
   from the deck's own copies, apart from the Compare one still in use.
 
 ### Security
+- Fixes from the 2026-11-01 security review (no Critical or High findings; these are the
+  Medium and Low ones, plus hardening). pgeo's own changes are in pgeo/CHANGELOG.md.
+  - **Serving bundle rate limit was shared by every visitor (Medium).** `deploy/edge/pgeo.conf`
+    limited per client address but had no real-IP handling. Behind a TLS terminator, everyone
+    therefore shared one 10 r/s bucket, so one client could get all the others refused. The new
+    `deploy/edge/real-ip.conf` trusts `X-Forwarded-For` from the terminator only (by default
+    loopback and Docker's bridge range), and `/v1/attribution` is now rate-limited too.
+    `deploy/README.md` and `docs/API_KEYS.md` now say plainly that the bundle has no key check.
+  - **The edges clear `Authorization` and `Prefer`** before PostgREST, in the bundle, in the
+    Ansible template and in the Caddy example in `docs/STACK_COMPARISON.md`.
+  - **API password off the command line.** `scripts/pgeo_swap.sh` and
+    `deploy/db/init/10-api-role.sh` passed it as `psql -v pw=...`, where `ps` shows it to every
+    local user. Both now read it from the environment with psql's `\getenv`.
+  - **Dumps must match their checksum.** `pgeo_swap.sh` refuses a dump without a matching
+    `.sha256` (`--no-checksum` to override explicitly), and the Ansible restore ships and
+    verifies it. `scripts/pgeo_dump.sh` now writes the `.sha256`, as the build image already
+    did. pg_restore runs as the database superuser, so an altered dump was worth stopping.
+  - **SSH hardening can no longer be overridden** by an earlier drop-in such as cloud-init's. It
+    moved from `60-hardening.conf` to `00-hardening.conf`, the old file is removed, and the role
+    asserts the result with `sshd -T`.
+  - **Containers.** PostgREST runs as `nobody`, read-only, with no capabilities. The bundle's
+    nginx keeps only `CHOWN`, `SETGID` and `SETUID`. Every service has `no-new-privileges`. The
+    `nginx:1.29-alpine` and `uv:0.9.17` images are pinned by digest. None of this has been run
+    here (no Docker on the machine it was written on); bring the bundle up once before relying
+    on it.
+  - The demo page's circle radius is clamped to the new 100 km limit. `.gitignore` covers `*.pem`
+    and `*.key`.
 - Dependabot triage, 69 open alerts. All of them were in two build-only components, `report/`
   (the PDF/Word report) and `slides/` (the Slidev deck). None were in `pgeo/`, `prep/` or anything
   that serves queries.

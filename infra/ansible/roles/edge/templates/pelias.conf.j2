@@ -119,6 +119,11 @@ server {
     proxy_http_version 1.1;
     proxy_set_header Connection "";
     proxy_set_header Host $host;
+    # PostgREST reads these and a public client has no business setting them: Authorization would
+    # be checked as a JWT, and Prefer changes how a call is counted and returned. A location with
+    # any proxy_set_header of its own inherits none of these, so it must repeat the whole list.
+    proxy_set_header Authorization "";
+    proxy_set_header Prefer "";
     proxy_connect_timeout 2s;
     proxy_read_timeout 15s;
     proxy_hide_header X-Powered-By;
@@ -192,6 +197,10 @@ server {
         limit_except GET { deny all; }
         if ($api_client = "") { return 401; }
         limit_req zone=pelias_search burst=20 nodelay;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header Authorization "";
+        proxy_set_header Prefer "";
         proxy_set_header Accept "text/html";
         proxy_pass http://pgeo_rest/rpc/v1_attribution;
     }

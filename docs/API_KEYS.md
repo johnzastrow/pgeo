@@ -11,6 +11,10 @@ curl -H 'X-API-Key: pgeo_...' 'https://geocoder.example.org/v1/search?text=389+c
 A key in the URL (`?api_key=`) is **refused**, valid or not: URLs land in browser history,
 referers and proxy logs.
 
+This applies to the edge the Ansible roles deploy. The Docker serving bundle in `deploy/` has no
+key check: it rate-limits each client but authenticates nobody, so keep it behind a terminator
+or network that does (`deploy/README.md`).
+
 ## Issue a key
 
 ```bash

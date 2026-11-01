@@ -3,6 +3,9 @@
 # but the switch itself.
 #
 #   scripts/pgeo_swap.sh --dump data/pgeo/dumps/pgeo-0.19.1-20260925-0825.dump [--build me]
+#                        [--keep-previous] [--no-checksum]
+#
+# The dump's .sha256 must sit beside it (pgeo_dump.sh writes one); --no-checksum skips that check.
 #
 # The expensive part - restore, the autocomplete side table, vacuum, and the checks - happens in
 # a second database while the current one keeps serving. Only the final switch interrupts
@@ -25,12 +28,14 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 build=me
 dump=""
 keep_previous=0
+verify_checksum=1
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --dump)  dump="${2:?--dump needs a path}"; shift 2 ;;
     --build) build="${2:?--build needs a name}"; shift 2 ;;
     --keep-previous) keep_previous=1; shift ;;
+    --no-checksum) verify_checksum=0; shift ;;
     -h|--help) sed -n '2,20p' "$0"; exit 0 ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
@@ -57,11 +62,20 @@ psql_db() { docker exec -i "$container" psql -v ON_ERROR_STOP=1 -U pgeo -d "$1" 
 
 docker inspect "$container" >/dev/null 2>&1 || { echo "container ${container} is not running" >&2; exit 1; }
 
-# A checksum beside the dump is honoured when present; the push writes one.
-if [[ -f "${dump}.sha256" ]]; then
+# The dump must arrive with its checksum, and match it. pg_restore runs as the database
+# superuser, so a truncated or altered dump is not something to restore and find out about.
+# Both pgeo_dump.sh and the build image's push write the .sha256; --no-checksum is the explicit
+# way round it for a dump made some other way.
+if [[ "$verify_checksum" == 1 ]]; then
+  [[ -f "${dump}.sha256" ]] || {
+    echo "no ${dump}.sha256 beside the dump; copy it too, or pass --no-checksum to skip the check" >&2
+    exit 1
+  }
   say "checking ${dump##*/}.sha256"
   (cd "$(dirname "$dump")" && sha256sum -c "$(basename "$dump").sha256" >/dev/null) \
     || { echo "checksum mismatch; refusing to swap" >&2; exit 1; }
+else
+  say "WARNING: --no-checksum given; restoring ${dump##*/} without verifying it"
 fi
 
 say "staging database ${staging}"
@@ -92,9 +106,14 @@ if [[ -z "${PGEO_API_PASSWORD:-}" && -f "$(dirname "${BASH_SOURCE[0]}")/.env" ]]
 fi
 if [[ -n "${PGEO_API_PASSWORD:-}" ]]; then
   say "setting the pgeo_api password from the deployment's environment"
-  # format(%L) rather than shell interpolation, so a password holding a quote stays a password.
-  psql_db postgres -v pw="$PGEO_API_PASSWORD" >/dev/null \
-    <<<"SELECT format('ALTER ROLE pgeo_api LOGIN PASSWORD %L', :'pw') \\gexec"
+  # The password never goes on a command line, where ps would show it to every local user: it
+  # reaches the container through docker exec's environment (-e with no value copies it from
+  # here), and psql reads it with \getenv. format(%L), so a password holding a quote stays one.
+  PGEO_API_PASSWORD="$PGEO_API_PASSWORD" docker exec -i -e PGEO_API_PASSWORD "$container" \
+    psql -v ON_ERROR_STOP=1 -U pgeo -d postgres >/dev/null <<'SQL'
+\getenv pw PGEO_API_PASSWORD
+SELECT format('ALTER ROLE pgeo_api LOGIN PASSWORD %L', :'pw') \gexec
+SQL
 fi
 psql_db postgres -c "GRANT CONNECT ON DATABASE ${staging} TO pgeo_api" >/dev/null
 

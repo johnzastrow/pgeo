@@ -13,6 +13,8 @@ services:
       POSTGRES_PASSWORD: ${PGEO_DB_PASSWORD:?set in pgeo.secrets}
     command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
     shm_size: 512m
+    # The entrypoint drops from root to postgres itself; nothing in it needs to gain privileges.
+    security_opt: ["no-new-privileges:true"]
     mem_limit: {{ pgeo_mem_limit_db }}
     memswap_limit: {{ pgeo_mem_limit_db }}
     volumes:
@@ -39,6 +41,11 @@ services:
       PGRST_SERVER_PORT: "3000"
       PGRST_OPENAPI_MODE: "disabled"
       PGRST_DB_MAX_ROWS: "40"
+    # A static binary that needs no capabilities, no root and no writable filesystem.
+    user: "65534:65534"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
     mem_limit: {{ pgeo_mem_limit_rest }}
     memswap_limit: {{ pgeo_mem_limit_rest }}
     ports: ["127.0.0.1:4600:3000"]

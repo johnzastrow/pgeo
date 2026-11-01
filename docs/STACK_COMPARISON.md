@@ -285,6 +285,7 @@ point and a circle. Both would end in `.lat` and `.lon`, so the functions name t
 | **nginx: rate limiting** (B, C, D) | Neither front end limits request rates. One client can saturate a 1-core server | Gateway rate limiting. Caddy needs a plugin for this |
 | **nginx: security headers, GET-only, 1 MB body cap** (B, C, D) | Missing on responses | Gateway configuration; not needed for server-to-server calls |
 | **nginx: demo page and basemap** (B, C, D) | Not served. FastAPI serves no static files, and the page expects the `/v1/` paths | Keep the edge if you want the page |
+| **nginx: clearing `Authorization` and `Prefer`** (C) | A client can send PostgREST a JWT to check, or a `Prefer` header that changes how a call is counted | Strip both headers at whatever gateway you use |
 | **nginx: Pelias-shaped 404s** (C) | Unknown paths get PostgREST's own error | Clients handle PostgREST errors |
 | **PostgREST and its HTTP status codes** (D) | Bad input returns the JSON envelope with `geocoding.errors` filled in, not an HTTP 400. The function sets `response.status`, but only PostgREST reads it | Check `geocoding.errors` in the result |
 | **A separate network hop** (D) | The application holds database credentials and pools its own connections | Connect as the read-only `pgeo_api` role only. Never use the owner role |
@@ -296,8 +297,12 @@ configuration, not in nginx:
   functions.
 - PostgREST exposes only the `geocode_api` schema, returns at most 40 rows and has the OpenAPI
   description disabled.
-- Every function validates and bounds its input in SQL: text up to 200 characters, `size` from 1
-  to 40, and at most 40 `ids`.
+- Every function validates and bounds its input in SQL: every text argument up to 200 characters
+  (structured fields included), `size` from 1 to 40, at most 40 `ids`, coordinates in range with
+  NaN and Infinity refused, a rectangle's minimum not above its maximum, and a circle of at most
+  100 km.
+- Errors tell the client only what pgeo's own validation says. Any other database error text is
+  replaced with "invalid parameter value", so internals do not leak even without an edge.
 - The `pgeo_api` role has `statement_timeout = '5s'`, so no single query can hold a core longer
   than that. The slowest measured query is about 0.5 s (a full New York address parse), so the
   cap only stops runaways. With no edge to absorb a burst, this is what bounds the cost of each
@@ -328,6 +333,7 @@ request, and Caddy has a directive for each:
 | Returns a Pelias-shaped 400 for unknown `/v1/*` paths | `respond` with a JSON body | Yes |
 | Accepts GET only; caps the body at 1 MB | `not method GET` matcher; `request_body { max_size }` | Yes |
 | Security headers (CSP and others) | `header` | Yes |
+| Clears `Authorization` and `Prefer` before PostgREST | `request_header -Authorization`, `-Prefer` | Yes |
 | Serves the demo page and basemap, with range requests | `file_server` | Yes |
 | Checks API keys | `map` on the `X-API-Key` header plus a `vars` matcher | Yes, but the keys are kept in plain text (see below) |
 | Rate-limits each client IP | `rate_limit` | No. Needs the [caddy-ratelimit](https://github.com/mholt/caddy-ratelimit) plugin in a custom build (`xcaddy build --with github.com/mholt/caddy-ratelimit`) |
@@ -362,6 +368,10 @@ geocoder.example.org {
 	route /v1/* {
 		@notget not method GET
 		respond @notget 405
+
+		# PostgREST would read these; a public client has no business setting them.
+		request_header -Authorization
+		request_header -Prefer
 
 		@nokey vars {api_client} none
 		respond @nokey `\{"geocoding":\{"errors":["missing or unknown API key"]},"type":"FeatureCollection","features":[]}` 401

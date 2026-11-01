@@ -8,7 +8,10 @@
 # existed - or one restored from a dump made elsewhere - converges on the right password too.
 set -eu
 
-psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d postgres -v pw="$PGEO_API_PASSWORD" <<'SQL'
+# The password is read from the environment with \getenv rather than passed as -v pw=..., which
+# would put it in psql's argument list, visible to ps on the host.
+psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d postgres <<'SQL'
+\getenv pw PGEO_API_PASSWORD
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'pgeo_api') THEN
     CREATE ROLE pgeo_api LOGIN;

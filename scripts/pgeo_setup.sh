@@ -154,6 +154,6 @@ fi
 docker rm -f "${stack}_rest_edge" >/dev/null 2>&1 || true
 cpus=(); [[ $pin -eq 1 ]] && cpus=(--cpuset-cpus 4,10)
 docker run -d --name "${stack}_rest_edge" --restart unless-stopped --network host "${cpus[@]}" \
-  -v "$conf:/etc/nginx/conf.d/default.conf:ro" nginx:1.29-alpine >/dev/null
+  -v "$conf:/etc/nginx/conf.d/default.conf:ro" nginx:1.29-alpine@sha256:5616878291a2eed594aee8db4dade5878cf7edcb475e59193904b198d9b830de >/dev/null
 
 echo "pgeo is set up. Next: scripts/pgeo_rebuild.sh --build $build --profile $profile$([[ $pin -eq 1 ]] && echo ' -f pgeo/compose.pinned.yml')"

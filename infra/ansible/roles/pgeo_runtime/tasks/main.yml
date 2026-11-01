@@ -111,6 +111,38 @@
     dest: "{{ pgeo_data_dir }}/dumps/{{ pgeo_dump_name }}.dump"
     rsync_opts: ["--chown={{ pgeo_user }}:{{ pgeo_user }}", "--chmod=F0644"]
 
+# pg_restore runs as the database superuser, so the dump is checked against the checksum
+# scripts/pgeo_dump.sh wrote beside it before anything restores it. Fail closed.
+- name: The dump's checksum exists on the workstation
+  when: pgeo_dump_name | length > 0
+  delegate_to: localhost
+  become: false
+  ansible.builtin.stat:
+    path: "{{ local_pgeo_dump_dir }}/{{ pgeo_dump_name }}.dump.sha256"
+  register: pgeo_runtime_dump_sum
+
+- name: Require the checksum
+  when: pgeo_dump_name | length > 0
+  ansible.builtin.assert:
+    that: pgeo_runtime_dump_sum.stat.exists
+    fail_msg: >-
+      {{ pgeo_dump_name }}.dump.sha256 is missing from {{ local_pgeo_dump_dir }}.
+      Re-run scripts/pgeo_dump.sh, which writes it, or create it with sha256sum.
+
+- name: Ship the dump's checksum
+  when: pgeo_dump_name | length > 0
+  ansible.posix.synchronize:
+    src: "{{ local_pgeo_dump_dir }}/{{ pgeo_dump_name }}.dump.sha256"
+    dest: "{{ pgeo_data_dir }}/dumps/{{ pgeo_dump_name }}.dump.sha256"
+    rsync_opts: ["--chown={{ pgeo_user }}:{{ pgeo_user }}", "--chmod=F0644"]
+
+- name: Verify the shipped dump against its checksum
+  when: pgeo_dump_name | length > 0
+  ansible.builtin.command:
+    cmd: sha256sum -c "{{ pgeo_dump_name }}.dump.sha256"
+    chdir: "{{ pgeo_data_dir }}/dumps"
+  changed_when: false
+
 - name: Start the database alone for restore
   ansible.builtin.command:
     cmd: docker compose --env-file pgeo.secrets up -d db

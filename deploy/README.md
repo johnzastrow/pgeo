@@ -20,7 +20,7 @@ cp -r ../web/. web/                                  # the demo page, already ve
 python3 ../scripts/gen_region_json.py --build me > web/region.json
 printf '{"engines":[{"label":"pgeo","base":"","kind":"pgeo"}]}\n' > web/engines.json
 cp ../data/raw/me/basemap/me.pmtiles tiles/          # the basemap for this build
-cp ../data/pgeo/dumps/pgeo-<version>-<date>.dump dumps/
+cp ../data/pgeo/dumps/pgeo-<version>-<date>.dump{,.sha256} dumps/   # the swap refuses a dump without its checksum
 cp ../scripts/pgeo_swap.sh .                         # one source of truth lives in scripts/
 rsync -a --exclude pgdata/ --exclude .env ./ <host>:~/pgeo/
 ```
@@ -67,6 +67,13 @@ pgeo.example.org {
 }
 ```
 
-There is no API authorization yet (TODO section 9 is on hold), so the deployment's only access
-control is whatever the terminator and the network provide. The reference deployment is reachable
+**The client's address.** The edge rate-limits each client (10 requests/s, bursts of 20), and it
+can only tell clients apart if it believes the terminator about who they are. `edge/real-ip.conf`
+lists the proxies it believes: by default a terminator on the same host or the same compose
+network. If yours runs on another machine, put its address there - its address only, not a whole
+LAN. Without this, every visitor arrives as the terminator and they all share one bucket.
+
+**No API keys.** This bundle does not check API keys; the key check in `docs/API_KEYS.md` belongs
+to the Ansible edge. There is no API authorization here yet (TODO section 9 is on hold), so the
+deployment's only access control is whatever the terminator and the network provide. The reference deployment is reachable
 over a tailnet and not from the public internet, which is what stands in for it meanwhile.

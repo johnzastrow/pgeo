@@ -14,6 +14,9 @@ projects/*/pelias.json
 # pgeo local secrets
 pgeo/.env
 *.secrets
+# private keys and certificates never belong in the repository
+*.pem
+*.key
 # pgeo-tune output (generated from pgeo/tuning/profiles/*.toml)
 pgeo/docker/db/tuning/active.conf
 pgeo/tuning/active.vars

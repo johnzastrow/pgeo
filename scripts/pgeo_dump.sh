@@ -44,5 +44,7 @@ name="pgeo-${tag}${ver}-$(date +%Y%m%d-%H%M)"
 docker exec "$container" pg_dump -U pgeo -d "$database" -Fc -Z 6 -n pgeo -n geocode -n geocode_api \
   --exclude-table=pgeo.feature_ac > "$OUT/$name.dump.part"
 mv "$OUT/$name.dump.part" "$OUT/$name.dump"
-echo "wrote $OUT/$name.dump ($(du -h "$OUT/$name.dump" | cut -f1))"
+# pgeo_swap.sh refuses a dump without its checksum, so write one beside it, as the build image does.
+( cd "$OUT" && sha256sum "$name.dump" > "$name.dump.sha256" )
+echo "wrote $OUT/$name.dump ($(du -h "$OUT/$name.dump" | cut -f1)) and its .sha256"
 echo "deploy: cd infra/ansible && ansible-playbook site.yml -e pgeo_dump_name=$name"

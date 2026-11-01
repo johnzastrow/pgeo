@@ -27,13 +27,37 @@
     - { name: vm.max_map_count, value: "262144" }
     - { name: vm.swappiness, value: "1" }
 
+# sshd keeps the first value it reads for most settings, and reads sshd_config.d in name order.
+# A file sorting earlier - cloud-init's 50-cloud-init.conf sets PasswordAuthentication on some
+# images - would beat a 60- file, so the hardening is 00- and the check below proves it won.
 - name: Harden sshd (key-only, no root, admin user only)
   ansible.builtin.template:
     src: sshd_hardening.conf.j2
-    dest: /etc/ssh/sshd_config.d/60-hardening.conf
+    dest: /etc/ssh/sshd_config.d/00-hardening.conf
     mode: "0644"
     validate: /usr/sbin/sshd -t -f %s
   notify: Restart sshd
+
+- name: Remove the hardening file's old name
+  ansible.builtin.file:
+    path: /etc/ssh/sshd_config.d/60-hardening.conf
+    state: absent
+  notify: Restart sshd
+
+- name: Read the configuration sshd will actually run with
+  ansible.builtin.command: /usr/sbin/sshd -T
+  register: base_sshd_effective
+  changed_when: false
+
+- name: Require the hardening to be in effect
+  ansible.builtin.assert:
+    that:
+      - "'permitrootlogin no' in base_sshd_effective.stdout_lines"
+      - "'passwordauthentication no' in base_sshd_effective.stdout_lines"
+      - "'kbdinteractiveauthentication no' in base_sshd_effective.stdout_lines"
+    fail_msg: >-
+      sshd -T shows a weaker setting than 00-hardening.conf asks for; another file in
+      /etc/ssh/sshd_config.d or sshd_config is overriding it.
 
 - name: Firewall defaults
   community.general.ufw:
