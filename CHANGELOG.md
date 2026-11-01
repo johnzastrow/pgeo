@@ -23,6 +23,16 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+### Security
+- **The serving bundle's edge logged every searched address.** `deploy/edge/nginx.conf` used
+  nginx's default `combined` access log, which records the full request line, so
+  `/v1/search?text=<address>` went into the container log. This is the same finding the Ansible
+  edge fixed on 2026-09-20 (`docs/SECURITY_DEPLOYMENT.md`), and the bundle had never had the fix.
+  The bundle now logs with the same `pathonly` format: method and path, no query string, no
+  referer. Found on the first public deployment (tailnode, behind pgeo.fluidgrid.site) minutes
+  after it went live. There the fix is applied and the edge container recreated, which
+  discarded the old log; it held only test queries.
+
 ## [0.23.1] - 2026-11-01
 
 Released with pgeo 0.20.1 and pelias-prep 0.2.1. The first end-to-end run of the 0.23.0 images,
