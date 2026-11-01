@@ -61,7 +61,7 @@ function applyOptions(params, opts = {}) {
     const c = opts.circle;
     params.set('boundary.circle.lat', finite(c.lat, 'circle.lat').toFixed(6));
     params.set('boundary.circle.lon', finite(c.lon, 'circle.lon').toFixed(6));
-    params.set('boundary.circle.radius', String(Math.min(1000, Math.max(0.1, finite(c.radiusKm, 'radius')))));
+    params.set('boundary.circle.radius', String(Math.min(100, Math.max(0.1, finite(c.radiusKm, 'radius')))));
   }
   if (opts.gid) {
     if (!GID_RE.test(opts.gid)) throw new PeliasError(`invalid boundary.gid: ${opts.gid}`);

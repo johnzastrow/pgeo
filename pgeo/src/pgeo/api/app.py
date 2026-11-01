@@ -31,6 +31,9 @@ LAYER_ALIASES = {"coarse": ["neighbourhood", "locality", "localadmin", "county",
 SOURCES = {"openaddresses", "openstreetmap", "whosonfirst", "gnis", "zcta", "overture", "interpolation"}
 SOURCE_ALIASES = {"oa": "openaddresses", "osm": "openstreetmap", "wof": "whosonfirst"}
 MAX_TEXT = 200
+# How long a request waits for a pooled connection before it is turned away with 503. Without a
+# limit, a few slow queries queue every other request behind them indefinitely.
+ACQUIRE_TIMEOUT = float(os.environ.get("PGEO_ACQUIRE_TIMEOUT", "3"))
 try:
     ENGINE_VERSION = version("pgeo")  # single source: pgeo/pyproject.toml
 except PackageNotFoundError:
@@ -81,12 +84,26 @@ async def lifespan(app: FastAPI):
     await app.state.pool.close()
 
 
-app = FastAPI(title="pgeo", version=ENGINE_VERSION, lifespan=lifespan, docs_url=None, redoc_url=None)
+app = FastAPI(
+    title="pgeo", version=ENGINE_VERSION, lifespan=lifespan, docs_url=None, redoc_url=None, openapi_url=None
+)
+
+
+def acquire(request: Request):
+    """A pooled connection, or TimeoutError (answered as 503) if none frees up in time."""
+    return request.app.state.pool.acquire(timeout=ACQUIRE_TIMEOUT)
 
 
 @app.exception_handler(BadRequest)
 async def bad_request(_: Request, exc: BadRequest) -> JSONResponse:
     return JSONResponse(status_code=400, content=envelope({}, [], errors=[str(exc)]))
+
+
+@app.exception_handler(TimeoutError)
+async def busy(_: Request, exc: TimeoutError) -> JSONResponse:
+    # Pool exhausted, or a query hit command_timeout: the service is overloaded, not broken.
+    log.warning("timed out waiting for the database")
+    return JSONResponse(status_code=503, content=envelope({}, [], errors=["service busy, try again"]))
 
 
 @app.exception_handler(Exception)
@@ -184,7 +201,7 @@ def circle(q: dict) -> list[float] | None:
     """boundary.circle.lat/lon/radius (km, default 50) as [lon, lat, radius], or None."""
     lat = finite(q.get("boundary.circle.lat"), "boundary.circle.lat", -90, 90)
     lon = finite(q.get("boundary.circle.lon"), "boundary.circle.lon", -180, 180)
-    radius = finite(q.get("boundary.circle.radius"), "boundary.circle.radius", 0.001, 1000)
+    radius = finite(q.get("boundary.circle.radius"), "boundary.circle.radius", 0.001, 100)
     if lat is None and lon is None:
         if radius is not None:
             raise BadRequest("boundary.circle.radius needs boundary.circle.lat and boundary.circle.lon")
@@ -202,11 +219,13 @@ def common(q: dict) -> dict:
     if (flat is None) != (flon is None):
         raise BadRequest("focus.point needs both lat and lon")
     rect = [
-        finite(q.get(f"boundary.rect.{k}"), f"boundary.rect.{k}", -180, 180)
-        for k in ("min_lon", "min_lat", "max_lon", "max_lat")
+        finite(q.get(f"boundary.rect.{k}"), f"boundary.rect.{k}", -lim, lim)
+        for k, lim in (("min_lon", 180), ("min_lat", 90), ("max_lon", 180), ("max_lat", 90))
     ]
     if any(r is not None for r in rect) and any(r is None for r in rect):
         raise BadRequest("boundary.rect needs min_lon, min_lat, max_lon, max_lat")
+    if rect[0] is not None and (rect[0] > rect[2] or rect[1] > rect[3]):
+        raise BadRequest("boundary.rect min_lon/min_lat must not exceed max_lon/max_lat")
     return {
         "focus_lon": flon,
         "focus_lat": flat,
@@ -223,8 +242,10 @@ def common(q: dict) -> dict:
 
 async def parse(request: Request, text: str) -> Parsed:
     mode = request.app.state.settings.parse_mode
-    override = request.query_params.get("pgeo.parse")  # experiments only
-    if override in ("service", "extension", "none"):
+    # Per-request override, for A/B experiments only. Off unless PGEO_ALLOW_PARSE_OVERRIDE is set,
+    # since it would let any client force the libpostal or in-database parse on every request.
+    override = request.query_params.get("pgeo.parse")
+    if request.app.state.settings.allow_parse_override and override in ("service", "extension", "none"):
         mode = override
     if mode == "service":
         try:
@@ -234,7 +255,7 @@ async def parse(request: Request, text: str) -> Parsed:
         except (httpx.HTTPError, ValueError):
             log.warning("libpostal service unavailable; falling back to rule parser")
     elif mode == "extension":
-        async with request.app.state.pool.acquire() as con:
+        async with acquire(request) as con:
             comp = await con.fetchval("SELECT postal_parse($1)", text)
         lp = from_libpostal(text, json.loads(comp) if isinstance(comp, str) else comp)
         return merge_rule_fallback(lp, request.app.state.rules.parse(text))
@@ -327,7 +348,7 @@ SEARCH_SQL = "SELECT * FROM geocode.search($1, $2, $3, $4, $5, $6, $7, $8, $9, $
 
 
 async def run_search(request: Request, text: str | None, p: Parsed, c: dict) -> list:
-    async with request.app.state.pool.acquire() as con:
+    async with acquire(request) as con:
         return await con.fetch(
             SEARCH_SQL,
             text,
@@ -381,7 +402,7 @@ async def structured(request: Request):
     p.postcode = fields["postalcode"]
     if not fields["address"]:
         p.name = p.locality or fields["county"] or p.postcode
-    async with request.app.state.pool.acquire() as con:
+    async with acquire(request) as con:
         # Nothing but a region: that asks for the region itself, and the two front ends used to
         # answer it differently. Everywhere else region is a filter, not text, but p.text above
         # joins every field - so "region=ME" alone searched the free text for "ME" and came back
@@ -428,7 +449,7 @@ async def autocomplete(request: Request, text: Annotated[str | None, Query()] = 
     q = dict(request.query_params)
     text = clean_text(text)
     c = common(q)
-    async with request.app.state.pool.acquire() as con:
+    async with acquire(request) as con:
         rows = await con.fetch(
             "SELECT * FROM geocode.autocomplete($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
             text,
@@ -455,7 +476,7 @@ async def reverse(request: Request):
         raise BadRequest("point.lat and point.lon are required")
     radius = finite(q.get("boundary.circle.radius"), "boundary.circle.radius", 0.001, 50)
     c = common({k: v for k, v in q.items() if not k.startswith(("focus.", "boundary.rect", "boundary.circle"))})
-    async with request.app.state.pool.acquire() as con:
+    async with acquire(request) as con:
         rows = await con.fetch(
             "SELECT * FROM geocode.reverse($1, $2, $3, $4, $5, $6, $7, $8, $9)",
             lon,
@@ -475,7 +496,7 @@ async def reverse(request: Request):
 async def place(request: Request, ids: Annotated[str | None, Query()] = None):
     ids = clean_text(ids, "ids")
     gids = [g.strip() for g in ids.split(",") if g.strip()][:40]
-    async with request.app.state.pool.acquire() as con:
+    async with acquire(request) as con:
         rows = await con.fetch("SELECT * FROM geocode.place($1)", gids)
     return envelope({"ids": gids}, rows)
 
@@ -486,7 +507,7 @@ async def attribution(request: Request) -> HTMLResponse:
 
     The page is built in SQL (geocode_api.v1_attribution), so both front ends and the
     pure-SQL path serve exactly the same text."""
-    async with request.app.state.pool.acquire() as con:
+    async with acquire(request) as con:
         html = await con.fetchval("SELECT geocode_api.v1_attribution()")
     return HTMLResponse(content=html)
 
@@ -507,13 +528,15 @@ async def address(request: Request):
     for name, v in (("ids", ids), ("text", text), ("unit", unit)):
         if v is not None and len(v) > 2000:
             raise BadRequest(f"{name} is too long")
-    async with request.app.state.pool.acquire() as con:
+    async with acquire(request) as con:
         try:
             doc = await con.fetchval(
                 "SELECT geocode_api.v1_address($1, $2, $3, $4, $5, $6)", ids, text, lat, lon, radius, unit
             )
         except asyncpg.exceptions.InvalidParameterValueError as e:  # SQLSTATE 22023: bad input
-            raise BadRequest(e.message) from None
+            # Only pgeo's own validation messages (HINT 'pgeo') are written for clients; a 22023
+            # from inside PostgreSQL or PostGIS describes internals, so it is not passed on.
+            raise BadRequest(e.message if e.hint == "pgeo" else "invalid parameter value") from None
     doc = json.loads(doc) if isinstance(doc, str) else doc
     if doc.get("geocoding", {}).get("errors"):  # the SQL function returns input errors as data
         return JSONResponse(status_code=400, content=doc)
@@ -522,6 +545,6 @@ async def address(request: Request):
 
 @app.get("/health")
 async def health(request: Request):
-    async with request.app.state.pool.acquire() as con:
+    async with acquire(request) as con:
         await con.fetchval("SELECT 1")
     return {"status": "ok"}

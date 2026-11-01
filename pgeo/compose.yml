@@ -55,6 +55,9 @@ services:
       PGEO_DSN: "postgresql://pgeo_api:${PGEO_API_PASSWORD:?set PGEO_API_PASSWORD in pgeo/pgeo.secrets}@db:5432/${PGEO_DB_NAME:-pgeo}"
       PGEO_LIBPOSTAL_URL: "http://libpostal:4400"
       PGEO_PARSE_MODE: "${PGEO_PARSE_MODE:-service}"
+      # The accuracy A/B runs pick a parser per request (?pgeo.parse=); this local stack allows
+      # it. Off by default in the app, and never set on a public front end.
+      PGEO_ALLOW_PARSE_OVERRIDE: "${PGEO_ALLOW_PARSE_OVERRIDE:-1}"
       PGEO_WORKERS: "${PGEO_WORKERS:-2}"
       PGEO_POOL_MAX: "${PGEO_POOL_MAX:-8}"
     ports: ["127.0.0.1:${PGEO_API_PORT:-4500}:4500"]

@@ -34,6 +34,9 @@ class Settings:
     libpostal_url: str
     parse_mode: str  # service | extension | none
     pool_max: int
+    # Lets a request pick its own parse mode with ?pgeo.parse=. For accuracy A/B runs against a
+    # local stack only: on a public front end it lets any client force the costlier modes.
+    allow_parse_override: bool = False
 
     @staticmethod
     def load() -> Settings:
@@ -59,4 +62,5 @@ class Settings:
             libpostal_url=env.get("PGEO_LIBPOSTAL_URL", "http://127.0.0.1:4401"),
             parse_mode=mode,
             pool_max=int(env.get("PGEO_POOL_MAX", "8")),
+            allow_parse_override=env.get("PGEO_ALLOW_PARSE_OVERRIDE", "").lower() in ("1", "true", "yes"),
         )

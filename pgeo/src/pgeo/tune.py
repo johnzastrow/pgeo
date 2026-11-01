@@ -85,10 +85,23 @@ def _check(section: str, key: str, value: object, rule: object) -> None:
         raise ProfileError(f"[{section}] {key} = {value!r} is not allowed")
 
 
+MACHINE_KEYS = {"description", "cpus", "db_memory_gb", "load_test_config"}
+# The description is written into the generated postgresql.conf as a comment. A line break in it
+# would end the comment and let the rest of the string become a setting, so it is one line of
+# printable text.
+DESCRIPTION_RE = re.compile(r"[^\x00-\x1f\x7f]{0,200}")
+
+
 def validate(profile: dict) -> dict:
     for section in ("machine", "postgres", "frontend"):
         if not isinstance(profile.get(section), dict):
             raise ProfileError(f"missing [{section}] table")
+    extra = set(profile["machine"]) - MACHINE_KEYS
+    if extra:
+        raise ProfileError(f"[machine] unknown keys: {sorted(extra)}")
+    desc = profile["machine"].get("description", "")
+    if not isinstance(desc, str) or not DESCRIPTION_RE.fullmatch(desc):
+        raise ProfileError("[machine] description must be one line of at most 200 printable characters")
     for key, value in profile["postgres"].items():
         if key not in PG_KEYS:
             raise ProfileError(f"[postgres] {key} is not a tunable setting (allowed: {', '.join(PG_KEYS)})")

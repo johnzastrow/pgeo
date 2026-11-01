@@ -18,6 +18,7 @@ def test_circle_defaults_radius_and_orders_lon_lat():
         {"boundary.circle.lat": "44.8"},
         {"boundary.circle.radius": "5"},
         {"boundary.circle.lat": "44.8", "boundary.circle.lon": "-68.7", "boundary.circle.radius": "5000"},
+        {"boundary.circle.lat": "44.8", "boundary.circle.lon": "-68.7", "boundary.circle.radius": "101"},
     ],
 )
 def test_circle_rejects_incomplete_or_out_of_range(q):
@@ -49,3 +50,26 @@ def test_extras_rejects_bad_values(q):
 def test_common_carries_all_filters():
     c = common({"boundary.circle.lat": "44.8", "boundary.circle.lon": "-68.77", "boundary.gid": "whosonfirst:county:1"})
     assert c["circle"] == [-68.77, 44.8, 50.0] and c["gid"] == "whosonfirst:county:1" and c["country"] is None
+
+
+RECT = {"boundary.rect.min_lon": "-70.5", "boundary.rect.min_lat": "43.5",
+        "boundary.rect.max_lon": "-70.0", "boundary.rect.max_lat": "44.0"}  # fmt: skip
+
+
+def test_common_accepts_a_well_formed_rect():
+    assert common(RECT)["rect"] == [-70.5, 43.5, -70.0, 44.0]
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        {"boundary.rect.min_lat": "-95"},  # latitude out of range (it used to be checked against +-180)
+        {"boundary.rect.max_lat": "nan"},
+        {"boundary.rect.max_lon": "inf"},
+        {"boundary.rect.min_lon": "-69"},  # min_lon > max_lon
+        {"boundary.rect.min_lat": "45"},  # min_lat > max_lat
+    ],
+)
+def test_common_rejects_a_bad_rect(change):
+    with pytest.raises(BadRequest):
+        common(RECT | change)

@@ -260,8 +260,8 @@ $$;
 CREATE OR REPLACE FUNCTION geocode.check_text(v text, field text) RETURNS text
 LANGUAGE plpgsql IMMUTABLE AS $$
 BEGIN
-  IF v IS NULL OR btrim(v) = '' THEN RAISE EXCEPTION USING ERRCODE = '22023', MESSAGE = format('missing param %s', field); END IF;
-  IF length(v) > 200 THEN RAISE EXCEPTION USING ERRCODE = '22023', MESSAGE = format('%s is longer than 200 characters', field); END IF;
+  IF v IS NULL OR btrim(v) = '' THEN RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = format('missing param %s', field); END IF;
+  IF length(v) > 200 THEN RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = format('%s is longer than 200 characters', field); END IF;
   RETURN btrim(v);
 END $$;
 
@@ -277,7 +277,7 @@ BEGIN
     out := array_remove(out, 'coarse') || ARRAY['neighbourhood','locality','localadmin','county','region','postalcode'];
   END IF;
   IF NOT out <@ allowed THEN
-    RAISE EXCEPTION USING ERRCODE = '22023', MESSAGE = format('invalid %s: %s', field, v);
+    RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = format('invalid %s: %s', field, v);
   END IF;
   RETURN out;
 END $$;
@@ -286,10 +286,28 @@ CREATE OR REPLACE FUNCTION geocode.check_range(v double precision, lo double pre
 RETURNS double precision LANGUAGE plpgsql IMMUTABLE AS $$
 BEGIN
   IF v IS NOT NULL AND (v < lo OR v > hi OR v = 'NaN'::float8) THEN
-    RAISE EXCEPTION USING ERRCODE = '22023', MESSAGE = format('%s must be between %s and %s', field, lo, hi);
+    RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = format('%s must be between %s and %s', field, lo, hi);
   END IF;
   RETURN v;
 END $$;
+
+-- An optional text argument: NULL is fine, anything longer than the limit is refused.
+CREATE OR REPLACE FUNCTION geocode.check_len(v text, field text, maxlen integer DEFAULT 200) RETURNS text
+LANGUAGE plpgsql IMMUTABLE AS $$
+BEGIN
+  IF v IS NOT NULL AND length(v) > maxlen THEN
+    RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = format('%s is longer than %s characters', field, maxlen);
+  END IF;
+  RETURN v;
+END $$;
+
+-- What a client is told about a 22023 error. The validation helpers above tag their own errors
+-- with HINT 'pgeo', and those messages are written for clients. Anything else with that SQLSTATE
+-- was raised inside PostgreSQL or PostGIS, and its text describes internals, so it is replaced.
+CREATE OR REPLACE FUNCTION geocode.client_message(p_message text, p_hint text) RETURNS text
+LANGUAGE sql IMMUTABLE AS $$
+  SELECT CASE WHEN p_hint = 'pgeo' THEN p_message ELSE 'invalid parameter value' END
+$$;
 
 -- ---------------------------------------------------------------------------------------
 -- Endpoints. Argument names are the LAST segment of the Pelias parameter names
@@ -317,21 +335,21 @@ LANGUAGE plpgsql IMMUTABLE AS $$
 DECLARE cats text[];
 BEGIN
   IF p_country IS NOT NULL AND btrim(p_country) !~ '^[A-Za-z]{2,3}$' THEN
-    RAISE EXCEPTION USING ERRCODE = '22023', MESSAGE = 'boundary.country must be an ISO 3166 alpha-2 or alpha-3 code';
+    RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = 'boundary.country must be an ISO 3166 alpha-2 or alpha-3 code';
   END IF;
   IF p_gid IS NOT NULL AND (length(p_gid) > 200 OR p_gid !~ '^[a-z_]+:[a-z]+:[A-Za-z0-9_/.:-]+$') THEN
-    RAISE EXCEPTION USING ERRCODE = '22023', MESSAGE = 'boundary.gid must look like whosonfirst:locality:85948877';
+    RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = 'boundary.gid must look like whosonfirst:locality:85948877';
   END IF;
   IF p_lang IS NOT NULL AND p_lang !~ '^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$' THEN
-    RAISE EXCEPTION USING ERRCODE = '22023', MESSAGE = 'invalid lang';
+    RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = 'invalid lang';
   END IF;
   IF p_api_key IS NOT NULL AND length(p_api_key) > 200 THEN
-    RAISE EXCEPTION USING ERRCODE = '22023', MESSAGE = 'invalid api_key';
+    RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = 'invalid api_key';
   END IF;
   IF p_categories IS NOT NULL AND btrim(p_categories) <> '' THEN
     cats := ARRAY(SELECT lower(btrim(x)) FROM unnest(string_to_array(p_categories, ',')) x WHERE btrim(x) <> '');
     IF cardinality(cats) > 20 OR EXISTS (SELECT 1 FROM unnest(cats) c WHERE c !~ '^[a-z0-9_=:.-]{1,60}$') THEN
-      RAISE EXCEPTION USING ERRCODE = '22023', MESSAGE = 'invalid categories';
+      RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = 'invalid categories';
     END IF;
   END IF;
   RETURN cats;
@@ -344,16 +362,16 @@ LANGUAGE plpgsql IMMUTABLE AS $$
 BEGIN
   IF p_lat IS NULL AND p_lon IS NULL THEN
     IF p_radius IS NOT NULL THEN
-      RAISE EXCEPTION USING ERRCODE = '22023', MESSAGE = 'boundary.circle.radius needs boundary.circle.lat and boundary.circle.lon';
+      RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = 'boundary.circle.radius needs boundary.circle.lat and boundary.circle.lon';
     END IF;
     RETURN NULL;
   END IF;
   IF p_lat IS NULL OR p_lon IS NULL THEN
-    RAISE EXCEPTION USING ERRCODE = '22023', MESSAGE = 'boundary.circle needs both lat and lon';
+    RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = 'boundary.circle needs both lat and lon';
   END IF;
   PERFORM geocode.check_range(p_lat, -90, 90, 'boundary.circle.lat');
   PERFORM geocode.check_range(p_lon, -180, 180, 'boundary.circle.lon');
-  PERFORM geocode.check_range(p_radius, 0.001, 1000, 'boundary.circle.radius');
+  PERFORM geocode.check_range(p_radius, 0.001, 100, 'boundary.circle.radius');
   RETURN ARRAY[p_lon, p_lat, coalesce(p_radius, 50)];
 END $$;
 
@@ -363,7 +381,16 @@ LANGUAGE plpgsql IMMUTABLE AS $$
 BEGIN
   IF a IS NULL AND b IS NULL AND c IS NULL AND d IS NULL THEN RETURN NULL; END IF;
   IF a IS NULL OR b IS NULL OR c IS NULL OR d IS NULL THEN
-    RAISE EXCEPTION USING ERRCODE = '22023', MESSAGE = 'boundary.rect needs min_lon, min_lat, max_lon, max_lat';
+    RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = 'boundary.rect needs min_lon, min_lat, max_lon, max_lat';
+  END IF;
+  -- check_range refuses NaN; the bounds refuse +-Infinity. Unchecked, either reached
+  -- ST_MakeEnvelope and the spatial index.
+  PERFORM geocode.check_range(a, -180, 180, 'boundary.rect.min_lon');
+  PERFORM geocode.check_range(b, -90, 90, 'boundary.rect.min_lat');
+  PERFORM geocode.check_range(c, -180, 180, 'boundary.rect.max_lon');
+  PERFORM geocode.check_range(d, -90, 90, 'boundary.rect.max_lat');
+  IF a > c OR b > d THEN
+    RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = 'boundary.rect min_lon/min_lat must not exceed max_lon/max_lat';
   END IF;
   RETURN ARRAY[a, b, c, d];
 END $$;
@@ -372,7 +399,7 @@ CREATE OR REPLACE FUNCTION geocode.check_focus(p_lat double precision, p_lon dou
 LANGUAGE plpgsql IMMUTABLE AS $$
 BEGIN
   IF (p_lat IS NULL) <> (p_lon IS NULL) THEN
-    RAISE EXCEPTION USING ERRCODE = '22023', MESSAGE = 'focus.point needs both lat and lon';
+    RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = 'focus.point needs both lat and lon';
   END IF;
   PERFORM geocode.check_range(p_lat, -90, 90, 'focus.point.lat');
   PERFORM geocode.check_range(p_lon, -180, 180, 'focus.point.lon');
@@ -392,6 +419,7 @@ CREATE OR REPLACE FUNCTION geocode_api.v1_search(
 RETURNS jsonb LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
 DECLARE
+  err_hint text;
   t   text;
   p   record;
   lp  jsonb;
@@ -424,7 +452,9 @@ BEGIN
                       p.state) h;
   RETURN geocode.envelope(jsonb_build_object('text', t, 'size', size, 'parsed_text', jsonb_strip_nulls(to_jsonb(p))), feats);
 EXCEPTION WHEN SQLSTATE '22023' THEN
-  RETURN geocode.api_error(jsonb_strip_nulls(jsonb_build_object('text', v1_search.text)), SQLERRM);
+  GET STACKED DIAGNOSTICS err_hint = PG_EXCEPTION_HINT;
+  RETURN geocode.api_error(jsonb_strip_nulls(jsonb_build_object('text', left(v1_search.text, 200))),
+                           geocode.client_message(SQLERRM, err_hint));
 END
 $$;
 
@@ -456,11 +486,21 @@ DECLARE
   full_text text := concat_ws(' ', address, locality, county, postalcode);
   cats  text[];
   feats jsonb;
-  q     jsonb := jsonb_strip_nulls(jsonb_build_object('address', address, 'locality', locality,
-                  'postalcode', postalcode, 'county', county, 'region', region, 'size', size));
+  q     jsonb := jsonb_strip_nulls(jsonb_build_object('address', left(address, 200), 'locality', left(locality, 200),
+                  'postalcode', left(postalcode, 200), 'county', left(county, 200), 'region', left(region, 200),
+                  'size', size));
+  err_hint text;
 BEGIN
+  -- Every field is bounded, not just address: the others reach the trigram index (through
+  -- full_text) or are echoed back, and were previously limited only by the URL length.
+  PERFORM geocode.check_len(neighbourhood, 'neighbourhood');
+  PERFORM geocode.check_len(locality, 'locality');
+  PERFORM geocode.check_len(county, 'county');
+  PERFORM geocode.check_len(region, 'region');
+  PERFORM geocode.check_len(postalcode, 'postalcode');
+  PERFORM geocode.check_len(country, 'country');
   IF coalesce(address, locality, postalcode, county, region) IS NULL THEN
-    RAISE EXCEPTION USING ERRCODE = '22023', MESSAGE = 'at least one of address, locality, postalcode, county, region is required';
+    RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = 'at least one of address, locality, postalcode, county, region is required';
   END IF;
   PERFORM geocode.check_focus(lat, lon);
   -- structured "country" is the address's country; like boundary.country, only the US matches
@@ -500,7 +540,8 @@ BEGIN
                       region) h;
   RETURN geocode.envelope(q, feats);
 EXCEPTION WHEN SQLSTATE '22023' THEN
-  RETURN geocode.api_error(q, SQLERRM);
+  GET STACKED DIAGNOSTICS err_hint = PG_EXCEPTION_HINT;
+  RETURN geocode.api_error(q, geocode.client_message(SQLERRM, err_hint));
 END
 $$;
 
@@ -517,6 +558,7 @@ CREATE OR REPLACE FUNCTION geocode_api.v1_autocomplete(
 RETURNS jsonb LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
 DECLARE
+  err_hint text;
   t text;
   cats text[];
   feats jsonb;
@@ -533,7 +575,9 @@ BEGIN
          geocode.check_circle(circle_lat, circle_lon, circle_radius), gid, cats, country) h;
   RETURN geocode.envelope(jsonb_build_object('text', t, 'size', size), feats);
 EXCEPTION WHEN SQLSTATE '22023' THEN
-  RETURN geocode.api_error(jsonb_strip_nulls(jsonb_build_object('text', v1_autocomplete.text)), SQLERRM);
+  GET STACKED DIAGNOSTICS err_hint = PG_EXCEPTION_HINT;
+  RETURN geocode.api_error(jsonb_strip_nulls(jsonb_build_object('text', left(v1_autocomplete.text, 200))),
+                           geocode.client_message(SQLERRM, err_hint));
 END
 $$;
 
@@ -545,12 +589,13 @@ CREATE OR REPLACE FUNCTION geocode_api.v1_reverse(
 RETURNS jsonb LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
 DECLARE
+  err_hint text;
   cats text[];
   feats jsonb;
   q jsonb := jsonb_strip_nulls(jsonb_build_object('point.lat', lat, 'point.lon', lon, 'size', size));
 BEGIN
   IF lat IS NULL OR lon IS NULL THEN
-    RAISE EXCEPTION USING ERRCODE = '22023', MESSAGE = 'point.lat and point.lon are required';
+    RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = 'point.lat and point.lon are required';
   END IF;
   PERFORM geocode.check_range(lat, -90, 90, 'point.lat');
   PERFORM geocode.check_range(lon, -180, 180, 'point.lon');
@@ -563,7 +608,8 @@ BEGIN
          radius, least(greatest(coalesce(size, 10), 1), 40), gid, cats, country) h;
   RETURN geocode.envelope(q, feats);
 EXCEPTION WHEN SQLSTATE '22023' THEN
-  RETURN geocode.api_error(q, SQLERRM);
+  GET STACKED DIAGNOSTICS err_hint = PG_EXCEPTION_HINT;
+  RETURN geocode.api_error(q, geocode.client_message(SQLERRM, err_hint));
 END
 $$;
 
@@ -572,6 +618,7 @@ CREATE OR REPLACE FUNCTION geocode_api.v1_place(ids text DEFAULT NULL,
 RETURNS jsonb LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
 DECLARE
+  err_hint text;
   g text[];
   feats jsonb;
 BEGIN
@@ -581,7 +628,8 @@ BEGIN
   SELECT jsonb_agg(geocode.feature_json(h)) INTO feats FROM geocode.place(g) h;
   RETURN geocode.envelope(jsonb_build_object('ids', to_jsonb(g)), feats);
 EXCEPTION WHEN SQLSTATE '22023' THEN
-  RETURN geocode.api_error(jsonb_build_object('ids', ids), SQLERRM);
+  GET STACKED DIAGNOSTICS err_hint = PG_EXCEPTION_HINT;
+  RETURN geocode.api_error(jsonb_build_object('ids', left(ids, 200)), geocode.client_message(SQLERRM, err_hint));
 END
 $$;
 

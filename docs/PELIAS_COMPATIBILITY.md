@@ -54,6 +54,8 @@ The accuracy gate passes unchanged (95.8%).
 | Ranking differs | Different, usually more accurate, first results (95.8% vs 75.5%) | By design; tests/accuracy |
 | No `/v1/` API description page | A client browsing the API root gets pgeo's Pelias-shaped 400 instead of Pelias's HTML index | Informational only; no client geocodes against it |
 | Pelias accepts `focus.point.lat=999`; pgeo returns 400 | Stricter validation | Kept |
+| `boundary.circle.radius` is capped at 100 km on search, structured and autocomplete (50 km on reverse) | A larger circle is a 400 rather than a slow query | Bounds the cost of an anonymous request; 100 km covers any town-to-county search |
+| `boundary.rect.*` must be in range (lon +-180, lat +-90) with min <= max; structured fields are capped at 200 characters | A malformed rectangle or an oversized field is a 400 | Previously unchecked; see the 2026-11 security review in CHANGELOG |
 
 ## Found along the way
 

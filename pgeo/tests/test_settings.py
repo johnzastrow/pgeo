@@ -122,6 +122,13 @@ def test_defaults_are_the_documented_ones(_isolate):
     assert s.parse_mode == "service"
     assert s.libpostal_url == "http://127.0.0.1:4401"
     assert s.pool_max == 8
+    assert s.allow_parse_override is False
+
+
+@pytest.mark.parametrize(("value", "want"), [("1", True), ("true", True), ("yes", True), ("0", False), ("", False)])
+def test_parse_override_is_opt_in(_isolate, value, want):
+    write_secrets(_isolate, f"PGEO_DB_PASSWORD=x\nPGEO_ALLOW_PARSE_OVERRIDE={value}\n")
+    assert Settings.load().allow_parse_override is want
 
 
 def test_pool_max_is_read_as_a_number(_isolate):

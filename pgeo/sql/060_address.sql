@@ -132,7 +132,7 @@ GRANT SELECT ON geocode.usps_suffix, geocode.usps_unit, geocode.usps_direction,
 CREATE OR REPLACE FUNCTION geocode.check_fail(msg text) RETURNS void
 LANGUAGE plpgsql IMMUTABLE AS $$
 BEGIN
-  RAISE EXCEPTION USING ERRCODE = '22023', MESSAGE = msg;
+  RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = msg;
 END $$;
 
 -- ---------------------------------------------------------------------------------------
@@ -369,6 +369,7 @@ CREATE OR REPLACE FUNCTION geocode_api.v1_address(
 RETURNS jsonb LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
 DECLARE
+  err_hint text;
   n_inputs integer := (ids IS NOT NULL)::int + (text IS NOT NULL)::int + (lat IS NOT NULL OR lon IS NOT NULL)::int;
   r_m      double precision := coalesce(radius, 0.5) * 1000;
   gids     text[];
@@ -459,8 +460,10 @@ BEGIN
     'type', 'FeatureCollection',
     'features', feats);
 EXCEPTION WHEN SQLSTATE '22023' THEN
-  RETURN geocode.api_error(jsonb_strip_nulls(jsonb_build_object('ids', ids, 'text', text, 'point.lat', lat,
-                                                                'point.lon', lon)), SQLERRM);
+  GET STACKED DIAGNOSTICS err_hint = PG_EXCEPTION_HINT;
+  RETURN geocode.api_error(jsonb_strip_nulls(jsonb_build_object('ids', left(ids, 200), 'text', left(text, 200),
+                                                                'point.lat', lat, 'point.lon', lon)),
+                           geocode.client_message(SQLERRM, err_hint));
 END
 $$;
 

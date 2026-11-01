@@ -11,6 +11,34 @@ docs/PGEO_TUNING.md.
 ## [Unreleased]
 
 ### Security
+- From the 2026-11-01 security review. None of these was a way into data; they are input
+  validation, error hygiene and cost control for anonymous requests.
+  - **Structured search bounded every field.** `v1_search_structured` length-checked only
+    `address`. `neighbourhood`, `locality`, `county`, `region`, `postalcode` and `country` reached
+    the trigram index or were echoed back, limited only by the URL length. All are now capped at
+    200 characters (new `geocode.check_len`), and error echoes are truncated to 200.
+  - **The search rectangle is validated.** `check_rect` accepted NaN, Infinity, out-of-range and
+    inverted values, which went straight to `ST_MakeEnvelope`. It now range-checks each value
+    (lon +-180, lat +-90) and requires min <= max. FastAPI checked latitude against +-180, and
+    now matches.
+  - **Search and autocomplete circles are capped at 100 km**, down from 1000; reverse stays at 50.
+  - **Database internals no longer reach clients.** pgeo's validation errors carry
+    `HINT = 'pgeo'`, and every endpoint's 22023 handler (and FastAPI's `/v1/address`) passes on
+    only those. Any other 22023 raised inside PostgreSQL or PostGIS becomes "invalid parameter
+    value".
+  - **FastAPI: `?pgeo.parse=` is opt-in.** Any client could choose the costlier libpostal or
+    in-database parse per request. The override now works only with
+    `PGEO_ALLOW_PARSE_OVERRIDE=1`, which the local compose sets for the accuracy A/B runs.
+  - **FastAPI: pool waits are bounded.** A request waits at most `PGEO_ACQUIRE_TIMEOUT` (3 s) for a
+    connection and is then answered 503, rather than queueing behind slow queries indefinitely.
+  - **FastAPI: `/openapi.json` is no longer served.**
+  - **`pgeo-tune`: a profile cannot inject settings through its description.** `[machine]
+    description` is written into postgresql.conf as a comment, and a line break in it would have
+    started a new setting, bypassing the allowlist. It must now be one printable line of at most
+    200 characters, and `[machine]` rejects unknown keys.
+  - The SQL changes have not been run against a database here (no PostgreSQL on the machine they
+    were written on). Run `scripts/pgeo_rebuild.sh` or `pgeo-load functions` and the accuracy and
+    compatibility tests before deploying.
 - certifi 2026.7.22 -> 2026.10.23 in `uv.lock` (GHSA-6q48-6c7w-9gw2, critical: the bundle trusted
   emSign root CAs whose intermediate keys were compromised). It comes in through httpx, so it
   ships in the FastAPI image. The only outbound HTTP at run time is the plain-HTTP call to the
