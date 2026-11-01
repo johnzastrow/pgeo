@@ -66,6 +66,23 @@ commits where each milestone was complete.
 - The 2026-09-20 `desktop-*` and `mobile-*` captures are removed, from `docs/screenshots/` and
   from the deck's own copies, apart from the Compare one still in use.
 
+### Added
+- **Configuration for limits that were hard-coded** (full list in the new
+  `docs/CONFIGURATION.md`):
+  - Request limits and the API statement timeout are configurable in the serving bundle's
+    `.env`, in Ansible (`pgeo_api_limits`, `pgeo_api_statement_timeout`) and in the local stack.
+  - The bundle and `pgeo_swap.sh` share one role script, `deploy/db/init/api-role.psql`. A change
+    to `.env` therefore takes effect on the next swap, and every value reaches psql through the
+    environment, never a command line.
+  - The bundle edge's rate and bursts (`PGEO_EDGE_RATE`, `PGEO_EDGE_BURST`,
+    `PGEO_EDGE_BURST_AUTOCOMPLETE`) are filled into `edge/pgeo.conf`, now a template, by the nginx
+    image at startup. The Ansible edge's bursts are variables (`edge_burst_search`,
+    `edge_burst_autocomplete`).
+  - Defaults are unchanged throughout.
+- The demo page holds the API key in memory only, not in `sessionStorage`, and removes any copy an
+  earlier version left. This closes CodeQL alert `js/clear-text-storage-of-sensitive-data`. A
+  reload asks for the key again.
+
 ### Security
 - Repository process (security review batch 3):
   - `.github/workflows/ci.yml` runs on every push and pull request to `main`, and weekly. It runs

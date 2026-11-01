@@ -198,8 +198,6 @@
           ALTER ROLE pgeo_api WITH LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE
             PASSWORD '{{ (pgeo_runtime_secrets.content | b64decode | regex_search('PGEO_API_PASSWORD=([A-Za-z0-9]+)', '\1'))[0] }}';
           GRANT CONNECT ON DATABASE pgeo TO pgeo_api;
-          -- Cap any one API query: the slowest measured is about 0.5 s, so 5 s only stops a runaway.
-          ALTER ROLE pgeo_api SET statement_timeout = '5s';
       no_log: true
 
     - name: pg_restore (blocks until done)
@@ -234,6 +232,44 @@
     - name: VACUUM ANALYZE (fresh tables have no visibility map or statistics)
       ansible.builtin.command: docker exec pgeo_db psql -U pgeo -d pgeo -c "VACUUM (ANALYZE)"
       timeout: 1800
+
+# On every run, not only on restore, so a change to these variables takes effect on the next
+# play. The values are checked first, so what reaches the SQL below is a number or a duration.
+- name: Check the API role settings
+  ansible.builtin.assert:
+    that:
+      - pgeo_api_statement_timeout is match('^[0-9]+(ms|s|min)$')
+      - pgeo_api_limits is mapping
+      - pgeo_api_limits.keys() | difference(pgeo_runtime_limit_names) | length == 0
+      - pgeo_api_limits.values() | map('string') | reject('match', '^[0-9]+(\.[0-9]+)?$') | list | length == 0
+    fail_msg: >-
+      pgeo_api_statement_timeout must look like 5s, 500ms or 1min, and pgeo_api_limits may only
+      hold {{ pgeo_runtime_limit_names | join(', ') }} with plain numbers as values.
+  vars:
+    pgeo_runtime_limit_names: [max_text, max_size, max_circle_km, max_reverse_km, max_address_km]
+
+- name: API role statement timeout and request limits
+  vars:
+    pgeo_runtime_limit_names: [max_text, max_size, max_circle_km, max_reverse_km, max_address_km]
+  ansible.builtin.command:
+    cmd: docker exec -i pgeo_db psql -v ON_ERROR_STOP=1 -U pgeo -d pgeo -At
+    stdin: |
+      ALTER ROLE pgeo_api SET statement_timeout = '{{ pgeo_api_statement_timeout }}';
+      {% for name in pgeo_runtime_limit_names %}
+      {% if name in pgeo_api_limits %}
+      ALTER ROLE pgeo_api SET pgeo.{{ name }} = '{{ pgeo_api_limits[name] }}';
+      {% else %}
+      ALTER ROLE pgeo_api RESET pgeo.{{ name }};
+      {% endif %}
+      {% endfor %}
+      -- Out-of-range values stop the play here rather than failing every request later.
+      SELECT geocode.check_api_role_limits();
+  register: pgeo_runtime_limits
+  changed_when: false
+
+- name: Report the request limits in force
+  ansible.builtin.debug:
+    msg: "pgeo_api limits: {{ pgeo_runtime_limits.stdout_lines | last }}"
 
 - name: Stack enabled and running
   ansible.builtin.systemd_service:

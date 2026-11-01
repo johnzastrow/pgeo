@@ -41,6 +41,9 @@ local_basemap_file: "{{ local_repo_root }}/data/raw/{{ pgeo_build }}/basemap/{{ 
 # Requests per second per client IP (real IP from X-Forwarded-For set by wharf Caddy).
 edge_rate_search: 10
 edge_rate_autocomplete: 25
+# Requests a client may send in a burst above that rate before it is refused (429).
+edge_burst_search: 20
+edge_burst_autocomplete: 50
 
 # API keys (Phase 11). The edge refuses /v1/* requests that do not carry a known key in the
 # X-API-Key header. The server holds SHA-256 hashes only, listed here as {name, sha256}; the keys
@@ -71,6 +74,13 @@ pgeo_pg: { shared_buffers: 512MB, effective_cache_size: 1536MB, work_mem: 16MB }
 pgeo_rest_pool: 10
 pgeo_mem_limit_db: 2560m
 pgeo_mem_limit_rest: 256m
+# The API role's statement timeout: the longest any one API query may run before it is cancelled.
+pgeo_api_statement_timeout: "5s"
+# Request limits, applied as pgeo.* settings on the API role (pgeo/sql/010_base.sql lists them,
+# with their defaults and allowed ranges). Leave out a key to keep its default; for example
+#   pgeo_api_limits: { max_circle_km: 150, max_size: 20 }
+# Keys: max_text, max_size, max_circle_km, max_reverse_km, max_address_km.
+pgeo_api_limits: {}
 # Dump to restore (created by scripts/pgeo_dump.sh). Required on first deploy.
 pgeo_dump_name: ""
 pgeo_force_restore: false

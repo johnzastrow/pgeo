@@ -89,32 +89,32 @@ CREATE EXTENSION IF NOT EXISTS postgis;
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 CREATE EXTENSION IF NOT EXISTS unaccent;
 CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'pgeo_api') THEN CREATE ROLE pgeo_api LOGIN; END IF;
-END $$;
--- Cap any one API query (see deploy/db/init/10-api-role.sh). The setting is cluster-wide, so it
--- holds across the swap, and it applies to every connection opened after it.
-ALTER ROLE pgeo_api SET statement_timeout = '5s';
 SQL
 
-# A dump carries the grants to pgeo_api but not its password - the role is cluster-wide, so no
-# dump could. On a serving bundle the password lives beside this script; apply it here, so that a
-# cluster restored from a dump made on another machine can still be connected to. Without this the
-# role exists and owns the right grants but has no password, and PostgREST cannot log in.
-if [[ -z "${PGEO_API_PASSWORD:-}" && -f "$(dirname "${BASH_SOURCE[0]}")/.env" ]]; then
-  PGEO_API_PASSWORD="$(sed -n 's/^PGEO_API_PASSWORD=//p' "$(dirname "${BASH_SOURCE[0]}")/.env")"
-fi
-if [[ -n "${PGEO_API_PASSWORD:-}" ]]; then
-  say "setting the pgeo_api password from the deployment's environment"
-  # The password never goes on a command line, where ps would show it to every local user: it
-  # reaches the container through docker exec's environment (-e with no value copies it from
-  # here), and psql reads it with \getenv. format(%L), so a password holding a quote stays one.
-  PGEO_API_PASSWORD="$PGEO_API_PASSWORD" docker exec -i -e PGEO_API_PASSWORD "$container" \
-    psql -v ON_ERROR_STOP=1 -U pgeo -d postgres >/dev/null <<'SQL'
-\getenv pw PGEO_API_PASSWORD
-SELECT format('ALTER ROLE pgeo_api LOGIN PASSWORD %L', :'pw') \gexec
-SQL
-fi
+# The API role's password, statement timeout and request limits. A dump carries the grants to
+# pgeo_api but none of these - the role is cluster-wide, so no dump could - and a change to them
+# in the deployment's settings should take effect on the next swap. The same api-role.psql runs
+# on a bundle's first boot (deploy/db/init/10-api-role.sh); its header lists the variables.
+#
+# Each value comes from this shell's environment, else from the deployment's settings file: .env
+# beside this script on a serving bundle, pgeo/pgeo.secrets in a checkout.
+role_sql="$(dirname "${BASH_SOURCE[0]}")/db/init/api-role.psql"           # serving bundle
+[[ -f "$role_sql" ]] || role_sql="${ROOT}/deploy/db/init/api-role.psql"    # checkout
+settings_file="$(dirname "${BASH_SOURCE[0]}")/.env"
+[[ -f "$settings_file" ]] || settings_file="${ROOT}/pgeo/pgeo.secrets"
+role_vars=(PGEO_API_PASSWORD PGEO_API_STATEMENT_TIMEOUT
+           PGEO_MAX_TEXT PGEO_MAX_SIZE PGEO_MAX_CIRCLE_KM PGEO_MAX_REVERSE_KM PGEO_MAX_ADDRESS_KM)
+exec_env=()
+for v in "${role_vars[@]}"; do
+  if [[ -z "${!v+x}" && -f "$settings_file" ]] && grep -q "^${v}=" "$settings_file"; then
+    export "$v=$(sed -n "s/^${v}=//p" "$settings_file" | tail -1)"
+  fi
+  # -e NAME with no value copies it from this environment: no value ever goes on a command line,
+  # where ps would show the password to every local user.
+  [[ -n "${!v+x}" ]] && { export "$v"; exec_env+=(-e "$v"); }
+done
+say "applying the pgeo_api role settings (password, statement timeout, request limits)"
+docker exec -i "${exec_env[@]}" "$container" psql -U pgeo -d postgres -q >/dev/null < "$role_sql"
 psql_db postgres -c "GRANT CONNECT ON DATABASE ${staging} TO pgeo_api" >/dev/null
 
 say "restoring (the live database is still answering)"
@@ -151,7 +151,21 @@ n="$(docker exec "$container" psql -U pgeo -d "$staging" -Atc 'SELECT count(*) F
 hits="$(docker exec "$container" psql -U pgeo -d "$staging" -Atc \
   "SELECT count(*) FROM geocode.search('main st', NULL, NULL, NULL, NULL, NULL)")"
 (( hits > 0 )) || { echo "staged database answers nothing for a query that should match" >&2; exit 1; }
+has_limits="$(docker exec "$container" psql -U pgeo -d "$staging" -Atc \
+  "SELECT to_regprocedure('geocode.check_api_role_limits()') IS NOT NULL")"
+if [[ "$has_limits" != t ]]; then
+  limits="(a dump from before configurable limits: the built-in values apply)"
+else
+  limits="$(docker exec "$container" psql -U pgeo -d "$staging" -Atc \
+    'SELECT geocode.check_api_role_limits()' 2>&1 | grep '^{' || true)"
+fi
+[[ -n "$limits" ]] || {
+  echo "the pgeo_api request limits are invalid; fix PGEO_MAX_* and swap again:" >&2
+  docker exec "$container" psql -U pgeo -d "$staging" -Atc 'SELECT geocode.check_api_role_limits()' >&2 || true
+  exit 1
+}
 say "staged: ${ver}, ${n} features, search returns ${hits} for 'main st'"
+say "request limits: ${limits}"
 
 # The switch. Two renames, each needing the database free of connections; PostgREST reconnects
 # by itself. Nothing here is slow, which is the whole point of the work above.

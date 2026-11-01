@@ -10,7 +10,19 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
-### Security
+### Added
+- **Configurable request limits.** The maximum text length, `size`, ids, and circle, reverse and
+  address radii are custom PostgreSQL settings on the API role (`pgeo.max_text`,
+  `pgeo.max_size`, `pgeo.max_circle_km`, `pgeo.max_reverse_km`, `pgeo.max_address_km`). They are
+  read per request through `geocode.api_limit()`, which applies today's values as defaults and
+  refuses a value outside its documented range. `geocode.api_limits()` reports the values in
+  force. `geocode.check_api_role_limits()` validates what is set on the role, and
+  `pgeo_swap.sh` calls it before switching. FastAPI reads the same values at startup, so both
+  front ends enforce the same limits.
+- The loader applies `PGEO_API_STATEMENT_TIMEOUT` and the `PGEO_MAX_*` limits from
+  `pgeo/pgeo.secrets` or the environment.
+- Range errors name their unit, and a rectangle error names the coordinate and both values.
+
 - From the 2026-11-01 security review. None of these was a way into data; they are input
   validation, error hygiene and cost control for anonymous requests.
   - **Structured search bounded every field.** `v1_search_structured` length-checked only

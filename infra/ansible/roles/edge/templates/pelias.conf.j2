@@ -132,14 +132,14 @@ server {
     location = /v1/autocomplete {
         limit_except GET { deny all; }
         if ($api_client = "") { return 401; }
-        limit_req zone=pelias_autocomplete burst=50 nodelay;
+        limit_req zone=pelias_autocomplete burst={{ edge_burst_autocomplete }} nodelay;
         proxy_pass http://pelias_api;
     }
 
     location ~ ^/v1/(search|search/structured|reverse|place)$ {
         limit_except GET { deny all; }
         if ($api_client = "") { return 401; }
-        limit_req zone=pelias_search burst=20 nodelay;
+        limit_req zone=pelias_search burst={{ edge_burst_search }} nodelay;
         proxy_pass http://pelias_api;
     }
 {% endif %}
@@ -150,7 +150,7 @@ server {
     location = {{ pgeo_prefix }}/v1/autocomplete {
         limit_except GET { deny all; }
         if ($api_client = "") { return 401; }
-        limit_req zone=pelias_autocomplete burst=50 nodelay;
+        limit_req zone=pelias_autocomplete burst={{ edge_burst_autocomplete }} nodelay;
         proxy_intercept_errors on;
         # error_page does not merge: a location with its own inherits none from the server, so
         # the 401 handler has to be repeated wherever a 404 one is declared.
@@ -161,7 +161,7 @@ server {
     location = {{ pgeo_prefix }}/v1/search {
         limit_except GET { deny all; }
         if ($api_client = "") { return 401; }
-        limit_req zone=pelias_search burst=20 nodelay;
+        limit_req zone=pelias_search burst={{ edge_burst_search }} nodelay;
         proxy_intercept_errors on;
         # error_page does not merge: a location with its own inherits none from the server, so
         # the 401 handler has to be repeated wherever a 404 one is declared.
@@ -172,7 +172,7 @@ server {
     location = {{ pgeo_prefix }}/v1/search/structured {
         limit_except GET { deny all; }
         if ($api_client = "") { return 401; }
-        limit_req zone=pelias_search burst=20 nodelay;
+        limit_req zone=pelias_search burst={{ edge_burst_search }} nodelay;
         proxy_intercept_errors on;
         # error_page does not merge: a location with its own inherits none from the server, so
         # the 401 handler has to be repeated wherever a 404 one is declared.
@@ -183,7 +183,7 @@ server {
     location ~ ^{{ pgeo_prefix }}/v1/(?<pgeo_fn>reverse|place|address)$ {
         limit_except GET { deny all; }
         if ($api_client = "") { return 401; }
-        limit_req zone=pelias_search burst=20 nodelay;
+        limit_req zone=pelias_search burst={{ edge_burst_search }} nodelay;
         proxy_intercept_errors on;
         # error_page does not merge: a location with its own inherits none from the server, so
         # the 401 handler has to be repeated wherever a 404 one is declared.
@@ -196,7 +196,7 @@ server {
     location = {{ pgeo_prefix }}/v1/attribution {
         limit_except GET { deny all; }
         if ($api_client = "") { return 401; }
-        limit_req zone=pelias_search burst=20 nodelay;
+        limit_req zone=pelias_search burst={{ edge_burst_search }} nodelay;
         proxy_set_header Connection "";
         proxy_set_header Host $host;
         proxy_set_header Authorization "";

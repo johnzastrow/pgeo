@@ -258,10 +258,11 @@ $$;
 
 -- Validation helpers: invalid input raises a clear error that the API returns as 400.
 CREATE OR REPLACE FUNCTION geocode.check_text(v text, field text) RETURNS text
-LANGUAGE plpgsql IMMUTABLE AS $$
+LANGUAGE plpgsql STABLE AS $$
+DECLARE maxlen integer := geocode.api_limit('max_text');
 BEGIN
   IF v IS NULL OR btrim(v) = '' THEN RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = format('missing param %s', field); END IF;
-  IF length(v) > 200 THEN RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = format('%s is longer than 200 characters', field); END IF;
+  IF length(v) > maxlen THEN RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = format('%s is longer than %s characters', field, maxlen); END IF;
   RETURN btrim(v);
 END $$;
 
@@ -291,9 +292,13 @@ BEGIN
   RETURN v;
 END $$;
 
--- An optional text argument: NULL is fine, anything longer than the limit is refused.
-CREATE OR REPLACE FUNCTION geocode.check_len(v text, field text, maxlen integer DEFAULT 200) RETURNS text
-LANGUAGE plpgsql IMMUTABLE AS $$
+-- An optional text argument: NULL is fine, anything longer than pgeo.max_text is refused.
+-- An earlier form took the limit as a third argument; drop it, or two-argument calls would be
+-- ambiguous between the two.
+DROP FUNCTION IF EXISTS geocode.check_len(text, text, integer);
+CREATE OR REPLACE FUNCTION geocode.check_len(v text, field text) RETURNS text
+LANGUAGE plpgsql STABLE AS $$
+DECLARE maxlen integer := geocode.api_limit('max_text');
 BEGIN
   IF v IS NOT NULL AND length(v) > maxlen THEN
     RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = format('%s is longer than %s characters', field, maxlen);
@@ -358,7 +363,8 @@ END $$;
 -- boundary.circle (lon, lat, radius km; radius defaults to 50) as an array, or NULL
 CREATE OR REPLACE FUNCTION geocode.check_circle(p_lat double precision, p_lon double precision,
                                                p_radius double precision) RETURNS double precision[]
-LANGUAGE plpgsql IMMUTABLE AS $$
+LANGUAGE plpgsql STABLE AS $$
+-- STABLE, not IMMUTABLE: the radius cap is a setting (pgeo.max_circle_km).
 BEGIN
   IF p_lat IS NULL AND p_lon IS NULL THEN
     IF p_radius IS NOT NULL THEN
@@ -371,7 +377,7 @@ BEGIN
   END IF;
   PERFORM geocode.check_range(p_lat, -90, 90, 'boundary.circle.lat');
   PERFORM geocode.check_range(p_lon, -180, 180, 'boundary.circle.lon');
-  PERFORM geocode.check_range(p_radius, 0.001, 100, 'boundary.circle.radius (km)');
+  PERFORM geocode.check_range(p_radius, 0.001, geocode.api_limit('max_circle_km'), 'boundary.circle.radius (km)');
   RETURN ARRAY[p_lon, p_lat, coalesce(p_radius, 50)];
 END $$;
 
@@ -452,7 +458,7 @@ BEGIN
                       geocode.check_list(layers, ARRAY['address','venue','street','neighbourhood','locality','localadmin','county','region','postalcode'], 'layers'),
                       geocode.check_list(sources, ARRAY['openaddresses','openstreetmap','whosonfirst','gnis','zcta','overture','interpolation'], 'sources'),
                       geocode.check_rect(min_lon, min_lat, max_lon, max_lat),
-                      least(greatest(coalesce(size, 10), 1), 40),
+                      least(greatest(coalesce(size, 10), 1), geocode.api_limit('max_size')::integer),
                       geocode.check_circle(circle_lat, circle_lon, circle_radius), gid, cats, country,
                       p.state) h;
   RETURN geocode.envelope(jsonb_build_object('text', t, 'size', size, 'parsed_text', jsonb_strip_nulls(to_jsonb(p))), feats);
@@ -539,7 +545,7 @@ BEGIN
                       lay,
                       geocode.check_list(sources, ARRAY['openaddresses','openstreetmap','whosonfirst','gnis','zcta','overture','interpolation'], 'sources'),
                       geocode.check_rect(min_lon, min_lat, max_lon, max_lat),
-                      least(greatest(coalesce(size, 10), 1), 40),
+                      least(greatest(coalesce(size, 10), 1), geocode.api_limit('max_size')::integer),
                       geocode.check_circle(circle_lat, circle_lon, circle_radius), gid, cats,
                       CASE WHEN country IS NULL OR country ~* '^(us|usa|united states( of america)?)$' THEN NULL ELSE country END,
                       region) h;
@@ -576,7 +582,7 @@ BEGIN
          geocode.check_list(layers, ARRAY['address','venue','street','neighbourhood','locality','localadmin','county','region','postalcode'], 'layers'),
          geocode.check_list(sources, ARRAY['openaddresses','openstreetmap','whosonfirst','gnis','zcta','overture','interpolation'], 'sources'),
          geocode.check_rect(min_lon, min_lat, max_lon, max_lat),
-         least(greatest(coalesce(size, 10), 1), 40),
+         least(greatest(coalesce(size, 10), 1), geocode.api_limit('max_size')::integer),
          geocode.check_circle(circle_lat, circle_lon, circle_radius), gid, cats, country) h;
   RETURN geocode.envelope(jsonb_build_object('text', t, 'size', size), feats);
 EXCEPTION WHEN SQLSTATE '22023' THEN
@@ -604,13 +610,13 @@ BEGIN
   END IF;
   PERFORM geocode.check_range(lat, -90, 90, 'point.lat');
   PERFORM geocode.check_range(lon, -180, 180, 'point.lon');
-  PERFORM geocode.check_range(radius, 0.001, 50, 'boundary.circle.radius (km)');
+  PERFORM geocode.check_range(radius, 0.001, geocode.api_limit('max_reverse_km'), 'boundary.circle.radius (km)');
   cats := geocode.check_extras(country, gid, categories, lang, api_key);
   SELECT jsonb_agg(geocode.feature_json(h)) INTO feats
   FROM geocode.reverse(lon, lat,
          geocode.check_list(layers, ARRAY['address','venue','street','neighbourhood','locality','localadmin','county','region','postalcode'], 'layers'),
          geocode.check_list(sources, ARRAY['openaddresses','openstreetmap','whosonfirst','gnis','zcta','overture'], 'sources'),
-         radius, least(greatest(coalesce(size, 10), 1), 40), gid, cats, country) h;
+         radius, least(greatest(coalesce(size, 10), 1), geocode.api_limit('max_size')::integer), gid, cats, country) h;
   RETURN geocode.envelope(q, feats);
 EXCEPTION WHEN SQLSTATE '22023' THEN
   GET STACKED DIAGNOSTICS err_hint = PG_EXCEPTION_HINT;
@@ -629,7 +635,7 @@ DECLARE
 BEGIN
   PERFORM geocode.check_extras(NULL, NULL, NULL, lang, api_key);
   g := ARRAY(SELECT btrim(x) FROM unnest(string_to_array(geocode.check_text(ids, 'ids'), ',')) x
-             WHERE btrim(x) <> '' LIMIT 40);
+             WHERE btrim(x) <> '' LIMIT geocode.api_limit('max_size')::integer);
   SELECT jsonb_agg(geocode.feature_json(h)) INTO feats FROM geocode.place(g) h;
   RETURN geocode.envelope(jsonb_build_object('ids', to_jsonb(g)), feats);
 EXCEPTION WHEN SQLSTATE '22023' THEN

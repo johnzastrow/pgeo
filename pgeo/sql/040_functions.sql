@@ -130,7 +130,7 @@ DECLARE
   focus geometry := CASE WHEN p_focus_lon IS NOT NULL AND p_focus_lat IS NOT NULL
                          THEN ST_SetSRID(ST_MakePoint(p_focus_lon, p_focus_lat), 4326) END;
   rect  geometry := geocode.search_area(p_rect, p_circle);
-  lim   integer := least(greatest(coalesce(p_size, 10), 1), 40);
+  lim   integer := least(greatest(coalesce(p_size, 10), 1), geocode.api_limit('max_size')::integer);
   townpt geometry;   -- the queried town's location(s), when the town name is known
   anchor geometry;   -- tie-break point for same-named candidates: focus, else the town
   -- keep() cannot be inlined and takes the whole row; with no filter set it is pure cost
@@ -438,7 +438,7 @@ DECLARE
   focus geometry := CASE WHEN p_focus_lon IS NOT NULL AND p_focus_lat IS NOT NULL
                          THEN ST_SetSRID(ST_MakePoint(p_focus_lon, p_focus_lat), 4326) END;
   rect  geometry := geocode.search_area(p_rect, p_circle);
-  lim   integer := least(greatest(coalesce(p_size, 10), 1), 40);
+  lim   integer := least(greatest(coalesce(p_size, 10), 1), geocode.api_limit('max_size')::integer);
   found integer := 0;
   -- No filter at all is the normal request. keep() holds an EXISTS, so it cannot be inlined, and
   -- it takes the whole 780-byte row: called per candidate it was 63% of the candidate stage while
@@ -601,8 +601,8 @@ LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
 DECLARE
   pt     geometry := ST_SetSRID(ST_MakePoint(p_lon, p_lat), 4326);
-  lim    integer := least(greatest(coalesce(p_size, 10), 1), 40);
-  radius double precision := least(coalesce(p_radius_km, 50), 50) * 1000;
+  lim    integer := least(greatest(coalesce(p_size, 10), 1), geocode.api_limit('max_size')::integer);
+  radius double precision := least(coalesce(p_radius_km, 50), geocode.api_limit('max_reverse_km')) * 1000;
   point_layers text[] := CASE WHEN cardinality(p_layers) > 0
                               THEN ARRAY(SELECT unnest(p_layers) INTERSECT SELECT unnest(ARRAY['address','venue','street']))
                               ELSE ARRAY['address', 'venue', 'street'] END;

@@ -100,6 +100,79 @@ LANGUAGE sql STABLE PARALLEL SAFE AS $$
            ''), '')
 $$;
 
+-- ---------------------------------------------------------------------------------------
+-- API limits. Each is a custom PostgreSQL setting, read per request, with the default below
+-- when it is not set. Set them on the API role, so they apply to every connection the front
+-- ends open and to nothing else:
+--   ALTER ROLE pgeo_api SET pgeo.max_circle_km = '150';
+-- New connections pick a change up; restart PostgREST (or the API) to apply it at once.
+-- A value outside its range is a configuration error, reported as such, rather than ignored.
+-- FastAPI reads the same values once at startup (geocode.api_limits()), so both front ends
+-- enforce the same limits.
+-- ---------------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION geocode.api_limit_spec()
+RETURNS TABLE (name text, default_value double precision, min_value double precision,
+               max_value double precision, description text)
+LANGUAGE sql IMMUTABLE PARALLEL SAFE AS $$
+  VALUES
+    ('max_text',       200::float8, 20::float8, 1000::float8, 'characters in text, address and structured fields'),
+    ('max_size',        40,          1,          100,          'results per request (size), and ids per /v1/place'),
+    ('max_circle_km',  100,          1,          1000,         'boundary.circle.radius on search, structured and autocomplete'),
+    ('max_reverse_km',  50,          0.1,        200,          'boundary.circle.radius on reverse'),
+    ('max_address_km',   5,          0.1,        50,           'radius on /v1/address')
+$$;
+
+CREATE OR REPLACE FUNCTION geocode.api_limit(p_name text) RETURNS double precision
+LANGUAGE plpgsql STABLE PARALLEL SAFE AS $$
+DECLARE
+  spec record;
+  raw  text;
+BEGIN
+  SELECT * INTO spec FROM geocode.api_limit_spec() s WHERE s.name = p_name;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'unknown pgeo limit %', p_name;
+  END IF;
+  raw := nullif(btrim(current_setting('pgeo.' || p_name, true)), '');
+  IF raw IS NULL THEN
+    RETURN spec.default_value;
+  END IF;
+  IF raw !~ '^[0-9]+(\.[0-9]+)?$' OR raw::float8 < spec.min_value OR raw::float8 > spec.max_value THEN
+    RAISE EXCEPTION USING ERRCODE = 'F0000',
+      MESSAGE = format('server setting pgeo.%s = %L must be a number from %s to %s',
+                       p_name, raw, spec.min_value, spec.max_value);
+  END IF;
+  RETURN raw::float8;
+END $$;
+
+-- The limits configured on the pgeo_api role (ALTER ROLE ... SET pgeo.*), checked against their
+-- ranges before anything depends on them: pgeo_swap.sh calls this on the staged database and
+-- stops before switching if a value is out of range, instead of every request failing after.
+-- Returns the effective values. Needs to read pg_db_role_setting, so it is for the owner role.
+CREATE OR REPLACE FUNCTION geocode.check_api_role_limits() RETURNS jsonb
+LANGUAGE plpgsql VOLATILE AS $$
+DECLARE
+  kv text;
+  k  text;
+BEGIN
+  FOR kv IN SELECT unnest(s.setconfig) FROM pg_db_role_setting s
+            JOIN pg_roles r ON r.oid = s.setrole
+            WHERE r.rolname = 'pgeo_api' AND s.setdatabase = 0 LOOP
+    IF kv LIKE 'pgeo.%=%' THEN
+      k := split_part(substr(kv, 6), '=', 1);
+      -- Apply it to this transaction only, then let api_limit judge it as a request would.
+      PERFORM set_config('pgeo.' || k, substr(kv, length(k) + 7), true);
+      PERFORM geocode.api_limit(k);
+    END IF;
+  END LOOP;
+  RETURN geocode.api_limits();
+END $$;
+
+-- Every limit in force for this connection, for the FastAPI front end and for operators.
+CREATE OR REPLACE FUNCTION geocode.api_limits() RETURNS jsonb
+LANGUAGE sql STABLE PARALLEL SAFE AS $$
+  SELECT jsonb_object_agg(s.name, geocode.api_limit(s.name)) FROM geocode.api_limit_spec() s
+$$;
+
 -- Pelias reverse-geocoding confidence bands by distance.
 CREATE OR REPLACE FUNCTION geocode.distance_confidence(meters double precision) RETURNS real
 LANGUAGE sql IMMUTABLE PARALLEL SAFE

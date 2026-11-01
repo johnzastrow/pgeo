@@ -30,7 +30,16 @@ LAYERS = {"address", "venue", "street", "neighbourhood", "locality", "localadmin
 LAYER_ALIASES = {"coarse": ["neighbourhood", "locality", "localadmin", "county", "region", "postalcode"]}
 SOURCES = {"openaddresses", "openstreetmap", "whosonfirst", "gnis", "zcta", "overture", "interpolation"}
 SOURCE_ALIASES = {"oa": "openaddresses", "osm": "openstreetmap", "wof": "whosonfirst"}
-MAX_TEXT = 200
+# Request limits. These are the defaults; at startup they are replaced by what the database
+# reports for this role (geocode.api_limits(), which reads the pgeo.* settings), so FastAPI and
+# the SQL front end always enforce the same values. See pgeo/sql/010_base.sql.
+LIMITS: dict[str, float] = {
+    "max_text": 200,
+    "max_size": 40,
+    "max_circle_km": 100,
+    "max_reverse_km": 50,
+    "max_address_km": 5,
+}
 # How long a request waits for a pooled connection before it is turned away with 503. Without a
 # limit, a few slow queries queue every other request behind them indefinitely.
 ACQUIRE_TIMEOUT = float(os.environ.get("PGEO_ACQUIRE_TIMEOUT", "3"))
@@ -79,6 +88,7 @@ async def lifespan(app: FastAPI):
         if r["region_a"]:
             town_states.setdefault(r["n"], set()).add(r["region_a"])
     app.state.rules = RuleParser({r["n"] for r in names}, states, town_states)
+    await load_limits(app.state.pool)
     yield
     await app.state.http.aclose()
     await app.state.pool.close()
@@ -87,6 +97,22 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="pgeo", version=ENGINE_VERSION, lifespan=lifespan, docs_url=None, redoc_url=None, openapi_url=None
 )
+
+
+async def load_limits(pool: asyncpg.Pool) -> None:
+    """Take the request limits from the database, so both front ends enforce the same ones."""
+    try:
+        async with pool.acquire() as con:
+            doc = await con.fetchval("SELECT geocode.api_limits()")
+    except asyncpg.exceptions.UndefinedFunctionError:
+        # A database loaded before the limits were configurable enforces exactly the defaults.
+        log.warning("geocode.api_limits() not found; using the default limits")
+        return
+    found = json.loads(doc) if isinstance(doc, str) else doc
+    for key in LIMITS:
+        if key in found:
+            LIMITS[key] = float(found[key])
+    log.info("request limits: %s", LIMITS)
 
 
 def acquire(request: Request):
@@ -121,8 +147,8 @@ def clean_text(v: str | None, name: str = "text", required: bool = True) -> str 
         if required:
             raise BadRequest(f"missing param '{name}'")
         return None
-    if len(v) > MAX_TEXT:
-        raise BadRequest(f"'{name}' is longer than {MAX_TEXT} characters")
+    if len(v) > LIMITS["max_text"]:
+        raise BadRequest(f"'{name}' is longer than {LIMITS['max_text']:g} characters")
     return v
 
 
@@ -134,7 +160,7 @@ def finite(v: str | None, name: str, lo: float, hi: float, unit: str = "") -> fl
     except ValueError as e:
         raise BadRequest(f"'{name}' must be a number") from e
     if not math.isfinite(f) or not lo <= f <= hi:
-        raise BadRequest(f"'{name}' must be between {lo} and {hi}{unit}")
+        raise BadRequest(f"'{name}' must be between {lo:g} and {hi:g}{unit}")
     return f
 
 
@@ -168,7 +194,7 @@ def size_param(v: str | None) -> int:
         n = int(v)
     except ValueError as e:
         raise BadRequest("'size' must be an integer") from e
-    return max(1, min(n, 40))
+    return max(1, min(n, int(LIMITS["max_size"])))
 
 
 COUNTRY_RE = re.compile(r"^[A-Za-z]{2,3}$")
@@ -201,7 +227,7 @@ def circle(q: dict) -> list[float] | None:
     """boundary.circle.lat/lon/radius (km, default 50) as [lon, lat, radius], or None."""
     lat = finite(q.get("boundary.circle.lat"), "boundary.circle.lat", -90, 90)
     lon = finite(q.get("boundary.circle.lon"), "boundary.circle.lon", -180, 180)
-    radius = finite(q.get("boundary.circle.radius"), "boundary.circle.radius", 0.001, 100, " km")
+    radius = finite(q.get("boundary.circle.radius"), "boundary.circle.radius", 0.001, LIMITS["max_circle_km"], " km")
     if lat is None and lon is None:
         if radius is not None:
             raise BadRequest("boundary.circle.radius needs boundary.circle.lat and boundary.circle.lon")
@@ -476,7 +502,7 @@ async def reverse(request: Request):
     lon = finite(q.get("point.lon"), "point.lon", -180, 180)
     if lat is None or lon is None:
         raise BadRequest("point.lat and point.lon are required")
-    radius = finite(q.get("boundary.circle.radius"), "boundary.circle.radius", 0.001, 50, " km")
+    radius = finite(q.get("boundary.circle.radius"), "boundary.circle.radius", 0.001, LIMITS["max_reverse_km"], " km")
     c = common({k: v for k, v in q.items() if not k.startswith(("focus.", "boundary.rect", "boundary.circle"))})
     async with acquire(request) as con:
         rows = await con.fetch(
@@ -497,7 +523,7 @@ async def reverse(request: Request):
 @app.get("/v1/place")
 async def place(request: Request, ids: Annotated[str | None, Query()] = None):
     ids = clean_text(ids, "ids")
-    gids = [g.strip() for g in ids.split(",") if g.strip()][:40]
+    gids = [g.strip() for g in ids.split(",") if g.strip()][: int(LIMITS["max_size"])]
     async with acquire(request) as con:
         rows = await con.fetch("SELECT * FROM geocode.place($1)", gids)
     return envelope({"ids": gids}, rows)
@@ -523,7 +549,7 @@ async def address(request: Request):
     q = dict(request.query_params)
     lat = finite(q.get("point.lat"), "point.lat", -90, 90)
     lon = finite(q.get("point.lon"), "point.lon", -180, 180)
-    radius = finite(q.get("radius"), "radius", 0.001, 5, " km")
+    radius = finite(q.get("radius"), "radius", 0.001, LIMITS["max_address_km"], " km")
     ids = q.get("ids")
     text = q.get("text")
     unit = q.get("unit")

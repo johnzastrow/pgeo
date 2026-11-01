@@ -388,8 +388,8 @@ BEGIN
   IF unit IS NOT NULL AND (length(unit) > 20 OR unit !~ '^[A-Za-z0-9 #.-]+$') THEN
     PERFORM geocode.check_fail('unit: up to 20 letters, digits, spaces, # . -');
   END IF;
-  IF radius IS NOT NULL AND (radius <= 0 OR radius > 5) THEN
-    PERFORM geocode.check_fail('radius must be > 0 and <= 5 (km)');
+  IF radius IS NOT NULL AND (radius <= 0 OR radius > geocode.api_limit('max_address_km')) THEN
+    PERFORM geocode.check_fail(format('radius must be > 0 and <= %s (km)', geocode.api_limit('max_address_km')));
   END IF;
 
   IF ids IS NOT NULL THEN
@@ -405,8 +405,8 @@ BEGIN
     END LOOP;
 
   ELSIF text IS NOT NULL THEN
-    IF length(text) > 200 OR btrim(text) = '' THEN
-      PERFORM geocode.check_fail('text: 1 to 200 characters');
+    IF length(text) > geocode.api_limit('max_text') OR btrim(text) = '' THEN
+      PERFORM geocode.check_fail(format('text: 1 to %s characters', geocode.api_limit('max_text')));
     END IF;
     q := jsonb_build_object('text', text);
     SELECT * INTO p FROM geocode.parse_rule(text);

@@ -63,8 +63,9 @@ The client's name on a success, nothing on a refusal, never the key, never the q
 ## The demo page
 
 Asks for a key when it has none, and again if the one it has stops being accepted. The key is
-kept for that browser tab only - `sessionStorage`, not `localStorage`, not a cookie - and sent in
-the header like any other client. Users of the page get their own client entry (`demo`, say), so
+held in the page's memory only - not `sessionStorage`, not `localStorage`, not a cookie - so a
+reload asks for it again, and nothing in the browser's storage keeps it in clear text. It is sent
+in the header like any other client. Users of the page get their own client entry (`demo`, say), so
 their use is distinguishable from the applications' in the log and revocable on its own.
 
 ## Clients

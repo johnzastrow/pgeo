@@ -76,9 +76,37 @@ async def ensure_api_role(con: asyncpg.Connection) -> None:
     # pw is validated to [A-Za-z0-9] above, so literal interpolation is safe here.
     verb = "ALTER" if exists else "CREATE"
     await con.execute(f"{verb} ROLE pgeo_api LOGIN PASSWORD '{pw}'")  # noqa: S608
-    # Cap any one API query. The slowest measured is about 0.5 s, so 5 s only stops a runaway. The
-    # serving bundle, pgeo_swap.sh and the Ansible role set the same value.
-    await con.execute("ALTER ROLE pgeo_api SET statement_timeout = '5s'")
+    await apply_api_role_settings(con, env | dict(os.environ))
+
+
+# Request limits a deployment may set (pgeo/sql/010_base.sql, geocode.api_limit_spec()), by the
+# environment variable that sets each one.
+API_LIMIT_VARS = {
+    "PGEO_MAX_TEXT": "max_text",
+    "PGEO_MAX_SIZE": "max_size",
+    "PGEO_MAX_CIRCLE_KM": "max_circle_km",
+    "PGEO_MAX_REVERSE_KM": "max_reverse_km",
+    "PGEO_MAX_ADDRESS_KM": "max_address_km",
+}
+
+
+async def apply_api_role_settings(con: asyncpg.Connection, env: dict[str, str]) -> None:
+    """Statement timeout and request limits on pgeo_api, as deploy/db/init/api-role.psql sets them.
+
+    The statement timeout caps any one API query: 5 s by default, against a slowest measured query
+    of about 0.5 s, so it only stops a runaway. A limit that is unset or blank is reset to its
+    default. Values are quoted by the server (format %L), never interpolated here.
+    """
+    timeout = (env.get("PGEO_API_STATEMENT_TIMEOUT") or "").strip() or "5s"
+    sql = await con.fetchval("SELECT format('ALTER ROLE pgeo_api SET statement_timeout = %L', $1::text)", timeout)
+    await con.execute(sql)
+    for var, name in API_LIMIT_VARS.items():
+        value = (env.get(var) or "").strip()
+        if value:
+            sql = await con.fetchval(f"SELECT format('ALTER ROLE pgeo_api SET pgeo.{name} = %L', $1::text)", value)
+        else:
+            sql = f"ALTER ROLE pgeo_api RESET pgeo.{name}"
+        await con.execute(sql)
 
 
 # Any fixed 64-bit number; it only has to be the same one in every build process. "pgeo" in

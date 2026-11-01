@@ -1,0 +1,81 @@
+-- The read-only API role, its password, its statement timeout and its request limits.
+--
+-- One script, run in two places: by 10-api-role.sh on the cluster's first boot, and by
+-- pgeo_swap.sh on every refresh, so a change to the environment takes effect on the next swap.
+-- (The entrypoint ignores this file itself; only .sh and .sql files there are run.)
+--
+-- Everything comes from the environment, read with \getenv so that no value is ever on a
+-- command line where ps would show it:
+--   PGEO_API_PASSWORD           the role's password (left alone when unset)
+--   PGEO_API_STATEMENT_TIMEOUT  longest any one API query may run (default 5s)
+--   PGEO_MAX_TEXT, PGEO_MAX_SIZE, PGEO_MAX_CIRCLE_KM, PGEO_MAX_REVERSE_KM, PGEO_MAX_ADDRESS_KM
+--                               request limits; unset means the default in
+--                               geocode.api_limit_spec() (pgeo/sql/010_base.sql)
+-- Values go through format(%L), so a quote in one is data, never SQL. PostgreSQL rejects a
+-- malformed timeout here; a limit outside its range is refused by the API at request time.
+\set ON_ERROR_STOP on
+
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'pgeo_api') THEN
+    CREATE ROLE pgeo_api LOGIN;
+  END IF;
+END $$;
+
+\getenv pw PGEO_API_PASSWORD
+\if :{?pw}
+SELECT format('ALTER ROLE pgeo_api LOGIN PASSWORD %L', :'pw') \gexec
+\endif
+
+\getenv st PGEO_API_STATEMENT_TIMEOUT
+\if :{?st}
+\else
+\set st '5s'
+\endif
+SELECT format('ALTER ROLE pgeo_api SET statement_timeout = %L', coalesce(nullif(btrim(:'st'), ''), '5s')) \gexec
+
+-- Each limit: set when given, reset to the default when unset or empty, so removing a variable
+-- (or leaving it blank in .env) undoes it.
+\getenv v PGEO_MAX_TEXT
+\if :{?v}
+SELECT CASE WHEN btrim(:'v') = '' THEN 'ALTER ROLE pgeo_api RESET pgeo.max_text'
+            ELSE format('ALTER ROLE pgeo_api SET pgeo.max_text = %L', btrim(:'v')) END \gexec
+\unset v
+\else
+ALTER ROLE pgeo_api RESET pgeo.max_text;
+\endif
+
+\getenv v PGEO_MAX_SIZE
+\if :{?v}
+SELECT CASE WHEN btrim(:'v') = '' THEN 'ALTER ROLE pgeo_api RESET pgeo.max_size'
+            ELSE format('ALTER ROLE pgeo_api SET pgeo.max_size = %L', btrim(:'v')) END \gexec
+\unset v
+\else
+ALTER ROLE pgeo_api RESET pgeo.max_size;
+\endif
+
+\getenv v PGEO_MAX_CIRCLE_KM
+\if :{?v}
+SELECT CASE WHEN btrim(:'v') = '' THEN 'ALTER ROLE pgeo_api RESET pgeo.max_circle_km'
+            ELSE format('ALTER ROLE pgeo_api SET pgeo.max_circle_km = %L', btrim(:'v')) END \gexec
+\unset v
+\else
+ALTER ROLE pgeo_api RESET pgeo.max_circle_km;
+\endif
+
+\getenv v PGEO_MAX_REVERSE_KM
+\if :{?v}
+SELECT CASE WHEN btrim(:'v') = '' THEN 'ALTER ROLE pgeo_api RESET pgeo.max_reverse_km'
+            ELSE format('ALTER ROLE pgeo_api SET pgeo.max_reverse_km = %L', btrim(:'v')) END \gexec
+\unset v
+\else
+ALTER ROLE pgeo_api RESET pgeo.max_reverse_km;
+\endif
+
+\getenv v PGEO_MAX_ADDRESS_KM
+\if :{?v}
+SELECT CASE WHEN btrim(:'v') = '' THEN 'ALTER ROLE pgeo_api RESET pgeo.max_address_km'
+            ELSE format('ALTER ROLE pgeo_api SET pgeo.max_address_km = %L', btrim(:'v')) END \gexec
+\unset v
+\else
+ALTER ROLE pgeo_api RESET pgeo.max_address_km;
+\endif

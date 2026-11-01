@@ -26,8 +26,15 @@ services:
       POSTGRES_DB: pgeo
       POSTGRES_USER: pgeo
       POSTGRES_PASSWORD: ${PGEO_DB_PASSWORD:?set PGEO_DB_PASSWORD in .env}
-      # Read by db/init/10-api-role.sh on the cluster's first boot; see that file.
+      # Read by db/init/api-role.psql on the cluster's first boot (and by pgeo_swap.sh from .env
+      # on every refresh). The limits are optional: blank means the built-in default.
       PGEO_API_PASSWORD: ${PGEO_API_PASSWORD:?set PGEO_API_PASSWORD in .env}
+      PGEO_API_STATEMENT_TIMEOUT: ${PGEO_API_STATEMENT_TIMEOUT:-5s}
+      PGEO_MAX_TEXT: ${PGEO_MAX_TEXT:-}
+      PGEO_MAX_SIZE: ${PGEO_MAX_SIZE:-}
+      PGEO_MAX_CIRCLE_KM: ${PGEO_MAX_CIRCLE_KM:-}
+      PGEO_MAX_REVERSE_KM: ${PGEO_MAX_REVERSE_KM:-}
+      PGEO_MAX_ADDRESS_KM: ${PGEO_MAX_ADDRESS_KM:-}
     shm_size: 512m
     # The entrypoint drops from root to postgres itself; nothing in it needs to gain privileges.
     security_opt: ["no-new-privileges:true"]
@@ -73,9 +80,17 @@ services:
     cap_drop: [ALL]
     cap_add: [CHOWN, SETGID, SETUID]
     security_opt: ["no-new-privileges:true"]
+    environment:
+      # Only these names are substituted into the template; nginx's own $variables are untouched.
+      NGINX_ENVSUBST_FILTER: "^PGEO_EDGE_"
+      PGEO_EDGE_RATE: ${PGEO_EDGE_RATE:-10}                       # requests/s per client address
+      PGEO_EDGE_BURST: ${PGEO_EDGE_BURST:-20}                     # burst above that, most endpoints
+      PGEO_EDGE_BURST_AUTOCOMPLETE: ${PGEO_EDGE_BURST_AUTOCOMPLETE:-40}   # autocomplete fires per keystroke
     volumes:
       - ./edge/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./edge/pgeo.conf:/etc/nginx/conf.d/default.conf:ro
+      # A template: the image writes conf.d/default.conf from it at startup, filling in the
+      # rate limits below.
+      - ./edge/pgeo.conf:/etc/nginx/templates/default.conf.template:ro
       - ./edge/real-ip.conf:/etc/nginx/pgeo-real-ip.conf:ro
       - ./web:/srv/web:ro
       - ./tiles:/srv/tiles:ro

@@ -81,19 +81,16 @@ function applyOptions(params, opts = {}) {
 }
 
 // The API key, shared by every client on the page (the Compare tab makes its own instances).
-// Held in memory and in sessionStorage - per tab, gone when it closes - never in localStorage,
-// a cookie or a URL. Sent only to this origin, in a header, so it does not land in browser
-// history, referers or the access log (which records the client's name, not the key).
-const KEY_STORE = 'pgeo-api-key';
+// Held in memory only, for this page load: never in sessionStorage, localStorage, a cookie or a
+// URL, so nothing on disk or in the browser's storage holds it in clear text. A reload asks for
+// it again. Sent only to this origin, in a header, so it does not land in browser history,
+// referers or the access log (which records the client's name, not the key).
 let apiKey = '';
-try { apiKey = sessionStorage.getItem(KEY_STORE) || ''; } catch { /* storage unavailable */ }
+// Earlier versions kept the key in sessionStorage; remove any copy they left behind.
+try { sessionStorage.removeItem('pgeo-api-key'); } catch { /* storage unavailable */ }
 
 export function setApiKey(key) {
   apiKey = String(key || '').trim();
-  try {
-    if (apiKey) sessionStorage.setItem(KEY_STORE, apiKey);
-    else sessionStorage.removeItem(KEY_STORE);
-  } catch { /* storage unavailable: the key lives for this page load only */ }
 }
 export function hasApiKey() { return apiKey !== ''; }
 

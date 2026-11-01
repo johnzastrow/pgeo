@@ -73,6 +73,10 @@ lists the proxies it believes: by default a terminator on the same host or the s
 network. If yours runs on another machine, put its address there - its address only, not a whole
 LAN. Without this, every visitor arrives as the terminator and they all share one bucket.
 
+**Limits and rates.** The request limits, the statement timeout and the edge's rate limits are
+all set in `.env`; `docs/CONFIGURATION.md` lists every variable and its default. Limits are applied
+on first boot and again by every `pgeo_swap.sh`, so a change takes effect on the next swap.
+
 **No API keys.** This bundle does not check API keys; the key check in `docs/API_KEYS.md` belongs
 to the Ansible edge. There is no API authorization here yet (TODO section 9 is on hold), so the
 deployment's only access control is whatever the terminator and the network provide. The reference deployment is reachable

@@ -186,6 +186,7 @@ see [docs/DEMO_ENGINES.md](docs/DEMO_ENGINES.md). Full set in
 | [docs/DATA_PIPELINE.md](docs/DATA_PIPELINE.md) | Every source, where it comes from, how it is converted |
 | [docs/REBUILD.md](docs/REBUILD.md) | Rebuild everything from scratch, and what each step proves |
 | [docs/DEPLOY_PGEO.md](docs/DEPLOY_PGEO.md) | The query host in detail |
+| [docs/CONFIGURATION.md](docs/CONFIGURATION.md) | Every limit and knob a deployment can change: request limits, statement timeout, rate limits, pools |
 | [docs/SECURITY_DEPLOYMENT.md](docs/SECURITY_DEPLOYMENT.md) | The hardening the Ansible roles apply |
 | [docs/API_KEYS.md](docs/API_KEYS.md) | Issuing, using and revoking keys at the edge |
 | [docs/PGEO_TUNING.md](docs/PGEO_TUNING.md) / [TUNING_REPORT.md](docs/TUNING_REPORT.md) | The tuning profiles and how they were measured |
