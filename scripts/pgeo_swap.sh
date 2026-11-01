@@ -78,6 +78,9 @@ CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'pgeo_api') THEN CREATE ROLE pgeo_api LOGIN; END IF;
 END $$;
+-- Cap any one API query (see deploy/db/init/10-api-role.sh). The setting is cluster-wide, so it
+-- holds across the swap, and it applies to every connection opened after it.
+ALTER ROLE pgeo_api SET statement_timeout = '5s';
 SQL
 
 # A dump carries the grants to pgeo_api but not its password - the role is cluster-wide, so no

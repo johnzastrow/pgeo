@@ -43,7 +43,7 @@ its `/v1/address` endpoint are this project's own. Bugs there are ours to find.
 | Unknown parameters | rejected with a Pelias-shaped 400 on the pure-SQL path |
 | Request bodies | capped at 4 KB |
 | Access log | path only - the query string is **not** logged (fixed 2026-09-20; see below) |
-| Database | `pgeo_api` is a non-superuser with `SELECT` only; the password is percent-encoded into the DSN |
+| Database | `pgeo_api` is a non-superuser with `SELECT` only; the password is percent-encoded into the DSN; `statement_timeout` is 5 s on the role, so no single API query can hold a core for longer |
 | Images | pinned by tag and digest |
 | Authorization | **API keys at the edge** (Phase 11, done 2026-09-22): `X-API-Key` header, SHA-256 hashes in the inventory, refused in the URL, client name in the log, fails closed. `docs/API_KEYS.md` |
 

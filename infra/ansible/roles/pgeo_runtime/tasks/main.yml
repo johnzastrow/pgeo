@@ -166,6 +166,8 @@
           ALTER ROLE pgeo_api WITH LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE
             PASSWORD '{{ (pgeo_runtime_secrets.content | b64decode | regex_search('PGEO_API_PASSWORD=([A-Za-z0-9]+)', '\1'))[0] }}';
           GRANT CONNECT ON DATABASE pgeo TO pgeo_api;
+          -- Cap any one API query: the slowest measured is about 0.5 s, so 5 s only stops a runaway.
+          ALTER ROLE pgeo_api SET statement_timeout = '5s';
       no_log: true
 
     - name: pg_restore (blocks until done)

@@ -10,6 +10,11 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+### Security
+- `ensure_api_role` now sets `statement_timeout = '5s'` on `pgeo_api`, so no single API query can
+  hold a core for longer than that. The slowest measured query is about 0.5 s. The serving bundle,
+  `pgeo_swap.sh` and the Ansible role set the same value.
+
 ## [0.19.3] - 2026-09-25
 
 ### Fixed

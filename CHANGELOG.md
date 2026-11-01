@@ -34,8 +34,14 @@ commits where each milestone was complete.
   from the full nginx edge down to PostgreSQL alone, each with what it gives up. It includes a
   greenfield route that keeps every geocoding function without Pelias compatibility (RPC or
   direct SQL calls, with the parameter-name mapping), and a table of which protections live in
-  nginx and which survive without it. It recommends a `statement_timeout` on `pgeo_api` for the
-  edgeless shapes; the repository does not set one yet. The README summarises the four shapes.
+  nginx and which survive without it. The README summarises the four shapes.
+- `statement_timeout = '5s'` on the read-only `pgeo_api` role, set everywhere the role is created
+  or converged: `deploy/db/init/10-api-role.sh`, `scripts/pgeo_swap.sh`, the Ansible
+  `pgeo_runtime` role and the loader (pgeo `ensure_api_role`). Nothing capped a single API query
+  before, which mattered most in the edgeless shapes, where no rate limit stands in front. The
+  slowest measured query is about 0.5 s, so the cap stops only runaways; a cancelled query
+  returns HTTP 500. `docs/SECURITY_DEPLOYMENT.md` and `docs/STACK_COMPARISON.md` record it. A
+  deployed host picks it up on its next restore or swap.
 - `docs/screenshots/`: seven captures of the demo page against the Maine deployment - search,
   reverse, batch, confidence, nearby and the two form-filler steps - showing the restyled page and
   the pgeo engine label. Page captures, no browser chrome. Taken before the Reset button existed,

@@ -17,4 +17,8 @@ END $$;
 -- Built through format(%L) rather than interpolated by the shell, so a password holding a quote
 -- is a password and not a syntax error or an injection.
 SELECT format('ALTER ROLE pgeo_api LOGIN PASSWORD %L', :'pw') \gexec
+-- Cap any one API query. The slowest measured query is about 0.5 s (a full New York address
+-- parse), so 5 s only ever stops a runaway, and it bounds what a burst can cost when nothing in
+-- front limits request rates. pgeo_swap.sh, the Ansible role and the loader set the same value.
+ALTER ROLE pgeo_api SET statement_timeout = '5s';
 SQL

@@ -68,8 +68,9 @@ def test_nominatim_uses_its_real_structured_endpoint():
 
 
 def test_photon_collapses_structured_to_one_line_in_postal_order():
-    """Photon has no structured endpoint, so the fields go as one line - but every field must
-    survive, in postal order, or the comparison understates it."""
+    """The harness sends structured cases to Photon's /api as one line, not to its /structured
+    endpoint (see docs/OSM_ENGINES.md), so every field must survive, in postal order, or the
+    comparison understates it."""
     c = case_of("structured")
     p = c["params"]
     _, q = photon.request_for(c)

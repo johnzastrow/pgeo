@@ -251,7 +251,7 @@ all. That server needs PostgreSQL 18 or newer (`pg_restore` does not go to an ol
 version), PostGIS 3.6 and the three contrib extensions. Restore into a dedicated database, because
 the dump brings the schemas `geocode`, `geocode_api` and the build schemas. Create the `pgeo_api`
 login role yourself, as `deploy/db/init/10-api-role.sh` does, because a dump does not carry role
-passwords.
+passwords, and set its statement timeout (see 9.3).
 
 **Parameter names** are the last part of each Pelias parameter, which is also how PostgREST reads
 a dotted key:
@@ -296,14 +296,20 @@ configuration, not in nginx:
   description disabled.
 - Every function validates and bounds its input in SQL: text up to 200 characters, `size` from 1
   to 40, and at most 40 `ids`.
+- The `pgeo_api` role has `statement_timeout = '5s'`, so no single query can hold a core longer
+  than that. The slowest measured query is about 0.5 s (a full New York address parse), so the
+  cap only stops runaways. With no edge to absorb a burst, this is what bounds the cost of each
+  request.
 
 **The rule.** Shapes B, C and D are fine on a private network, between services or behind a gateway
 you already operate. Do not expose PostgREST, FastAPI or PostgreSQL directly to the internet.
 Whatever faces the internet needs TLS, authentication and rate limits, and in shape A that
-something is the nginx edge plus a TLS terminator. One more safeguard is worth adding in shapes
-B to D: a statement timeout on the API role, for example
-`ALTER ROLE pgeo_api SET statement_timeout = '5s'`. With no edge to absorb a burst of requests,
-that caps how long any single query can hold a core. The repository does not set one today.
+something is the nginx edge plus a TLS terminator. If you restore the dump into your own
+database server (shape D), set the statement timeout yourself, because a dump does not carry
+role settings: `ALTER ROLE pgeo_api SET statement_timeout = '5s'`. Every route in this
+repository already sets it: `deploy/db/init/10-api-role.sh`, `scripts/pgeo_swap.sh`, the
+Ansible `pgeo_runtime` role and the loader. A query that hits the cap is cancelled and returns
+an error: HTTP 500 from PostgREST or FastAPI, or SQLSTATE `57014` in shape D.
 
 ---
 

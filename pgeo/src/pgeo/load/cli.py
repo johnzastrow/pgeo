@@ -76,6 +76,9 @@ async def ensure_api_role(con: asyncpg.Connection) -> None:
     # pw is validated to [A-Za-z0-9] above, so literal interpolation is safe here.
     verb = "ALTER" if exists else "CREATE"
     await con.execute(f"{verb} ROLE pgeo_api LOGIN PASSWORD '{pw}'")  # noqa: S608
+    # Cap any one API query. The slowest measured is about 0.5 s, so 5 s only stops a runaway. The
+    # serving bundle, pgeo_swap.sh and the Ansible role set the same value.
+    await con.execute("ALTER ROLE pgeo_api SET statement_timeout = '5s'")
 
 
 # Any fixed 64-bit number; it only has to be the same one in every build process. "pgeo" in
