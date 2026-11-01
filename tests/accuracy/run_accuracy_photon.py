@@ -7,12 +7,12 @@ alone - the same cases, the same ground truth, the same radius, the same housenu
 (run_accuracy.score). Photon already answers in GeoJSON with `properties.housenumber`, so the
 response needs no translation at all.
 
-Two differences are properties of Photon rather than of this harness, and both are reported
-rather than worked around:
+Two differences from the other engines' runs:
 
-  * There is no structured endpoint. The structured cases are sent as one line, which is what a
-    client would have to do - the same concession the load session makes.
-  * There is no confidence score. A "miss" case counts as correct when the engine returns nothing
+  * The structured cases are sent to /api as one line, the same as the load session. This is a
+    harness choice, not a Photon limit: Photon 1.3.0 has a /structured endpoint (always enabled
+    since 1.0.0) that this script does not yet use. See docs/OSM_ENGINES.md.
+  * There is no confidence score, which is a property of Photon. A "miss" case counts as correct when the engine returns nothing
     or scores its best answer below 0.8; Photon can only ever satisfy the first of those, so it
     has no way to say "I do not know".
 
@@ -49,7 +49,7 @@ def request_for(case: dict) -> tuple[str, dict]:
         return "reverse", q
 
     if case["endpoint"] == "structured":
-        # No structured endpoint: send the fields as one line, in postal order.
+        # Sent as one line to /api, in postal order; /structured is not used yet (see docstring).
         text = ", ".join(
             str(p[k]) for k in ("address", "locality", "region", "postalcode") if p.get(k)
         )

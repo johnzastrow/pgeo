@@ -29,7 +29,7 @@ Disk, measured, for one state:
 | | Maine | New York |
 |---|---|---|
 | Downloads | 0.6 GB | 3.0 GB |
-| Database | 2.6 GB | 8 GB |
+| Database (while building) | 2.6 GB | 11 GB |
 | Basemap (optional) | 0.3 GB | 1.5 GB |
 
 Who's on First adds a one-off 5.2 GB that every build shares. Budget 20 GB for a small state and

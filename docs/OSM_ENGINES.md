@@ -71,10 +71,20 @@ k6 runs pinned to cores 5 and 11 (`run_matrix.K6_CPUS`), so a pinned Photon must
 
 ## Where the comparison is not like for like
 
-These are properties of Photon, reported rather than worked around:
+One is a choice made by this harness, not a limit of Photon:
 
-- **No structured endpoint.** The structured cases and the structured share of the load session
-  are sent as one line, which is what a client would have to do.
+- **Structured queries were sent as one line.** Photon 1.3.0 does have a `/structured` endpoint,
+  which has been always enabled since Photon 1.0.0
+  ([release notes](https://github.com/komoot/photon/releases),
+  [API documentation](https://github.com/komoot/photon/blob/1.3.0/docs/api-v1.md)). The adapters
+  were written on the earlier belief that it needed a special import option, and they send the
+  structured cases, and the structured share of the load session, to `/api` as one line. The
+  Structured row for Photon (88.7%) therefore measures its free-text search on structured input,
+  not its structured endpoint, and may understate it. Measuring `/structured` needs the adapters
+  changed and the Photon runs repeated; that has not been done.
+
+The rest are properties of Photon, reported rather than worked around:
+
 - **No confidence score.** A miss counts as correct when an engine returns nothing *or* scores its
   best answer below 0.8. Photon can only ever satisfy the first.
 - **Reverse needs a different filter.** The cases ask Pelias for `layers=address`; Photon spells

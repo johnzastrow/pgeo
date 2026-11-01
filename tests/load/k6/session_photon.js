@@ -7,8 +7,9 @@
 //   /api?q=<text>&limit=N[&lat=&lon=]     forward and type-ahead
 //   /reverse?lat=&lon=[&limit=N]          reverse
 //
-// Photon has no structured-search endpoint without a Nominatim-backed import option, so the
-// structured share of the session is sent as a single-line query instead, and tagged as such.
+// The structured share of the session is sent as a single-line query and tagged as such. This is
+// a harness choice: Photon 1.3.0 has a /structured endpoint (always enabled since 1.0.0) that this
+// session does not yet use. See docs/OSM_ENGINES.md.
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 import exec from 'k6/execution';
@@ -118,8 +119,8 @@ function fullSearch() {
 }
 
 function structured() {
-  // Photon has no structured endpoint: send the same fields as one line, which is what a client
-  // would have to do. Tagged 'structured' so the comparison lines up with the other engines.
+  // Send the same fields as one line to /api (Photon's /structured is not used yet; see the
+  // header). Tagged 'structured' so the comparison lines up with the other engines.
   const s = pick(D.structured);
   const line = [s.address, s.locality, s.region, s.postalcode].filter(Boolean).join(', ');
   get('structured', 'api', { q: line, limit: 8 });
