@@ -63,6 +63,50 @@ machine bigger rather than by adding machines, and the report's section 4 says w
   yet published to a registry ([DOCKER-DEPLOY.md](DOCKER-DEPLOY.md),
   [deploy/README.md](deploy/README.md), [docs/DOCKER_IMAGES.md](docs/DOCKER_IMAGES.md))
 
+## Requirements and technology stack
+
+pgeo is built on one workstation and served from another machine, and the two have very
+different needs. For how this compares with Pelias, Photon and Nominatim, see
+[docs/STACK_COMPARISON.md](docs/STACK_COMPARISON.md).
+
+**Serving (the query host)**
+
+| Component | Version | Notes |
+|---|---|---|
+| PostgreSQL | 18 | The geocoder itself. Parsing, ranking and JSON formatting run in PL/pgSQL |
+| PostGIS | 3.6 | Spatial indexes, point-in-polygon, distance ranking, reverse geocoding |
+| `pg_trgm`, `fuzzystrmatch`, `unaccent` | ship with PostgreSQL | Fuzzy and type-ahead matching, typo rescue, diacritic folding |
+| PostgREST | v16.3 | Pure-SQL HTTP front end. No application code |
+| *or* FastAPI on Python | 3.12+ | Optional alternative front end (FastAPI, Uvicorn, asyncpg, Pydantic), and the route to libpostal parsing |
+| nginx | 1.29 | Maps Pelias paths to SQL functions; API keys, rate limits, security headers, demo page |
+| Docker Engine + Compose | current | Packaging. Three stock images, pinned by digest: `postgis/postgis`, `postgrest/postgrest`, `nginx` |
+
+It needs no search engine, no JVM, no Node.js and no separate parser or point-in-polygon
+service. Hardware, measured:
+
+| Region | vCPU | RAM | Disk |
+|---|---|---|---|
+| Maine-sized state (0.9 M features) | 1 | 1 GB | 10 GB |
+| New York-sized state (7.2 M features) | 2 | 4 GB | 20 GB |
+
+The reference host is Debian 13, and the Ansible roles in `infra/ansible/` target it.
+
+**Building (the workstation)**
+
+| Tool | Purpose |
+|---|---|
+| Docker Engine + Compose | Runs the build database |
+| Python 3.12+ with [uv](https://docs.astral.sh/uv/) | Loader (`pgeo-load`), tuning (`pgeo-tune`), data prep (`pelias-prep`) |
+| DuckDB 1.5.5 | Reads Overture Parquet and the CSV sources (installed by uv) |
+| GDAL (`ogr2ogr`) | Loads the OSM extract and the Census shapefiles |
+| `git`, `curl`, `jq`, `unzip`, `bzip2` | Fetching and scripting |
+| `pmtiles` (optional) | Cuts the demo page's basemap to the region |
+
+Budget 20 GB of disk for a small state and 40 GB for a large one, plus a one-off 5.2 GB for
+Who's on First that every build shares. Maine builds in about 5 minutes and New York in about 44.
+See [GETTING_STARTED.md](GETTING_STARTED.md) for install commands and [docs/SIZING.md](docs/SIZING.md)
+for the measurements.
+
 ## The demo page
 
 Served same-origin under a strict CSP: no CDN, no remote script, a self-hosted MapLibre and a
@@ -111,6 +155,7 @@ see [docs/DEMO_ENGINES.md](docs/DEMO_ENGINES.md). Full set in
 | [docs/REPORT.md](docs/REPORT.md) / [REPORT.pdf](docs/REPORT.pdf) | The study: four engines, accuracy, capacity, cost |
 | [docs/OPTIMIZATION.md](docs/OPTIMIZATION.md) / [.pdf](docs/OPTIMIZATION.pdf) | What changed after it: any US state, a 3.7x faster build, and the defects a second region found |
 | [docs/SIZING.md](docs/SIZING.md) | What a deployment costs, measured for Maine and New York |
+| [docs/STACK_COMPARISON.md](docs/STACK_COMPARISON.md) | Requirements and technology stacks of pgeo, Pelias, Photon and Nominatim compared |
 | [DOCKER-DEPLOY.md](DOCKER-DEPLOY.md) | The container route (designed; images not yet published) |
 | [TODO.md](TODO.md) | What is not done, and what was decided about it |
 

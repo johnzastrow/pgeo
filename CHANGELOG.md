@@ -24,6 +24,12 @@ commits where each milestone was complete.
 ## [Unreleased]
 
 ### Added
+- `docs/STACK_COMPARISON.md`: the requirements and technology stacks of pgeo, Pelias, Photon and
+  Nominatim, side by side. It covers languages, data stores, run-time and build-time software,
+  data sources, published and measured hardware, operations and API shape, with links to each
+  project's own documentation.
+- README: a "Requirements and technology stack" section listing what the serving host and the
+  build workstation each need, with versions and measured hardware, and a link to the comparison.
 - `docs/screenshots/`: seven captures of the demo page against the Maine deployment - search,
   reverse, batch, confidence, nearby and the two form-filler steps - showing the restyled page and
   the pgeo engine label. Page captures, no browser chrome. Taken before the Reset button existed,
