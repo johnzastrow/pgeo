@@ -42,7 +42,7 @@ services:
       retries: 30
 
   rest:
-    image: postgrest/postgrest:v16.3@sha256:ec0e25a4e24b0a3bc5e4f011369bfc736bd1b19f513bd01079b86329a7636962
+    image: postgrest/postgrest:v16.5@sha256:1347d7552b88f17832912c06afbf7c43209af6eeeb60834b04aae12c9bd9d5cc
     container_name: ${PGEO_STACK:-pgeo}_rest
     restart: unless-stopped
     depends_on:
