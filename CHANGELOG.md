@@ -35,6 +35,13 @@ commits where each milestone was complete.
   greenfield route that keeps every geocoding function without Pelias compatibility (RPC or
   direct SQL calls, with the parameter-name mapping), and a table of which protections live in
   nginx and which survive without it. The README summarises the four shapes.
+- `docs/STACK_COMPARISON.md` section 9.4: full Pelias compatibility with Caddy in place of the
+  nginx edge. It maps every edge function to a Caddy directive and gives a complete site block
+  (path rewrites, circle renames, attribution, error shape, headers, API keys, rate limits, demo
+  page). It also states the differences: keys are compared in plain text rather than as hashes,
+  rate limiting needs the caddy-ratelimit plugin, and the demo page's meta tag has to be added to
+  the file. The block has not been run here; the section says to `caddy validate` it and run the
+  compatibility test against it.
 - `statement_timeout = '5s'` on the read-only `pgeo_api` role, set everywhere the role is created
   or converged: `deploy/db/init/10-api-role.sh`, `scripts/pgeo_swap.sh`, the Ansible
   `pgeo_runtime` role and the loader (pgeo `ensure_api_role`). Nothing capped a single API query
@@ -58,6 +65,24 @@ commits where each milestone was complete.
   recapture and the slide keeps the picture that makes its argument.
 - The 2026-09-20 `desktop-*` and `mobile-*` captures are removed, from `docs/screenshots/` and
   from the deck's own copies, apart from the Compare one still in use.
+
+### Security
+- Dependabot triage, 69 open alerts. All of them were in two build-only components, `report/`
+  (the PDF/Word report) and `slides/` (the Slidev deck). None were in `pgeo/`, `prep/` or anything
+  that serves queries.
+  - `report/uv.lock`: Pillow 12.3.0 -> 13.0.0 (41 alerts, pulled in by matplotlib). Plotting is
+    unchanged. Pillow only ever read the report's own figures, so none of these was reachable
+    from outside.
+  - `slides/`: targeted updates to vite 8.3.3, markdown-it, katex, lodash-es, zod,
+    source-map-js, hono, mermaid 12.2.0 and the MCP SDK packages, plus an `overrides` entry
+    pinning DOMPurify to ^3.4.17. The override is needed because monaco-editor 0.56 pins the
+    vulnerable 3.4.8 itself. A blanket `npm audit fix` was tried first and broke the deck build
+    (a lightningcss minify error), so the updates are package by package. `slidev build`
+    succeeds after them.
+  - Accepted, not fixed: image-size 1.2.1 (2 alerts, infinite-loop denial of service on crafted
+    ICNS/JXL/HEIF files), required by pptxgenjs. The fix is image-size 2.x, which pptxgenjs does
+    not support, and pptxgenjs runs only for a PPTX export of the deck. This project exports a
+    PDF, from its own images.
 
 ### Fixed
 - `docs/OSM_ENGINES.md` and the Photon adapters (`tests/accuracy/run_accuracy_photon.py`,
