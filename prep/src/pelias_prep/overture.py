@@ -1,6 +1,8 @@
 """Overture Maps Places (GeoParquet extract) -> Pelias CSV, clipped to the build's states.
 
 Input is a bbox extract of the Overture `places/place` theme (see scripts/fetch_data.sh).
+The addendum's `category` is `taxonomy.primary`: Overture dropped the older `categories` column
+from places in release 2026-10-21.0, and `taxonomy` is present in releases before and after it.
 Rows are kept when they are open (or status unknown), meet a minimum confidence, and fall
 inside the region polygon (table `region_poly`, slightly buffered to keep piers and shoreline
 POIs). Requires `region_poly`, `zctas` and `zcta_prefixes` on the connection (see common.py).
@@ -76,7 +78,7 @@ SELECT
         id: id,
         confidence: round(confidence, 3),
         basic_category: basic_category,
-        category: categories."primary",
+        category: taxonomy."primary",
         taxonomy: taxonomy.hierarchy,
         brand: brand.names."primary",
         websites: websites,

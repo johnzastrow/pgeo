@@ -67,9 +67,16 @@ pg_stop() { su postgres -c "pg_ctl -D '$PGDATA' -w -t 120 -m fast stop" >/dev/nu
 trap pg_stop EXIT
 
 # --- commands ----------------------------------------------------------------------------------
+# A fetch that finishes leaves this marker. `build` fetches again unless it is there, so a fetch
+# that failed part-way (an expired upstream release, a dropped connection) is retried rather than
+# leaving a half-filled cache that the build then trips over.
+fetch_marker() { echo "${PGEO_DATA_DIR}/raw/$(tr ',' '-' <<<"$build")/.fetch-complete"; }
+
 cmd_fetch() {
   say "fetching sources for build '${build}' into ${PGEO_DATA_DIR} (cached between runs)"
+  rm -f "$(fetch_marker)"
   ( cd "$ROOT" && bash scripts/fetch_data.sh --build "$build" all )
+  date -u +%FT%TZ > "$(fetch_marker)"
 }
 
 # The loader creates a read-only role for the query side and wants its password in
@@ -87,7 +94,7 @@ ensure_secrets() {
 }
 
 cmd_build() {
-  [[ -d "${PGEO_DATA_DIR}/raw/$(tr ',' '-' <<<"$build")" ]] || cmd_fetch
+  [[ -f "$(fetch_marker)" ]] || cmd_fetch
   ensure_secrets
   pg_start
   say "preparing GNIS, ZCTA and Overture"

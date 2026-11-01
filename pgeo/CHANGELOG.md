@@ -10,6 +10,13 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+## [0.20.1] - 2026-11-01
+
+### Fixed
+- `pgeo-build` image: `build` re-fetches until a fetch has completed (a marker file), instead of
+  only when the region's data folder is missing. The geocoder's SQL and API are unchanged from
+  0.20.0; this release exists so the published image builds again (project CHANGELOG 0.23.1).
+
 ## [0.20.0] - 2026-11-01
 
 Published as `ghcr.io/johnzastrow/pgeo-build:0.20.0`, `pgeo-api:0.20.0` and

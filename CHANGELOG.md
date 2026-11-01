@@ -23,6 +23,43 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+## [0.23.1] - 2026-11-01
+
+Released with pgeo 0.20.1 and pelias-prep 0.2.1. The first end-to-end run of the 0.23.0 images,
+a Maine build on a workstation and a deployment of the bundle, found that the published
+`pgeo-build` could no longer build anything, because upstream data had moved on. Nothing in the
+geocoder itself changed.
+
+### Fixed
+- **Expired data pins.** `scripts/fetch_data.sh` pinned Overture `2026-08-19.0` and Protomaps
+  `20260925`, and both publishers had since deleted them: Overture keeps about two months of
+  releases, Protomaps about a week. Both now default to `latest`, resolved from Overture's STAC
+  catalogue and Protomaps' build index when a target needs it; passing `OVERTURE_RELEASE` or
+  `PROTOMAPS_BUILD` still pins an exact one. A fetched places extract replaces those of older
+  releases, since prep reads exactly one.
+- **Overture schema change.** Release `2026-10-21.0` removed the places `categories` column.
+  See prep 0.2.1.
+- **The build image never retried a failed fetch.** `pgeo-build build` fetched only when the
+  region's folder was missing, so a fetch that failed part-way left a half-filled cache and every
+  later build tripped over it. A completed fetch now leaves a marker, and `build` fetches until
+  it is there.
+- **The basemap stopped the build image's fetch.** The image does not carry `pmtiles`. The
+  basemap, which only the demo page uses, is now skipped with a note when `pmtiles` is absent.
+- Serving bundle: an edge over its rate limit answers 429 (it was 503, indistinguishable from an
+  outage), the Server header no longer gives the nginx version, and `deploy/README.md` adds the
+  `chmod` the demo page's files need (copied with a restrictive umask, they returned 403).
+- `.gitattributes` keeps shell scripts, SQL, nginx configs and Dockerfiles LF on Windows
+  checkouts, which otherwise produced `bash\r` errors in a locally built image.
+
+### Measured
+- The Maine build from current data scores 92.9% on the 1,560-case accuracy set (95.7% in the
+  last stored run, 2026-09-25). 48 cases regressed and 5 improved. In 30 of the 48 the right
+  address is still the top result, but its point now lies more than 150 m from the ground truth:
+  the current OpenAddresses statewide file places those addresses differently from the snapshot
+  the cases were drawn from, and one OpenAddresses source (Biddeford) has no current run. The
+  ground truth needs re-deriving from current data before the figure can be compared.
+- Pelias compatibility: 28 of 28 contract cases pass on the pure-SQL path.
+
 ## [0.23.0] - 2026-11-01
 
 Released with pgeo 0.20.0 (pgeo/CHANGELOG.md). This is the first release published as

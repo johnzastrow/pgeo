@@ -210,7 +210,7 @@ def write_overture_parquet(con, path: Path) -> None:
             SELECT
                 id,
                 ST_Point(lon, lat) AS geometry,
-                {'primary': 'cafe', 'alternate': ['coffee_shop']} AS categories,
+                -- No `categories` column: Overture dropped it in 2026-10-21.0.
                 confidence,
                 ['https://example.org'] AS websites,
                 ['+12075550100'] AS phones,
@@ -241,6 +241,7 @@ def test_overture_filters_and_parses_address(con, tmp_path, reg):
     assert rows["a"]["street"] == "Main St"
     assert rows["a"]["postcode"] == "04101"
     assert rows["a"]["category"] == "eat_and_drink"
+    assert '"category":"cafe"' in rows["a"]["addendum_json_overture"].replace(" ", "")
     # No leading number -> no street/housenumber; an out-of-region ZIP is dropped, not guessed.
     assert rows["e"]["housenumber"] == ""
     assert rows["e"]["street"] == ""

@@ -17,6 +17,7 @@ From a checkout, with the build already made:
 cd deploy
 mkdir -p web tiles dumps
 cp -r ../web/. web/                                  # the demo page, already vendored
+chmod -R a+rX web tiles                              # nginx's workers must be able to read them
 python3 ../scripts/gen_region_json.py --build me > web/region.json
 printf '{"engines":[{"label":"pgeo","base":"","kind":"pgeo"}]}\n' > web/engines.json
 cp ../data/raw/me/basemap/me.pmtiles tiles/          # the basemap for this build

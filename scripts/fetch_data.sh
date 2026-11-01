@@ -19,8 +19,11 @@
 # so there is no separate CLI to install or keep in step.
 set -euo pipefail
 
-OVERTURE_RELEASE="${OVERTURE_RELEASE:-2026-08-19.0}"
-PROTOMAPS_BUILD="${PROTOMAPS_BUILD:-20260925}"
+# Overture and Protomaps both delete old releases (Overture keeps about two months, Protomaps about
+# a week), so a fixed default stops working on its own. They default to "latest", resolved from
+# each publisher's own index when a target needs it. Pass a value to pin a build exactly.
+OVERTURE_RELEASE="${OVERTURE_RELEASE:-latest}"
+PROTOMAPS_BUILD="${PROTOMAPS_BUILD:-latest}"
 ZCTA_YEAR="${ZCTA_YEAR:-2025}"
 WOF_DIST="${WOF_DIST:-https://data.geocode.earth/wof/dist/sqlite}"
 OA_RUNS="${OA_RUNS:-https://results.openaddresses.io/latest/run}"
@@ -186,7 +189,24 @@ boundary() {
     "${SHARED}/boundary/cb_2024_us_state_500k.zip"
 }
 
+# "latest" -> the newest Overture release, from the STAC catalogue Overture publishes.
+resolve_overture() {
+  [[ "$OVERTURE_RELEASE" == latest ]] || return 0
+  OVERTURE_RELEASE="$(curl -fsS https://stac.overturemaps.org/catalog.json | jq -r .latest)"
+  [[ "$OVERTURE_RELEASE" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}\.[0-9]+$ ]] || { echo "fetch_data: could not resolve the latest Overture release" >&2; return 1; }
+  echo "Overture release: ${OVERTURE_RELEASE} (latest)"
+}
+
+# "latest" -> the newest daily Protomaps build, from build-metadata.protomaps.dev.
+resolve_protomaps() {
+  [[ "$PROTOMAPS_BUILD" == latest ]] || return 0
+  PROTOMAPS_BUILD="$(curl -fsS https://build-metadata.protomaps.dev/builds.json | jq -r '[.[].key | select(test("^[0-9]{8}\\.pmtiles$"))] | sort | last | rtrimstr(".pmtiles")')"
+  [[ "$PROTOMAPS_BUILD" =~ ^[0-9]{8}$ ]] || { echo "fetch_data: could not resolve the latest Protomaps build" >&2; return 1; }
+  echo "Protomaps build: ${PROTOMAPS_BUILD} (latest)"
+}
+
 overture() {
+  resolve_overture
   local out="${RAW}/overture/places_${OVERTURE_RELEASE}_bbox.parquet"
   local xmin ymin xmax ymax
   IFS=, read -r xmin ymin xmax ymax < <(bbox)
@@ -201,11 +221,14 @@ overture() {
     ) TO '${out}.part' (FORMAT parquet, COMPRESSION zstd);
 SQL
   mv "${out}.part" "$out"
+  # prep reads exactly one places extract; drop the ones from older releases.
+  find "$(dirname "$out")" -maxdepth 1 -name 'places_*_bbox.parquet' ! -name "$(basename "$out")" -delete
   echo "fetched $(basename "$out") ($(du -h "$out" | cut -f1))"
 }
 
 overture_themes() {
   # Other Overture themes, kept as raw inputs for evaluation and Phase 10 (PostGIS).
+  resolve_overture
   local r="$OVERTURE_RELEASE" base="s3://overturemaps-us-west-2/release/${OVERTURE_RELEASE}"
   local xmin ymin xmax ymax dir="${RAW}/overture"
   IFS=, read -r xmin ymin xmax ymax < <(bbox)
@@ -239,6 +262,12 @@ SQL
 BASEMAP_MARGIN=0.15
 
 basemap() {
+  # The basemap is for the demo page only; the geocoder does not need it. Without the pmtiles
+  # tool (the build image does not carry it) skip it rather than fail the whole fetch.
+  if ! command -v pmtiles >/dev/null 2>&1; then
+    echo "basemap: skipped, pmtiles is not installed (only the demo page's map needs it)"
+    return 0
+  fi
   local out="${RAW}/basemap/${build}.pmtiles"
   mkdir -p "$(dirname "$out")"
   local bb
@@ -249,6 +278,7 @@ basemap() {
   # build.protomaps.com keeps only about a week of daily builds, so a pin that was fine last month
   # is a 404 today. Say that plainly rather than leaving the operator with a Go stack trace: the
   # fix is always to re-pin PROTOMAPS_BUILD to a build that still exists.
+  resolve_protomaps
   local src="https://build.protomaps.com/${PROTOMAPS_BUILD}.pmtiles"
   if ! curl -fsS -o /dev/null -r 0-0 "$src"; then
     echo "fetch_data: the pinned Protomaps build ${PROTOMAPS_BUILD} is not available." >&2

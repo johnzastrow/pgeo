@@ -7,6 +7,14 @@ Data preparation tools for the Pelias Maine build. Format:
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-01
+
+### Fixed
+- Overture places: the addendum's `category` comes from `taxonomy.primary`. Overture removed the
+  `categories` column in release 2026-10-21.0, and the converter failed with "Referenced table
+  categories not found". `taxonomy` exists in releases before and after the change, so either
+  converts. The test fixture now has no `categories` column.
+
 ## [0.2.0] - 2026-09-22
 
 ### Added
