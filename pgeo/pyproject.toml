@@ -4,11 +4,11 @@ version = "0.20.0"
 description = "PostgreSQL/PostGIS geocoder with a Pelias-compatible API (Phase 10)"
 requires-python = ">=3.12"
 dependencies = [
-    "fastapi==0.141.1",
-    "uvicorn==0.53.0",
-    "asyncpg==0.31.0",
+    "fastapi==0.162.0",
+    "uvicorn==0.54.0",
+    "asyncpg==0.32.0",
     "httpx==0.28.1",
-    "pydantic==2.13.5",
+    "pydantic==2.14.2",
     "duckdb==1.5.5",
 ]
 
@@ -18,8 +18,8 @@ pgeo-tune = "pgeo.tune:main"
 
 [dependency-groups]
 dev = [
-    "pytest==9.1.1",
-    "ruff==0.16.8",
+    "pytest==9.2.0",
+    "ruff==0.17.3",
 ]
 
 [build-system]
