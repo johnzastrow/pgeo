@@ -44,8 +44,9 @@ postgis, PostgREST, nginx - and nothing built locally. `scripts/pgeo_swap.sh` is
 online swap. The first real deployment is a LAN host behind Caddy, serving Maine at 0.19.3;
 its hostname is local and stays out of this repository (see `deploy/README.md` for the shape).
 
-Publishing the images to a registry is *not* done - both are built from the repository. That is
-what remains of this item, and item 2 is the data half of the same question.
+**Published 2026-11-01** (0.23.0 / pgeo 0.20.0): `ghcr.io/johnzastrow/pgeo-build`, `pgeo-api` and
+`pgeo-db`, built and attested by `.github/workflows/release.yml` on every release tag. Item 2 is
+the data half of the same question and remains open.
 
 Four things the first deployment found, all now fixed in the bundle rather than on the host:
 

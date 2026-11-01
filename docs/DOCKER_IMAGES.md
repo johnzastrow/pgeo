@@ -1,6 +1,7 @@
 # Published container images - design
 
-Status: **designed, not built** (2026-09-22; multi-region and the data-image option added the same day). Operator's page: `DOCKER-DEPLOY.md`. Goal: pgeo deployable with `docker pull` rather than
+Status: **built 2026-09-25, published 2026-11-01** as `ghcr.io/johnzastrow/pgeo-build`, `pgeo-api` and
+`pgeo-db` (designed 2026-09-22; multi-region and the data-image option added the same day). Operator's page: `DOCKER-DEPLOY.md`. Goal: pgeo deployable with `docker pull` rather than
 "clone the repository and run four scripts". Decisions below were taken in conversation on
 2026-09-22; the remaining open points are listed at the end.
 
@@ -39,12 +40,12 @@ About 1.2 GB. Needs Docker and about 6 GB of memory while building.
 ```bash
 # first time: fetch (cached in ./data), build, dump - one command
 docker run --rm -v ./data:/data -e PGEO_BUILD=me \
-  git.wharf.example/jcz/pgeo-build:0.10 build
+  ghcr.io/johnzastrow/pgeo-build:0.20.0 build
 #   -> /data/dumps/pgeo-us-maine-20260922.dump   (117 MB)
 
 # ship it to a VPS running the serving bundle (atomic swap on arrival, no downtime)
 docker run --rm -v ./data:/data -v "$SSH_AUTH_SOCK:/ssh-agent" -e SSH_AUTH_SOCK=/ssh-agent \
-  git.wharf.example/jcz/pgeo-build:0.10 push deploy@vps.example.org
+  ghcr.io/johnzastrow/pgeo-build:0.20.0 push deploy@vps.example.org
 ```
 
 Subcommands: `fetch` (sources missing from the cache), `build` (fetch + load + dump),
@@ -160,12 +161,17 @@ report as the New Hampshire future-work item.
 
 ## Registries and tags
 
-- Forgejo container registry at the project's Forgejo (canonical), mirrored to GHCR when the
-  repository is published on GitHub. Same tags on both.
-- `pgeo-build:<pgeo semver>` and `pgeo-build:latest`; the compose bundle pins the serving images
-  by digest, and the bundle file itself is released with the repository tag.
-- Built by CI on a tag (Forgejo Actions; GitHub Actions mirroring), amd64. Images pinned by
-  digest in the published compose file, as the Ansible role already does.
+Decided 2026-11-01: **GHCR only, public**, since the repository stays on GitHub. This replaces the
+earlier plan of a Forgejo registry with a GHCR mirror.
+
+- `ghcr.io/johnzastrow/pgeo-build`, `pgeo-api` and `pgeo-db`, each tagged with the pgeo
+  component's version (`pgeo/pyproject.toml`) and `latest`. Pin the version, or the digest that
+  the GitHub release lists, rather than `latest`.
+- Built by `.github/workflows/release.yml` when a project tag (`vX.Y.Z`) is pushed. linux/amd64
+  only, because pgeo-db installs an amd64 ParadeDB package. Each image has an SBOM and a signed
+  build-provenance attestation: `gh attestation verify oci://<image> --owner johnzastrow`.
+- The serving bundle publishes nothing of its own. It pins the stock PostGIS, PostgREST and
+  nginx images by digest, and the bundle files are released with the repository tag.
 
 ## What this delivers against the report
 

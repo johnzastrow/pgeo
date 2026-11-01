@@ -1,0 +1,19 @@
+# Build context for pgeo/docker/build (the pre-processor), which is the repository root. Keep the
+# context to what the Dockerfile copies: never data, secrets, environments or the git history.
+.git
+data
+**/.venv
+**/node_modules
+**/__pycache__
+**/*.secrets
+**/.env
+**/*.pem
+**/*.key
+deploy/pgdata
+deploy/dumps
+docs
+report
+slides
+web
+projects
+infra

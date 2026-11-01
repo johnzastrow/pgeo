@@ -1,0 +1,200 @@
+# Release: on a project tag (v0.23.0 and so on), build the three pgeo images, publish them to the
+# GitHub Container Registry with build-provenance attestations, and create the GitHub release.
+#
+#   ghcr.io/johnzastrow/pgeo-build  the pre-processor: fetch, build, dump, push (pgeo/docker/build)
+#   ghcr.io/johnzastrow/pgeo-api    the optional FastAPI front end (pgeo/docker/api)
+#   ghcr.io/johnzastrow/pgeo-db     PostGIS with libpostal and pg_search (pgeo/docker/db)
+#
+# Each image is tagged with the pgeo component's version (pgeo/pyproject.toml) and `latest`, as
+# docs/DOCKER_IMAGES.md specifies. amd64 only: pgeo-db installs an amd64 ParadeDB package, and
+# the other two share its PostGIS base. The serving bundle (deploy/) needs none of them; it runs
+# stock PostGIS, PostgREST and nginx images.
+#
+# Every third-party action is pinned to a commit SHA. The release notes are the tag's section of
+# CHANGELOG.md.
+name: Release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing project tag to (re)publish, e.g. v0.23.0"
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  versions:
+    name: Read versions
+    runs-on: ubuntu-24.04
+    outputs:
+      tag: ${{ steps.v.outputs.tag }}
+      project: ${{ steps.v.outputs.project }}
+      pgeo: ${{ steps.v.outputs.pgeo }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          persist-credentials: false
+      - id: v
+        name: Check the tag against VERSION and read the pgeo version
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          set -euo pipefail
+          project="$(tr -d '[:space:]' < VERSION)"
+          pgeo="$(sed -n 's/^version = "\(.*\)"$/\1/p' pgeo/pyproject.toml | head -1)"
+          [[ "$TAG" == "v${project}" ]] || { echo "tag $TAG does not match VERSION ${project}" >&2; exit 1; }
+          [[ "$pgeo" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "unreadable pgeo version: $pgeo" >&2; exit 1; }
+          {
+            echo "tag=$TAG"
+            echo "project=$project"
+            echo "pgeo=$pgeo"
+          } >> "$GITHUB_OUTPUT"
+
+  images:
+    name: Image ${{ matrix.image }}
+    needs: versions
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      packages: write        # push to ghcr.io
+      id-token: write        # sign the provenance attestation
+      attestations: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: pgeo-build
+            context: .
+            file: pgeo/docker/build/Dockerfile
+            title: pgeo pre-processor
+          - image: pgeo-api
+            context: pgeo
+            file: pgeo/docker/api/Dockerfile
+            title: pgeo FastAPI front end
+          - image: pgeo-db
+            context: pgeo/docker/db
+            file: pgeo/docker/db/Dockerfile
+            title: pgeo PostGIS with libpostal
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.versions.outputs.tag }}
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: build
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.file }}
+          platforms: linux/amd64
+          push: true
+          provenance: mode=max
+          sbom: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}:${{ needs.versions.outputs.pgeo }}
+            ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}:latest
+          labels: |
+            org.opencontainers.image.title=${{ matrix.title }}
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.version=${{ needs.versions.outputs.pgeo }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.licenses=Apache-2.0
+          cache-from: type=gha,scope=${{ matrix.image }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-name: ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+      - name: Record the digest
+        run: echo "${{ matrix.image }}@${{ steps.build.outputs.digest }}" > "digest-${{ matrix.image }}.txt"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: digest-${{ matrix.image }}
+          path: digest-${{ matrix.image }}.txt
+
+  release:
+    name: GitHub release
+    needs: [versions, images]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write        # create the release
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.versions.outputs.tag }}
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: digest-*
+          merge-multiple: true
+      - name: Pack the serving bundle
+        # deploy/ as tracked in git (no local state can creep in) plus the swap script, which a
+        # deployed host has to have beside .env. Unpacks to ./pgeo.
+        run: |
+          set -euo pipefail
+          mkdir -p bundle/pgeo
+          git ls-files -z deploy | while IFS= read -r -d '' f; do
+            rel="${f#deploy/}"
+            mkdir -p "bundle/pgeo/$(dirname "$rel")"
+            cp -p "$f" "bundle/pgeo/$rel"
+          done
+          cp -p scripts/pgeo_swap.sh bundle/pgeo/
+          tar -C bundle -czf pgeo-bundle.tar.gz pgeo
+          sha256sum pgeo-bundle.tar.gz > pgeo-bundle.tar.gz.sha256
+          tar -tzf pgeo-bundle.tar.gz
+      - name: Write the release notes
+        env:
+          PROJECT: ${{ needs.versions.outputs.project }}
+          PGEO: ${{ needs.versions.outputs.pgeo }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+          # This version's section of CHANGELOG.md, without its own heading.
+          awk -v h="## [${PROJECT}]" '
+            index($0, h) == 1 { on = 1; next }
+            on && index($0, "## [") == 1 { exit }
+            on { print }
+          ' CHANGELOG.md > notes.md
+          [[ -s notes.md ]] || { echo "no CHANGELOG.md section for ${PROJECT}" >&2; exit 1; }
+          {
+            echo
+            echo "## Container images (pgeo ${PGEO}, linux/amd64)"
+            echo
+            for f in digest-*.txt; do
+              ref="$(cat "$f")"
+              echo "- \`ghcr.io/${OWNER}/${ref%@*}:${PGEO}\` - \`${ref#*@}\`"
+            done
+            echo
+            echo "## Serving bundle"
+            echo
+            echo "\`pgeo-bundle.tar.gz\` (below) is \`deploy/\` plus \`pgeo_swap.sh\`: stock PostGIS, PostgREST and nginx images pinned by digest, and their configuration. See DOCKER-DEPLOY.md."
+            echo
+            echo "Verify an image's build provenance with \`gh attestation verify oci://ghcr.io/${OWNER}/pgeo-build:${PGEO} --owner ${OWNER}\`."
+          } >> notes.md
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.versions.outputs.tag }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --notes-file notes.md
+            gh release upload "$TAG" pgeo-bundle.tar.gz pgeo-bundle.tar.gz.sha256 --clobber
+          else
+            gh release create "$TAG" --title "pgeo $TAG" --notes-file notes.md --verify-tag               pgeo-bundle.tar.gz pgeo-bundle.tar.gz.sha256
+          fi

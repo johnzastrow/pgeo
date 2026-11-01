@@ -1,0 +1,8 @@
+# Build context for pgeo/docker/api (FastAPI), which is pgeo/. Only pyproject, uv.lock and src are
+# copied; keep secrets, environments and local state out of the context.
+.venv
+**/__pycache__
+*.secrets
+.env
+builds
+tests

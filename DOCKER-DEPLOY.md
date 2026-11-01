@@ -1,12 +1,11 @@
 # Deploying pgeo with Docker
 
-> **Status (2026-09-25): both sides exist and one deployment is running; neither image is
-> published to a registry yet.** `pgeo-build` is built from `pgeo/docker/build/`, and the serving
-> bundle is `deploy/` - three stock images, so only its configuration needs shipping. The
-> commands below that pull `git.wharf.example/jcz/pgeo-build` are therefore still aspirational;
-> build it locally with `docker build -f pgeo/docker/build/Dockerfile .` and see `deploy/README.md`
-> for how the bundle is actually shipped. Registry publication is what remains of `TODO.md`
-> section 1.
+> **Status (2026-11-01): published.** `pgeo-build` is `ghcr.io/johnzastrow/pgeo-build`, tagged
+> with the pgeo version and `latest` (linux/amd64), built and attested by
+> `.github/workflows/release.yml` on each release. The serving bundle is three stock images plus
+> configuration, attached to each GitHub release as `pgeo-bundle.tar.gz`. To build the image
+> yourself instead: `docker build -f pgeo/docker/build/Dockerfile .` from a checkout. To check an
+> image came from this repository: `gh attestation verify oci://ghcr.io/johnzastrow/pgeo-build:0.20.0 --owner johnzastrow`.
 
 pgeo is a geocoder that runs inside PostgreSQL. Two images cover everything:
 
@@ -23,7 +22,7 @@ minutes; serving needs a quarter of a core and 1.4 GB.
 ```bash
 mkdir pgeo && cd pgeo
 docker run --rm -v ./data:/data -e PGEO_BUILD=me \
-  git.wharf.example/jcz/pgeo-build build
+  ghcr.io/johnzastrow/pgeo-build:0.20.0 build
 ```
 
 That fetches the sources for the region into `./data` (kept, so the next build is quick), builds
@@ -36,16 +35,22 @@ five stages of `scripts/build_region.sh` with the tools already installed.
 Check it before shipping (the 1,560-case Maine accuracy set; other regions need their own):
 
 ```bash
-docker run --rm -v ./data:/data git.wharf.example/jcz/pgeo-build accuracy
+docker run --rm -v ./data:/data ghcr.io/johnzastrow/pgeo-build:0.20.0 accuracy
 ```
 
 ## 2. Start the serving side (server)
 
 ```bash
-mkdir -p /srv/pgeo && cd /srv/pgeo
-curl -O https://git.wharf.example/jcz/pgeo/releases/latest/compose.yml
+cd /srv
+curl -fsSLO https://github.com/johnzastrow/pgeo/releases/latest/download/pgeo-bundle.tar.gz
+curl -fsSLO https://github.com/johnzastrow/pgeo/releases/latest/download/pgeo-bundle.tar.gz.sha256
+sha256sum -c pgeo-bundle.tar.gz.sha256 && tar -xzf pgeo-bundle.tar.gz && cd pgeo
+cp .env.example .env && $EDITOR .env      # two passwords; limits and rates are optional
 docker compose up -d
 ```
+
+The bundle is `deploy/` plus `pgeo_swap.sh`, attached to every GitHub release. Its settings are
+listed in `docs/CONFIGURATION.md`.
 
 It comes up empty and answers `503` with a one-line hint until a database arrives. The API is
 on port 8080 behind nginx, with the rate limits, security headers and path allowlist the study
@@ -56,7 +61,7 @@ deployed. Put your TLS terminator in front of it; the bundle does not do TLS.
 ```bash
 docker run --rm -v ./data:/data \
   -v "$SSH_AUTH_SOCK:/ssh-agent" -e SSH_AUTH_SOCK=/ssh-agent \
-  git.wharf.example/jcz/pgeo-build push deploy@your-server
+  ghcr.io/johnzastrow/pgeo-build:0.20.0 push deploy@your-server
 ```
 
 Over SSH: `rsync` the newest dump (resumable), verify its checksum on the server, then swap it

@@ -10,6 +10,12 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+## [0.20.0] - 2026-11-01
+
+Published as `ghcr.io/johnzastrow/pgeo-build:0.20.0`, `pgeo-api:0.20.0` and
+`pgeo-db:0.20.0`. A database restored from a 0.19.x dump keeps the limits it was built with
+until it is rebuilt or its functions are reloaded.
+
 ### Added
 - **Configurable request limits.** The maximum text length, `size`, ids, and circle, reverse and
   address radii are custom PostgreSQL settings on the API role (`pgeo.max_text`,

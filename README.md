@@ -59,8 +59,8 @@ machine bigger rather than by adding machines, and the report's section 4 says w
 * Ansible roles that take a bare Debian host to a hardened, rate-limited, API-key-protected
   service
 * A test suite that measures accuracy against independent ground truth, not against itself
-* A pre-processor image and a three-container serving bundle, built from this repository and not
-  yet published to a registry ([DOCKER-DEPLOY.md](DOCKER-DEPLOY.md),
+* A pre-processor image (`ghcr.io/johnzastrow/pgeo-build`) and a three-container serving bundle
+  of stock images ([DOCKER-DEPLOY.md](DOCKER-DEPLOY.md),
   [deploy/README.md](deploy/README.md), [docs/DOCKER_IMAGES.md](docs/DOCKER_IMAGES.md))
 
 ## Requirements and technology stack
@@ -176,7 +176,7 @@ see [docs/DEMO_ENGINES.md](docs/DEMO_ENGINES.md). Full set in
 | [docs/OPTIMIZATION.md](docs/OPTIMIZATION.md) / [.pdf](docs/OPTIMIZATION.pdf) | What changed after it: any US state, a 3.7x faster build, and the defects a second region found |
 | [docs/SIZING.md](docs/SIZING.md) | What a deployment costs, measured for Maine and New York |
 | [docs/STACK_COMPARISON.md](docs/STACK_COMPARISON.md) | Requirements and technology stacks of pgeo, Pelias, Photon and Nominatim compared |
-| [DOCKER-DEPLOY.md](DOCKER-DEPLOY.md) | The container route (designed; images not yet published) |
+| [DOCKER-DEPLOY.md](DOCKER-DEPLOY.md) | The container route, with the published `pgeo-build` image |
 | [TODO.md](TODO.md) | What is not done, and what was decided about it |
 
 **Running it**

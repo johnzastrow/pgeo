@@ -23,6 +23,20 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+## [0.23.0] - 2026-11-01
+
+Released with pgeo 0.20.0 (pgeo/CHANGELOG.md). This is the first release published as
+container images: `ghcr.io/johnzastrow/pgeo-build`, `pgeo-api` and `pgeo-db`, tagged `0.20.0`
+and `latest`, linux/amd64, with build-provenance attestations
+(`.github/workflows/release.yml`).
+
+**Behaviour changes for API clients:** a search, structured or autocomplete circle larger than
+100 km is now a 400 (it was 1000 km, and the cap is configurable). A malformed
+`boundary.rect` is now a 400, as is any structured field over 200 characters.
+
+**For operators:** `pgeo_swap.sh` now requires the dump's `.sha256`. `deploy/edge/pgeo.conf`
+is now mounted as an nginx template; take the new `deploy/compose.yml` with it.
+
 ### Added
 - `docs/STACK_COMPARISON.md`: the requirements and technology stacks of pgeo, Pelias, Photon and
   Nominatim, side by side. It covers languages, data stores, run-time and build-time software,
