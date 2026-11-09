@@ -4,12 +4,14 @@
 //   - header with lat + lon (or latitude/longitude) columns -> reverse geocode each row
 //   - header with an "address" (or "query"/"text") column    -> forward geocode that column
 //   - otherwise every non-empty line is a forward query
+// The download is the upload's own columns, unchanged and in order, with the geocoder's answer
+// appended as pgeo_* columns - one output row per input row.
 // Requests run one at a time, at most RATE_PER_SEC, well under the server's rate limit.
 // This is a demo convenience; large jobs belong in a server-side batch tool (Phase 10).
 import { parseCsv, toCsv } from './format.js';
 
-const MAX_ROWS = 250;
-const MAX_BYTES = 100_000;
+const MAX_ROWS = 1000;
+const MAX_BYTES = 250_000;
 const RATE_PER_SEC = 4;
 const MAX_RETRIES = 3;
 
@@ -28,26 +30,37 @@ function planJobs(text) {
   const iLon = idx('lon', 'lng', 'long', 'longitude', 'x');
   const iText = idx('address', 'query', 'text');
 
+  // Every job carries `orig`, the row's own cells, and the plan carries `columns`, their names:
+  // the output file is the upload with the geocoder's answer appended, so rows can be joined back
+  // to the caller's records. A row with extra cells (unquoted commas) widens the table rather than
+  // losing them.
   let mode;
   let jobs;
+  let columns;
   if (iLat >= 0 && iLon >= 0) {
     mode = 'reverse';
-    jobs = rows.slice(1).map((r) => ({ input: `${r[iLat]},${r[iLon]}`, lat: Number(r[iLat]), lon: Number(r[iLon]) }));
+    columns = rows[0];
+    jobs = rows.slice(1).map((r) => ({ orig: r, input: `${r[iLat]},${r[iLon]}`, lat: Number(r[iLat]), lon: Number(r[iLon]) }));
   } else if (iText >= 0 && header.length === 1) {
     // A lone "address" column: unquoted addresses contain commas, so the parser splits
     // them into extra fields. Rejoin the whole line instead of taking only field 0.
     mode = 'forward';
-    jobs = rows.slice(1).map((r) => ({ input: r.join(', ').trim() }));
+    columns = [rows[0][0]];
+    jobs = rows.slice(1).map((r) => ({ orig: [r.join(', ').trim()], input: r.join(', ').trim() }));
   } else if (iText >= 0) {
     mode = 'forward';
-    jobs = rows.slice(1).map((r) => ({ input: (r[iText] || '').trim() }));
+    columns = rows[0];
+    jobs = rows.slice(1).map((r) => ({ orig: r, input: (r[iText] || '').trim() }));
   } else {
     mode = 'forward';
-    jobs = rows.map((r) => ({ input: r.join(', ').trim() }));
+    columns = ['input'];
+    jobs = rows.map((r) => ({ orig: [r.join(', ').trim()], input: r.join(', ').trim() }));
   }
-  jobs = jobs.filter((j) => j.input);
   if (jobs.length > MAX_ROWS) throw new Error(`Limit is ${MAX_ROWS} rows (got ${jobs.length})`);
-  return { mode, jobs };
+  const width = Math.max(columns.length, ...jobs.map((j) => j.orig.length));
+  columns = Array.from({ length: width }, (_, i) => columns[i] ?? '');
+  for (const j of jobs) j.orig = Array.from({ length: width }, (_, i) => j.orig[i] ?? '');
+  return { mode, jobs, columns };
 }
 
 async function runOne(client, mode, job, opts, signal) {
@@ -115,7 +128,10 @@ export function setupBatch(ui) {
     ui.progress.value = 0;
 
     const opts = ui.context();
-    const out = [['input', 'mode', 'label', 'lat', 'lon', 'confidence', 'match_type', 'layer', 'source', 'gid', 'error']];
+    // The caller's own columns first, then the answer. The answer's names carry a pgeo_ prefix so
+    // that an upload with its own "label", "lat" or "lon" column never ends up with two of them.
+    const out = [[...plan.columns, 'pgeo_mode', 'pgeo_label', 'pgeo_lat', 'pgeo_lon', 'pgeo_confidence',
+      'pgeo_match_type', 'pgeo_layer', 'pgeo_source', 'pgeo_gid', 'pgeo_error']];
     const features = [];
     const interval = 1000 / RATE_PER_SEC;
     let ok = 0;
@@ -124,21 +140,30 @@ export function setupBatch(ui) {
       const started = performance.now();
       let feature = null;
       let error = '';
-      try {
-        feature = await runOne(ui.client, plan.mode, job, opts, signal);
-        if (feature) { ok += 1; features.push(feature); }
-      } catch (err) {
-        if (err.name === 'AbortError') break;
-        error = err.message;
+      // A row with nothing to look up is kept, so the output has one row per input row, but it
+      // costs no request.
+      const unusable = plan.mode === 'reverse'
+        ? !Number.isFinite(job.lat) || !Number.isFinite(job.lon)
+        : !job.input;
+      if (unusable) {
+        error = plan.mode === 'reverse' ? 'invalid coordinates' : 'no address';
+      } else {
+        try {
+          feature = await runOne(ui.client, plan.mode, job, opts, signal);
+          if (feature) { ok += 1; features.push(feature); }
+        } catch (err) {
+          if (err.name === 'AbortError') break;
+          error = err.message;
+        }
       }
       const p = feature?.properties || {};
       const [lon, lat] = feature?.geometry?.coordinates || [];
-      out.push([job.input, plan.mode, p.label, lat?.toFixed(6), lon?.toFixed(6), p.confidence,
+      out.push([...job.orig, plan.mode, p.label, lat?.toFixed(6), lon?.toFixed(6), p.confidence,
         p.match_type, p.layer, p.source, p.gid, error || (feature ? '' : 'no match')]);
-      appendRow(ui.table, out[out.length - 1]);
+      appendRow(ui.table, [job.input, p.label, p.confidence, error || (feature ? '' : 'no match')]);
       ui.progress.value = i + 1;
       ui.status.textContent = `${i + 1} / ${plan.jobs.length} · ${ok} matched`;
-      const wait = interval - (performance.now() - started);
+      const wait = unusable ? 0 : interval - (performance.now() - started);
       if (wait > 0) await sleep(wait, signal).catch(() => {});
     }
     ui.status.textContent = `${signal.aborted ? 'Cancelled' : 'Done'} · ${ok} of ${out.length - 1} matched`;
@@ -150,14 +175,14 @@ export function setupBatch(ui) {
   });
 }
 
+// cells: input, label, confidence, error
 function appendRow(table, cells) {
   const tr = document.createElement('tr');
-  // input, label, confidence, error
-  for (const v of [cells[0], cells[2], cells[5], cells[10]]) {
+  for (const v of cells) {
     const td = document.createElement('td');
     td.textContent = v == null ? '' : String(v);
     tr.append(td);
   }
-  if (cells[10]) tr.className = 'batch-miss';
+  if (cells[3]) tr.className = 'batch-miss';
   table.append(tr);
 }

@@ -220,7 +220,7 @@
 
     <section class="panel" id="panel-batch" role="tabpanel" aria-labelledby="tab-batch" hidden>
       <p class="hint">Paste a CSV with an <code>address</code> column (forward) or <code>lat,lon</code> columns
-        (reverse), or one query per line. Up to 250 rows, 4 per second.</p>
+        (reverse), or one query per line. Up to 1,000 rows, 4 per second (about four minutes for a full file).</p>
       <textarea id="batch-input" rows="6" spellcheck="false" aria-label="Batch input"></textarea>
       <div class="row">
         <input type="file" id="batch-file" accept=".csv,text/csv" aria-label="Load a CSV file">

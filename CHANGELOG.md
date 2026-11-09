@@ -117,6 +117,15 @@ is now mounted as an nginx template; take the new `deploy/compose.yml` with it.
   rectangle and "search inside" working in the same frame.
 
 ### Changed
+- Demo page batch tool: the cap is 1,000 rows (was 250) and 250 KB of input (was 100 KB), so a
+  1,000-address CSV can be uploaded and the results downloaded. Still one request at a time, 4 per
+  second, so a full file takes about four minutes and stays under the edge's rate limit.
+- Demo page batch tool: the downloaded CSV is now the upload's own columns, unchanged and in
+  order, followed by the answer as `pgeo_*` columns (`pgeo_label`, `pgeo_lat`, `pgeo_lon`,
+  `pgeo_confidence`, ...). Before, only the address text came back, so an ID column was lost. The
+  prefix keeps an upload's own `label` or `lat` column from colliding with ours. A row with no
+  address (or unusable coordinates) is kept with `pgeo_error` set and costs no request, so the output
+  has one row per input row. Output column names changed (`label` is now `pgeo_label`).
 - The slide deck is rebuilt on the new UI. Six of its seven demo-page images are the captures
   above, renamed on the way into `slides/public/` so a slide refers to what it shows rather than
   to the order the screenshots were taken in. Two captions changed with them, since the queries
