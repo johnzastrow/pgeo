@@ -68,6 +68,24 @@ let engines = [{ label: 'Pelias', base: '', kind: 'pelias' }];
 let pgeoClient = null;
 const engineOf = (base) => engines.find((e) => e.base === base) || engines[0];
 
+// The engine's name and version, as its own API reports them in every response's geocoding block.
+// One small search at load and when the engine is switched. It is a plain fetch, not the client's:
+// a deployment that wants an API key must not pop the key prompt before anyone has searched, and
+// on any failure the line simply stays at the page's version.
+async function showEngineVersion() {
+  const out = $('#ver-engine');
+  out.textContent = '';
+  try {
+    const res = await fetch(`${client.baseUrl}/v1/search?text=pgeo&size=1`, {
+      headers: { Accept: 'application/json' },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) return;
+    const eng = (await res.json())?.geocoding?.engine;
+    if (eng?.version) out.textContent = ` \u00b7 ${String(eng.name || 'engine').slice(0, 24)} ${String(eng.version).slice(0, 24)}`;
+  } catch { /* leave the page version alone */ }
+}
+
 async function setupEngines() {
   if (document.querySelector('meta[name="demo-engines"]')?.content === '/engines.json') {
     try {
@@ -93,6 +111,7 @@ async function setupEngines() {
   // unless pgeo is mounted there.
   client.baseUrl = engines[0].base;
   $('#engine-note').textContent = engines[0].kind === 'pgeo' ? 'PostgreSQL / PostGIS' : 'Elasticsearch';
+  showEngineVersion();
   if (engines.length < 2) {
     // One engine: no switch to show, but say which one is answering.
     $('#engine-pick').hidden = false;
@@ -114,6 +133,7 @@ async function setupEngines() {
   const apply = () => {
     client.baseUrl = sel.value;
     $('#engine-note').textContent = engineOf(sel.value).kind === 'pgeo' ? 'PostgreSQL / PostGIS' : 'Elasticsearch';
+    showEngineVersion();
   };
   apply();
   sel.addEventListener('change', () => {

@@ -112,6 +112,13 @@ h1 {
   letter-spacing: -0.021em;      /* a large sans needs the tracking pulled in */
 }
 .t-sub { font-weight: 400; color: var(--accent); }
+.version {
+  margin: 6px 0 0;
+  font: 400 10px/1.4 var(--mono);
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  opacity: 0.8;
+}
 .edition {
   margin: 8px 0 0;
   font: 400 10.5px/1.4 var(--mono);

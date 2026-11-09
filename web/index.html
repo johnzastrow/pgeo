@@ -25,6 +25,9 @@
            serves any build (see web/js/map.js and the edge role). -->
       <p class="kicker" id="region-kicker">United States</p>
       <h1><span class="t-main" id="region-name">&nbsp;</span> <span class="t-sub">Geocoder</span></h1>
+      <!-- The page's own version is written here and kept equal to VERSION by tests/web/test_version.py;
+           the engine's is read from the API at load (web/js/app.js, showVersions). -->
+      <p class="version" id="version" title="Page version, then the geocoder engine the API reports">page <span id="ver-page">0.25.0</span><span id="ver-engine"></span></p>
       <p class="edition">Self-hosted &middot; <span id="region-features"></span>OSM &middot; OA &middot; WOF &middot; GNIS &middot; Overture</p>
       <!-- With two or more announced engines this is a switch; with one it names the engine
            that is answering, so a pgeo-only deployment still says what it is running. -->

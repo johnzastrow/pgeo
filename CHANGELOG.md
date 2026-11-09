@@ -23,6 +23,18 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+## [0.25.0] - 2026-11-09
+
+### Added
+- Demo page: a small version line under the title, for example "page 0.25.0 · pgeo-sql 0.21.0". The
+  first number is the page's own version (the project `VERSION`; `tests/web/test_version.py` fails
+  if the two differ, so a release has to update both). The second is the engine name and version
+  the API reports in its `geocoding.engine` block, read with one small request at load and again
+  when the engine is switched. It is the quickest way to see which code a deployment is actually
+  running: after a function-only update the page number moves and the engine number does not.
+  If the request fails (an API key is required, the service is down) the line stays at the page's
+  version, and no key prompt appears before anyone has searched.
+
 ## [0.24.0] - 2026-11-09
 
 Demo page batch tool (delimiters, an example file, points on the map with attributes), a fix for
