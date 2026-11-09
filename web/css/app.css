@@ -349,6 +349,9 @@ progress::-moz-progress-bar { background: var(--accent); }
 .status { font: 12px/1.6 var(--mono); color: var(--ink-2); margin: 6px 0; min-height: 1.6em; }
 
 .table-wrap { max-height: 220px; overflow: auto; border-top: 1px solid var(--rule); }
+.attr-popup table { border-collapse: collapse; font-size: 12.5px; }
+.attr-popup th { text-align: left; padding: 2px 8px 2px 0; color: var(--muted, #5b6573); font-weight: 600; white-space: nowrap; vertical-align: top; }
+.attr-popup td { padding: 2px 0; word-break: break-word; }
 .batch-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
 .batch-table th {
   position: sticky; top: 0;

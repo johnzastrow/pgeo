@@ -28,11 +28,32 @@ export function distanceLabel(km) {
 
 // --- CSV --------------------------------------------------------------------------------
 
+/** Field separators the batch tool accepts, in the order a tie is settled: comma first. */
+export const DELIMITERS = [',', '|', '\t', ';'];
+
 /**
- * Parse CSV text into rows of strings. Handles quoted fields, escaped quotes ("") and
- * CRLF. Deliberately small: this is for pasted address lists, not general CSV.
+ * Guess the separator from the first non-empty line (the header row): the candidate that
+ * appears most often outside double quotes. No candidate present -> comma.
  */
-export function parseCsv(text) {
+export function detectDelimiter(text) {
+  const line = text.split(/\r\n|\n|\r/).find((l) => l.trim() !== '') || '';
+  const counts = new Map(DELIMITERS.map((d) => [d, 0]));
+  let quoted = false;
+  for (const c of line) {
+    if (c === '"') quoted = !quoted;
+    else if (!quoted && counts.has(c)) counts.set(c, counts.get(c) + 1);
+  }
+  let best = ',';
+  for (const d of DELIMITERS) if (counts.get(d) > counts.get(best)) best = d;
+  return best;
+}
+
+/**
+ * Parse delimited text into rows of strings. Handles quoted fields, escaped quotes ("") and
+ * CRLF. The separator is one character (default comma; see detectDelimiter). Deliberately
+ * small: this is for pasted address lists, not general CSV.
+ */
+export function parseCsv(text, delimiter = ',') {
   const rows = [];
   let row = [];
   let field = '';
@@ -44,7 +65,7 @@ export function parseCsv(text) {
       else if (c === '"') quoted = false;
       else field += c;
     } else if (c === '"') quoted = true;
-    else if (c === ',') { row.push(field); field = ''; }
+    else if (c === delimiter) { row.push(field); field = ''; }
     else if (c === '\n' || c === '\r') {
       if (c === '\r' && text[i + 1] === '\n') i += 1;
       row.push(field); rows.push(row); row = []; field = '';

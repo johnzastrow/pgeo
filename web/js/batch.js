@@ -1,14 +1,17 @@
 // Small client-side batch geocoder (forward and reverse).
 //
-// Input: pasted CSV or a local .csv file.
+// Input: pasted text or a local delimited file (comma, pipe, tab or semicolon; the separator is
+// read from the header row). The first row is expected to be a header.
 //   - header with lat + lon (or latitude/longitude) columns -> reverse geocode each row
 //   - header with an "address" (or "query"/"text") column    -> forward geocode that column
 //   - otherwise every non-empty line is a forward query
+// Matched rows also go to the map as GeoJSON features whose properties are the upload's columns
+// plus the pgeo_* answer, and can be downloaded as a .geojson file.
 // The download is the upload's own columns, unchanged and in order, with the geocoder's answer
 // appended as pgeo_* columns - one output row per input row.
 // Requests run a few at a time, at most `rate` started per second (see DEFAULT_RATE_PER_SEC).
 // This is a demo convenience; large jobs belong in a server-side batch tool (Phase 10).
-import { parseCsv, toCsv } from './format.js';
+import { parseCsv, toCsv, detectDelimiter } from './format.js';
 
 const MAX_ROWS = 1000;
 const MAX_BYTES = 250_000;
@@ -28,7 +31,8 @@ const sleep = (ms, signal) => new Promise((resolve, reject) => {
 
 function planJobs(text) {
   if (text.length > MAX_BYTES) throw new Error(`Input is larger than ${MAX_BYTES / 1000} KB`);
-  const rows = parseCsv(text);
+  const delimiter = detectDelimiter(text);
+  const rows = parseCsv(text, delimiter);
   if (!rows.length) throw new Error('Nothing to geocode');
   const header = rows[0].map((h) => h.trim().toLowerCase());
   const idx = (...names) => header.findIndex((h) => names.includes(h));
@@ -66,7 +70,34 @@ function planJobs(text) {
   const width = Math.max(columns.length, ...jobs.map((j) => j.orig.length));
   columns = Array.from({ length: width }, (_, i) => columns[i] ?? '');
   for (const j of jobs) j.orig = Array.from({ length: width }, (_, i) => j.orig[i] ?? '');
-  return { mode, jobs, columns };
+  return { mode, jobs, columns, delimiter };
+}
+
+// The example offered on the form: a header row, an address column and some attribute columns of
+// the kind a real list carries. Every column comes back in the download and in a map click.
+export const EXAMPLE_CSV = [
+  'site_id,site_name,category,status,inspected,address',
+  'S-101,Portland office,office,active,2026-03-14,"389 Congress St, Portland, ME"',
+  'S-102,Augusta depot,warehouse,active,2026-02-02,"210 State St, Augusta, ME"',
+  'S-103,Bangor annex,office,closed,2025-11-20,"73 Harlow St, Bangor, ME"',
+  'S-201,Concord field office,office,active,2026-04-08,"107 N Main St, Concord, NH"',
+  'S-202,Portsmouth yard,yard,active,2026-01-27,"1 Junkins Ave, Portsmouth, NH"',
+  'S-104,Caribou site,yard,pending,2026-05-19,"100 Main St, Caribou, ME"',
+].join('\n') + '\n';
+
+const DELIMITER_NAMES = { ',': 'comma', '|': 'pipe', '\t': 'tab', ';': 'semicolon' };
+
+// Property names for the upload's columns: the header text, made unique, with a stand-in for a
+// blank one. An upload column that is already called pgeo_* is kept apart from the answer's.
+function propertyNames(columns) {
+  const seen = new Map();
+  return columns.map((c, i) => {
+    let name = String(c).trim() || `column_${i + 1}`;
+    if (name.startsWith('pgeo_')) name = `input_${name}`;
+    const n = (seen.get(name) || 0) + 1;
+    seen.set(name, n);
+    return n === 1 ? name : `${name}_${n}`;
+  });
 }
 
 async function runOne(client, mode, job, opts, signal) {
@@ -94,6 +125,16 @@ async function runOne(client, mode, job, opts, signal) {
 export function setupBatch(ui) {
   let controller = null;
   let lastCsv = null;
+  let lastGeojson = null;
+  const save = (text, type, ext) => {
+    const url = URL.createObjectURL(new Blob([text], { type }));
+    const a = document.createElement('a');
+    a.href = url;
+    const build = document.documentElement.dataset.build || 'geocoder';
+    a.download = `pgeo-${build}-batch-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '')}.${ext}`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
 
   ui.file.addEventListener('change', async () => {
     const f = ui.file.files?.[0];
@@ -105,14 +146,18 @@ export function setupBatch(ui) {
   ui.cancel.addEventListener('click', () => controller?.abort());
 
   ui.download.addEventListener('click', () => {
-    if (!lastCsv) return;
-    const url = URL.createObjectURL(new Blob([lastCsv], { type: 'text/csv' }));
+    if (lastCsv) save(lastCsv, 'text/csv', 'csv');
+  });
+  ui.example?.addEventListener('click', () => {
+    const url = URL.createObjectURL(new Blob([EXAMPLE_CSV], { type: 'text/csv' }));
     const a = document.createElement('a');
     a.href = url;
-    const build = document.documentElement.dataset.build || 'geocoder';
-    a.download = `pgeo-${build}-batch-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '')}.csv`;
+    a.download = 'pgeo-batch-example.csv';
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+  ui.geojson?.addEventListener('click', () => {
+    if (lastGeojson) save(lastGeojson, 'application/geo+json', 'geojson');
   });
 
   ui.run.addEventListener('click', async () => {
@@ -129,6 +174,7 @@ export function setupBatch(ui) {
     ui.run.disabled = true;
     ui.cancel.disabled = false;
     ui.download.disabled = true;
+    if (ui.geojson) ui.geojson.disabled = true;
     ui.table.replaceChildren();
     ui.progress.max = plan.jobs.length;
     ui.progress.value = 0;
@@ -139,6 +185,7 @@ export function setupBatch(ui) {
     const out = [[...plan.columns, 'pgeo_mode', 'pgeo_label', 'pgeo_lat', 'pgeo_lon', 'pgeo_confidence',
       'pgeo_match_type', 'pgeo_layer', 'pgeo_source', 'pgeo_gid', 'pgeo_error']];
     const features = [];
+    const names = propertyNames(plan.columns);
     const rate = Math.min(MAX_RATE_PER_SEC, Math.max(1, Number(ui.rate) || DEFAULT_RATE_PER_SEC));
     const concurrency = Math.min(MAX_CONCURRENCY, Math.max(1, Math.ceil(rate / 5)));
     const interval = 1000 / rate;
@@ -179,7 +226,7 @@ export function setupBatch(ui) {
           try {
             await takeSlot();
             feature = await runOne(ui.client, plan.mode, job, opts, signal);
-            if (feature) { ok += 1; features.push(feature); }
+            if (feature) ok += 1;
           } catch (err) {
             if (err.name === 'AbortError') return;
             error = err.message;
@@ -188,13 +235,20 @@ export function setupBatch(ui) {
         const p = feature?.properties || {};
         const [lon, lat] = feature?.geometry?.coordinates || [];
         const miss = error || (feature ? '' : 'no match');
+        // The map's copy of the answer: the point, with the upload's cells and the pgeo_* fields as
+        // flat properties, so a click can show them all. pgeo_row is the row's place in the file.
+        const props = Object.fromEntries(names.map((n, k) => [n, job.orig[k]]));
+        Object.assign(props, { pgeo_row: i + 1, pgeo_mode: plan.mode, pgeo_label: p.label, pgeo_confidence: p.confidence,
+          pgeo_match_type: p.match_type, pgeo_layer: p.layer, pgeo_source: p.source, pgeo_gid: p.gid });
         finished[i] = {
+          geo: feature?.geometry ? { type: 'Feature', geometry: feature.geometry, properties: props } : null,
           row: [...job.orig, plan.mode, p.label, lat?.toFixed(6), lon?.toFixed(6), p.confidence,
             p.match_type, p.layer, p.source, p.gid, miss],
           shown: [job.input, p.label, p.confidence, miss],
         };
         while (finished[flushed]) {
           out.push(finished[flushed].row);
+          if (finished[flushed].geo) features.push(finished[flushed].geo);
           appendRow(ui.table, finished[flushed].shown);
           finished[flushed] = null;
           flushed += 1;
@@ -205,9 +259,12 @@ export function setupBatch(ui) {
       }
     };
     await Promise.all(Array.from({ length: concurrency }, worker));
-    ui.status.textContent = `${signal.aborted ? 'Cancelled' : 'Done'} · ${ok} of ${out.length - 1} matched`;
+    ui.status.textContent = `${signal.aborted ? 'Cancelled' : 'Done'} · ${ok} of ${out.length - 1} matched`
+      + ` · ${DELIMITER_NAMES[plan.delimiter]}-separated`;
     lastCsv = toCsv(out);
+    lastGeojson = JSON.stringify({ type: 'FeatureCollection', features });
     ui.download.disabled = out.length <= 1;
+    if (ui.geojson) ui.geojson.disabled = !features.length;
     ui.run.disabled = false;
     ui.cancel.disabled = true;
     ui.onResults(features);

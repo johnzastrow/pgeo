@@ -2,8 +2,8 @@
 // reverse geocoding and the batch tool. Rendering uses DOM APIs and textContent only.
 import { PeliasClient, setApiKey, hasApiKey } from './pelias-client.js';
 import './pelias-search.js';
-import { createMap, loadRegion, makeMarker } from './map.js';
-import { setupBatch } from './batch.js';
+import { createMap, loadRegion, makeMarker, maplibregl } from './map.js';
+import { setupBatch, EXAMPLE_CSV } from './batch.js';
 import { setupDemoTabs } from './demo-tabs.js';
 import { dms, fixed, distanceLabel } from './format.js';
 
@@ -180,7 +180,10 @@ map.on('load', () => {
     },
   });
   map.on('click', 'results-dot', (e) => {
-    const gid = e.features?.[0]?.properties?.gid;
+    const props = e.features?.[0]?.properties;
+    // A batch row carries the upload's own columns: show them all in a popup.
+    if (props?.pgeo_row != null) { showAttributes(e.lngLat, props); return; }
+    const gid = props?.gid;
     const hit = lastFeatures.find((f) => f.properties?.gid === gid);
     if (hit) select(hit);
   });
@@ -188,8 +191,26 @@ map.on('load', () => {
   map.on('mouseleave', 'results-dot', () => { map.getCanvas().style.cursor = ''; });
 });
 
+let attrPopup = null;
+// Attribute table for one batch point. Built with DOM text nodes only, since the cells are the
+// uploader's data.
+function showAttributes(lngLat, props) {
+  attrPopup?.remove();
+  const box = el('div', 'attr-popup');
+  const table = el('table');
+  for (const [k, v] of Object.entries(props)) {
+    if (v == null || v === '' || v === 'null' || v === 'undefined') continue;
+    const tr = el('tr');
+    tr.append(el('th', null, k), el('td', null, String(v)));
+    table.append(tr);
+  }
+  box.append(table);
+  attrPopup = new maplibregl.Popup({ maxWidth: '340px', closeButton: true }).setLngLat(lngLat).setDOMContent(box).addTo(map);
+}
+
 let lastFeatures = [];
 function showDots(features) {
+  attrPopup?.remove();
   lastFeatures = features;
   map.getSource('results')?.setData({ type: 'FeatureCollection', features });
 }
@@ -785,18 +806,7 @@ $('#compare-form').addEventListener('submit', async (e) => {
 
 // ---- Batch tab ----------------------------------------------------------------------------
 
-const SAMPLE = [
-  'address',
-  '389 Congress St, Portland, ME',
-  '210 State St, Augusta, ME',
-  '73 Harlow St, Bangor, ME',
-  '32 Park St, Bar Harbor, ME',
-  '100 Main St, Caribou, ME',
-  'Moosehead Lake',
-  'Katahdin',
-  '04401',
-].join('\n');
-$('#batch-sample').addEventListener('click', () => { $('#batch-input').value = SAMPLE; });
+$('#batch-sample').addEventListener('click', () => { $('#batch-input').value = EXAMPLE_CSV; });
 setupBatch({
   client,
   // Requests per second the deployment's edge allows this page (region.json "batch_rate"); the
@@ -807,6 +817,8 @@ setupBatch({
   run: $('#batch-run'),
   cancel: $('#batch-cancel'),
   download: $('#batch-download'),
+  geojson: $('#batch-geojson'),
+  example: $('#batch-example'),
   progress: $('#batch-progress'),
   status: $('#batch-status'),
   table: $('#batch-table'),

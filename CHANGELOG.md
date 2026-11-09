@@ -23,7 +23,18 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+## [0.24.0] - 2026-11-09
+
+Demo page batch tool (delimiters, an example file, points on the map with attributes), a fix for
+New Hampshire address data, and pgeo 0.21.0 (a named state is searched first). Existing
+deployments: re-fetch OpenAddresses and rebuild for the data fix; the search fix can also be applied
+to a running database (see pgeo/CHANGELOG.md 0.21.0).
+
 ### Fixed
+- **A same-named town in the next state could outrank the state the query named** ("45 Squirrel
+  Dr, Auburn, NH" returned a street in Auburn, ME), and New Hampshire addresses stored with a
+  leading zero (`0045`) never matched. Both are fixed in pgeo 0.21.0, which searches the named
+  state first; details and the live-database steps are in pgeo/CHANGELOG.md.
 - **OpenAddresses sources were downloaded from a stale endpoint.** `scripts/fetch_data.sh` read
   `results.openaddresses.io/latest/run/<source>.zip`, which is not kept current. For New Hampshire's
   statewide source it held 610,582 points with no street number, street or town, so a New Hampshire
@@ -52,6 +63,15 @@ commits where each milestone was complete.
   limit of 10. A deployment that raises `PGEO_EDGE_RATE` can add `"batch_rate"` to `region.json` to
   match: 40 against an edge limit of 50 does 1,000 rows in about 25 seconds. Rows still come out
   in input order. `docs/CONFIGURATION.md` has the setting.
+
+### Added
+- Batch tool: the upload may be separated by commas, pipes, tabs or semicolons; the separator is read
+  from the header row (a quoted field may contain any of them). The form now says the first row must
+  be a header row, offers an example file with attribute columns (Load example, Download example file),
+  and the status line names the separator it found.
+- Batch tool: matched rows go to the map as GeoJSON points whose properties are the upload's own
+  columns plus the `pgeo_*` answer. Clicking a point lists them all, and "Download GeoJSON" saves the
+  same collection.
 
 ### Security
 - **The serving bundle's edge logged every searched address.** `deploy/edge/nginx.conf` used

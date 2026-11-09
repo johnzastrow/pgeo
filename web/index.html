@@ -219,17 +219,22 @@
     </section>
 
     <section class="panel" id="panel-batch" role="tabpanel" aria-labelledby="tab-batch" hidden>
-      <p class="hint">Paste a CSV with an <code>address</code> column (forward) or <code>lat,lon</code> columns
-        (reverse), or one query per line. Up to 1,000 rows, a few requests at a time.</p>
+      <p class="hint">The first row must be a header row. Use an <code>address</code> column (forward) or
+        <code>lat</code> and <code>lon</code> columns (reverse). Fields may be separated by commas, pipes,
+        tabs or semicolons, and the separator is detected from the header. Pasted text with no header is
+        read as one query per line. Up to 1,000 rows, a few requests at a time. Matches are plotted on the
+        map with your columns as attributes: click a point to see them.</p>
       <textarea id="batch-input" rows="6" spellcheck="false" aria-label="Batch input"></textarea>
       <div class="row">
-        <input type="file" id="batch-file" accept=".csv,text/csv" aria-label="Load a CSV file">
-        <button type="button" class="btn" id="batch-sample">Sample</button>
+        <input type="file" id="batch-file" accept=".csv,.tsv,.txt,.psv,text/csv,text/plain,text/tab-separated-values" aria-label="Load a delimited text file with a header row">
+        <button type="button" class="btn" id="batch-sample">Load example</button>
+        <button type="button" class="btn" id="batch-example">Download example file</button>
       </div>
       <div class="row">
         <button type="button" class="btn btn-ink" id="batch-run">Geocode</button>
         <button type="button" class="btn" id="batch-cancel" disabled>Cancel</button>
         <button type="button" class="btn" id="batch-download" disabled>Download CSV</button>
+        <button type="button" class="btn" id="batch-geojson" disabled>Download GeoJSON</button>
       </div>
       <progress id="batch-progress" value="0" max="1"></progress>
       <p class="status" id="batch-status" role="status"></p>
