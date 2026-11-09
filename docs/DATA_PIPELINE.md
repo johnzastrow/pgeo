@@ -147,9 +147,9 @@ curl -s https://build-metadata.protomaps.dev/builds.json | jq -r '.[-1].key' # e
 > Maine examples are still literally correct. `GETTING_STARTED.md` walks the same ground for a
 > new region, and section 3 of `TODO.md` records what the change involved.
 >
-> A pgeo build no longer needs the Pelias CLI at all: OpenAddresses comes from
-> `results.openaddresses.io` and Who's on First from `data.geocode.earth`, both as targets of
-> `scripts/fetch_data.sh`. Steps 6-8 below remain the route for the *Pelias* stack, which is
+> A pgeo build no longer needs the Pelias CLI at all: OpenAddresses comes from its batch service
+> (`batch.openaddresses.io`, each source's latest successful run) and Who's on First from
+> `data.geocode.earth`, both as targets of `scripts/fetch_data.sh`. Steps 6-8 below remain the route for the *Pelias* stack, which is
 > still built the Pelias way so the comparison in the report stays like-for-like.
 
 Everything in this step lands in `data/raw/<build>/` and `data/raw/shared/`.

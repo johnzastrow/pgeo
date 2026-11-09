@@ -26,7 +26,12 @@ OVERTURE_RELEASE="${OVERTURE_RELEASE:-latest}"
 PROTOMAPS_BUILD="${PROTOMAPS_BUILD:-latest}"
 ZCTA_YEAR="${ZCTA_YEAR:-2025}"
 WOF_DIST="${WOF_DIST:-https://data.geocode.earth/wof/dist/sqlite}"
-OA_RUNS="${OA_RUNS:-https://results.openaddresses.io/latest/run}"
+# OpenAddresses publishes each source's latest successful run through its batch service. The older
+# results.openaddresses.io/latest/run archives are not kept current: for New Hampshire's statewide
+# source they hold 610,582 points with no street numbers or names, where the current run holds
+# 495,886 valid addresses, and Maine's statewide file there was missing 63,000 rows.
+OA_API="${OA_API:-https://batch.openaddresses.io/api}"
+OA_OUTPUT="${OA_OUTPUT:-https://v2.openaddresses.io/batch-prod/job}"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 REGISTRY="${ROOT}/regions/regions.json"
@@ -105,29 +110,49 @@ gnis() {
 OA_HEADER='LON,LAT,NUMBER,STREET,UNIT,CITY,DISTRICT,REGION,POSTCODE,ID,HASH'
 
 oa() {
-  # Each OpenAddresses run archive holds <source>.csv in the legacy column layout, plus a README
-  # and a .vrt. Sources come and go: one listed in the registry but absent from the latest run is
-  # reported and skipped, not fatal. A present-but-wrong archive is fatal.
-  local missing=0 src zip csv
+  # For each registered source: ask the batch service for its latest address layer, take that
+  # layer's job if it succeeded, and download the job's GeoJSON output. That is converted to the
+  # legacy column layout (OA_HEADER) the loader reads, so nothing downstream changes. A source
+  # listed in the registry but with no successful run is reported and skipped, not fatal; a
+  # download that is not the expected shape is fatal.
+  local missing=0 src csv id job status updated rows
   for st in $states; do
     while read -r src; do
       [[ -n "$src" ]] || continue
-      zip="${RAW}/oa/${src}.zip"; csv="${RAW}/oa/${src}.csv"
-      mkdir -p "$(dirname "$zip")"
-      if ! curl -sSfL --retry 2 -o "${zip}.part" "${OA_RUNS}/${src}.zip" 2>/dev/null; then
-        rm -f "${zip}.part"; echo "  no current run for ${src}"; missing=$((missing + 1)); continue
+      # The name goes into a URL and a path. The registry is ours, but check it anyway.
+      [[ "$src" =~ ^[a-z]{2}(/[a-z0-9_-]+)+$ ]] || { echo "refusing odd OpenAddresses source name: ${src}" >&2; exit 1; }
+      csv="${RAW}/oa/${src}.csv"
+      mkdir -p "$(dirname "$csv")"
+      # Newest address layer for the source; a source can list more than one.
+      read -r id updated < <(curl -sSfL --retry 2 "${OA_API}/data?source=${src}&layer=addresses" 2>/dev/null \
+        | jq -r 'map(select(.layer == "addresses")) | sort_by(.updated) | last | "\(.id // "") \(.updated // "")"' || true)
+      if [[ ! "${id:-}" =~ ^[0-9]+$ ]]; then
+        echo "  no current run for ${src}"; missing=$((missing + 1)); continue
       fi
-      mv "${zip}.part" "$zip"
-      # Extract the member by its exact name into a path of our own; never trust archive paths.
-      unzip -p -- "$zip" "${src}.csv" > "${csv}.part"
-      # The run archives are CRLF; DuckDB reads that fine, so only the check has to allow for it.
-      if [[ ! -s "${csv}.part" || "$(head -1 "${csv}.part" | tr -d '\r')" != "$OA_HEADER" ]]; then
-        rm -f "${csv}.part" "$zip"
-        echo "${src}: run archive has no ${src}.csv with the expected header" >&2
-        exit 1
+      job="$(curl -sSfL --retry 2 "${OA_API}/data/${id}" 2>/dev/null | jq -r '.job // empty' || true)"
+      status="$(curl -sSfL --retry 2 "${OA_API}/job/${job}" 2>/dev/null | jq -r '.status // empty' || true)"
+      if [[ ! "$job" =~ ^[0-9]+$ || "$status" != "Success" ]]; then
+        echo "  no successful run for ${src} (job '${job}', status '${status}')"; missing=$((missing + 1)); continue
       fi
-      mv "${csv}.part" "$csv"; rm -f "$zip"
-      echo "fetched ${src}.csv ($(du -h "$csv" | cut -f1), $(($(wc -l < "$csv") - 1)) rows)"
+      curl -sSfL --retry 2 -o "${csv}.gz.part" "${OA_OUTPUT}/${job}/source.geojson.gz"
+      gzip -t "${csv}.gz.part" || { rm -f "${csv}.gz.part"; echo "${src}: job ${job} output is not a gzip file" >&2; exit 1; }
+      # One GeoJSON feature per line. Fields are written unquoted unless they need it, as the legacy
+      # files were, so an empty field stays an empty field. Features without a point are dropped.
+      { echo "$OA_HEADER"
+        gzip -dc "${csv}.gz.part" | jq -r '
+          def q: tostring | if test("[\",\r\n]") then "\"" + gsub("\""; "\"\"") + "\"" else . end;
+          select(.geometry.type == "Point") | .properties as $p
+          | [.geometry.coordinates[0], .geometry.coordinates[1], $p.number, $p.street, $p.unit,
+             $p.city, $p.district, $p.region, $p.postcode, $p.id, $p.hash]
+          | map(if . == null then "" else q end) | join(",")'
+      } > "${csv}.part"
+      rm -f "${csv}.gz.part"
+      rows=$(($(wc -l < "${csv}.part") - 1))
+      if [[ $rows -le 0 ]]; then
+        rm -f "${csv}.part"; echo "${src}: job ${job} produced no rows" >&2; exit 1
+      fi
+      mv "${csv}.part" "$csv"
+      echo "fetched ${src}.csv (${rows} rows, job ${job}, run of ${updated%%T*})"
     done < <(jq -r --arg s "$st" '.states[$s].openaddresses[]? // empty' "$REGISTRY")
   done
   [[ $missing -eq 0 ]] || echo "$missing OpenAddresses source(s) had no current run"
