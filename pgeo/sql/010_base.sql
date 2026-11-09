@@ -56,6 +56,12 @@ CREATE OR REPLACE FUNCTION geocode.hn_int(hn text) RETURNS integer
 LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT
 AS $$ SELECT nullif(substring(hn from '^\s*(\d{1,7})'), '')::integer $$;
 
+-- A house number as it is compared: lower case, no leading zeros ("0045" -> "45", "007A" -> "7a").
+-- Builds loaded before the loader dropped the zeros still hold "0045", and a query never has one.
+CREATE OR REPLACE FUNCTION geocode.hn_norm(hn text) RETURNS text
+LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT
+AS $$ SELECT lower(regexp_replace(btrim(hn), '^0+([0-9])', '\1')) $$;
+
 -- Engine version reported by the SQL API. The loader replaces this placeholder with the
 -- package version from pgeo/pyproject.toml after applying 050_api.sql (single source).
 CREATE OR REPLACE FUNCTION geocode.engine_version() RETURNS text

@@ -10,6 +10,45 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-11-09
+
+Same-named towns across a state line no longer outrank the state the query names, and New
+Hampshire addresses stored with a leading zero now match. Applies to a running database without a
+rebuild (below); the leading-zero cleanup of the stored data needs the next build.
+
+### Fixed
+- **A town name shared across a state line could outrank the state the query named.** "45 Squirrel
+  Dr, Auburn, NH" returned 45 Spencer Dr, Auburn, ME (0.448) because the state was only a 0.06
+  ranking bonus applied after the candidate scans had cut to 25/40/60 rows, so the other state's
+  rows used up the slots. `geocode.search` now runs the search once restricted to the named state
+  (`geocode.search_core`, new `p_only_state`) and returns that if its best answer is 0.6 or more.
+  Anything weaker runs the search again across every state, with a result in another state scaled
+  to 85% of its confidence: the state reorders and discounts, and never empties the answer ("Portland,
+  NH" still finds Portland, ME, at 0.85 instead of 1.0). A query that names no state runs once,
+  as before. A rival town in the other state also no longer makes a clear answer read as
+  ambiguous ("Auburn, NH" 0.741 became 1.0).
+- **A house number stored with a leading zero never matched.** About 8,000 New Hampshire address
+  points carry numbers such as `0045`, and the exact-match join compared the text. House numbers
+  are now compared by `geocode.hn_norm()` (lower case, no leading zeros), and the OpenAddresses
+  loader drops the zeros from both the house number and the display name, so the next build holds
+  `45 SQUIRREL DRIVE`. Autocomplete matches on the stored text and picks this up with the rebuild.
+
+### Added
+- `geocode.hn_norm(text)`, `geocode.search_core(...)` (the single-pass search, with a state
+  restriction), and tests for both behaviours in `tests/test_ranking_sql.py`. The cross-state tests
+  skip on a build without both Maine and New Hampshire.
+
+### Deploying to a running database
+Apply the three functions (`hn_norm` from `sql/010_base.sql`, `search_core` and `search` from
+`sql/040_functions.sql`) in one transaction. Do not run `040_functions.sql` itself against a live
+database: it drops and recreates every function in the schema. `geocode.engine_version()` keeps
+its old value until the functions are reloaded by a build or swap.
+
+### Not yet done
+- `pgeo.street_name` has no state column, so its top-25 street list still mixes states before the
+  state restriction applies. A build-time `region_a` column would close that, and matters more as
+  states are added.
+
 ## [0.20.1] - 2026-11-01
 
 ### Fixed

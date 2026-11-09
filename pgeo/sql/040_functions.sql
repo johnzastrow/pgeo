@@ -91,14 +91,14 @@ RETURNS text LANGUAGE sql STABLE PARALLEL SAFE AS $$
    LIMIT 1
 $$;
 
-CREATE OR REPLACE FUNCTION geocode.search(
+CREATE OR REPLACE FUNCTION geocode.search_core(
     p_text text, p_name text, p_hn text, p_street text, p_locality text, p_postcode text,
     p_focus_lon double precision DEFAULT NULL, p_focus_lat double precision DEFAULT NULL,
     p_layers text[] DEFAULT NULL, p_sources text[] DEFAULT NULL,
     p_rect double precision[] DEFAULT NULL, p_size integer DEFAULT 10,
     p_circle double precision[] DEFAULT NULL, p_gid text DEFAULT NULL,
     p_categories text[] DEFAULT NULL, p_country text DEFAULT NULL,
-    p_state text DEFAULT NULL)
+    p_state text DEFAULT NULL, p_only_state text DEFAULT NULL)
 RETURNS SETOF geocode.hit
 LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
@@ -111,7 +111,10 @@ DECLARE
   qn    text := nullif(geocode.norm(p_name), '');                     -- parser's name part
   st    text := nullif(geocode.norm(p_street), '');
   loc   text := nullif(geocode.norm(p_locality), '');
-  hn    text := nullif(lower(trim(p_hn)), '');
+  hn    text := nullif(geocode.hn_norm(p_hn), '');
+  -- when set, every candidate scan is limited to this state (see geocode.search, which runs this
+  -- function once restricted and, if that finds nothing good, once without)
+  rs    text := p_only_state;
   -- A parsed house number + street means address intent: the full text is then not searched
   -- as a place name (it would match the town and outrank the address).
   addr_intent boolean := hn IS NOT NULL AND st IS NOT NULL;
@@ -145,6 +148,7 @@ BEGIN
     SELECT ST_Collect(t.geom) INTO townpt FROM (
       SELECT f.geom FROM pgeo.feature f
       WHERE f.layer IN ('locality', 'localadmin', 'neighbourhood') AND f.name_norm = loc
+        AND (rs IS NULL OR f.region_a = rs)
       ORDER BY f.importance DESC LIMIT 5) t;
   END IF;
   IF NOT geocode.country_ok(p_country) THEN
@@ -188,7 +192,7 @@ BEGIN
     FROM streets s
     JOIN pgeo.feature f ON f.layer = 'address' AND f.street_norm = s.street_norm AND f.hn_int = hni
                         AND (f.locality_norm = s.locality_norm OR f.postal_locality_norm = s.locality_norm)
-    WHERE lower(f.housenumber) = hn
+    WHERE geocode.hn_norm(f.housenumber) = hn AND (rs IS NULL OR f.region_a = rs)
     UNION ALL
     -- The same number on the best street names in *any* town. "streets" keeps 25 of ~150
     -- (Church Street, town) pairs, so without this "21 Church St, Maine" looked unique.
@@ -199,7 +203,7 @@ BEGIN
     FROM (SELECT x.street_norm, max(x.st_sim) AS st_sim FROM streets x
           GROUP BY x.street_norm ORDER BY 2 DESC LIMIT 3) n
     JOIN pgeo.feature f ON f.layer = 'address' AND f.street_norm = n.street_norm AND f.hn_int = hni
-    WHERE lower(f.housenumber) = hn
+    WHERE geocode.hn_norm(f.housenumber) = hn AND (rs IS NULL OR f.region_a = rs)
   ),
   -- Interpolation on the best streets that lack the exact number: nearest known numbers
   -- below and above on the same street and town, position linearly between them.
@@ -227,7 +231,7 @@ BEGIN
     SELECT DISTINCT ON (f.street_norm, f.locality_norm) f.id, s.st_sim, s.loc_sim
     FROM streets s
     JOIN pgeo.feature f ON f.layer = 'street' AND f.street_norm = s.street_norm
-                        AND f.locality_norm = s.locality_norm
+                        AND f.locality_norm = s.locality_norm AND (rs IS NULL OR f.region_a = rs)
     WHERE s.st_sim >= 0.6
     ORDER BY f.street_norm, f.locality_norm, f.id
   ),
@@ -251,7 +255,7 @@ BEGIN
       -- even INSERT ... ORDER BY ctid left 660 of 203,399 rows out of place. Tried, and it
       -- changed the top result of 16 of 5,002 golden queries for a 17% gain on this stage.
       FROM pgeo.feature f
-      WHERE f.layer <> 'address' AND f.name_norm % q.txt
+      WHERE f.layer <> 'address' AND f.name_norm % q.txt AND (rs IS NULL OR f.region_a = rs)
       -- ties (hundreds of "Main Street"s) are broken by distance to the focus point, so the
       -- nearby ones survive the candidate limit
       ORDER BY similarity(f.name_norm, q.txt) DESC,
@@ -262,12 +266,14 @@ BEGIN
   names_exact AS (
     SELECT f.id, 1.0::double precision AS nsim FROM pgeo.feature f
     WHERE cardinality(targets) > 0 AND f.layer <> 'address' AND f.name_norm = ANY (targets)
+      AND (rs IS NULL OR f.region_a = rs)
     ORDER BY CASE WHEN anchor IS NULL THEN 0 ELSE f.geom <-> anchor END
     LIMIT 40
   ),
   town AS (  -- the town itself, for fallbacks when nothing finer matches
     SELECT f.id FROM pgeo.feature f
     WHERE loc IS NOT NULL AND f.layer IN ('locality', 'localadmin') AND f.name_norm = loc
+      AND (rs IS NULL OR f.region_a = rs)
     LIMIT 2
   ),
   postal AS (
@@ -322,7 +328,12 @@ BEGIN
   ),
   final AS (
     SELECT s.*,
-           least(1.0, s.base * (0.4 + 0.6 * least(1.0, s.agree)))::real AS conf
+           -- A result in another state than the query named is a different place that shares a
+           -- name (Auburn, ME for "Auburn, NH"): its confidence is cut by 15%, on top of the
+           -- ranking bonus below. Only reached when the state-restricted pass found nothing good.
+           least(1.0, s.base * (0.4 + 0.6 * least(1.0, s.agree))
+                 * CASE WHEN stt IS NOT NULL AND (s.f).region_a IS NOT NULL AND (s.f).region_a <> stt
+                        THEN 0.85 ELSE 1.0 END)::real AS conf
     FROM scored s
   ),
   hits AS (
@@ -406,6 +417,48 @@ BEGIN
   ) y
   ORDER BY (y.h2).score DESC
   LIMIT lim;
+END
+$$;
+
+
+-- ---------------------------------------------------------------------------------------
+-- search: the entry point. A query that names a state ("..., Auburn, NH") is answered from that
+-- state first: the candidate scans of search_core cut to 25/40/60 rows before any scoring, and
+-- when two states share a town name the other state's rows used up slots the right ones needed.
+-- A confident answer (0.6 or more) from inside the state is returned as it is. Anything weaker
+-- might be a state typed wrongly, or a place the data files under a neighbour, so the search is
+-- then run again across every state, wrong-state rows scaled down: the state still reorders and
+-- never empties the answer (Texarkana, AR and TX).
+-- ---------------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION geocode.search(
+    p_text text, p_name text, p_hn text, p_street text, p_locality text, p_postcode text,
+    p_focus_lon double precision DEFAULT NULL, p_focus_lat double precision DEFAULT NULL,
+    p_layers text[] DEFAULT NULL, p_sources text[] DEFAULT NULL,
+    p_rect double precision[] DEFAULT NULL, p_size integer DEFAULT 10,
+    p_circle double precision[] DEFAULT NULL, p_gid text DEFAULT NULL,
+    p_categories text[] DEFAULT NULL, p_country text DEFAULT NULL,
+    p_state text DEFAULT NULL)
+RETURNS SETOF geocode.hit
+LANGUAGE plpgsql STABLE PARALLEL SAFE
+AS $$
+DECLARE
+  stt text := (SELECT r.abbr FROM geocode.region_ref r
+                WHERE upper(btrim(coalesce(p_state, ''))) IN (upper(r.abbr), upper(r.name))
+                LIMIT 1);
+  first_pass geocode.hit[];
+BEGIN
+  IF stt IS NOT NULL THEN
+    first_pass := ARRAY(SELECT c FROM geocode.search_core(
+      p_text, p_name, p_hn, p_street, p_locality, p_postcode, p_focus_lon, p_focus_lat, p_layers,
+      p_sources, p_rect, p_size, p_circle, p_gid, p_categories, p_country, p_state, stt) c);
+    IF cardinality(first_pass) > 0 AND (first_pass[1]).confidence >= 0.6 THEN
+      RETURN QUERY SELECT * FROM unnest(first_pass);
+      RETURN;
+    END IF;
+  END IF;
+  RETURN QUERY SELECT * FROM geocode.search_core(
+    p_text, p_name, p_hn, p_street, p_locality, p_postcode, p_focus_lon, p_focus_lat, p_layers,
+    p_sources, p_rect, p_size, p_circle, p_gid, p_categories, p_country, p_state, NULL);
 END
 $$;
 

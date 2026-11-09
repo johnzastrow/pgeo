@@ -102,7 +102,10 @@ def openaddresses(out: Path, reg: Region) -> int:
         """COPY (
           SELECT DISTINCT ON (HASH)
             'openaddresses' AS source, 'address' AS layer, HASH AS source_id,
-            NUMBER || ' ' || STREET AS name, NUMBER AS housenumber, STREET AS street, UNIT AS unit,
+            -- A leading zero is a data-entry habit, not part of the number ("0045 SQUIRREL DRIVE" in
+            -- New Hampshire's parcel points), and nobody types it: "45 Squirrel Dr" would never match.
+            regexp_replace(NUMBER, '^0+([0-9])', '\\1') || ' ' || STREET AS name,
+            regexp_replace(NUMBER, '^0+([0-9])', '\\1') AS housenumber, STREET AS street, UNIT AS unit,
             POSTCODE AS postcode, CITY AS locality_hint, '' AS category, '' AS addendum,
             LON AS lon, LAT AS lat, NULL::REAL AS popularity
           -- The dialect is stated, not sniffed. OpenAddresses files are quoted comma CSV with

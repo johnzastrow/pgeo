@@ -239,6 +239,65 @@ def test_autocomplete_applies_its_filters_inside_the_candidate_cut():
     assert {p["layer"] for p in ps} == {"street"}
 
 
+# ---- step: the state the query names comes first ----------------------------------------
+
+
+def _has_state(code: str) -> bool:
+    return bool(_fetchval("SELECT count(*) FROM pgeo.feature WHERE layer = 'address' AND region_a = $1", code))
+
+
+@pytest.mark.parametrize(
+    ("raw", "want"),
+    [("0045", "45"), ("007A", "7a"), ("0", "0"), ("00", "0"), ("10-12", "10-12"), (" 12b ", "12b")],
+)
+def test_a_house_number_is_compared_without_its_leading_zeros(raw, want):
+    """New Hampshire's parcel points carry "0045"; nobody types it, so it never matched 45."""
+    assert _fetchval("SELECT geocode.hn_norm($1)", raw) == want
+
+
+def test_a_stored_house_number_with_a_leading_zero_still_matches():
+    if not _has_state("NH"):
+        pytest.skip("this build holds no New Hampshire addresses")
+    row = _fetchval(
+        "SELECT housenumber || '|' || street FROM pgeo.feature WHERE layer = 'address' AND region_a = 'NH' "
+        "AND housenumber ~ '^0[1-9]' AND street_norm <> '' ORDER BY id LIMIT 1"
+    )
+    if row is None:
+        pytest.skip("the loader already dropped the zeros in this build")
+    number, street = row.split("|")
+    hit = first(search(text=f"{int(number)} {street}, NH"))
+    assert hit["layer"] == "address"
+    assert hit["match_type"] == "exact"
+
+
+@pytest.mark.parametrize(("query", "state"), [("Auburn, NH", "NH"), ("Auburn, ME", "ME")])
+def test_a_town_name_shared_across_the_state_line_answers_with_the_named_state(query, state):
+    if not (_has_state("NH") and _has_state("ME")):
+        pytest.skip("needs a build with both Maine and New Hampshire")
+    ps = props(search(text=query, size=5))
+    assert ps[0]["region_a"] == state
+    assert ps[0]["confidence"] >= 0.9, "a rival town in the other state must not make the answer ambiguous"
+
+
+def test_a_street_in_the_named_state_beats_a_same_numbered_street_in_the_neighbour():
+    """Auburn, ME has 45 Spencer / Damy / David Dr; the Auburn, NH address was outranked by them."""
+    if not _has_state("NH"):
+        pytest.skip("this build holds no New Hampshire addresses")
+    hit = first(search(text="45 Squirrel Drive, Auburn, NH"))
+    assert hit["region_a"] == "NH"
+    assert "squirrel" in hit["label"].lower()
+
+
+def test_a_wrong_state_still_finds_the_town_but_with_less_confidence():
+    """The state reorders and discounts; it never empties the answer (Texarkana, AR and TX)."""
+    if not _has_state("NH"):
+        pytest.skip("this build holds no New Hampshire addresses")
+    right = first(search(text="Portland, ME"))
+    wrong = first(search(text="Portland, NH"))
+    assert wrong["label"] == right["label"]
+    assert wrong["confidence"] < right["confidence"]
+
+
 # ---- envelope ---------------------------------------------------------------------------
 
 
