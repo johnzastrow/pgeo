@@ -13,7 +13,7 @@ pelias-prep = "pelias_prep.cli:main"
 [dependency-groups]
 dev = [
     "pytest==9.2.0",
-    "ruff==0.17.3",
+    "ruff==0.17.4",
 ]
 
 [build-system]
