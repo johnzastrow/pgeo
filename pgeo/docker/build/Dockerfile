@@ -10,7 +10,7 @@
 # pgeo-db, so this image does not carry libpostal's 1.9 GB of model data.
 ARG POSTGIS_IMAGE=postgis/postgis:18-3.6@sha256:60f6ad1d21ea86a67d47780b9a0d1e1d200500f62b19293fa834d0dea80b8677
 
-FROM ghcr.io/astral-sh/uv:0.9.17@sha256:5cb6b54d2bc3fe2eb9a8483db958a0b9eebf9edff68adedb369df8e7b98711a2 AS uv
+FROM ghcr.io/astral-sh/uv:0.13.7@sha256:96f40d3904aad8d0bd010539001d36c8e2188b981e1334471a90c4a1d93bb490 AS uv
 
 FROM ${POSTGIS_IMAGE}
 COPY --from=uv /uv /usr/local/bin/uv
