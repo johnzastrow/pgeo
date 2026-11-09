@@ -23,6 +23,32 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+## [0.26.0] - 2026-11-09
+
+Found by a real upload: a pipe-delimited company list with the address split across `Address
+Line 1`, `City` and `State` columns returned zero matches.
+
+### Fixed
+- **Batch tool: an upload whose address is split across columns matched nothing.** Only a column
+  named `address`, `query` or `text` was recognised, so a file headed `Address Line 1`, `City`,
+  `State` was read as one query per whole line. The tool now recognises the common street column
+  names (`address`, `Address Line 1`, `Address1`, `Street`, `Street Address` and similar) and, when
+  the upload has `City`, `State` and `ZIP` columns (several spellings of each), puts them on the end
+  of the street, unless the street already names them (a whole-word test: the state `ME` is not
+  found in "Homestead"). The upload's own cells are unchanged in the download. On that file, 427 of
+  735 rows now match, with no wrong-state matches; before, none did.
+
+### Added
+- Batch tool: rows that cannot be answered are kept, with the reason in `pgeo_error`, and cost no
+  request: no street address, a PO box (including "3157 PO Box"), and a state the deployment does
+  not hold (read from `region.json` `states`, so a Maine and New Hampshire build reports "outside
+  coverage (CA)" instead of searching and returning a guess). The status line says how many were
+  not searched.
+- Batch tool: a trailing unit ("Suite 100", ", Ste 4", "Unit B", "#12") is left off the query, which
+  it used to pull toward the wrong street.
+- `tests/web/test_batch_plan.py`: the planner on this file's layout, run through node (skipped
+  without it).
+
 ## [0.25.1] - 2026-11-09
 
 ### Fixed

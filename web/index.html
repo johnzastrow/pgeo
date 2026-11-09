@@ -27,7 +27,7 @@
       <h1><span class="t-main" id="region-name">&nbsp;</span> <span class="t-sub">Geocoder</span></h1>
       <!-- The page's own version is written here and kept equal to VERSION by tests/web/test_version.py;
            the engine's is read from the API at load (web/js/app.js, showVersions). -->
-      <p class="version" id="version" title="Page version, then the geocoder engine the API reports">page <span id="ver-page">0.25.1</span><span id="ver-engine"></span></p>
+      <p class="version" id="version" title="Page version, then the geocoder engine the API reports">page <span id="ver-page">0.26.0</span><span id="ver-engine"></span></p>
       <p class="edition">Self-hosted &middot; <span id="region-features"></span>OSM &middot; OA &middot; WOF &middot; GNIS &middot; Overture</p>
       <!-- With two or more announced engines this is a switch; with one it names the engine
            that is answering, so a pgeo-only deployment still says what it is running. -->
@@ -222,8 +222,10 @@
     </section>
 
     <section class="panel" id="panel-batch" role="tabpanel" aria-labelledby="tab-batch" hidden>
-      <p class="hint">The first row must be a header row. Use an <code>address</code> column (forward) or
-        <code>lat</code> and <code>lon</code> columns (reverse). Fields may be separated by commas, pipes,
+      <p class="hint">The first row must be a header row. Use an <code>address</code> column (forward), an address
+        split across <code>Address Line 1</code>, <code>City</code>, <code>State</code> and <code>ZIP</code>
+        columns, or <code>lat</code> and <code>lon</code> columns (reverse). Rows with no street, a PO box,
+        or a state this build does not cover are kept and say why in <code>pgeo_error</code>. Fields may be separated by commas, pipes,
         tabs or semicolons, and the separator is detected from the header. Pasted text with no header is
         read as one query per line. Up to 1,000 rows, a few requests at a time. Matches are plotted on the
         map with your columns as attributes: click a point to see them.</p>

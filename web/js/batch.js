@@ -4,7 +4,11 @@
 // read from the header row). The first row is expected to be a header.
 //   - header with lat + lon (or latitude/longitude) columns -> reverse geocode each row
 //   - header with an "address" (or "query"/"text") column    -> forward geocode that column
+//   - an address split across columns ("Address Line 1" or "Street", with "City", "State" and
+//     "ZIP" if present) -> forward geocode the parts together, unit tail and all-caps left as given
 //   - otherwise every non-empty line is a forward query
+// Rows that cannot be answered stay in the output with the reason in pgeo_error and cost no
+// request: no address, a PO box, or a state this deployment does not hold (region.json "states").
 // Matched rows also go to the map as GeoJSON features whose properties are the upload's columns
 // plus the pgeo_* answer, and can be downloaded as a .geojson file.
 // The download is the upload's own columns, unchanged and in order, with the geocoder's answer
@@ -29,7 +33,25 @@ const sleep = (ms, signal) => new Promise((resolve, reject) => {
   signal?.addEventListener('abort', () => { clearTimeout(t); reject(new DOMException('aborted', 'AbortError')); }, { once: true });
 });
 
-function planJobs(text) {
+// Column names that carry a street address, a town, a state and a ZIP in an upload that splits the
+// address across columns ("Address Line 1", "City", "State"). Compared in lower case.
+const STREET_COLS = ['address', 'address line 1', 'address line1', 'address1', 'address 1', 'address_line_1',
+  'street address', 'street_address', 'street', 'addr'];
+const CITY_COLS = ['city', 'town', 'locality', 'municipality'];
+const STATE_COLS = ['state', 'st', 'state code', 'state_code', 'region', 'province'];
+const ZIP_COLS = ['zip', 'zipcode', 'zip code', 'zip_code', 'postal code', 'postal_code', 'postcode', 'postal'];
+
+// A unit or suite tail ("Suite 100", ", Ste 4", "#12") is not part of where the building is, and it
+// pulls a match toward the wrong street; the query leaves it off. The row's own cell is unchanged.
+const UNIT_TAIL = /[,\s]+(?:suite|ste|unit|apt|apartment|floor|fl|room|rm|bldg|building)\b\.?\s*#?\s*[\w-]*.*$/i;
+const HASH_TAIL = /\s+#\s*[\w-]+.*$/;
+const PO_BOX = /^\s*(?:\d+\s+)?(?:p\.?\s*o\.?\s*box|post\s+office\s+box)\b/i;
+const cleanStreet = (s) => String(s || '').trim().replace(UNIT_TAIL, '').replace(HASH_TAIL, '').trim();
+const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+// Whole-word test, so the state "ME" is not found inside "Homestead".
+const mentions = (text, v) => new RegExp(`(^|[^a-z0-9])${escapeRe(v)}($|[^a-z0-9])`, 'i').test(text);
+
+export function planJobs(text, states = []) {
   if (text.length > MAX_BYTES) throw new Error(`Input is larger than ${MAX_BYTES / 1000} KB`);
   const delimiter = detectDelimiter(text);
   const rows = parseCsv(text, delimiter);
@@ -38,7 +60,11 @@ function planJobs(text) {
   const idx = (...names) => header.findIndex((h) => names.includes(h));
   const iLat = idx('lat', 'latitude', 'y');
   const iLon = idx('lon', 'lng', 'long', 'longitude', 'x');
-  const iText = idx('address', 'query', 'text');
+  const iAddr = idx(...STREET_COLS);
+  const iText = iAddr >= 0 ? iAddr : idx('query', 'text');
+  const iCity = idx(...CITY_COLS);
+  const iState = idx(...STATE_COLS);
+  const iZip = idx(...ZIP_COLS);
 
   // Every job carries `orig`, the row's own cells, and the plan carries `columns`, their names:
   // the output file is the upload with the geocoder's answer appended, so rows can be joined back
@@ -60,7 +86,26 @@ function planJobs(text) {
   } else if (iText >= 0) {
     mode = 'forward';
     columns = rows[0];
-    jobs = rows.slice(1).map((r) => ({ orig: r, input: (r[iText] || '').trim() }));
+    const parts = iAddr >= 0 ? [iCity, iState, iZip].filter((i) => i >= 0) : [];
+    jobs = rows.slice(1).map((r) => {
+      const raw = (r[iText] || '').trim();
+      if (iAddr < 0) return { orig: r, input: raw };
+      // A street alone is ambiguous across a whole state or two. When the upload gives a town,
+      // state or ZIP in their own columns they go on the end, unless the street already says so.
+      const street = cleanStreet(raw);
+      const job = { orig: r, input: street };
+      if (street) {
+        const extra = parts.map((i) => (r[i] || '').trim()).filter((v) => v && !mentions(street, v));
+        job.input = [street, ...extra].join(', ');
+      }
+      // Rows that cannot be answered are kept, with the reason, and cost no request.
+      if (PO_BOX.test(raw)) job.skip = 'PO box';
+      const st = iState >= 0 ? (r[iState] || '').trim().toUpperCase() : '';
+      if (!job.skip && states.length && /^[A-Z]{2}$/.test(st) && !states.includes(st)) {
+        job.skip = `outside coverage (${st})`;
+      }
+      return job;
+    });
   } else {
     mode = 'forward';
     columns = ['input'];
@@ -163,7 +208,7 @@ export function setupBatch(ui) {
   ui.run.addEventListener('click', async () => {
     let plan;
     try {
-      plan = planJobs(ui.textarea.value);
+      plan = planJobs(ui.textarea.value, ui.states || []);
     } catch (err) {
       ui.status.textContent = err.message;
       return;
@@ -198,6 +243,7 @@ export function setupBatch(ui) {
     let flushed = 0;
     let done = 0;
     let ok = 0;
+    let skipped = 0;
     let slot = performance.now();
     // One request may start per `interval` across all workers, so the rate holds however many
     // workers there are. Waiting for a slot is what the abort signal interrupts.
@@ -222,6 +268,10 @@ export function setupBatch(ui) {
           : !job.input;
         if (unusable) {
           error = plan.mode === 'reverse' ? 'invalid coordinates' : 'no address';
+          skipped += 1;
+        } else if (job.skip) {
+          error = job.skip;
+          skipped += 1;
         } else {
           try {
             await takeSlot();
@@ -260,7 +310,7 @@ export function setupBatch(ui) {
     };
     await Promise.all(Array.from({ length: concurrency }, worker));
     ui.status.textContent = `${signal.aborted ? 'Cancelled' : 'Done'} · ${ok} of ${out.length - 1} matched`
-      + ` · ${DELIMITER_NAMES[plan.delimiter]}-separated`;
+      + `${skipped ? ` · ${skipped} not searched` : ''} · ${DELIMITER_NAMES[plan.delimiter]}-separated`;
     lastCsv = toCsv(out);
     lastGeojson = JSON.stringify({ type: 'FeatureCollection', features });
     ui.download.disabled = out.length <= 1;

@@ -832,6 +832,8 @@ setupBatch({
   // Requests per second the deployment's edge allows this page (region.json "batch_rate"); the
   // tool paces itself to it and falls back to a rate that fits the bundle's default limit.
   rate: region.batch_rate,
+  // The states this build holds: a row naming another state is reported, not searched.
+  states: region.states,
   textarea: $('#batch-input'),
   file: $('#batch-file'),
   run: $('#batch-run'),
