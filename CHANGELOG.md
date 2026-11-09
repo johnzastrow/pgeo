@@ -23,6 +23,36 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+### Fixed
+- **OpenAddresses sources were downloaded from a stale endpoint.** `scripts/fetch_data.sh` read
+  `results.openaddresses.io/latest/run/<source>.zip`, which is not kept current. For New Hampshire's
+  statewide source it held 610,582 points with no street number, street or town, so a New Hampshire
+  build had addresses only from five town files (38,793) and OpenStreetMap; OpenAddresses' current
+  run of the same source holds 495,886 valid addresses. Maine's statewide file there was missing
+  about 63,000 rows (738,706 against 801,786), and `us/me/city_of_biddeford` was absent altogether.
+  The `oa` target now asks the batch service (`batch.openaddresses.io/api`) for each source's latest
+  successful address run, downloads that job's GeoJSON output, and converts it to the same
+  legacy column layout the loader already reads. It says which job and run date each file came from.
+  **Existing builds need their OpenAddresses files re-fetched** (`fetch_data.sh --build ... oa`) and
+  the database rebuilt; nothing else changes.
+
+### Changed
+- Demo page batch tool: the cap is 1,000 rows (was 250) and 250 KB of input (was 100 KB), so a
+  1,000-address CSV can be uploaded and the results downloaded.
+- Demo page batch tool: the downloaded CSV is now the upload's own columns, unchanged and in
+  order, followed by the answer as `pgeo_*` columns (`pgeo_label`, `pgeo_lat`, `pgeo_lon`,
+  `pgeo_confidence`, ...). Before, only the address text came back, so an ID column was lost. The
+  prefix keeps an upload's own `label` or `lat` column from colliding with ours. A row with no
+  address (or unusable coordinates) is kept with `pgeo_error` set and costs no request, so the output
+  has one row per input row. Output column names changed (`label` is now `pgeo_label`).
+- Demo page batch tool: runs several requests at once and the rate is the deployment's to set.
+  Before, it sent one request at a time at 4 a second (a full 1,000-row file took about four
+  minutes). It now starts `batch_rate` requests a second, from the deployment's `region.json`, with
+  up to 8 in flight; without that field it uses 8 a second, which fits the bundle's default edge
+  limit of 10. A deployment that raises `PGEO_EDGE_RATE` can add `"batch_rate"` to `region.json` to
+  match: 40 against an edge limit of 50 does 1,000 rows in about 25 seconds. Rows still come out
+  in input order. `docs/CONFIGURATION.md` has the setting.
+
 ### Security
 - **The serving bundle's edge logged every searched address.** `deploy/edge/nginx.conf` used
   nginx's default `combined` access log, which records the full request line, so
@@ -117,15 +147,6 @@ is now mounted as an nginx template; take the new `deploy/compose.yml` with it.
   rectangle and "search inside" working in the same frame.
 
 ### Changed
-- Demo page batch tool: the cap is 1,000 rows (was 250) and 250 KB of input (was 100 KB), so a
-  1,000-address CSV can be uploaded and the results downloaded. Still one request at a time, 4 per
-  second, so a full file takes about four minutes and stays under the edge's rate limit.
-- Demo page batch tool: the downloaded CSV is now the upload's own columns, unchanged and in
-  order, followed by the answer as `pgeo_*` columns (`pgeo_label`, `pgeo_lat`, `pgeo_lon`,
-  `pgeo_confidence`, ...). Before, only the address text came back, so an ID column was lost. The
-  prefix keeps an upload's own `label` or `lat` column from colliding with ours. A row with no
-  address (or unusable coordinates) is kept with `pgeo_error` set and costs no request, so the output
-  has one row per input row. Output column names changed (`label` is now `pgeo_label`).
 - The slide deck is rebuilt on the new UI. Six of its seven demo-page images are the captures
   above, renamed on the way into `slides/public/` so a slide refers to what it shows rather than
   to the order the screenshots were taken in. Two captions changed with them, since the queries

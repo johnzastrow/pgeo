@@ -799,6 +799,9 @@ const SAMPLE = [
 $('#batch-sample').addEventListener('click', () => { $('#batch-input').value = SAMPLE; });
 setupBatch({
   client,
+  // Requests per second the deployment's edge allows this page (region.json "batch_rate"); the
+  // tool paces itself to it and falls back to a rate that fits the bundle's default limit.
+  rate: region.batch_rate,
   textarea: $('#batch-input'),
   file: $('#batch-file'),
   run: $('#batch-run'),

@@ -6,13 +6,19 @@
 //   - otherwise every non-empty line is a forward query
 // The download is the upload's own columns, unchanged and in order, with the geocoder's answer
 // appended as pgeo_* columns - one output row per input row.
-// Requests run one at a time, at most RATE_PER_SEC, well under the server's rate limit.
+// Requests run a few at a time, at most `rate` started per second (see DEFAULT_RATE_PER_SEC).
 // This is a demo convenience; large jobs belong in a server-side batch tool (Phase 10).
 import { parseCsv, toCsv } from './format.js';
 
 const MAX_ROWS = 1000;
 const MAX_BYTES = 250_000;
-const RATE_PER_SEC = 4;
+// Requests started per second. The default fits the serving bundle's own edge limit of 10 a second
+// per client; a deployment that has raised that limit (PGEO_EDGE_RATE, docs/CONFIGURATION.md) says
+// so with "batch_rate" in its region.json and the page speeds up to match. A search takes about
+// 70 ms, so one at a time would top out near 13 a second whatever the pacing: several run at once.
+const DEFAULT_RATE_PER_SEC = 8;
+const MAX_RATE_PER_SEC = 50;
+const MAX_CONCURRENCY = 8;
 const MAX_RETRIES = 3;
 
 const sleep = (ms, signal) => new Promise((resolve, reject) => {
@@ -82,7 +88,7 @@ async function runOne(client, mode, job, opts, signal) {
 
 /**
  * Wire the batch panel.
- * @param {object} ui  { client, textarea, file, run, cancel, download, progress, status, table, context,
+ * @param {object} ui  { client, rate, textarea, file, run, cancel, download, progress, status, table, context,
  *                      onStart, onResults }
  */
 export function setupBatch(ui) {
@@ -133,39 +139,72 @@ export function setupBatch(ui) {
     const out = [[...plan.columns, 'pgeo_mode', 'pgeo_label', 'pgeo_lat', 'pgeo_lon', 'pgeo_confidence',
       'pgeo_match_type', 'pgeo_layer', 'pgeo_source', 'pgeo_gid', 'pgeo_error']];
     const features = [];
-    const interval = 1000 / RATE_PER_SEC;
+    const rate = Math.min(MAX_RATE_PER_SEC, Math.max(1, Number(ui.rate) || DEFAULT_RATE_PER_SEC));
+    const concurrency = Math.min(MAX_CONCURRENCY, Math.max(1, Math.ceil(rate / 5)));
+    const interval = 1000 / rate;
+    const total = plan.jobs.length;
+    // Finished rows wait here, by input position, and are written out in input order: with several
+    // requests in flight a later row can finish first, but the file and the table must not be
+    // reordered. A cancel keeps the rows that finished in order and drops any after a gap.
+    const finished = new Array(total);
+    let next = 0;
+    let flushed = 0;
+    let done = 0;
     let ok = 0;
-    for (const [i, job] of plan.jobs.entries()) {
-      if (signal.aborted) break;
-      const started = performance.now();
-      let feature = null;
-      let error = '';
-      // A row with nothing to look up is kept, so the output has one row per input row, but it
-      // costs no request.
-      const unusable = plan.mode === 'reverse'
-        ? !Number.isFinite(job.lat) || !Number.isFinite(job.lon)
-        : !job.input;
-      if (unusable) {
-        error = plan.mode === 'reverse' ? 'invalid coordinates' : 'no address';
-      } else {
-        try {
-          feature = await runOne(ui.client, plan.mode, job, opts, signal);
-          if (feature) { ok += 1; features.push(feature); }
-        } catch (err) {
-          if (err.name === 'AbortError') break;
-          error = err.message;
+    let slot = performance.now();
+    // One request may start per `interval` across all workers, so the rate holds however many
+    // workers there are. Waiting for a slot is what the abort signal interrupts.
+    const takeSlot = async () => {
+      const at = Math.max(slot, performance.now());
+      slot = at + interval;
+      const wait = at - performance.now();
+      if (wait > 0) await sleep(wait, signal);
+    };
+    const worker = async () => {
+      while (!signal.aborted) {
+        const i = next;
+        next += 1;
+        if (i >= total) return;
+        const job = plan.jobs[i];
+        let feature = null;
+        let error = '';
+        // A row with nothing to look up is kept, so the output has one row per input row, but it
+        // costs no request.
+        const unusable = plan.mode === 'reverse'
+          ? !Number.isFinite(job.lat) || !Number.isFinite(job.lon)
+          : !job.input;
+        if (unusable) {
+          error = plan.mode === 'reverse' ? 'invalid coordinates' : 'no address';
+        } else {
+          try {
+            await takeSlot();
+            feature = await runOne(ui.client, plan.mode, job, opts, signal);
+            if (feature) { ok += 1; features.push(feature); }
+          } catch (err) {
+            if (err.name === 'AbortError') return;
+            error = err.message;
+          }
         }
+        const p = feature?.properties || {};
+        const [lon, lat] = feature?.geometry?.coordinates || [];
+        const miss = error || (feature ? '' : 'no match');
+        finished[i] = {
+          row: [...job.orig, plan.mode, p.label, lat?.toFixed(6), lon?.toFixed(6), p.confidence,
+            p.match_type, p.layer, p.source, p.gid, miss],
+          shown: [job.input, p.label, p.confidence, miss],
+        };
+        while (finished[flushed]) {
+          out.push(finished[flushed].row);
+          appendRow(ui.table, finished[flushed].shown);
+          finished[flushed] = null;
+          flushed += 1;
+        }
+        done += 1;
+        ui.progress.value = done;
+        ui.status.textContent = `${done} / ${total} · ${ok} matched`;
       }
-      const p = feature?.properties || {};
-      const [lon, lat] = feature?.geometry?.coordinates || [];
-      out.push([...job.orig, plan.mode, p.label, lat?.toFixed(6), lon?.toFixed(6), p.confidence,
-        p.match_type, p.layer, p.source, p.gid, error || (feature ? '' : 'no match')]);
-      appendRow(ui.table, [job.input, p.label, p.confidence, error || (feature ? '' : 'no match')]);
-      ui.progress.value = i + 1;
-      ui.status.textContent = `${i + 1} / ${plan.jobs.length} · ${ok} matched`;
-      const wait = unusable ? 0 : interval - (performance.now() - started);
-      if (wait > 0) await sleep(wait, signal).catch(() => {});
-    }
+    };
+    await Promise.all(Array.from({ length: concurrency }, worker));
     ui.status.textContent = `${signal.aborted ? 'Cancelled' : 'Done'} · ${ok} of ${out.length - 1} matched`;
     lastCsv = toCsv(out);
     ui.download.disabled = out.length <= 1;

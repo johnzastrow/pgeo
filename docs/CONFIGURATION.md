@@ -62,6 +62,14 @@ Per client address, after the real address is recovered from the TLS terminator'
 | Serving bundle | `PGEO_EDGE_RATE` (requests/s), `PGEO_EDGE_BURST`, `PGEO_EDGE_BURST_AUTOCOMPLETE` in `.env` | 10, 20, 40 |
 | Ansible | `edge_rate_search`, `edge_rate_autocomplete`, `edge_burst_search`, `edge_burst_autocomplete` | 10, 25, 20, 50 |
 
+**Batch tool pace.** The demo page's batch tool starts requests at the rate in `region.json`
+(`"batch_rate"`, requests per second, 1 to 50) and keeps up to 8 in flight; without the field it
+uses 8, which fits the default edge limit. If you raise `PGEO_EDGE_RATE`, add a `batch_rate` a
+little below it (for example 40 against an edge limit of 50), or the page will not use the headroom.
+`scripts/gen_region_json.py` does not write the field, so add it after generating the file.
+Raise both only where the clients are trusted, such as a private LAN: the limit is what stops one
+client from using the whole database.
+
 ## Front ends and pools
 
 | Setting | Where | Default | Notes |

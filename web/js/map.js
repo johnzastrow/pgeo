@@ -22,7 +22,8 @@ export async function loadRegion() {
     const r = await res.json();
     const ok = Array.isArray(r?.bounds) && r.bounds.length === 2 && typeof r.tiles === 'string';
     return ok ? { build: r.build || '', name: r.name || '', bounds: r.bounds,
-                  tiles: r.tiles, features: r.features || 0 }
+                  tiles: r.tiles, features: r.features || 0,
+                  batch_rate: Number(r.batch_rate) || 0 }
               : DEFAULT_REGION;
   } catch {
     return DEFAULT_REGION;
