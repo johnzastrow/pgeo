@@ -1,0 +1,94 @@
+{
+  "build": "me-nh",
+  "note": "Known answers for a Maine-plus-New-Hampshire build. The two state-qualified locality checks are the ones a multi-state build must get right: Portland is Maine's here (not Oregon's, which is not loaded), Concord is New Hampshire's. Madawaska and Mattawamkeag are Maine border-country names that a clip could take by mistake; Portsmouth sits on the Maine and New Hampshire line. The coordinates are the Portland, ME and Concord, NH city centres.",
+  "cases": [
+    {
+      "path": "search",
+      "params": {
+        "text": "Portland, Maine"
+      },
+      "want": "Portland, ME",
+      "layer": "locality"
+    },
+    {
+      "path": "search",
+      "params": {
+        "text": "Concord, New Hampshire"
+      },
+      "want": "Concord, NH",
+      "layer": "locality"
+    },
+    {
+      "path": "search",
+      "params": {
+        "text": "389 Congress St, Portland, ME"
+      },
+      "want": "389 Congress St, Portland",
+      "layer": "address"
+    },
+    {
+      "path": "search",
+      "params": {
+        "text": "Portlnd, ME"
+      },
+      "want": "Portland, ME",
+      "layer": "locality"
+    },
+    {
+      "path": "search",
+      "params": {
+        "text": "Manchestr, NH"
+      },
+      "want": "Manchester",
+      "layer": "locality"
+    },
+    {
+      "path": "search",
+      "params": {
+        "text": "Portsmouth, NH"
+      },
+      "want": "Portsmouth, NH",
+      "layer": "locality"
+    },
+    {
+      "path": "search",
+      "params": {
+        "text": "Madawaska, Maine"
+      },
+      "want": "Madawaska",
+      "layer": "locality"
+    },
+    {
+      "path": "search",
+      "params": {
+        "text": "Mattawamkeag, ME"
+      },
+      "want": "Mattawamkeag",
+      "layer": "locality"
+    },
+    {
+      "path": "autocomplete",
+      "params": {
+        "text": "389 congress st portland"
+      },
+      "want": "389 Congress St",
+      "layer": "address"
+    },
+    {
+      "path": "reverse",
+      "params": {
+        "point.lat": "43.6568",
+        "point.lon": "-70.2626"
+      },
+      "want": "Portland"
+    },
+    {
+      "path": "reverse",
+      "params": {
+        "point.lat": "43.2081",
+        "point.lon": "-71.5376"
+      },
+      "want": "Concord"
+    }
+  ]
+}
