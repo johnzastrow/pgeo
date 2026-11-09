@@ -23,6 +23,21 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+## [0.25.1] - 2026-11-09
+
+### Fixed
+- An exact address filed under a village could lose to a street-level match on a freshly built
+  database ("45 Squirrel Drive, Auburn, NH"). Fixed in pgeo 0.21.1; details in pgeo/CHANGELOG.md.
+  Found by test-deploying the published 0.21.0 images (below).
+
+### Verified
+- The published 0.21.0 images on a throwaway stack: `pgeo-db` starts with PostGIS, libpostal and
+  pg_search; `pgeo-api` is healthy and reports 0.21.0; `pgeo-build` fetched, built and dumped
+  New Hampshire and Maine from nothing (1,601,240 features, no zero-padded house numbers, SQL
+  engine version 0.21.0). With the rule parser all me-nh known answers pass; with the in-database
+  libpostal parser the misspelling "Portlnd, ME" reads as a venue, as `docs/TUNING_REPORT.md`
+  already records.
+
 ## [0.25.0] - 2026-11-09
 
 ### Added

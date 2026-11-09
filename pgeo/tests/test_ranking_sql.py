@@ -286,6 +286,11 @@ def test_a_street_in_the_named_state_beats_a_same_numbered_street_in_the_neighbo
     hit = first(search(text="45 Squirrel Drive, Auburn, NH"))
     assert hit["region_a"] == "NH"
     assert "squirrel" in hit["label"].lower()
+    # The point is filed under the village South Hooksett with Auburn as its postal town. It has to
+    # count as in Auburn however the match reached it; scored by the village alone it came back at
+    # 0.4 and the street-level fallback (0.6) outranked the exact address.
+    assert hit["match_type"] == "exact"
+    assert hit["confidence"] >= 0.9
 
 
 def test_a_wrong_state_still_finds_the_town_but_with_less_confidence():

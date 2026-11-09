@@ -188,7 +188,14 @@ BEGIN
     LIMIT 25
   ),
   addr_exact AS (
-    SELECT f.id, s.st_sim, s.loc_sim
+    -- The town agreement of a row reached through a street/town pair is the better of the pair's
+    -- town and the row's postal town. A point filed under a village ("South Hooksett") but with
+    -- the postal town the query used ("Auburn") agrees fully; scoring it by the pair's village
+    -- alone gave 0, and which of the two routes to the same row survived "scored" below was
+    -- left to physical order.
+    SELECT f.id, s.st_sim,
+           CASE WHEN loc IS NULL THEN NULL
+                ELSE greatest(s.loc_sim, similarity(coalesce(f.postal_locality_norm, ''), loc)) END AS loc_sim
     FROM streets s
     JOIN pgeo.feature f ON f.layer = 'address' AND f.street_norm = s.street_norm AND f.hn_int = hni
                         AND (f.locality_norm = s.locality_norm OR f.postal_locality_norm = s.locality_norm)
@@ -324,7 +331,8 @@ BEGIN
            END AS agree
     FROM cand c JOIN pgeo.feature f ON f.id = c.id
     WHERE (nofilter AND rect IS NULL) OR geocode.keep(f, p_layers, p_sources, rect, p_gid, p_categories)
-    ORDER BY c.id, c.ihn, c.base DESC
+    -- the better town agreement wins among routes to the same row, not whichever came first
+    ORDER BY c.id, c.ihn, c.base DESC, coalesce(c.loc_sim, 0) DESC
   ),
   final AS (
     SELECT s.*,

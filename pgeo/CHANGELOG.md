@@ -10,6 +10,27 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+## [0.21.1] - 2026-11-09
+
+Found by test-deploying the published 0.21.0 images on a fresh me-nh build. A database built with
+`pgeo-build:0.21.0` has this bug in its SQL; 0.21.1 fixes it, and a running database takes the fix
+by reloading the functions (see 0.21.0 "Deploying to a running database").
+
+### Fixed
+- **An exact address filed under a village could come back at 0.4 and lose to a street-level
+  match.** "45 Squirrel Drive, Auburn, NH" returned the street fallback (0.6) over the exact
+  address, because the point is filed under the village South Hooksett with Auburn as its postal
+  town. `geocode.search_core` reaches an exact address by two routes, and one scored the town by the
+  street/town pair's village alone (0) where the other took the better of the village and the
+  postal town (1.0). Which route's copy survived the duplicate removal was left to physical row
+  order, so a rebuild could flip the answer; with the old zero-padded numbers it happened to be the
+  good copy. The first route now takes the better of the two as well, and among routes to the same
+  row the higher town agreement wins.
+
+### Tests
+- `test_a_street_in_the_named_state_beats_a_same_numbered_street_in_the_neighbour` now also asserts
+  an exact match at 0.9 or better. The SQL suite against the fresh build: 140 passed, 1 skipped.
+
 ## [0.21.0] - 2026-11-09
 
 Same-named towns across a state line no longer outrank the state the query names, and New
