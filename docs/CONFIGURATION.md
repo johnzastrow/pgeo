@@ -70,6 +70,14 @@ little below it (for example 40 against an edge limit of 50), or the page will n
 Raise both only where the clients are trusted, such as a private LAN: the limit is what stops one
 client from using the whole database.
 
+**World basemap.** By default the demo map shows only the build's region and cannot be zoomed out
+past it. To show the whole globe at low zoom, run `scripts/fetch_data.sh basemap_world` (a shared
+target, not part of `all`; one file of about 45 MB at zoom 6, in `data/raw/shared/basemap/`), copy it
+to the served `tiles/` directory as `world.pmtiles`, and add `"world_tiles": "/tiles/world.pmtiles"` to
+`region.json` (a path starting with `/`; `gen_region_json.py` does not write it). The page then draws
+the world tiles below zoom 7 and the regional tiles from zoom 7, and lets the map pan anywhere and zoom
+out to about zoom 1.5. Without the field nothing changes.
+
 ## Front ends and pools
 
 | Setting | Where | Default | Notes |

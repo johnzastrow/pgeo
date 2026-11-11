@@ -23,6 +23,44 @@ commits where each milestone was complete.
 
 ## [Unreleased]
 
+## [0.28.0] - 2026-11-10
+
+### Added
+- `scripts/fetch_data.sh coarse` also fetches the simplified region and country boundaries
+  (`areas_<release>.parquet`, 22 MB) used by pgeo 0.23.0 for reverse geocoding outside the region.
+### Changed
+- Page version 0.28.0. The geocoder changes (containing state and country for reverse geocoding,
+  alpha-3 country codes, a state typed without a comma) are in pgeo/CHANGELOG.md 0.23.0;
+  `docs/COARSE_TIER.md` is updated.
+
+## [0.27.0] - 2026-11-09
+
+The worldwide tier (pgeo 0.22.0), a worldwide basemap, and a batch tool that uses them.
+
+### Added
+- **Worldwide places in the geocoder** (pgeo 0.22.0): records outside Maine and New Hampshire get a
+  point at town, ZIP, state or country level, with a confidence that says how coarse it is.
+  `docs/COARSE_TIER.md`. The new `coarse` request parameter turns it off.
+- **Batch tool: coarse matches.** A tick box (on by default) includes them. Rows outside the build's
+  states are searched instead of skipped; rows with no street but a town, state or ZIP are geocoded
+  to what they say (a state alone by its full name); `pgeo_confidence` is capped by the kind of place
+  that answered (street 0.6, ZIP 0.5, town 0.45, county 0.3, state 0.2, country 0.1), with the reason
+  in the Note column; a new `pgeo_coarse` column. A row that names a state and is answered in another
+  one (a same-named town) has its confidence cut to 60% and says "state differs: found in WA". With the box unticked, a state outside the build is
+  again reported "outside coverage".
+- **Worldwide basemap.** `scripts/fetch_data.sh basemap_world` extracts a 45 MB global tile file
+  (Protomaps, zoom 0 to 6); a deployment that adds `"world_tiles": "/tiles/world.pmtiles"` to
+  `region.json` gets the whole globe when zoomed out, with the regional tiles taking over from zoom 7.
+  Without the field the map behaves as before. `docs/CONFIGURATION.md`.
+- The layer filter offers `region` and `country`.
+- Measured on the real production list (735 rows, pipe-delimited, address split across columns): 583
+  matched, up from 426 before the tier; 153 of the rows naming a state outside Maine and New
+  Hampshire matched at town level (0.45); four answers fell in another state, all junk rows, at 0.19
+  to 0.30.
+
+### Changed
+- `region.json` may carry `world_tiles`; the page's panning is unrestricted when it does.
+
 ## [0.26.0] - 2026-11-09
 
 Found by a real upload: a pipe-delimited company list with the address split across `Address

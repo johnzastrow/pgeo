@@ -88,6 +88,7 @@ data/                              (gitignored; keep it: it is the source archiv
   raw/                             step 3: untouched downloads
     osm/          maine-latest.osm.pbf (+ .md5)
     gnis/         DomesticNames_ME_Text.zip
+    shared/coarse/ divisions_<R>.parquet (worldwide places for the coarse tier, section 3.7)
     zcta/         2025_Gaz_zcta_national.zip
     boundary/     cb_2024_us_state_500k.zip
     overture/     places_<R>_me_bbox.parquet and other theme extracts (section 10)
@@ -158,7 +159,7 @@ Scripted, all at once (about 5 minutes on broadband for one state):
 
 ```bash
 scripts/fetch_data.sh --build me all
-# or one target: osm | gnis | oa | wof | zcta | boundary | overture | overture_themes | basemap
+# or one target: osm | gnis | oa | wof | zcta | coarse | boundary | overture | overture_themes | basemap
 ```
 
 Maine bbox used everywhere: `-71.2,42.9,-66.8,47.5` (lon_min, lat_min, lon_max, lat_max),
@@ -229,6 +230,22 @@ SELECT count(*) FROM 'data/raw/overture/places_${R}_me_bbox.parquet';"
 Reference: 127,185 rows in the bbox (includes parts of NH, QC, NB), 16 MB, about 1 minute.
 DuckDB reads only the row groups whose bbox statistics overlap, so it does not download the
 whole global dataset. Other Overture themes: section 10.
+
+### 3.7 Coarse tier (worldwide places, shared by every build)
+
+`scripts/fetch_data.sh coarse` reads the Overture `divisions` theme (point features and the
+`division_area` polygons) and writes `data/raw/shared/coarse/divisions_<release>.parquet`:
+every country, dependency, region, county and localadmin, plus localities that are in the US, or
+are a city or town, or have a population of 1,000 or more (about 460,000 rows with the ZIP codes
+added at load time). Bounding boxes come from `division_area` (the land area where a division has
+several); a US state's point is replaced by a point on its polygon when it falls outside it.
+
+At load time `pgeo/src/pgeo/load/coarse.py` turns that file and the national ZCTA Gazetteer
+into `stage_coarse`, and `030_enrich_index.sql` inserts those rows into `feature` with
+`coarse = true` and a `country_a` / `country`, before the street, town and autocomplete tables
+are built. Rows for the build's own states, and ZIP codes already loaded in-region, are left out.
+`PGEO_COARSE=0` turns the tier off; a build with no coarse file says
+`coarse tier skipped: <reason>` and carries on without it.
 
 ### 3.6 Protomaps basemap (for the demo page)
 

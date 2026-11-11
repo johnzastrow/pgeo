@@ -45,6 +45,11 @@ back to a hard-coded Maine default whose basemap filename does not match what is
 map comes up blank with a 404 for a file nobody asked for. The basemap's own name must match what
 that file says - `me.pmtiles` for the `me` build.
 
+Optional: a low-zoom world basemap, so the map shows the globe when zoomed out. Run
+`scripts/fetch_data.sh basemap_world`, `cp ../data/raw/shared/basemap/world-z6.pmtiles tiles/world.pmtiles`
+(about 45 MB, served from `/tiles/` like the regional file, no edge change needed), and add
+`"world_tiles": "/tiles/world.pmtiles"` to `web/region.json`.
+
 `engines.json` says which geocoder the page is talking to. Without it the page falls back to a
 built-in default that calls this deployment "Pelias / Elasticsearch" and hides the tabs only pgeo
 can serve - it still works, it is just labelled wrong and missing features. The edge injects the
