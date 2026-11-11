@@ -46,12 +46,28 @@ const ZIP_COLS = ['zip', 'zipcode', 'zip code', 'zip_code', 'postal code', 'post
 const UNIT_TAIL = /[,\s]+(?:suite|ste|unit|apt|apartment|floor|fl|room|rm|bldg|building)\b\.?\s*#?\s*[\w-]*.*$/i;
 const HASH_TAIL = /\s+#\s*[\w-]+.*$/;
 const PO_BOX = /^\s*(?:\d+\s+)?(?:p\.?\s*o\.?\s*box|post\s+office\s+box)\b/i;
+// What a record may claim, by the kind of place that answered it. The engine's confidence says how
+// well the answer fits the question: "Portland, ME" fits a town exactly. A record is geocoded to
+// find a building, and a town, a county or a state answering for it is a poor answer however well
+// it fits, so the batch output caps the confidence at what that kind of place can deliver.
+const LAYER_CAP = { street: 0.6, postalcode: 0.5, neighbourhood: 0.5, locality: 0.45, localadmin: 0.45,
+  county: 0.3, region: 0.2, country: 0.1 };
+const STATE_NAMES = { AL: 'Alabama', AK: 'Alaska', AZ: 'Arizona', AR: 'Arkansas', CA: 'California', CO: 'Colorado',
+  CT: 'Connecticut', DE: 'Delaware', DC: 'District of Columbia', FL: 'Florida', GA: 'Georgia', HI: 'Hawaii',
+  ID: 'Idaho', IL: 'Illinois', IN: 'Indiana', IA: 'Iowa', KS: 'Kansas', KY: 'Kentucky', LA: 'Louisiana',
+  ME: 'Maine', MD: 'Maryland', MA: 'Massachusetts', MI: 'Michigan', MN: 'Minnesota', MS: 'Mississippi',
+  MO: 'Missouri', MT: 'Montana', NE: 'Nebraska', NV: 'Nevada', NH: 'New Hampshire', NJ: 'New Jersey',
+  NM: 'New Mexico', NY: 'New York', NC: 'North Carolina', ND: 'North Dakota', OH: 'Ohio', OK: 'Oklahoma',
+  OR: 'Oregon', PA: 'Pennsylvania', RI: 'Rhode Island', SC: 'South Carolina', SD: 'South Dakota',
+  TN: 'Tennessee', TX: 'Texas', UT: 'Utah', VT: 'Vermont', VA: 'Virginia', WA: 'Washington',
+  WV: 'West Virginia', WI: 'Wisconsin', WY: 'Wyoming', PR: 'Puerto Rico', GU: 'Guam', VI: 'Virgin Islands',
+  AS: 'American Samoa', MP: 'Northern Mariana Islands' };
 const cleanStreet = (s) => String(s || '').trim().replace(UNIT_TAIL, '').replace(HASH_TAIL, '').trim();
 const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 // Whole-word test, so the state "ME" is not found inside "Homestead".
 const mentions = (text, v) => new RegExp(`(^|[^a-z0-9])${escapeRe(v)}($|[^a-z0-9])`, 'i').test(text);
 
-export function planJobs(text, states = []) {
+export function planJobs(text, states = [], includeCoarse = true) {
   if (text.length > MAX_BYTES) throw new Error(`Input is larger than ${MAX_BYTES / 1000} KB`);
   const delimiter = detectDelimiter(text);
   const rows = parseCsv(text, delimiter);
@@ -97,11 +113,21 @@ export function planJobs(text, states = []) {
       if (street) {
         const extra = parts.map((i) => (r[i] || '').trim()).filter((v) => v && !mentions(street, v));
         job.input = [street, ...extra].join(', ');
+      } else {
+        // No street, but the row may still say where it is. It is geocoded to what it does say, at
+        // that level: a town and state, a ZIP, or a state alone (named in full, since "CA" by itself
+        // is not a place name). The batch output caps the confidence by that level.
+        const place = [iCity, iState, iZip].filter((i) => i >= 0).map((i) => (r[i] || '').trim()).filter(Boolean);
+        const lone = place.length === 1 ? STATE_NAMES[place[0].toUpperCase()] : '';
+        if (place.length) job.input = lone || place.join(', ');
       }
       // Rows that cannot be answered are kept, with the reason, and cost no request.
       if (PO_BOX.test(raw)) job.skip = 'PO box';
       const st = iState >= 0 ? (r[iState] || '').trim().toUpperCase() : '';
-      if (!job.skip && states.length && /^[A-Z]{2}$/.test(st) && !states.includes(st)) {
+      if (/^[A-Z]{2}$/.test(st)) job.state = st;
+      // With the worldwide tier on, a state outside the build is answered at a coarser level. Only with
+      // it off is such a row left unsearched.
+      if (!job.skip && !includeCoarse && states.length && /^[A-Z]{2}$/.test(st) && !states.includes(st)) {
         job.skip = `outside coverage (${st})`;
       }
       return job;
@@ -149,7 +175,7 @@ async function runOne(client, mode, job, opts, signal) {
   for (let attempt = 0; ; attempt += 1) {
     try {
       const fc = mode === 'reverse'
-        ? await client.reverse(job.lat, job.lon, { size: 1, layers: opts.layers }, signal)
+        ? await client.reverse(job.lat, job.lon, { size: 1, layers: opts.layers, coarse: opts.coarse }, signal)
         : await client.search(job.input, { size: 1, ...opts }, signal);
       return fc.features?.[0] || null;
     } catch (err) {
@@ -208,7 +234,7 @@ export function setupBatch(ui) {
   ui.run.addEventListener('click', async () => {
     let plan;
     try {
-      plan = planJobs(ui.textarea.value, ui.states || []);
+      plan = planJobs(ui.textarea.value, ui.states || [], ui.coarse ? ui.coarse.checked : true);
     } catch (err) {
       ui.status.textContent = err.message;
       return;
@@ -225,10 +251,11 @@ export function setupBatch(ui) {
     ui.progress.value = 0;
 
     const opts = ui.context();
+    if (ui.coarse && !ui.coarse.checked) opts.coarse = false;
     // The caller's own columns first, then the answer. The answer's names carry a pgeo_ prefix so
     // that an upload with its own "label", "lat" or "lon" column never ends up with two of them.
     const out = [[...plan.columns, 'pgeo_mode', 'pgeo_label', 'pgeo_lat', 'pgeo_lon', 'pgeo_confidence',
-      'pgeo_match_type', 'pgeo_layer', 'pgeo_source', 'pgeo_gid', 'pgeo_error']];
+      'pgeo_match_type', 'pgeo_layer', 'pgeo_source', 'pgeo_gid', 'pgeo_coarse', 'pgeo_error']];
     const features = [];
     const names = propertyNames(plan.columns);
     const rate = Math.min(MAX_RATE_PER_SEC, Math.max(1, Number(ui.rate) || DEFAULT_RATE_PER_SEC));
@@ -285,21 +312,33 @@ export function setupBatch(ui) {
         const p = feature?.properties || {};
         const [lon, lat] = feature?.geometry?.coordinates || [];
         const miss = error || (feature ? '' : 'no match');
+        // The confidence a record may claim, and why when it was lowered (see LAYER_CAP).
+        const cap = LAYER_CAP[p.layer];
+        let conf = p.confidence != null && cap != null ? Math.min(p.confidence, cap) : p.confidence;
+        let note = !miss && conf !== p.confidence ? `matched at ${p.layer} level` : '';
+        // The row named a state and the answer is in another (or in no US state): a different place
+        // that shares a name. Lower than a right-state answer at the same level, and say so.
+        if (!miss && feature && job.state && p.region_a !== job.state) {
+          conf = conf == null ? conf : Math.round(conf * 0.6 * 1000) / 1000;
+          note = `state differs: found in ${p.region_a || p.country_code || 'another place'}`;
+        }
         // The map's copy of the answer: the point, with the upload's cells and the pgeo_* fields as
         // flat properties, so a click can show them all. pgeo_row is the row's place in the file.
         const props = Object.fromEntries(names.map((n, k) => [n, job.orig[k]]));
-        Object.assign(props, { pgeo_row: i + 1, pgeo_mode: plan.mode, pgeo_label: p.label, pgeo_confidence: p.confidence,
-          pgeo_match_type: p.match_type, pgeo_layer: p.layer, pgeo_source: p.source, pgeo_gid: p.gid });
+        Object.assign(props, { pgeo_row: i + 1, pgeo_mode: plan.mode, pgeo_label: p.label, pgeo_confidence: conf,
+          pgeo_match_type: p.match_type, pgeo_layer: p.layer, pgeo_source: p.source, pgeo_gid: p.gid,
+          pgeo_coarse: p.coarse ? 'true' : '' });
         finished[i] = {
           geo: feature?.geometry ? { type: 'Feature', geometry: feature.geometry, properties: props } : null,
-          row: [...job.orig, plan.mode, p.label, lat?.toFixed(6), lon?.toFixed(6), p.confidence,
-            p.match_type, p.layer, p.source, p.gid, miss],
-          shown: [job.input, p.label, p.confidence, miss],
+          row: [...job.orig, plan.mode, p.label, lat?.toFixed(6), lon?.toFixed(6), conf,
+            p.match_type, p.layer, p.source, p.gid, p.coarse ? 'true' : '', miss],
+          shown: [job.input, p.label, conf, miss || note],
+          miss: Boolean(miss),
         };
         while (finished[flushed]) {
           out.push(finished[flushed].row);
           if (finished[flushed].geo) features.push(finished[flushed].geo);
-          appendRow(ui.table, finished[flushed].shown);
+          appendRow(ui.table, finished[flushed].shown, finished[flushed].miss);
           finished[flushed] = null;
           flushed += 1;
         }
@@ -321,14 +360,14 @@ export function setupBatch(ui) {
   });
 }
 
-// cells: input, label, confidence, error
-function appendRow(table, cells) {
+// cells: input, label, confidence, note (an error, or why the confidence was lowered)
+function appendRow(table, cells, isMiss) {
   const tr = document.createElement('tr');
   for (const v of cells) {
     const td = document.createElement('td');
     td.textContent = v == null ? '' : String(v);
     tr.append(td);
   }
-  if (cells[3]) tr.className = 'batch-miss';
+  if (isMiss) tr.className = 'batch-miss';
   table.append(tr);
 }

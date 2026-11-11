@@ -17,17 +17,17 @@ pytestmark = pytest.mark.skipif(shutil.which("node") is None, reason="node is no
 
 SCRIPT = """
 import { planJobs } from '%s';
-const [text, states] = JSON.parse(process.argv[1]);
-const p = planJobs(text, states);
+const [text, states, coarse] = JSON.parse(process.argv[1]);
+const p = planJobs(text, states, coarse);
 console.log(JSON.stringify({ mode: p.mode, delimiter: p.delimiter, columns: p.columns,
   jobs: p.jobs.map((j) => ({ input: j.input, skip: j.skip || '' })) }));
 """
 
 
-def plan(text: str, states: list[str] | None = None) -> dict:
+def plan(text: str, states: list[str] | None = None, coarse: bool = True) -> dict:
     src = (ROOT / "web" / "js" / "batch.js").as_uri()
     out = subprocess.run(
-        ["node", "--input-type=module", "-e", SCRIPT % src, json.dumps([text, states or []])],
+        ["node", "--input-type=module", "-e", SCRIPT % src, json.dumps([text, states or [], coarse])],
         capture_output=True, text=True, check=True, timeout=30,
     )  # fmt: skip
     return json.loads(out.stdout)
@@ -63,13 +63,31 @@ def test_a_town_or_state_the_street_already_names_is_not_added_twice():
 
 
 def test_rows_that_cannot_be_answered_say_why_and_are_kept():
-    p = plan(PIPE, ["ME", "NH"])
+    p = plan(PIPE, ["ME", "NH"], coarse=False)
     assert len(p["jobs"]) == 7
     assert p["jobs"][1]["skip"] == "outside coverage (CA)"
     assert p["jobs"][2]["skip"] == "PO box"
-    assert p["jobs"][4]["input"] == ""  # no street: reported as "no address" by the page
+
+
+def test_with_the_worldwide_tier_on_a_state_outside_the_build_is_searched():
+    p = plan(PIPE, ["ME", "NH"], coarse=True)
+    assert p["jobs"][1]["skip"] == ""
+    assert p["jobs"][1]["input"] == "3626 Fair Oaks Blvd., Sacramento, CA"
+    assert p["jobs"][2]["skip"] == "PO box"  # a PO box has no place to find, whichever tier
+
+
+def test_a_row_with_no_street_is_geocoded_to_the_place_it_does_name():
+    p = plan(PIPE, ["ME", "NH"])
+    assert p["jobs"][4]["input"] == "Boston, MA"  # town and state, no street
+
+
+def test_a_row_with_only_a_state_is_looked_up_by_the_states_full_name():
+    text = '"Name"|"City"|"State"|"Address Line 1"\n"Acme"|""|"CA"|""\n"Beta"|""|""|""\n'
+    p = plan(text, ["ME", "NH"])
+    assert p["jobs"][0]["input"] == "California"
+    assert p["jobs"][1]["input"] == ""  # nothing at all: reported as "no address"
 
 
 def test_without_a_state_list_nothing_is_excluded_by_state():
-    p = plan(PIPE)
+    p = plan(PIPE, coarse=False)
     assert p["jobs"][1]["skip"] == ""

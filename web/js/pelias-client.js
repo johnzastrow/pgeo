@@ -77,6 +77,8 @@ function applyOptions(params, opts = {}) {
   if (layers) params.set('layers', layers);
   const sources = cleanList(opts.sources, SOURCE_RE, 'source');
   if (sources) params.set('sources', sources);
+  // The worldwide tier answers unless asked not to; only the off switch is sent.
+  if (opts.coarse === false) params.set('coarse', 'false');
   return params;
 }
 

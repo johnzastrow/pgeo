@@ -7,7 +7,7 @@ import { setupBatch, EXAMPLE_CSV } from './batch.js';
 import { setupDemoTabs } from './demo-tabs.js';
 import { dms, fixed, distanceLabel } from './format.js';
 
-const LAYERS = ['address', 'venue', 'street', 'locality', 'localadmin', 'neighbourhood', 'county', 'postalcode'];
+const LAYERS = ['address', 'venue', 'street', 'locality', 'localadmin', 'neighbourhood', 'county', 'region', 'country', 'postalcode'];
 const SOURCES = [
   ['openaddresses', 'OA'], ['openstreetmap', 'OSM'], ['whosonfirst', 'WOF'],
   ['gnis', 'GNIS'], ['overture', 'Overture'], ['zcta', 'ZCTA'],
@@ -834,6 +834,7 @@ setupBatch({
   rate: region.batch_rate,
   // The states this build holds: a row naming another state is reported, not searched.
   states: region.states,
+  coarse: $('#batch-coarse'),
   textarea: $('#batch-input'),
   file: $('#batch-file'),
   run: $('#batch-run'),

@@ -13,6 +13,7 @@ export const DEFAULT_REGION = {
   name: 'Maine',
   bounds: [[-71.2, 42.9], [-66.8, 47.5]],
   tiles: '/tiles/maine.pmtiles',
+  world_tiles: '',
 };
 
 export async function loadRegion() {
@@ -23,6 +24,9 @@ export async function loadRegion() {
     const ok = Array.isArray(r?.bounds) && r.bounds.length === 2 && typeof r.tiles === 'string';
     return ok ? { build: r.build || '', name: r.name || '', bounds: r.bounds,
                   tiles: r.tiles, features: r.features || 0,
+                  // Optional low-zoom world file; same rule as "tiles": a path on this origin.
+                  world_tiles: typeof r.world_tiles === 'string' && r.world_tiles.startsWith('/')
+                    ? r.world_tiles : '',
                   batch_rate: Number(r.batch_rate) || 0,
                   states: Array.isArray(r.states)
                     ? r.states.filter((s) => /^[A-Za-z]{2}$/.test(s)).map((s) => s.toUpperCase()) : [] }
@@ -69,10 +73,38 @@ function panBounds([[w, s], [e, n]]) {
   return [[w - dx, s - dy], [e + dx, n + dy]];
 }
 
+// With a world file (region.json "world_tiles", built by `fetch_data.sh basemap_world`) the map
+// draws the world tiles below this zoom and the regional tiles from it up. Each layer is drawn
+// from one source only at any zoom, so nothing, labels included, is drawn twice in between. The
+// world file ends at zoom 6; between 6 and 7 its tiles are enlarged.
+const WORLD_MAX_ZOOM = 7;
+const WORLD_MIN_ZOOM = 1.5;
+
+// Copy the basemap layers for the world source and clip both copies at the crossover zoom.
+function splitLayers(layers) {
+  const out = [];
+  for (const l of layers) {
+    if (l.type === 'background') { out.push(l); continue; }
+    const lo = l.minzoom || 0;
+    const hi = l.maxzoom ?? 24;
+    if (hi > WORLD_MAX_ZOOM) out.push({ ...l, minzoom: Math.max(lo, WORLD_MAX_ZOOM) });
+    if (lo < WORLD_MAX_ZOOM) {
+      out.push({ ...l, id: `world-${l.id}`, source: 'world', minzoom: lo,
+                 maxzoom: Math.min(hi, WORLD_MAX_ZOOM) });
+    }
+  }
+  // The world copies go first, so they sit below every regional layer.
+  const bg = out.filter((l) => l.type === 'background');
+  return [...bg, ...out.filter((l) => l.source === 'world'),
+          ...out.filter((l) => l.type !== 'background' && l.source !== 'world')];
+}
+
 export function createMap(container, region = DEFAULT_REGION) {
   const protocol = new window.pmtiles.Protocol();
   maplibregl.addProtocol('pmtiles', protocol.tile);
 
+  const world = region.world_tiles || '';
+  const layers = window.basemaps.layers('protomaps', chartFlavor(), { lang: 'en' });
   const style = {
     version: 8,
     glyphs: `${ORIGIN}/vendor/glyphs/{fontstack}/{range}.pbf`,
@@ -84,8 +116,14 @@ export function createMap(container, region = DEFAULT_REGION) {
         attribution:
           '<a href="https://protomaps.com">Protomaps</a> &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
       },
+      ...(world ? { world: {
+        type: 'vector',
+        url: `pmtiles://${ORIGIN}${world}`,
+        attribution:
+          '<a href="https://protomaps.com">Protomaps</a> &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
+      } } : {}),
     },
-    layers: window.basemaps.layers('protomaps', chartFlavor(), { lang: 'en' }),
+    layers: world ? splitLayers(layers) : layers,
   };
 
   const map = new maplibregl.Map({
@@ -97,7 +135,8 @@ export function createMap(container, region = DEFAULT_REGION) {
     // margin (BASEMAP_MARGIN in scripts/fetch_data.sh), so this is still "no untiled area is ever
     // shown" - but clamping to the region's own box left no room to move: the cartouche floats
     // over the left of the map, and the part of the state beneath it could not be panned out.
-    maxBounds: panBounds(region.bounds),
+    // With world tiles there is tiled ground everywhere, so the limit is the whole world.
+    ...(world ? { minZoom: WORLD_MIN_ZOOM } : { maxBounds: panBounds(region.bounds) }),
     attributionControl: false,
     cooperativeGestures: false,
   });
