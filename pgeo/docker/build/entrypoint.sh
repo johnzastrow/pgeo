@@ -95,6 +95,14 @@ ensure_secrets() {
 
 cmd_build() {
   [[ -f "$(fetch_marker)" ]] || cmd_fetch
+  # The coarse tier is shared by every build and was added after caches that already hold a fetch
+  # marker, so fetch it on its own when it is missing. Failure is not fatal: the loader then
+  # says "coarse tier skipped" and the build goes ahead without it. PGEO_COARSE=0 turns it off.
+  if [[ "${PGEO_COARSE:-1}" != 0 ]] && ! compgen -G "${PGEO_DATA_DIR}/raw/shared/coarse/divisions_*.parquet" >/dev/null; then
+    say "fetching the coarse tier (worldwide places, shared by every build)"
+    ( cd "$ROOT" && bash scripts/fetch_data.sh --build "$build" coarse ) \
+      || say "coarse fetch failed; continuing without it"
+  fi
   ensure_secrets
   pg_start
   say "preparing GNIS, ZCTA and Overture"

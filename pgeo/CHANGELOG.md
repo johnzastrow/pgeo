@@ -10,6 +10,106 @@ docs/PGEO_TUNING.md.
 
 ## [Unreleased]
 
+## [0.23.0] - 2026-11-10
+
+### Added
+- **Containing state and country for reverse geocoding outside the region.** The build now holds the
+  boundaries of every worldwide region and country (Overture division areas, simplified to about 1 km:
+  about 4,200 shapes, 29 MB) in `pgeo.coarse_area`. A reverse lookup returns the region and the
+  country that contain the point at confidence 0.7 (a boundary is simplified, so a point within a
+  kilometre of a border can land on the wrong side), after any nearby towns. The towns offered are
+  only those in the containing country and state, so a point on one side of a border no longer
+  answers with a town on the other. The list is the nearest town, the state, the country, then the
+  other towns, so the state is never cut off by the size limit. `coarse=false` leaves them out; `layers=region` or
+  `layers=country` returns just that level. Fetched by `scripts/fetch_data.sh coarse` into
+  `data/raw/shared/coarse/areas_<release>.parquet`; without it the lookup behaves as in 0.22.0.
+- **ISO 3166-1 country codes.** `geocode.country_ref` holds alpha-2, alpha-3 and numeric codes for
+  the 249 countries and Kosovo (XKX). `country_a` is now the alpha-3 code for every country, as
+  Pelias returns it (it was `USA` for the United States only); `country_code` stays the alpha-2.
+  `boundary.country` and a structured `country` accept alpha-3 codes. Overture codes a few disputed
+  areas outside ISO 3166-1 (XA to XZ except XK, CP): they have no alpha-3, so `country_a` is omitted
+  for them and their `country_code` is still present.
+- **`region_a` for worldwide places** is the ISO 3166-2 code ("ON" for Ontario, "03" for Oslo). It
+  travels in `hier`, because `region_a` on a feature still means a US state to the parser and the
+  state filters.
+
+### Changed
+- **Reverse lookups far from any address** (central Nevada, open ocean) took 0.5 to 0.7 s: the
+  nearest-address search walked the spatial index across the worldwide tier. It is now bounded to a
+  box around the radius (about 50 ms there; unchanged in the region).
+- **A state outside the build typed without a comma** is now recognised when the town before it is
+  in that state: "Sacramento CA" and "1 Main St Sacramento California" are Sacramento, California.
+  The rule is the pair, not the word: "Eric Broen Md" and "Richard Batstone Md Pa" still keep their
+  words, because no town of those names is in Maryland or Pennsylvania. Both parsers (SQL and
+  FastAPI) apply it.
+- `geocode.feature_json` and `geocode.country_code` are now STABLE, not IMMUTABLE: they read the
+  code table.
+
+### Deploying
+- The data layout changed (`stage_coarse.hier`, `pgeo.coarse_area`) and so did the function bodies:
+  rebuild and swap, as for 0.22.0. Fetch the boundaries first (`scripts/fetch_data.sh coarse`).
+
+## [0.22.0] - 2026-11-09
+
+### Added
+- **A worldwide (coarse) tier.** A build now also holds a downsampled worldwide set of places from
+  Overture divisions (every country, region, county and local admin; every US locality; elsewhere
+  cities, towns and places of 1,000 people or more) and every US ZIP centroid from the Census
+  gazetteer, about 450,000 rows. A record outside the build's own states gets a point at the level the
+  data supports (town, ZIP, state, country) and a confidence that says so: a street address answered by
+  its town is 0.45. Places the build already covers in detail are not loaded again. Rows are flagged
+  `coarse` and carry `country` and `country_a` (ISO alpha-2, in the output as `country_code`).
+  `docs/COARSE_TIER.md` has the design, sources, licenses and limits. Fetch it with
+  `scripts/fetch_data.sh coarse`; `PGEO_COARSE=0` leaves it out of a build.
+- **`coarse` parameter** on search, structured search, autocomplete and reverse (both front ends),
+  default true. `coarse=false` answers from the build's own data only: "Sacramento, CA" then returns
+  nothing on a Maine and New Hampshire build. Not Pelias's `layers=coarse` alias, which stays.
+- **`country` layer**, and `boundary.country` that works for any country (ISO alpha-2, or `USA`); a
+  country at the end of a query ("Oslo, Norway") limits the search to it (`geocode.split_country`).
+  A structured `country` may be a name (`geocode.country_code_of`).
+- `geocode.state_ref`: every US state and territory, so a query naming any state parses and is
+  answered from that state first (the build's own states stay in `region_ref`).
+- Reverse geocoding outside the region returns the nearest coarse towns and counties, at the
+  distance's confidence and never above 0.45.
+- Tests for all of this in `tests/test_ranking_sql.py`; they skip on a build without the tier.
+
+### Changed
+- **Ranking with the tier loaded.** A local result comes first at equal confidence; a worldwide town
+  of the same name is not a rival when deciding ambiguity ("Portland" stays Portland, ME at full
+  confidence); a bare "California" is the state. A wrong-state result is now discounted to 60% of its
+  confidence (it was 85%), so a town-level answer in the named state beats a street in a same-named
+  town elsewhere ("1 Main St, Springfield, IL" is Springfield, IL, not Main Street in Springfield, ME).
+- `geocode.hit` gains `coarse`, `country_a` and `country`; `feature` and `feature_ac` gain `coarse`.
+  The API reports the feature's own country; before, it was the United States whenever a state was
+  known. `layers=coarse` now includes `country`.
+- The Overture attribution names the divisions data's sources (OpenStreetMap, ODbL 1.0; Esri Community
+  Maps, CC BY 4.0).
+
+- **The parser does not over-trust the wider list of states and towns.** `geocode.state_ref`
+  (every US state) and the worldwide towns make "Eric Broen, MD" look like Maryland and "40 Bayview
+  Ter Maine" like a town called Ter. A state the build does not hold is now taken only after a comma
+  with a known town before it; worldwide towns count as the locality only after such a state; typos
+  and "this name is also a town" tests use the build's own towns (`pgeo.town` gains `coarse`), in both
+  front ends. A country is split off only as a whole trailing comma part ("Oslo, Norway", not "red
+  hill, west peru").
+- **A town-level answer inside the named state is returned as it is** (confidence 0.4 or more, in a
+  town, county, region or ZIP layer), so "20 Davis Drive, Belmont, CA" is Belmont, CA, not a Belmont,
+  NH address.
+- Autocomplete ranks the build's own places first, including the short-prefix table, so "Chi" is
+  Chichester before Chile; and its ties are broken by id, so the fast and slow routes agree.
+- On the 1,560-case accuracy set, with the same data: 94.9% before the tier, 93.8% with it; ten of the
+  19 cases that changed are queries for places outside Maine that the tier now answers correctly.
+
+### Fixed
+- Reverse geocoding outside the region took four seconds: the nearest coarse town was searched on the
+  whole table. A spatial index over the coarse rows alone makes it 6 to 330 ms.
+- A town-distance term underflowed (`value out of range`) once a feature could be thousands of
+  kilometres from the queried town; the distance is now capped where the term is already zero.
+
+### Deploying
+This changes the data layout, so it needs a rebuild and a swap, not a function update: the tier's
+rows come from the build, and `geocode.hit` changed shape. Fetch with `scripts/fetch_data.sh coarse`.
+
 ## [0.21.1] - 2026-11-09
 
 Found by test-deploying the published 0.21.0 images on a fresh me-nh build. A database built with

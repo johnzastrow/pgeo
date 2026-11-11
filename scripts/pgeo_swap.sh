@@ -129,7 +129,7 @@ BEGIN;
 SET LOCAL max_parallel_workers_per_gather = 0;
 DROP TABLE IF EXISTS pgeo.feature_ac;
 CREATE TABLE pgeo.feature_ac AS
-  SELECT id, importance, geom, layer, label, name_norm, tokens
+  SELECT id, importance, geom, layer, label, name_norm, tokens, coarse
   FROM pgeo.feature WHERE layer <> 'address' ORDER BY ctid;
 ALTER TABLE pgeo.feature_ac ADD PRIMARY KEY (id);
 CREATE INDEX feature_ac_tokens_idx ON pgeo.feature_ac USING gin (tokens);

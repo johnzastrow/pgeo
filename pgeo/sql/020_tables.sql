@@ -73,7 +73,15 @@ CREATE TABLE feature (
     locality_norm text,
     postal_locality_norm text,              -- town as the source wrote it (OA postal city)
     hn_int        integer,
-    tokens        tsvector
+    tokens        tsvector,
+    -- Country, and the coarse tier flag. Added last so the columns above keep their positions.
+    -- country_a is ISO 3166-1 alpha-2. Every non-coarse feature with a state is in the United
+    -- States (the build holds states, not countries); a coarse row takes both from Overture.
+    country_a     text,
+    country       text,
+    -- true for the worldwide backbone loaded from stage_coarse (Overture divisions and the ZIP
+    -- codes outside the build): low precision, ranked below the build's own features.
+    coarse        boolean NOT NULL DEFAULT false
 );
 
 -- Distinct street names per town: the small table fuzzy street matching runs against
@@ -120,4 +128,28 @@ CREATE UNLOGGED TABLE stage_point (
     source text, layer text, source_id text, name text, housenumber text, street text,
     unit text, postcode text, locality_hint text, category text, addendum text,
     lon double precision, lat double precision, popularity real
+);
+
+-- The coarse tier, fully worked out by pgeo/src/pgeo/load/coarse.py: 030_enrich_index.sql
+-- numbers these rows and adds the normalised forms. Empty when the tier is off or not fetched.
+CREATE UNLOGGED TABLE stage_coarse (
+    source text, layer text, source_id text, name text, postcode text,
+    locality text, localadmin text, county text, region text, region_a text,
+    country_a text, country text, label text, addendum text,
+    lon double precision, lat double precision,
+    minlon double precision, minlat double precision, maxlon double precision, maxlat double precision,
+    importance real,
+    -- JSON object merged into the feature's hier: the ISO 3166-2 short code of a non-US region
+    -- (region_a stays US-only, since the build and the parser read it as a US state)
+    hier text
+);
+
+-- Simplified boundaries (about 1 km) of the worldwide tier's regions and countries, keyed by the
+-- Overture division id, so a reverse lookup outside the build's own region can say which state and
+-- country contain a point. Empty when the areas file was not fetched.
+CREATE UNLOGGED TABLE stage_coarse_area (source_id text, layer text, wkb_hex text);
+CREATE TABLE coarse_area (
+    feature_id bigint PRIMARY KEY,
+    layer      text NOT NULL,
+    geom       geometry(Geometry, 4326) NOT NULL
 );

@@ -133,7 +133,7 @@ INSERT INTO feature (
     id, gid, source, layer, source_id, name, housenumber, street, unit, postcode,
     neighbourhood, locality, localadmin, county, region, region_a, label, category, addendum,
     geom, bbox, admin_id, hier, importance, name_norm, street_norm, locality_norm, postal_locality_norm,
-    hn_int, tokens)
+    hn_int, tokens, country_a, country)
 SELECT
     row_number() OVER (ORDER BY r.layer, r.source, r.source_id),
     r.source || ':' || r.layer || ':' || r.source_id,
@@ -175,9 +175,52 @@ SELECT
     geocode.norm(r.locality_hint),
     r.hn_int,
     to_tsvector('simple', coalesce(r.name_norm, '') || ' ' ||
-                coalesce(geocode.norm(coalesce(r.pip_locality, r.localadmin, r.locality_hint)), ''))
+                coalesce(geocode.norm(coalesce(r.pip_locality, r.localadmin, r.locality_hint)), '')),
+    -- a feature with a state is in the United States; one without has no evidence of either
+    CASE WHEN r.region_a IS NOT NULL THEN 'US' END,
+    CASE WHEN r.region_a IS NOT NULL THEN 'United States' END
 FROM raw_ranked r
 WHERE r.dup_rank = 1;
+
+-- The coarse tier: worldwide places at low precision, from stage_coarse (loaded by
+-- pgeo/src/pgeo/load/coarse.py; empty when the tier is off or not fetched). Inserted here, before
+-- the street, town, prefix and autocomplete tables are built, so all of them include it. The
+-- rows skip the point-in-polygon step above: their hierarchy came with them. Ids continue after
+-- the main insert's; a ZIP already loaded in-region (same gid) is not loaded twice.
+INSERT INTO feature (
+    id, gid, source, layer, source_id, name, postcode, locality, localadmin, county, region,
+    region_a, label, addendum, geom, bbox, hier, importance, name_norm, locality_norm, tokens,
+    country_a, country, coarse)
+SELECT
+    (SELECT coalesce(max(id), 0) FROM feature) + row_number() OVER (ORDER BY c.layer, c.source, c.source_id),
+    c.gid, c.source, c.layer, c.source_id, c.name, c.postcode, c.locality, c.localadmin, c.county,
+    c.region, c.region_a, c.label, c.addendum::jsonb,
+    ST_SetSRID(ST_MakePoint(c.lon, c.lat), 4326),
+    CASE WHEN c.minlon IS NOT NULL THEN ARRAY[c.minlon, c.minlat, c.maxlon, c.maxlat] END,
+    coalesce(c.hier::jsonb, '{}'::jsonb), c.importance,
+    geocode.norm(c.name),
+    geocode.norm(coalesce(c.locality, c.localadmin)),
+    to_tsvector('simple', coalesce(geocode.norm(c.name), '') || ' ' ||
+                coalesce(geocode.norm(coalesce(c.locality, c.localadmin)), '')),
+    c.country_a, c.country, true
+FROM (SELECT DISTINCT ON (gid) s.*
+      FROM (SELECT sc.*, sc.source || ':' || sc.layer || ':' || sc.source_id AS gid
+            FROM stage_coarse sc
+            WHERE sc.lon BETWEEN -180 AND 180 AND sc.lat BETWEEN -90 AND 90
+              AND coalesce(sc.name, '') <> '') s
+      ORDER BY gid) c
+WHERE NOT EXISTS (SELECT 1 FROM feature f WHERE f.gid = c.gid);
+
+-- Region and country boundaries of the worldwide tier, joined to their feature rows by gid. A
+-- boundary whose division was not loaded (the build's own states) matches nothing and is dropped.
+INSERT INTO coarse_area (feature_id, layer, geom)
+SELECT DISTINCT ON (f.id) f.id, f.layer,
+       ST_SetSRID(ST_GeomFromWKB(decode(a.wkb_hex, 'hex')), 4326)
+FROM stage_coarse_area a
+JOIN feature f ON f.gid = 'overture:' || a.layer || ':' || a.source_id AND f.coarse
+WHERE a.wkb_hex IS NOT NULL
+ORDER BY f.id;
+CREATE INDEX coarse_area_geom_idx ON coarse_area USING gist (geom);
 
 -- Distinct streets per town (from addresses and street features), keyed both by the
 -- WOF town and by the postal city the source gave (what people type).
@@ -200,15 +243,25 @@ GROUP BY street_norm, town;
 -- town in the state the query named. Without it "Hosuton, TX" corrects to Hosston, Louisiana,
 -- one edit away, rather than Houston, two edits away by transposition. A name in two states gets
 -- a row for each, so the exact-match tests that read this table are unaffected.
+-- `coarse` marks the worldwide tier's towns. The parser asks two different questions of this table:
+-- "is this a town the build covers" (a state name is not the state when it is also one of the
+-- build's own towns; typos are corrected to the build's own towns) and "is this a town anywhere"
+-- (what comes before a trailing state name). Towns called Maine, Washington or Georgia exist in
+-- other states, so answering the first with the worldwide towns read "238 Everett Rd Maine" as
+-- an address in a town called Maine.
 CREATE TABLE town AS
-SELECT DISTINCT lower(name) AS name, region_a FROM feature WHERE layer IN ('locality', 'localadmin');
+SELECT DISTINCT lower(name) AS name, region_a, coarse FROM feature WHERE layer IN ('locality', 'localadmin');
 CREATE INDEX town_name_idx ON town (name);
 
 -- Top 25 non-address features per 1-3 character prefix of the name.
 INSERT INTO ac_prefix (prefix, rank, feature_id)
 SELECT prefix, rn, id FROM (
   SELECT p.prefix, f.id,
-         row_number() OVER (PARTITION BY p.prefix ORDER BY f.importance DESC, length(f.name_norm), f.id) AS rn
+         -- The worldwide tier ranks below the build's own: "Chi" is Chichester here before it is
+         -- Chile, and without this the countries and regions (importance 0.9) fill every prefix.
+         row_number() OVER (PARTITION BY p.prefix
+                            ORDER BY f.importance - CASE WHEN f.coarse THEN 0.2 ELSE 0 END DESC,
+                                     length(f.name_norm), f.id) AS rn
   FROM feature f
   CROSS JOIN LATERAL (SELECT left(f.name_norm, n) AS prefix FROM generate_series(1, 3) n) p
   WHERE f.layer <> 'address' AND length(f.name_norm) >= 1
@@ -230,13 +283,17 @@ SELECT prefix, rn, id FROM (
 -- backfills earlier pages: it left 660 of 203,399 rows out of place, and that alone changed 12
 -- of 4,018 golden autocomplete results. pgeo/tests/test_feature_ac_sql.py guards the order.
 CREATE TABLE feature_ac AS
-SELECT id, importance, geom, layer, label, name_norm, tokens
+SELECT id, importance, geom, layer, label, name_norm, tokens, coarse
 FROM feature WHERE layer <> 'address' ORDER BY ctid;
 ALTER TABLE feature_ac ADD PRIMARY KEY (id);
 
 -- Indexes (the tuning log records experiments with alternatives).
 CREATE UNIQUE INDEX feature_gid_idx ON feature (gid);
 CREATE INDEX feature_geom_idx ON feature USING gist (geom);
+-- The worldwide tier alone. Reverse geocoding outside the region asks for the nearest coarse town; on
+-- the whole table the nearest-neighbour search walks outward through every one of the build's own
+-- features (1.6 million) before it finds one, which took four seconds.
+CREATE INDEX feature_coarse_geom_idx ON feature USING gist (geom) WHERE coarse;
 CREATE INDEX feature_tokens_idx ON feature USING gin (tokens);
 CREATE INDEX feature_name_trgm_idx ON feature USING gin (name_norm gin_trgm_ops) WHERE layer <> 'address';
 CREATE INDEX feature_name_idx ON feature (name_norm text_pattern_ops) WHERE layer <> 'address';

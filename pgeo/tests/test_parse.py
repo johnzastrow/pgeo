@@ -223,3 +223,23 @@ def test_a_unit_keyword_must_be_a_whole_word():
     assert p.parse("123 Main St Ste. 200, Stewart").street == "Main St"
     # "#12" at the start of a field is matched now; a word boundary before "#" never holds
     assert p.parse("123 Main St #4B, Stewart").street == "Main St"
+
+
+def test_a_state_the_build_lacks_is_taken_without_a_comma_only_when_the_town_is_in_it():
+    # "Sacramento CA": Sacramento is a California town. "Eric Broen Md" and "Richard Batstone Md Pa"
+    # end in state codes but no town of those names is in Maryland or Pennsylvania.
+    states = {"me": "ME", "maine": "ME", "ca": "CA", "california": "CA", "md": "MD", "pa": "PA"}
+    towns = {"portland", "sacramento", "broen"}
+    rules = RuleParser(towns, states, {"sacramento": {"CA"}, "portland": {"ME", "OR"}},
+                       home_localities={"portland"}, home_states={"ME"})
+    p = rules.parse("Sacramento CA")
+    assert (p.locality, p.state) == ("Sacramento", "CA")
+    p = rules.parse("Sacramento California")
+    assert (p.locality, p.state) == ("Sacramento", "CA")
+    p = rules.parse("1 Main St Sacramento CA")
+    assert (p.housenumber, p.street, p.locality, p.state) == ("1", "Main St", "Sacramento", "CA")
+    # the town is real but not in that state
+    assert rules.parse("Sacramento MD").state is None
+    # no town before the code
+    assert rules.parse("Eric Broen Md").state is None
+    assert rules.parse("Richard Batstone Md Pa").state is None

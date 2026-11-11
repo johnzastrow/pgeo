@@ -215,7 +215,9 @@ def test_a_rectangle_excludes_everything_outside_it():
 
 
 def test_another_country_returns_nothing_rather_than_maine():
-    assert not props(search(text="bangor", country="FRA"))
+    # alpha-3 codes resolve now, and there is a Bangor in Brittany: whatever comes back is French
+    assert {p["country_code"] for p in props(search(text="bangor", country="FRA"))} <= {"FR"}
+    assert not props(search(text="bangor", country="ZZZ"))
 
 
 def test_size_caps_the_number_of_results():
@@ -301,6 +303,194 @@ def test_a_wrong_state_still_finds_the_town_but_with_less_confidence():
     wrong = first(search(text="Portland, NH"))
     assert wrong["label"] == right["label"]
     assert wrong["confidence"] < right["confidence"]
+
+
+# ---- step: the worldwide (coarse) tier -------------------------------------------------
+
+
+def _has_coarse() -> bool:
+    return bool(_fetchval("SELECT count(*) FROM pgeo.feature WHERE coarse"))
+
+
+def _needs_coarse():
+    if not _has_coarse():
+        pytest.skip("this build has no worldwide tier")
+
+
+def test_a_town_outside_the_build_is_answered_from_the_worldwide_tier():
+    _needs_coarse()
+    hit = first(search(text="Sacramento, CA"))
+    assert hit["layer"] == "locality"
+    assert hit["region_a"] == "CA"
+    assert hit["country_code"] == "US"
+    assert hit["coarse"] is True
+    assert hit["confidence"] >= 0.9, "the town itself was asked for, so the town is a full answer"
+
+
+def test_a_street_address_answered_by_its_town_is_not_a_confident_answer():
+    """The honest confidence of a coarse match: the query asked for a building, the data has a town."""
+    _needs_coarse()
+    hit = first(search(text="3626 Fair Oaks Blvd, Sacramento, CA"))
+    assert hit["coarse"] is True
+    assert hit["layer"] in ("locality", "localadmin", "postalcode", "county")
+    assert hit["confidence"] <= 0.5
+
+
+def test_a_bare_state_name_is_the_state_not_a_village_that_shares_it():
+    _needs_coarse()
+    hit = first(search(text="California"))
+    assert hit["layer"] == "region"
+    assert hit["region_a"] == "CA"
+
+
+def test_the_builds_own_town_comes_first_and_is_not_made_ambiguous_by_the_worldwide_tier():
+    """Portland, OR is in the worldwide tier; Portland, ME is the build's. Neither the order nor
+    the confidence of the local one may change because the other exists."""
+    _needs_coarse()
+    ps = props(search(text="Portland", size=5))
+    assert ps[0]["region_a"] == "ME"
+    assert not ps[0].get("coarse")
+    assert ps[0]["confidence"] >= 0.9
+
+
+def test_a_named_state_outside_the_build_is_answered_from_that_state():
+    _needs_coarse()
+    hit = first(search(text="Portland, OR"))
+    assert hit["region_a"] == "OR"
+    assert hit["coarse"] is True
+
+
+def test_a_street_address_in_a_town_of_another_state_is_that_towns_not_a_same_named_ones():
+    """"1 Main St, Springfield, IL" has no street data here. The answer is the town it names, at a
+    town's confidence, not Main Street in the build's own Springfield."""
+    _needs_coarse()
+    hit = first(search(text="1 Main St, Springfield, IL"))
+    assert hit["region_a"] == "IL"
+    assert hit["confidence"] <= 0.5
+
+
+def test_coarse_false_leaves_the_worldwide_tier_out_and_the_builds_own_alone():
+    _needs_coarse()
+    assert props(search(text="Sacramento, CA", coarse="false")) == []
+    local = first(search(text="Portland, ME", coarse="false"))
+    assert local["region_a"] == "ME"
+    assert not local.get("coarse")
+
+
+def test_coarse_false_applies_to_autocomplete_and_reverse_too():
+    _needs_coarse()
+    on = props(autocomplete(text="sacram"))
+    off = props(autocomplete(text="sacram", coarse="false"))
+    assert any(p.get("coarse") for p in on)
+    assert not any(p.get("coarse") for p in off)
+
+
+def test_a_country_at_the_end_of_the_query_limits_the_search_to_it():
+    _needs_coarse()
+    n = _fetchval("SELECT count(*) FROM pgeo.feature WHERE layer = 'country' AND coarse AND country_a = 'NO'")
+    if not n:
+        pytest.skip("no Norway in this build")
+    hit = first(search(text="Oslo, Norway"))
+    assert hit["country_code"] == "NO"
+    assert "Norway" in hit["label"]
+
+
+def test_boundary_country_limits_results_to_that_country():
+    _needs_coarse()
+    ps = props(search(text="Portland", country="US", size=10))
+    assert ps and {p["country_code"] for p in ps} == {"US"}
+    assert props(search(text="Portland", country="ZZ")) == []
+
+
+def test_reverse_outside_the_region_names_the_nearest_town_at_a_towns_confidence():
+    _needs_coarse()
+    doc = _fetchval(
+        "SELECT geocode_api.v1_reverse(lat := 38.5816, lon := -121.4944, size := 3)"
+    )
+    ps = props(json.loads(doc))
+    assert ps, "no place near Sacramento"
+    assert ps[0]["coarse"] is True
+    assert ps[0]["confidence"] <= 0.45
+
+
+def _reverse(lat: float, lon: float, **kw) -> list[dict]:
+    args = ", ".join(f"{k} := {v!r}" for k, v in kw.items())
+    doc = _fetchval(f"SELECT geocode_api.v1_reverse(lat := {lat}, lon := {lon}{', ' + args if args else ''})")
+    return props(json.loads(doc))
+
+
+def _has_areas() -> bool:
+    return bool(_fetchval("SELECT count(*) FROM pgeo.coarse_area"))
+
+
+def test_a_state_outside_the_build_is_taken_without_a_comma_when_the_town_is_in_it():
+    _needs_coarse()
+    for q in ("Sacramento CA", "Sacramento California"):
+        hit = first(search(text=q))
+        assert (hit["name"], hit["region_a"], hit["country_code"]) == ("Sacramento", "CA", "US"), q
+        assert hit["layer"] == "locality", q
+    # a code that ends a name is not a state: no Maryland town of that name exists
+    hit = first(search(text="Eric Broen Md"))
+    assert hit.get("region_a") != "MD"
+
+
+def test_country_a_is_the_iso_alpha_3_code_and_a_worldwide_region_has_its_short_code():
+    _needs_coarse()
+    oslo = first(search(text="Oslo, Norway"))
+    assert (oslo["country_a"], oslo["country_code"], oslo["region_a"]) == ("NOR", "NO", "03")
+    assert first(search(text="Toronto, Canada"))["country_a"] == "CAN"
+    assert first(search(text="Portland, ME"))["country_a"] == "USA"
+    # the 249 ISO 3166-1 countries and Kosovo (XKX)
+    assert _fetchval("SELECT count(*) FROM geocode.country_ref") == 250
+
+
+def test_boundary_country_accepts_alpha_3_codes():
+    _needs_coarse()
+    assert {p["country_code"] for p in props(search(text="Oslo", country="NOR"))} == {"NO"}
+    us = props(search(text="Portland", country="USA", size=10))
+    assert us and {p["country_code"] for p in us} == {"US"}
+    assert props(search(text="Oslo", country="XXX")) == []
+
+
+def test_reverse_outside_the_region_names_the_containing_state_and_country():
+    _needs_coarse()
+    if not _has_areas():
+        pytest.skip("this build has no region boundaries")
+    ps = _reverse(39.50, -117.00, size=5)  # central Nevada, no town within the radius
+    by_layer = {p["layer"]: p for p in ps}
+    assert by_layer["region"]["name"] == "Nevada" and by_layer["region"]["region_a"] == "NV"
+    assert by_layer["country"]["country_a"] == "USA"
+    ps = _reverse(43.6532, -79.3832, size=5)  # Toronto
+    by_layer = {p["layer"]: p for p in ps}
+    assert (by_layer["region"]["name"], by_layer["region"]["region_a"]) == ("Ontario", "ON")
+    assert by_layer["country"]["country_a"] == "CAN"
+    assert all(p["confidence"] <= 0.7 for p in ps)
+
+
+def test_reverse_does_not_offer_a_town_across_the_border_as_the_answer():
+    _needs_coarse()
+    if not _has_areas():
+        pytest.skip("this build has no region boundaries")
+    # 1 km north of the Columbia River in Vancouver, Washington: Portland, Oregon is nearer to some
+    # of the points around here than any Washington locality
+    ps = _reverse(45.6330, -122.6700, size=10)
+    towns = [p for p in ps if p["layer"] in ("locality", "localadmin") and p.get("coarse")]
+    assert towns and all(p["region"] == "Washington" for p in towns)
+    assert [p["name"] for p in ps if p["layer"] == "region"] == ["Washington"]
+
+
+def test_reverse_boundaries_are_left_out_with_coarse_false_or_a_layer_filter():
+    _needs_coarse()
+    if not _has_areas():
+        pytest.skip("this build has no region boundaries")
+    assert not [p for p in _reverse(39.50, -117.00, size=5, coarse="false") if p["layer"] in ("region", "country")]
+    assert {p["layer"] for p in _reverse(39.50, -117.00, size=5, layers="country")} == {"country"}
+
+
+def test_a_bad_coarse_value_is_a_pelias_shaped_error():
+    doc = search(text="Portland", coarse="maybe")
+    assert doc["geocoding"]["errors"], doc
+    assert doc["features"] == []
 
 
 # ---- envelope ---------------------------------------------------------------------------

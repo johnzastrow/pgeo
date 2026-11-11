@@ -50,6 +50,9 @@ LANGUAGE sql STABLE PARALLEL SAFE AS $$
   -- Below five characters a single edit reaches too far: "park" is one from Parks, "bath" one
   -- from Bethel's neighbours. Short names must be spelled correctly.
   WHERE length(cand) >= 5
+    -- the build's own towns only: a typo is corrected to a town the build covers, and scanning the
+    -- worldwide towns (300,000 names) on every misspelling would cost far more than it finds
+    AND NOT t.coarse
     AND abs(length(t.name) - length(cand)) <= 1
     AND array_length(string_to_array(t.name, ' '), 1) = array_length(string_to_array(cand, ' '), 1)
     AND (levenshtein(t.name, cand) <= 1
@@ -79,6 +82,7 @@ DECLARE
   tail   text;
   prev   text;
   lead   text;
+  world  boolean := false;  -- the query named a state this build does not hold: worldwide towns count
 BEGIN
   s := regexp_replace(s, '\m(apt|apartment|unit|ste|suite)\M\.?\s*[[:alnum:]-]+|#\s*[[:alnum:]-]+', ' ', 'gi');
   -- Look for a postcode past any leading house number. Phoenix and Las Vegas number houses in
@@ -95,7 +99,7 @@ BEGIN
   END IF;
   parts := ARRAY(SELECT trim(x) FROM unnest(string_to_array(s, ',')) x WHERE trim(x) <> '');
   words := regexp_split_to_array(trim(array_to_string(parts, ' ')), '\s+');
-  -- Strip a trailing state, for any state this build covers (geocode.region_ref). It used to be
+  -- Strip a trailing state, any US state (geocode.state_ref). It used to be
   -- the literals 'me' and 'maine'. A state name can be several words, so the comma-separated
   -- part is tried before the last word.
   --
@@ -109,11 +113,18 @@ BEGIN
     tail := lower(rtrim(parts[cardinality(parts)], '.'));
     prev := CASE WHEN cardinality(parts) > 1
                  THEN lower(rtrim(parts[cardinality(parts) - 1], '.')) END;
-    SELECT r.abbr INTO state FROM geocode.region_ref r
-     WHERE tail = lower(r.abbr)
-        OR (tail = lower(r.name)
-            AND (NOT EXISTS (SELECT 1 FROM pgeo.town t WHERE t.name = tail)
-                 OR EXISTS (SELECT 1 FROM pgeo.town t WHERE t.name = prev)))
+    -- A state the build does not hold counts only with a known town before it ("Sacramento, CA"):
+    -- the tokens MD, PA, MS and IN end names and credentials ("Eric Broen, MD") as often as they
+    -- name a state. The build's own states keep the rules they always had.
+    SELECT r.abbr INTO state FROM geocode.state_ref r
+     WHERE CASE WHEN EXISTS (SELECT 1 FROM geocode.region_ref h WHERE h.abbr = r.abbr)
+                THEN tail = lower(r.abbr)
+                     OR (tail = lower(r.name)
+                         AND (NOT EXISTS (SELECT 1 FROM pgeo.town t WHERE t.name = tail AND NOT t.coarse)
+                              OR EXISTS (SELECT 1 FROM pgeo.town t WHERE t.name = prev)))
+                ELSE (tail = lower(r.abbr) OR tail = lower(r.name))
+                     AND prev IS NOT NULL AND EXISTS (SELECT 1 FROM pgeo.town t WHERE t.name = prev)
+           END
      LIMIT 1;
     IF state IS NOT NULL THEN
       parts := parts[1:cardinality(parts) - 1];
@@ -128,12 +139,25 @@ BEGIN
     FOR n IN REVERSE least(maxw, cardinality(words)) .. 1 LOOP
       tail := lower(rtrim(array_to_string(words[cardinality(words) - n + 1 : cardinality(words)],
                                           ' '), '.'));
-      SELECT r.abbr INTO state FROM geocode.region_ref r
-       WHERE tail = lower(r.abbr)
-          OR (tail = lower(r.name)
-              AND (NOT EXISTS (SELECT 1 FROM pgeo.town t WHERE t.name = tail)
-                   -- the head decides, as above; here it is any town ending the remainder
-                   OR geocode.tail_is_town(words, cardinality(words) - n, maxw)))
+      -- Without a comma, a state the build does not hold is taken only when the town before it is
+      -- in that state ("Sacramento CA": Sacramento is a California town). Bare tokens such as MD,
+      -- PA and MS end names and credentials ("Richard Batstone Md Pa", "Third Lake North
+      -- Washington") and no town of that name lies in those states, so they stay in the text.
+      SELECT r.abbr INTO state FROM geocode.state_ref r
+       WHERE CASE WHEN EXISTS (SELECT 1 FROM geocode.region_ref h WHERE h.abbr = r.abbr)
+                  THEN tail = lower(r.abbr)
+                       OR (tail = lower(r.name)
+                           AND (NOT EXISTS (SELECT 1 FROM pgeo.town t WHERE t.name = tail AND NOT t.coarse)
+                                -- the head decides, as above; here it is any town ending the remainder
+                                OR geocode.tail_is_town(words, cardinality(words) - n, maxw)))
+                  ELSE (tail = lower(r.abbr) OR tail = lower(r.name))
+                       AND EXISTS (SELECT 1
+                                   FROM generate_series(1, least(maxw, cardinality(words) - n)) k
+                                   JOIN pgeo.town t
+                                     ON t.name = lower(array_to_string(
+                                          words[cardinality(words) - n - k + 1 : cardinality(words) - n], ' '))
+                                    AND t.region_a = r.abbr)
+             END
        LIMIT 1;
       IF state IS NOT NULL THEN
         words := words[1 : cardinality(words) - n];
@@ -142,8 +166,10 @@ BEGIN
     END LOOP;
   END IF;
 
+  world := state IS NOT NULL AND NOT EXISTS (SELECT 1 FROM geocode.region_ref h WHERE h.abbr = state);
   IF cardinality(parts) >= 2 AND (
-       EXISTS (SELECT 1 FROM pgeo.town t WHERE t.name = lower(parts[cardinality(parts)]))
+       EXISTS (SELECT 1 FROM pgeo.town t WHERE t.name = lower(parts[cardinality(parts)])
+                                          AND (world OR NOT t.coarse))
        OR parts[1] ~ '^\s*\d{1,6}[a-zA-Z]?(\s*-\s*\d{1,6})?\s+\S') THEN
     locality := parts[cardinality(parts)];
     head := array_to_string(parts[1:cardinality(parts) - 1], ', ');
@@ -151,7 +177,7 @@ BEGIN
     head := array_to_string(words, ' ');
     FOR n IN REVERSE least(maxw, cardinality(words))..1 LOOP
       cand := lower(array_to_string(words[cardinality(words) - n + 1:cardinality(words)], ' '));
-      IF EXISTS (SELECT 1 FROM pgeo.town t WHERE t.name = cand) THEN
+      IF EXISTS (SELECT 1 FROM pgeo.town t WHERE t.name = cand AND (world OR NOT t.coarse)) THEN
         locality := array_to_string(words[cardinality(words) - n + 1:cardinality(words)], ' ');
         head := array_to_string(words[1:cardinality(words) - n], ' ');
         EXIT;
@@ -207,7 +233,7 @@ $$;
 -- Pelias GeoJSON
 -- ---------------------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION geocode.feature_json(h geocode.hit) RETURNS jsonb
-LANGUAGE sql IMMUTABLE PARALLEL SAFE
+LANGUAGE sql STABLE PARALLEL SAFE
 AS $$
   SELECT jsonb_strip_nulls(jsonb_build_object(
     'type', 'Feature',
@@ -222,10 +248,16 @@ AS $$
       -- feature outside every region polygon carries neither, rather than a country asserted on
       -- the assumption that a US build contains only US places - which is how "Akwesasne Canada
       -- Post" came to read ", NY, USA" and then ", USA".
-      'country', CASE WHEN h.region_a IS NOT NULL THEN 'United States' END,
-      'country_gid', CASE WHEN h.region_a IS NOT NULL THEN 'whosonfirst:country:85633793' END,
-      'country_a', CASE WHEN h.region_a IS NOT NULL THEN 'USA' END,
-      'country_code', CASE WHEN h.region_a IS NOT NULL THEN 'US' END,
+      -- The country is the feature's own (a Maine build also holds worldwide places, see
+      -- geocode.hit.coarse). country_a is the ISO alpha-3 code, as Pelias returns it, looked up from
+      -- the alpha-2 the data carries (geocode.country_ref); a territory Overture codes outside ISO
+      -- 3166-1 has none. country_code is the alpha-2. region_a is the US state abbreviation; for
+      -- a worldwide place it comes in with hier (the ISO 3166-2 code), which is merged below.
+      'country', h.country,
+      'country_gid', CASE WHEN h.country_a = 'US' THEN 'whosonfirst:country:85633793' END,
+      'country_a', (SELECT r.alpha3 FROM geocode.country_ref r WHERE r.alpha2 = h.country_a),
+      'country_code', h.country_a,
+      'coarse', CASE WHEN h.coarse THEN to_jsonb(true) END,
       'region', h.region, 'region_a', h.region_a,
       -- already carries its own suffix from Who's on First (Parish, Borough, Census Area)
       'county', h.county,
@@ -275,7 +307,7 @@ BEGIN
                                            WHEN 'wof' THEN 'whosonfirst' ELSE lower(btrim(x)) END
                FROM unnest(string_to_array(v, ',')) x);
   IF field = 'layers' AND 'coarse' = ANY (out) THEN
-    out := array_remove(out, 'coarse') || ARRAY['neighbourhood','locality','localadmin','county','region','postalcode'];
+    out := array_remove(out, 'coarse') || ARRAY['neighbourhood','locality','localadmin','county','region','country','postalcode'];
   END IF;
   IF NOT out <@ allowed THEN
     RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = format('invalid %s: %s', field, v);
@@ -296,6 +328,18 @@ END $$;
 -- An earlier form took the limit as a third argument; drop it, or two-argument calls would be
 -- ambiguous between the two.
 DROP FUNCTION IF EXISTS geocode.check_len(text, text, integer);
+-- A boolean request parameter: absent is the default, true, so the coarse tier answers unless asked
+-- not to. Anything but true/false/1/0/yes/no is the client's mistake, reported as one.
+CREATE OR REPLACE FUNCTION geocode.check_bool(v text, field text, dflt boolean DEFAULT true) RETURNS boolean
+LANGUAGE plpgsql IMMUTABLE PARALLEL SAFE AS $f$
+BEGIN
+  IF v IS NULL OR btrim(v) = '' THEN RETURN dflt; END IF;
+  IF lower(btrim(v)) IN ('true', 't', '1', 'yes', 'y', 'on') THEN RETURN true; END IF;
+  IF lower(btrim(v)) IN ('false', 'f', '0', 'no', 'n', 'off') THEN RETURN false; END IF;
+  RAISE EXCEPTION USING ERRCODE = '22023', HINT = 'pgeo', MESSAGE = field || ' must be true or false';
+END
+$f$;
+
 CREATE OR REPLACE FUNCTION geocode.check_len(v text, field text) RETURNS text
 LANGUAGE plpgsql STABLE AS $$
 DECLARE maxlen integer := geocode.api_limit('max_text');
@@ -416,6 +460,40 @@ BEGIN
   PERFORM geocode.check_range(p_lon, -180, 180, 'focus.point.lon');
 END $$;
 
+-- A structured query's country, given as an ISO code or a name: the ISO alpha-2 code to filter on,
+-- NULL when none was given, ZZ (which matches nothing) for a name that is not a country the
+-- worldwide tier knows. The United States, by any of its names, is US.
+CREATE OR REPLACE FUNCTION geocode.country_code_of(c text) RETURNS text
+LANGUAGE sql STABLE PARALLEL SAFE AS $$
+  SELECT CASE WHEN nullif(btrim(c), '') IS NULL THEN NULL
+              WHEN c ~* '^(us|usa|united states( of america)?)$' THEN 'US'
+              WHEN c ~ '^[A-Za-z]{2,3}$' THEN geocode.country_code(c)
+              ELSE coalesce((SELECT f.country_a FROM pgeo.feature f
+                              WHERE f.layer = 'country' AND f.name_norm = geocode.norm(c) LIMIT 1), 'ZZ') END
+$$;
+
+-- A country named at the end of the query ("Oslo, Norway"): the query without it, and the country's
+-- ISO alpha-2 code, so the search can be limited to that country. The United States is left to the
+-- parser, which already strips it, and a name that is the whole query ("Norway") is not split:
+-- the country and a town of that name are both answers then, and neither is chosen for the caller.
+-- Names come from the worldwide tier's country rows, so a build without one finds none.
+CREATE OR REPLACE FUNCTION geocode.split_country(t text, OUT rest text, OUT cc text)
+LANGUAGE sql STABLE PARALLEL SAFE AS $$
+  -- the country is the last comma-separated part and not all of the query, so "Oslo, Norway" splits
+  -- and "red hill, west peru" (West Peru is a town in Maine) and "Norway" alone do not
+  WITH p AS (SELECT string_to_array(t, ',') AS parts),
+       n AS (SELECT array_length(parts, 1) AS k,
+                    geocode.norm(parts[array_length(parts, 1)]) AS last,
+                    geocode.norm(array_to_string(parts[1:array_length(parts, 1) - 1], ' ')) AS head
+             FROM p)
+  SELECT n.head, f.country_a
+  FROM n, pgeo.feature f
+  WHERE n.k > 1 AND n.head <> ''
+    AND f.layer = 'country' AND f.coarse AND f.country_a <> 'US' AND f.name_norm = n.last
+  ORDER BY f.id
+  LIMIT 1
+$$;
+
 CREATE OR REPLACE FUNCTION geocode_api.v1_search(
     text text DEFAULT NULL, size integer DEFAULT 10,
     lat double precision DEFAULT NULL, lon double precision DEFAULT NULL,
@@ -426,7 +504,7 @@ CREATE OR REPLACE FUNCTION geocode_api.v1_search(
     layers text DEFAULT NULL, sources text DEFAULT NULL, country text DEFAULT NULL,
     gid text DEFAULT NULL, categories text DEFAULT NULL,
     lang text DEFAULT NULL, api_key text DEFAULT NULL, debug text DEFAULT NULL,
-    parser text DEFAULT 'rule')
+    parser text DEFAULT 'rule', coarse text DEFAULT NULL)
 RETURNS jsonb LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
 DECLARE
@@ -436,13 +514,19 @@ DECLARE
   lp  jsonb;
   cats text[];
   feats jsonb;
+  sc_rest text;
+  sc_cc   text;
+  tq  text;   -- the text that is parsed and searched: t without a trailing country
+  cty text;   -- boundary.country, or the one the text named
 BEGIN
   t := geocode.check_text(v1_search.text, 'text');
   PERFORM geocode.check_focus(lat, lon);
   cats := geocode.check_extras(country, gid, categories, lang, api_key);
-  p := geocode.parse_rule(t);
+  SELECT x.rest, x.cc INTO sc_rest, sc_cc FROM geocode.split_country(t) x;
+  IF sc_cc IS NOT NULL AND country IS NULL THEN tq := sc_rest; cty := sc_cc; ELSE tq := t; cty := country; END IF;
+  p := geocode.parse_rule(tq);
   IF parser = 'postal' THEN
-    lp := geocode.parse_postal(t);
+    lp := geocode.parse_postal(tq);
     IF lp IS NOT NULL THEN
       -- libpostal components; keep the rule parser's street when libpostal found none
       p := ROW(lp ->> 'house',
@@ -453,14 +537,14 @@ BEGIN
     END IF;
   END IF;
   SELECT jsonb_agg(geocode.feature_json(h) ORDER BY h.score DESC) INTO feats
-  FROM geocode.search(t, p.name, p.housenumber, p.street, p.locality, p.postcode,
+  FROM geocode.search(tq, p.name, p.housenumber, p.street, p.locality, p.postcode,
                       lon, lat,
-                      geocode.check_list(layers, ARRAY['address','venue','street','neighbourhood','locality','localadmin','county','region','postalcode'], 'layers'),
+                      geocode.check_list(layers, ARRAY['address','venue','street','neighbourhood','locality','localadmin','county','region','country','postalcode'], 'layers'),
                       geocode.check_list(sources, ARRAY['openaddresses','openstreetmap','whosonfirst','gnis','zcta','overture','interpolation'], 'sources'),
                       geocode.check_rect(min_lon, min_lat, max_lon, max_lat),
                       least(greatest(coalesce(size, 10), 1), geocode.api_limit('max_size')::integer),
-                      geocode.check_circle(circle_lat, circle_lon, circle_radius), gid, cats, country,
-                      p.state) h;
+                      geocode.check_circle(circle_lat, circle_lon, circle_radius), gid, cats, cty,
+                      p.state, geocode.check_bool(v1_search.coarse, 'coarse')) h;
   RETURN geocode.envelope(jsonb_build_object('text', t, 'size', size, 'parsed_text', jsonb_strip_nulls(to_jsonb(p))), feats);
 EXCEPTION WHEN SQLSTATE '22023' THEN
   GET STACKED DIAGNOSTICS err_hint = PG_EXCEPTION_HINT;
@@ -480,7 +564,7 @@ CREATE OR REPLACE FUNCTION geocode_api.v1_search_structured(
     circle_radius double precision DEFAULT NULL,
     layers text DEFAULT NULL, sources text DEFAULT NULL,
     gid text DEFAULT NULL, categories text DEFAULT NULL,
-    lang text DEFAULT NULL, api_key text DEFAULT NULL, debug text DEFAULT NULL)
+    lang text DEFAULT NULL, api_key text DEFAULT NULL, debug text DEFAULT NULL, coarse text DEFAULT NULL)
 RETURNS jsonb LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
 DECLARE
@@ -524,7 +608,7 @@ BEGIN
   ELSE
     nm := coalesce(locality, county, postalcode);
   END IF;
-  lay := geocode.check_list(layers, ARRAY['address','venue','street','neighbourhood','locality','localadmin','county','region','postalcode'], 'layers');
+  lay := geocode.check_list(layers, ARRAY['address','venue','street','neighbourhood','locality','localadmin','county','region','country','postalcode'], 'layers');
   -- Nothing but a region: that asks for the region itself, and the two front ends used to
   -- answer it differently. region is otherwise a filter and never part of the text, so the SQL
   -- edge had no name to search for and returned nothing, while FastAPI folded the bare "ME" into
@@ -547,8 +631,10 @@ BEGIN
                       geocode.check_rect(min_lon, min_lat, max_lon, max_lat),
                       least(greatest(coalesce(size, 10), 1), geocode.api_limit('max_size')::integer),
                       geocode.check_circle(circle_lat, circle_lon, circle_radius), gid, cats,
-                      CASE WHEN country IS NULL OR country ~* '^(us|usa|united states( of america)?)$' THEN NULL ELSE country END,
-                      region) h;
+                      -- a country given by name is looked up among the worldwide tier's countries;
+                      -- one it does not know matches nothing (ZZ is no country)
+                      geocode.country_code_of(country),
+                      region, geocode.check_bool(v1_search_structured.coarse, 'coarse')) h;
   RETURN geocode.envelope(q, feats);
 EXCEPTION WHEN SQLSTATE '22023' THEN
   GET STACKED DIAGNOSTICS err_hint = PG_EXCEPTION_HINT;
@@ -565,7 +651,7 @@ CREATE OR REPLACE FUNCTION geocode_api.v1_autocomplete(
     circle_radius double precision DEFAULT NULL,
     layers text DEFAULT NULL, sources text DEFAULT NULL, country text DEFAULT NULL,
     gid text DEFAULT NULL, categories text DEFAULT NULL,
-    lang text DEFAULT NULL, api_key text DEFAULT NULL, debug text DEFAULT NULL)
+    lang text DEFAULT NULL, api_key text DEFAULT NULL, debug text DEFAULT NULL, coarse text DEFAULT NULL)
 RETURNS jsonb LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
 DECLARE
@@ -579,11 +665,12 @@ BEGIN
   cats := geocode.check_extras(country, gid, categories, lang, api_key);
   SELECT jsonb_agg(geocode.feature_json(h)) INTO feats
   FROM geocode.autocomplete(t, lon, lat,
-         geocode.check_list(layers, ARRAY['address','venue','street','neighbourhood','locality','localadmin','county','region','postalcode'], 'layers'),
+         geocode.check_list(layers, ARRAY['address','venue','street','neighbourhood','locality','localadmin','county','region','country','postalcode'], 'layers'),
          geocode.check_list(sources, ARRAY['openaddresses','openstreetmap','whosonfirst','gnis','zcta','overture','interpolation'], 'sources'),
          geocode.check_rect(min_lon, min_lat, max_lon, max_lat),
          least(greatest(coalesce(size, 10), 1), geocode.api_limit('max_size')::integer),
-         geocode.check_circle(circle_lat, circle_lon, circle_radius), gid, cats, country) h;
+         geocode.check_circle(circle_lat, circle_lon, circle_radius), gid, cats, country,
+         geocode.check_bool(v1_autocomplete.coarse, 'coarse')) h;
   RETURN geocode.envelope(jsonb_build_object('text', t, 'size', size), feats);
 EXCEPTION WHEN SQLSTATE '22023' THEN
   GET STACKED DIAGNOSTICS err_hint = PG_EXCEPTION_HINT;
@@ -596,7 +683,7 @@ CREATE OR REPLACE FUNCTION geocode_api.v1_reverse(
     lat double precision DEFAULT NULL, lon double precision DEFAULT NULL, size integer DEFAULT 10,
     radius double precision DEFAULT NULL, layers text DEFAULT NULL, sources text DEFAULT NULL,
     country text DEFAULT NULL, gid text DEFAULT NULL, categories text DEFAULT NULL,
-    lang text DEFAULT NULL, api_key text DEFAULT NULL, debug text DEFAULT NULL)
+    lang text DEFAULT NULL, api_key text DEFAULT NULL, debug text DEFAULT NULL, coarse text DEFAULT NULL)
 RETURNS jsonb LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
 DECLARE
@@ -614,9 +701,10 @@ BEGIN
   cats := geocode.check_extras(country, gid, categories, lang, api_key);
   SELECT jsonb_agg(geocode.feature_json(h)) INTO feats
   FROM geocode.reverse(lon, lat,
-         geocode.check_list(layers, ARRAY['address','venue','street','neighbourhood','locality','localadmin','county','region','postalcode'], 'layers'),
+         geocode.check_list(layers, ARRAY['address','venue','street','neighbourhood','locality','localadmin','county','region','country','postalcode'], 'layers'),
          geocode.check_list(sources, ARRAY['openaddresses','openstreetmap','whosonfirst','gnis','zcta','overture'], 'sources'),
-         radius, least(greatest(coalesce(size, 10), 1), geocode.api_limit('max_size')::integer), gid, cats, country) h;
+         radius, least(greatest(coalesce(size, 10), 1), geocode.api_limit('max_size')::integer), gid, cats, country,
+         geocode.check_bool(v1_reverse.coarse, 'coarse')) h;
   RETURN geocode.envelope(q, feats);
 EXCEPTION WHEN SQLSTATE '22023' THEN
   GET STACKED DIAGNOSTICS err_hint = PG_EXCEPTION_HINT;
@@ -687,7 +775,9 @@ LANGUAGE sql STABLE PARALLEL SAFE AS $fn$
       <li><a href="https://www.census.gov/">US Census Bureau</a> TIGER/Line and the ZCTA
           gazetteer: public domain.</li>
       <li><a href="https://overturemaps.org/">Overture Maps</a> places, under
-          CDLA-Permissive-2.0; Overture themes derived from OpenStreetMap under ODbL 1.0.</li>
+          CDLA-Permissive-2.0. Overture divisions (the worldwide towns, counties, regions and countries
+          used outside the region the build covers) are derived from OpenStreetMap under ODbL 1.0 and from
+          Esri Community Maps contributors under CC BY 4.0.</li>
     </ul>
   </body>
 </html>

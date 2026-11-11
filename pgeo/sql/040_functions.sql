@@ -14,7 +14,10 @@ CREATE TYPE geocode.hit AS (
     label text, category text[], addendum jsonb,
     lon double precision, lat double precision, bbox double precision[],
     confidence real, match_type text, accuracy text, distance_km double precision, score real,
-    hier jsonb                                   -- Pelias hierarchy ids (locality_gid, county_gid, county_a, ...)
+    hier jsonb,                                  -- Pelias hierarchy ids (locality_gid, county_gid, county_a, ...)
+    -- the coarse tier (worldwide places outside the build's own region), and the country the
+    -- feature is in: ISO 3166-1 alpha-2 and the English name
+    coarse boolean, country_a text, country text
 );
 
 -- Focus-point boost: 1 at the focus, ~0.37 at 50 km, fading with distance.
@@ -25,10 +28,13 @@ AS $$ SELECT CASE WHEN focus IS NULL THEN 0
 
 -- Shared filter: layers, sources, bounding rectangle.
 DROP FUNCTION IF EXISTS geocode.keep(pgeo.feature, text[], text[], geometry) CASCADE;
+-- the six-argument form, before the coarse and country switches were added
+DROP FUNCTION IF EXISTS geocode.keep(pgeo.feature, text[], text[], geometry, text, text[]) CASCADE;
 -- Shared filter: layers, sources, area (boundary.rect and/or boundary.circle), boundary.gid
 -- (the feature is, or lies in, that admin area), categories (any overlap).
 CREATE OR REPLACE FUNCTION geocode.keep(f pgeo.feature, layers text[], sources text[], rect geometry,
-                                        gid text DEFAULT NULL, cats text[] DEFAULT NULL)
+                                        gid text DEFAULT NULL, cats text[] DEFAULT NULL,
+                                        nocoarse boolean DEFAULT false, cc text DEFAULT NULL)
 RETURNS boolean LANGUAGE sql STABLE PARALLEL SAFE
 AS $$ SELECT (layers IS NULL OR cardinality(layers) = 0 OR f.layer = ANY (layers))
          AND (sources IS NULL OR cardinality(sources) = 0 OR f.source = ANY (sources))
@@ -38,7 +44,10 @@ AS $$ SELECT (layers IS NULL OR cardinality(layers) = 0 OR f.layer = ANY (layers
               OR EXISTS (SELECT 1 FROM geocode.region_ref r
                          WHERE gid = 'whosonfirst:region:' || r.wof_id)
               OR EXISTS (SELECT 1 FROM jsonb_each_text(f.hier) e WHERE e.value = gid))
-         AND (cats IS NULL OR cardinality(cats) = 0 OR f.category && cats) $$;
+         AND (cats IS NULL OR cardinality(cats) = 0 OR f.category && cats)
+         -- coarse=false leaves the worldwide tier out; boundary.country keeps one country's features
+         AND (NOT nocoarse OR NOT f.coarse)
+         AND (cc IS NULL OR f.country_a = cc) $$;
 
 -- Search area from boundary.rect (min_lon, min_lat, max_lon, max_lat) and boundary.circle
 -- (lon, lat, radius km); NULL when neither is given.
@@ -54,10 +63,20 @@ AS $$
   FROM r, c
 $$;
 
--- boundary.country: the data is Maine only, so any country other than the US matches nothing.
+-- boundary.country as an ISO 3166-1 alpha-2 code: a two-letter code as given, a three-letter code
+-- looked up in geocode.country_ref (USA is US), NULL when none was asked for. A three-letter code
+-- that is not an ISO alpha-3 code gives '--', which matches nothing.
+CREATE OR REPLACE FUNCTION geocode.country_code(p_country text) RETURNS text
+LANGUAGE sql STABLE PARALLEL SAFE
+AS $$ SELECT CASE WHEN nullif(btrim(p_country), '') IS NULL THEN NULL
+                  WHEN btrim(p_country) ~ '^[A-Za-z]{2}$' THEN upper(btrim(p_country))
+                  WHEN btrim(p_country) ~ '^[A-Za-z]{3}$'
+                  THEN coalesce((SELECT r.alpha2 FROM geocode.country_ref r
+                                 WHERE r.alpha3 = upper(btrim(p_country))), '--')
+                  ELSE '--' END $$;
 CREATE OR REPLACE FUNCTION geocode.country_ok(p_country text) RETURNS boolean
-LANGUAGE sql IMMUTABLE PARALLEL SAFE
-AS $$ SELECT p_country IS NULL OR upper(btrim(p_country)) IN ('US', 'USA') $$;
+LANGUAGE sql STABLE PARALLEL SAFE
+AS $$ SELECT geocode.country_code(p_country) IS DISTINCT FROM '--' $$;
 
 -- Copy of a hit with a different confidence.
 CREATE OR REPLACE FUNCTION geocode.set_conf(h geocode.hit, c real) RETURNS geocode.hit
@@ -65,7 +84,7 @@ LANGUAGE sql IMMUTABLE PARALLEL SAFE
 AS $$ SELECT ROW(h.id, h.gid, h.source, h.layer, h.source_id, h.name, h.housenumber, h.street, h.postcode,
               h.neighbourhood, h.locality, h.localadmin, h.county, h.region, h.region_a, h.label,
               h.category, h.addendum, h.lon, h.lat, h.bbox, c, h.match_type, h.accuracy,
-              h.distance_km, h.score, h.hier)::geocode.hit $$;
+              h.distance_km, h.score, h.hier, h.coarse, h.country_a, h.country)::geocode.hit $$;
 
 CREATE OR REPLACE FUNCTION geocode.to_hit(f pgeo.feature, conf real, mt text, acc text,
                                           dist_km double precision, score real)
@@ -73,7 +92,7 @@ RETURNS geocode.hit LANGUAGE sql IMMUTABLE PARALLEL SAFE
 AS $$ SELECT ROW(f.id, f.gid, f.source, f.layer, f.source_id, f.name, f.housenumber, f.street,
               f.postcode, f.neighbourhood, f.locality, f.localadmin, f.county, f.region, f.region_a,
               f.label, f.category, f.addendum, ST_X(f.geom), ST_Y(f.geom), f.bbox,
-              conf, mt, acc, dist_km, score, f.hier)::geocode.hit $$;
+              conf, mt, acc, dist_km, score, f.hier, f.coarse, f.country_a, f.country)::geocode.hit $$;
 
 -- ---------------------------------------------------------------------------------------
 -- search: unstructured and structured forward geocoding.
@@ -86,7 +105,7 @@ AS $$ SELECT ROW(f.id, f.gid, f.source, f.layer, f.source_id, f.name, f.housenum
 -- the region itself, and both front ends need the same answer to what that region is called.
 CREATE OR REPLACE FUNCTION geocode.region_name(p_region text)
 RETURNS text LANGUAGE sql STABLE PARALLEL SAFE AS $$
-  SELECT r.name FROM geocode.region_ref r
+  SELECT r.name FROM geocode.state_ref r
    WHERE upper(btrim(coalesce(p_region, ''))) IN (upper(r.abbr), upper(r.name))
    LIMIT 1
 $$;
@@ -98,7 +117,7 @@ CREATE OR REPLACE FUNCTION geocode.search_core(
     p_rect double precision[] DEFAULT NULL, p_size integer DEFAULT 10,
     p_circle double precision[] DEFAULT NULL, p_gid text DEFAULT NULL,
     p_categories text[] DEFAULT NULL, p_country text DEFAULT NULL,
-    p_state text DEFAULT NULL, p_only_state text DEFAULT NULL)
+    p_state text DEFAULT NULL, p_only_state text DEFAULT NULL, p_coarse boolean DEFAULT true)
 RETURNS SETOF geocode.hit
 LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
@@ -124,9 +143,12 @@ DECLARE
   -- results rather than empty them.
   -- resolved through region_ref, so "TX" and "Texas" both arrive as TX and anything this build
   -- does not cover arrives as NULL and ranks nothing
-  stt   text := (SELECT r.abbr FROM geocode.region_ref r
+  stt   text := (SELECT r.abbr FROM geocode.state_ref r
                   WHERE upper(btrim(coalesce(p_state, ''))) IN (upper(r.abbr), upper(r.name))
                   LIMIT 1);
+  -- the coarse tier (worldwide places outside the build's region) is answered unless asked not to
+  nc    boolean := NOT coalesce(p_coarse, true);
+  cc    text := geocode.country_code(p_country);
   targets text[];
   hni   integer := geocode.hn_int(p_hn);
   pc    text := substring(p_postcode from '\d{5}');
@@ -148,8 +170,8 @@ BEGIN
     SELECT ST_Collect(t.geom) INTO townpt FROM (
       SELECT f.geom FROM pgeo.feature f
       WHERE f.layer IN ('locality', 'localadmin', 'neighbourhood') AND f.name_norm = loc
-        AND (rs IS NULL OR f.region_a = rs)
-      ORDER BY f.importance DESC LIMIT 5) t;
+        AND (rs IS NULL OR f.region_a = rs) AND (NOT nc OR NOT f.coarse) AND (cc IS NULL OR f.country_a = cc)
+      ORDER BY (stt IS NOT NULL AND f.region_a IS DISTINCT FROM stt), f.importance DESC LIMIT 5) t;
   END IF;
   IF NOT geocode.country_ok(p_country) THEN
     RETURN;
@@ -182,7 +204,7 @@ BEGIN
            similarity(s.street_norm, st) AS st_sim,
            CASE WHEN loc IS NULL THEN NULL ELSE similarity(s.locality_norm, loc) END AS loc_sim
     FROM pgeo.street_name s
-    WHERE st IS NOT NULL AND hn IS NOT NULL AND s.street_norm % st
+    WHERE st IS NOT NULL AND hn IS NOT NULL AND (cc IS NULL OR cc = 'US') AND s.street_norm % st
     ORDER BY similarity(s.street_norm, st)
              + CASE WHEN loc IS NOT NULL THEN similarity(s.locality_norm, loc) ELSE 0 END DESC
     LIMIT 25
@@ -263,9 +285,12 @@ BEGIN
       -- changed the top result of 16 of 5,002 golden queries for a 17% gain on this stage.
       FROM pgeo.feature f
       WHERE f.layer <> 'address' AND f.name_norm % q.txt AND (rs IS NULL OR f.region_a = rs)
+        AND (NOT nc OR NOT f.coarse) AND (cc IS NULL OR f.country_a = cc)
       -- ties (hundreds of "Main Street"s) are broken by distance to the focus point, so the
       -- nearby ones survive the candidate limit
-      ORDER BY similarity(f.name_norm, q.txt) DESC,
+      -- the build's own features come before the worldwide ones at equal similarity: with the
+      -- coarse tier loaded, "Portland" ties in the hundreds and the local one must survive the cut
+      ORDER BY similarity(f.name_norm, q.txt) DESC, f.coarse,
                CASE WHEN anchor IS NULL THEN 0 ELSE f.geom <-> anchor END
       LIMIT 60) n
     GROUP BY n.id
@@ -273,18 +298,21 @@ BEGIN
   names_exact AS (
     SELECT f.id, 1.0::double precision AS nsim FROM pgeo.feature f
     WHERE cardinality(targets) > 0 AND f.layer <> 'address' AND f.name_norm = ANY (targets)
-      AND (rs IS NULL OR f.region_a = rs)
-    ORDER BY CASE WHEN anchor IS NULL THEN 0 ELSE f.geom <-> anchor END
+      AND (rs IS NULL OR f.region_a = rs) AND (NOT nc OR NOT f.coarse) AND (cc IS NULL OR f.country_a = cc)
+    ORDER BY (stt IS NOT NULL AND f.region_a IS DISTINCT FROM stt), f.coarse,
+             CASE WHEN anchor IS NULL THEN 0 ELSE f.geom <-> anchor END
     LIMIT 40
   ),
   town AS (  -- the town itself, for fallbacks when nothing finer matches
     SELECT f.id FROM pgeo.feature f
     WHERE loc IS NOT NULL AND f.layer IN ('locality', 'localadmin') AND f.name_norm = loc
-      AND (rs IS NULL OR f.region_a = rs)
+      AND (rs IS NULL OR f.region_a = rs) AND (NOT nc OR NOT f.coarse) AND (cc IS NULL OR f.country_a = cc)
+    ORDER BY (stt IS NOT NULL AND f.region_a IS DISTINCT FROM stt), f.coarse, f.importance DESC
     LIMIT 2
   ),
   postal AS (
     SELECT f.id FROM pgeo.feature f WHERE pc IS NOT NULL AND f.layer = 'postalcode' AND f.postcode = pc
+      AND (NOT nc OR NOT f.coarse) AND (cc IS NULL OR f.country_a = cc)
   ),
   -- Candidate scoring. "agree" = how well the result's town / ZIP match the query's (1 when
   -- the query gave neither). A town mismatch is penalized hard (Pelias finding F16).
@@ -327,7 +355,7 @@ BEGIN
                   -- town is often a village or the nearest town, not the containing one
                   -- ("Calvary Bible Church, Stratton" is in Eustis); 1 km 0.85, 3 km 0.6
                   CASE WHEN townpt IS NOT NULL AND f.layer <> 'address'
-                       THEN exp(-ST_Distance(f.geom::geography, townpt::geography) / 6000.0) ELSE 0 END)
+                       THEN exp(-least(ST_Distance(f.geom::geography, townpt::geography), 200000.0) / 6000.0) ELSE 0 END)
            END AS agree
     FROM cand c JOIN pgeo.feature f ON f.id = c.id
     WHERE (nofilter AND rect IS NULL) OR geocode.keep(f, p_layers, p_sources, rect, p_gid, p_categories)
@@ -336,17 +364,21 @@ BEGIN
   ),
   final AS (
     SELECT s.*,
-           -- A result in another state than the query named is a different place that shares a
-           -- name (Auburn, ME for "Auburn, NH"): its confidence is cut by 15%, on top of the
+           -- A result in another state than the query named, or in none (a worldwide place, or one
+           -- outside every state) is a different place that shares a name (Auburn, ME for "Auburn,
+           -- NH"; Portland, Jamaica for "Portland, NH"): its confidence is cut to 60%, on top of the
            -- ranking bonus below. Only reached when the state-restricted pass found nothing good.
+           -- The cut has to be deep enough that a town-level answer in the right state (0.45) beats
+           -- a street in a same-named town of the wrong one: "1 Main St, Springfield, IL" is
+           -- Springfield, IL, not Main Street in Springfield, ME.
            least(1.0, s.base * (0.4 + 0.6 * least(1.0, s.agree))
-                 * CASE WHEN stt IS NOT NULL AND (s.f).region_a IS NOT NULL AND (s.f).region_a <> stt
-                        THEN 0.85 ELSE 1.0 END)::real AS conf
+                 * CASE WHEN stt IS NOT NULL AND (s.f).region_a IS DISTINCT FROM stt
+                        THEN 0.6 ELSE 1.0 END)::real AS conf
     FROM scored s
   ),
   hits AS (
-  SELECT d.h FROM (
-  SELECT z.h, row_number() OVER (
+  SELECT d.h, d.coarse FROM (
+  SELECT z.h, (fi.f).coarse AS coarse, row_number() OVER (
            -- A county joins the locality bucket, so a county and a city of the same name collapse
            -- to one result instead of two rows reading "Albany, NY, USA".
            PARTITION BY (z.h).label,
@@ -375,7 +407,14 @@ BEGIN
                       -- 0.06 sits above the 0.05 the importance term can span, so the state the
                       -- user named beats mere prominence, and below a real difference in match
                       -- quality, so it reorders ties rather than overriding a better answer.
-                      + CASE WHEN stt IS NOT NULL AND (fi.f).region_a = stt THEN 0.06 ELSE 0 END)::real)
+                      + CASE WHEN stt IS NOT NULL AND (fi.f).region_a = stt THEN 0.06 ELSE 0 END
+                      -- worldwide places never outrank the build's own at equal confidence: a tie
+                      -- breaker, small enough that a name matched exactly beats one that merely
+                      -- contains the word ("London" is London, England, not New London, NH)
+                      -- (not when the query named this very state: then there is no local twin to defer to)
+                      - CASE WHEN (fi.f).coarse AND (fi.f).layer NOT IN ('region', 'country')
+                                  AND (stt IS NULL OR (fi.f).region_a IS DISTINCT FROM stt)
+                             THEN 0.01 ELSE 0 END)::real)
     ELSE
       -- interpolated address: synthesize the row at the interpolated position
       ROW(NULL, 'interpolation:address:' || (fi.f).street_norm || ':' || fi.ihn || ':' || coalesce((fi.f).locality_norm, ''),
@@ -392,7 +431,7 @@ BEGIN
           g.dm / 1000,
           (fi.conf + 0.05 * (fi.f).importance + 0.1 * g.boost
            + CASE WHEN stt IS NOT NULL AND (fi.f).region_a = stt THEN 0.06 ELSE 0 END)::real,
-          (fi.f).hier)::geocode.hit
+          (fi.f).hier, false, 'US', 'United States')::geocode.hit
     END AS h
   ) z
   WHERE fi.conf >= 0.3                         -- drop weak matches: misses return nothing
@@ -406,12 +445,18 @@ BEGIN
   top AS (SELECT max((h).confidence) AS c FROM hits),
   -- When a town is among the ties, only other towns count as rivals: a venue or GNIS point
   -- that shares the town's name ("Portland, Maine") is not a different answer.
-  tied AS (SELECT hits.h FROM hits, top WHERE (hits.h).confidence >= top.c - 0.02),
+  tied AS (SELECT hits.h, hits.coarse FROM hits, top WHERE (hits.h).confidence >= top.c - 0.02),
   amb AS (
     SELECT count(DISTINCT (round((h).lon::numeric, 2), round((h).lat::numeric, 2))) AS n
     FROM tied
-    WHERE NOT EXISTS (SELECT 1 FROM tied t WHERE (t.h).layer IN ('locality', 'localadmin'))
-       OR (h).layer IN ('locality', 'localadmin')
+    WHERE (CASE WHEN EXISTS (SELECT 1 FROM tied t WHERE (t.h).layer = 'country')
+                -- "Germany" is the country; Germany, GA and Germany, PA do not make it ambiguous
+                THEN (h).layer = 'country'
+                ELSE NOT EXISTS (SELECT 1 FROM tied t WHERE (t.h).layer IN ('locality', 'localadmin'))
+                     OR (h).layer IN ('locality', 'localadmin') END)
+      -- a worldwide Portland is not a rival of the build's own Portland: it only counts when
+      -- nothing local is among the ties
+      AND (NOT coarse OR NOT EXISTS (SELECT 1 FROM tied t2 WHERE NOT t2.coarse))
   )
   SELECT (y.h2).*
   FROM hits CROSS JOIN top CROSS JOIN amb
@@ -445,28 +490,43 @@ CREATE OR REPLACE FUNCTION geocode.search(
     p_rect double precision[] DEFAULT NULL, p_size integer DEFAULT 10,
     p_circle double precision[] DEFAULT NULL, p_gid text DEFAULT NULL,
     p_categories text[] DEFAULT NULL, p_country text DEFAULT NULL,
-    p_state text DEFAULT NULL)
+    p_state text DEFAULT NULL, p_coarse boolean DEFAULT true)
 RETURNS SETOF geocode.hit
 LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
 DECLARE
-  stt text := (SELECT r.abbr FROM geocode.region_ref r
+  -- any US state or territory, not only the build's: a query naming California is answered from
+  -- California's coarse features first
+  stt text := (SELECT r.abbr FROM geocode.state_ref r
                 WHERE upper(btrim(coalesce(p_state, ''))) IN (upper(r.abbr), upper(r.name))
                 LIMIT 1);
   first_pass geocode.hit[];
 BEGIN
+  -- Without the worldwide tier the build answers only for its own states. A state it does not hold
+  -- has nothing to answer with, and the all-states pass below would return a same-named town in
+  -- the build's own, discounted, which is a wrong answer and not a low-confidence one.
+  IF NOT coalesce(p_coarse, true) AND stt IS NOT NULL
+     AND NOT EXISTS (SELECT 1 FROM geocode.region_ref r WHERE r.abbr = stt) THEN
+    RETURN;
+  END IF;
   IF stt IS NOT NULL THEN
     first_pass := ARRAY(SELECT c FROM geocode.search_core(
       p_text, p_name, p_hn, p_street, p_locality, p_postcode, p_focus_lon, p_focus_lat, p_layers,
-      p_sources, p_rect, p_size, p_circle, p_gid, p_categories, p_country, p_state, stt) c);
-    IF cardinality(first_pass) > 0 AND (first_pass[1]).confidence >= 0.6 THEN
+      p_sources, p_rect, p_size, p_circle, p_gid, p_categories, p_country, p_state, stt, p_coarse) c);
+    -- A confident answer inside the state, or a town-level one: a query that names a state and finds
+    -- the town in it ("20 Davis Drive, Belmont, CA" and a Belmont, CA) is answered by that town, not
+    -- by a street of the same name in another state's Belmont.
+    IF cardinality(first_pass) > 0
+       AND ((first_pass[1]).confidence >= 0.6
+            OR ((first_pass[1]).confidence >= 0.4
+                AND (first_pass[1]).layer IN ('locality', 'localadmin', 'county', 'region', 'postalcode'))) THEN
       RETURN QUERY SELECT * FROM unnest(first_pass);
       RETURN;
     END IF;
   END IF;
   RETURN QUERY SELECT * FROM geocode.search_core(
     p_text, p_name, p_hn, p_street, p_locality, p_postcode, p_focus_lon, p_focus_lat, p_layers,
-    p_sources, p_rect, p_size, p_circle, p_gid, p_categories, p_country, p_state, NULL);
+    p_sources, p_rect, p_size, p_circle, p_gid, p_categories, p_country, p_state, NULL, p_coarse);
 END
 $$;
 
@@ -479,7 +539,7 @@ CREATE OR REPLACE FUNCTION geocode.autocomplete(
     p_layers text[] DEFAULT NULL, p_sources text[] DEFAULT NULL,
     p_rect double precision[] DEFAULT NULL, p_size integer DEFAULT 10,
     p_circle double precision[] DEFAULT NULL, p_gid text DEFAULT NULL,
-    p_categories text[] DEFAULT NULL, p_country text DEFAULT NULL)
+    p_categories text[] DEFAULT NULL, p_country text DEFAULT NULL, p_coarse boolean DEFAULT true)
 RETURNS SETOF geocode.hit
 LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
@@ -504,8 +564,11 @@ DECLARE
   -- No filter at all is the normal request. keep() holds an EXISTS, so it cannot be inlined, and
   -- it takes the whole 780-byte row: called per candidate it was 63% of the candidate stage while
   -- filtering nothing (docs/PERFORMANCE_OPTIMIZATION.md, F1). Decide once, here.
+  nc    boolean := NOT coalesce(p_coarse, true);
+  cc    text := geocode.country_code(p_country);
   nofilter boolean := (p_layers IS NULL OR cardinality(p_layers) = 0)
                   AND (p_sources IS NULL OR cardinality(p_sources) = 0)
+                  AND NOT nc AND cc IS NULL
                   AND rect IS NULL AND p_gid IS NULL
                   AND (p_categories IS NULL OR cardinality(p_categories) = 0);
 BEGIN
@@ -555,7 +618,7 @@ BEGIN
       FROM pgeo.feature f
       WHERE f.layer = 'address' AND f.housenumber = toks[1] AND f.tokens @@ tsq_idx
         AND (NOT split OR ts_match_vq(f.tokens, tsq))
-        AND (nofilter OR geocode.keep(f, p_layers, p_sources, rect, p_gid, p_categories))),
+        AND (nofilter OR geocode.keep(f, p_layers, p_sources, rect, p_gid, p_categories, nc, cc))),
     top AS (
       SELECT c.id, c.dm,
              (c.importance + 0.3 * CASE WHEN c.dm IS NULL THEN 0 ELSE exp(-(c.dm / 50000.0)) END)::real AS sc
@@ -571,9 +634,10 @@ BEGIN
     SELECT (z.h).*
     FROM pgeo.ac_prefix p JOIN pgeo.feature f ON f.id = p.feature_id
     CROSS JOIN LATERAL (SELECT geocode.to_hit(f, NULL, NULL, 'centroid', NULL,
-             (f.importance + 0.3 * geocode.focus_boost(f.geom, focus))::real) AS h) z
-    WHERE p.prefix = q AND (nofilter OR geocode.keep(f, p_layers, p_sources, rect, p_gid, p_categories))
-    ORDER BY (z.h).score DESC
+             (f.importance + 0.3 * geocode.focus_boost(f.geom, focus)
+              - CASE WHEN f.coarse THEN 0.2 ELSE 0 END)::real) AS h) z   -- the build's own first
+    WHERE p.prefix = q AND (nofilter OR geocode.keep(f, p_layers, p_sources, rect, p_gid, p_categories, nc, cc))
+    ORDER BY (z.h).score DESC, f.id
     LIMIT lim;
     GET DIAGNOSTICS found = ROW_COUNT;
   ELSE
@@ -582,28 +646,32 @@ BEGIN
     -- constant false.
     RETURN QUERY
     WITH cand AS (
-      (SELECT x.id, x.label, x.importance, x.name_norm, x.geom
+      (SELECT x.id, x.label, x.importance, x.name_norm, x.geom, x.coarse
        FROM pgeo.feature_ac x
        WHERE nofilter AND x.tokens @@ tsq_idx AND (NOT split OR ts_match_vq(x.tokens, tsq))
-       ORDER BY x.importance DESC LIMIT 400)
+       ORDER BY x.importance DESC, x.id LIMIT 400)
       UNION ALL
-      (SELECT x.id, x.label, x.importance, x.name_norm, x.geom
+      (SELECT x.id, x.label, x.importance, x.name_norm, x.geom, x.coarse
        FROM pgeo.feature x
        WHERE NOT nofilter AND x.tokens @@ tsq_idx AND (NOT split OR ts_match_vq(x.tokens, tsq))
          AND x.layer <> 'address'
-         AND geocode.keep(x, p_layers, p_sources, rect, p_gid, p_categories)  -- filter before the cut
-       ORDER BY x.importance DESC LIMIT 400)),
-    ded AS (SELECT DISTINCT ON (c.label) c.* FROM cand c ORDER BY c.label, c.importance DESC),
+         AND geocode.keep(x, p_layers, p_sources, rect, p_gid, p_categories, nc, cc)  -- filter before the cut
+       ORDER BY x.importance DESC, x.id LIMIT 400)),
+    ded AS (SELECT DISTINCT ON (c.label) c.* FROM cand c ORDER BY c.label, c.importance DESC, c.id),
     dist AS (SELECT d.*, CASE WHEN focus IS NULL THEN NULL
                               ELSE ST_Distance(d.geom::geography, focus::geography) END AS dm FROM ded d),
     top AS (
       SELECT t.id, t.dm,
              (t.importance + CASE WHEN t.name_norm LIKE q || '%' THEN 0.25 ELSE 0 END
-              + 0.3 * CASE WHEN t.dm IS NULL THEN 0 ELSE exp(-(t.dm / 50000.0)) END)::real AS sc
-      FROM dist t ORDER BY sc DESC LIMIT lim)
+              + 0.3 * CASE WHEN t.dm IS NULL THEN 0 ELSE exp(-(t.dm / 50000.0)) END
+              -- The build's own first. A prefix like "Chi" matches China and Chile (importance 0.9) as
+              -- well as the build's own Chichester; typed into a Maine and New Hampshire page, the
+              -- local one is the suggestion. A prefix nothing local matches still finds the world.
+              - CASE WHEN t.coarse THEN 0.2 ELSE 0 END)::real AS sc
+      FROM dist t ORDER BY sc DESC, t.id LIMIT lim)
     SELECT (geocode.to_hit(f, NULL, NULL, 'centroid', t.dm / 1000, t.sc)).*
     FROM top t JOIN pgeo.feature f ON f.id = t.id
-    ORDER BY t.sc DESC;
+    ORDER BY t.sc DESC, t.id;
     GET DIAGNOSTICS found = ROW_COUNT;
   END IF;
 
@@ -620,31 +688,32 @@ BEGIN
     PERFORM set_config('pg_trgm.similarity_threshold', '0.35', true);
     RETURN QUERY
     WITH cand AS (
-      (SELECT x.id, x.label, x.layer, x.importance, x.name_norm, x.geom
+      (SELECT x.id, x.label, x.layer, x.importance, x.name_norm, x.geom, x.coarse
        FROM pgeo.feature_ac x
        WHERE nofilter AND x.name_norm % q AND NOT (x.tokens @@ tsq))
       UNION ALL
-      (SELECT x.id, x.label, x.layer, x.importance, x.name_norm, x.geom
+      (SELECT x.id, x.label, x.layer, x.importance, x.name_norm, x.geom, x.coarse
        FROM pgeo.feature x
        WHERE NOT nofilter AND x.layer <> 'address' AND x.name_norm % q AND NOT (x.tokens @@ tsq))),
     ded AS (SELECT DISTINCT ON (c.label) c.* FROM cand c   -- one row per label (locality/localadmin)
-            ORDER BY c.label, CASE c.layer WHEN 'locality' THEN 0 ELSE 1 END, c.importance DESC),
+            ORDER BY c.label, CASE c.layer WHEN 'locality' THEN 0 ELSE 1 END, c.importance DESC, c.id),
     -- Filters apply after the one-per-label cut here, not before it as in name mode: a label
     -- whose best row fails the filter is dropped, not replaced by its runner-up. That is how
     -- this branch has always behaved, and the order is kept so that its output is unchanged.
     kept AS (SELECT d.* FROM ded d
              WHERE nofilter OR EXISTS (SELECT 1 FROM pgeo.feature f WHERE f.id = d.id
-                     AND geocode.keep(f, p_layers, p_sources, rect, p_gid, p_categories))),
+                     AND geocode.keep(f, p_layers, p_sources, rect, p_gid, p_categories, nc, cc))),
     dist AS (SELECT d.*, CASE WHEN focus IS NULL THEN NULL
                               ELSE ST_Distance(d.geom::geography, focus::geography) END AS dm FROM kept d),
     top AS (
       SELECT t.id, t.dm,
              (similarity(t.name_norm, q) + 0.2 * t.importance
-              + 0.2 * CASE WHEN t.dm IS NULL THEN 0 ELSE exp(-(t.dm / 50000.0)) END)::real AS sc
-      FROM dist t ORDER BY sc DESC LIMIT lim - found)
+              + 0.2 * CASE WHEN t.dm IS NULL THEN 0 ELSE exp(-(t.dm / 50000.0)) END
+              - CASE WHEN t.coarse THEN 0.1 ELSE 0 END)::real AS sc
+      FROM dist t ORDER BY sc DESC, t.id LIMIT lim - found)
     SELECT (geocode.to_hit(f, NULL, 'fallback', 'centroid', t.dm / 1000, t.sc)).*
     FROM top t JOIN pgeo.feature f ON f.id = t.id
-    ORDER BY t.sc DESC;
+    ORDER BY t.sc DESC, t.id;
   END IF;
 END
 $$;
@@ -656,12 +725,15 @@ CREATE OR REPLACE FUNCTION geocode.reverse(
     p_lon double precision, p_lat double precision,
     p_layers text[] DEFAULT NULL, p_sources text[] DEFAULT NULL,
     p_radius_km double precision DEFAULT NULL, p_size integer DEFAULT 10,
-    p_gid text DEFAULT NULL, p_categories text[] DEFAULT NULL, p_country text DEFAULT NULL)
+    p_gid text DEFAULT NULL, p_categories text[] DEFAULT NULL, p_country text DEFAULT NULL,
+    p_coarse boolean DEFAULT true)
 RETURNS SETOF geocode.hit
 LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
 DECLARE
   pt     geometry := ST_SetSRID(ST_MakePoint(p_lon, p_lat), 4326);
+  nc     boolean := NOT coalesce(p_coarse, true);
+  cc     text := geocode.country_code(p_country);
   lim    integer := least(greatest(coalesce(p_size, 10), 1), geocode.api_limit('max_size')::integer);
   radius double precision := least(coalesce(p_radius_km, 50), geocode.api_limit('max_reverse_km')) * 1000;
   point_layers text[] := CASE WHEN cardinality(p_layers) > 0
@@ -671,6 +743,14 @@ DECLARE
                               THEN ARRAY(SELECT unnest(p_layers) INTERSECT
                                          SELECT unnest(ARRAY['neighbourhood','locality','localadmin','county','region','postalcode']))
                               ELSE ARRAY['neighbourhood','locality','localadmin','county','region'] END;
+  -- the region and country boundaries of the worldwide tier (pgeo.coarse_area)
+  area_layers text[] := CASE WHEN cardinality(p_layers) > 0
+                             THEN ARRAY(SELECT unnest(p_layers) INTERSECT SELECT unnest(ARRAY['region','country']))
+                             ELSE ARRAY['region', 'country'] END;
+  -- the layers the worldwide tier can answer a reverse lookup with
+  coarse_layers text[] := CASE WHEN cardinality(p_layers) > 0
+                               THEN ARRAY(SELECT unnest(p_layers) INTERSECT SELECT unnest(ARRAY['locality','localadmin','county']))
+                               ELSE ARRAY['locality','localadmin','county'] END;
 BEGIN
   IF NOT geocode.country_ok(p_country) THEN
     RETURN;
@@ -680,8 +760,41 @@ BEGIN
     SELECT x AS f, ST_Distance(x.geom::geography, pt::geography) AS d
     FROM pgeo.feature x
     WHERE x.layer = ANY (point_layers)
+      -- a box that holds the radius, so the index is not walked across the whole worldwide tier to
+      -- reach the nearest address when the point is far from any (0.5 s in the Nevada desert)
+      AND x.geom && ST_Expand(pt, radius / (111320.0 * greatest(cos(radians(p_lat)), 0.05)))
       AND (p_sources IS NULL OR cardinality(p_sources) = 0 OR x.source = ANY (p_sources))
       AND (p_gid IS NULL AND p_categories IS NULL OR geocode.keep(x, NULL, NULL, NULL, p_gid, p_categories))
+      AND (NOT nc OR NOT x.coarse) AND (cc IS NULL OR x.country_a = cc)
+    ORDER BY x.geom <-> pt
+    LIMIT lim * 3
+  ),
+  -- The region and country boundaries of the worldwide tier that contain the point (simplified to
+  -- about 1 km, so a point within that of a border can fall on the wrong side).
+  area AS (
+    SELECT f, a.layer AS lyr
+    FROM pgeo.coarse_area a JOIN pgeo.feature f ON f.id = a.feature_id
+    WHERE NOT nc AND ST_Intersects(a.geom, pt)
+      AND (cc IS NULL OR f.country_a = cc)
+      AND p_gid IS NULL AND p_categories IS NULL
+      AND (p_sources IS NULL OR cardinality(p_sources) = 0 OR f.source = ANY (p_sources))
+  ),
+  -- Outside the build's region the worldwide tier answers with the nearest places within the
+  -- radius: a town or county centroid. A place is taken only from the country and the state that
+  -- contain the point, when the boundaries say which those are, so a town across a border is not
+  -- offered as the answer. Its confidence is the distance's, capped at a town's.
+  near_coarse AS (
+    SELECT x AS f, ST_Distance(x.geom::geography, pt::geography) AS d
+    FROM pgeo.feature x
+    WHERE NOT nc AND cardinality(coarse_layers) > 0 AND x.coarse AND x.layer = ANY (coarse_layers)
+      AND (p_sources IS NULL OR cardinality(p_sources) = 0 OR x.source = ANY (p_sources))
+      AND (cc IS NULL OR x.country_a = cc)
+      AND (NOT EXISTS (SELECT 1 FROM area WHERE lyr = 'country')
+           OR x.country_a = (SELECT (f).country_a FROM area WHERE lyr = 'country' LIMIT 1))
+      AND (NOT EXISTS (SELECT 1 FROM area WHERE lyr = 'region')
+           OR x.region IS NOT DISTINCT FROM (SELECT (f).region FROM area WHERE lyr = 'region' LIMIT 1)
+           OR x.region IS NULL)
+      AND p_gid IS NULL AND p_categories IS NULL
     ORDER BY x.geom <-> pt
     LIMIT lim * 3
   ),
@@ -691,6 +804,7 @@ BEGIN
     FROM pgeo.admin a JOIN pgeo.feature f ON f.admin_id = a.id
     WHERE cardinality(admin_layers) > 0 AND a.placetype = ANY (admin_layers)
       AND ST_Intersects(a.geom, pt)
+      AND (NOT nc OR NOT f.coarse) AND (cc IS NULL OR f.country_a = cc)
       AND (p_sources IS NULL OR cardinality(p_sources) = 0 OR f.source = ANY (p_sources))
       -- boundary.gid, written inline: a function call here stopped the planner from using the
       -- admin_id index (13 s per request instead of milliseconds)
@@ -707,6 +821,17 @@ BEGIN
     UNION ALL
     SELECT geocode.to_hit(c.f, 1.0::real, NULL, 'centroid', 0, 0::real), 1, c.o
     FROM containing c
+    UNION ALL
+    -- the nearest town, then (below) the state and country that contain the point, then the other
+    -- towns: the containing areas must not be cut off by the size limit behind a list of towns
+    SELECT geocode.to_hit(k.f, least(0.45, geocode.distance_confidence(k.d))::real, NULL, 'centroid',
+             k.d / 1000, 0::real),
+           CASE WHEN row_number() OVER (ORDER BY k.d) = 1 THEN 2 ELSE 4 END, k.d
+    FROM near_coarse k WHERE k.d <= radius
+    UNION ALL
+    SELECT geocode.to_hit(ar.f, 0.7::real, NULL, 'centroid', 0, 0::real), 3,
+           CASE ar.lyr WHEN 'region' THEN 0 ELSE 1 END
+    FROM area ar WHERE ar.lyr = ANY (area_layers)
   ) x
   ORDER BY x.grp, x.ord
   LIMIT lim;

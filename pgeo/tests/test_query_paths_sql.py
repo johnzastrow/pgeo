@@ -34,7 +34,7 @@ BANGOR = (44.8016, -68.7712)
 
 # Every layer there is: as a filter it excludes nothing, but it is a filter, so it takes the slow route.
 ALL_LAYERS = ["address", "venue", "street", "neighbourhood", "locality", "localadmin",
-              "county", "region", "postalcode"]  # fmt: skip
+              "county", "region", "country", "postalcode"]  # fmt: skip
 
 NAMES = ["portland city hall", "moosehead lake", "main street bangor", "walmart supercenter",
          "acadia national park", "saco", "mount katahdin", "bowdoin college", "04101",

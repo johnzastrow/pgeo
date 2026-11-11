@@ -26,8 +26,11 @@ from pgeo.settings import Settings
 
 log = logging.getLogger("pgeo.api")
 
-LAYERS = {"address", "venue", "street", "neighbourhood", "locality", "localadmin", "county", "region", "postalcode"}
-LAYER_ALIASES = {"coarse": ["neighbourhood", "locality", "localadmin", "county", "region", "postalcode"]}
+LAYERS = {
+    "address", "venue", "street", "neighbourhood", "locality", "localadmin", "county", "region", "country",
+    "postalcode",
+}
+LAYER_ALIASES = {"coarse": ["neighbourhood", "locality", "localadmin", "county", "region", "country", "postalcode"]}
 SOURCES = {"openaddresses", "openstreetmap", "whosonfirst", "gnis", "zcta", "overture", "interpolation"}
 SOURCE_ALIASES = {"oa": "openaddresses", "osm": "openstreetmap", "wof": "whosonfirst"}
 # Request limits. These are the defaults; at startup they are replaced by what the database
@@ -73,12 +76,18 @@ async def lifespan(app: FastAPI):
         # The state each town is in, so the typo fallback can prefer one in the state the query
         # named: "Hosuton, TX" is one edit from Hosston, Louisiana and two from Houston, Texas.
         names = await con.fetch(
-            "SELECT DISTINCT lower(name) AS n, region_a FROM pgeo.feature "
+            "SELECT DISTINCT lower(name) AS n, region_a, coarse FROM pgeo.feature "
             "WHERE layer IN ('locality', 'localadmin')"
         )
-        # The states this build covers, so the parser can strip a trailing one whatever it is.
+        # Every US state and territory, not only the build's own: a query naming California is
+        # answered from the worldwide tier, and the parser must know "CA" is a state.
         regions = await con.fetch("SELECT lower(name) AS name, lower(abbr) AS abbr, abbr AS code "
-                                  "FROM geocode.region_ref")
+                                  "FROM geocode.state_ref")
+        home = {r["abbr"] for r in await con.fetch("SELECT abbr FROM geocode.region_ref")}
+        # ISO alpha-2 -> alpha-3, so country_a reads as Pelias gives it (the data carries alpha-2)
+        ALPHA3.clear()
+        ALPHA3.update({r["alpha2"]: r["alpha3"] for r in await con.fetch(
+            "SELECT alpha2, alpha3 FROM geocode.country_ref")})
     states = {}
     for r in regions:
         states[r["abbr"]] = r["code"]
@@ -87,7 +96,10 @@ async def lifespan(app: FastAPI):
     for r in names:
         if r["region_a"]:
             town_states.setdefault(r["n"], set()).add(r["region_a"])
-    app.state.rules = RuleParser({r["n"] for r in names}, states, town_states)
+    # every town, and separately the build's own (the worldwide tier is flagged `coarse`)
+    app.state.rules = RuleParser({r["n"] for r in names}, states, town_states,
+                                 home_localities={r["n"] for r in names if not r["coarse"]},
+                                 home_states=home)
     await load_limits(app.state.pool)
     yield
     await app.state.http.aclose()
@@ -162,6 +174,18 @@ def finite(v: str | None, name: str, lo: float, hi: float, unit: str = "") -> fl
     if not math.isfinite(f) or not lo <= f <= hi:
         raise BadRequest(f"'{name}' must be between {lo:g} and {hi:g}{unit}")
     return f
+
+
+def bool_param(v: str | None, name: str, default: bool = True) -> bool:
+    """A true/false request parameter; absent means `default`. Mirrors geocode.check_bool."""
+    if v is None or not v.strip():
+        return default
+    t = v.strip().lower()
+    if t in ("true", "t", "1", "yes", "y", "on"):
+        return True
+    if t in ("false", "f", "0", "no", "n", "off"):
+        return False
+    raise BadRequest(f"{name} must be true or false")
 
 
 def layers_param(v: str | None) -> list[str] | None:
@@ -262,6 +286,8 @@ def common(q: dict) -> dict:
         "sources": sources_param(q.get("sources")),
         "size": size_param(q.get("size")),
         "circle": circle(q),
+        # the worldwide tier answers unless the caller turns it off (coarse=false)
+        "coarse": bool_param(q.get("coarse"), "coarse"),
     } | extras(q)
 
 
@@ -293,6 +319,10 @@ async def parse(request: Request, text: str) -> Parsed:
 # ---- output --------------------------------------------------------------------------------
 
 
+# ISO 3166-1 alpha-2 -> alpha-3, filled from geocode.country_ref at startup
+ALPHA3: dict[str, str] = {}
+
+
 def feature_json(r: asyncpg.Record) -> dict:
     props = {
         "id": r["source_id"],
@@ -308,13 +338,14 @@ def feature_json(r: asyncpg.Record) -> dict:
         "match_type": r["match_type"],
         "accuracy": r["accuracy"],
         "distance": None if r["distance_km"] is None else round(float(r["distance_km"]), 3),
-        # The country follows the state: the state is the only evidence this build has that a
-        # feature is in the United States, since the build holds states and not countries. A
-        # feature outside every region polygon carries neither.
-        "country": "United States" if r["region_a"] else None,
-        "country_gid": "whosonfirst:country:85633793" if r["region_a"] else None,
-        "country_a": "USA" if r["region_a"] else None,
-        "country_code": "US" if r["region_a"] else None,
+        # The country is the feature's own: country_a is its ISO alpha-3 code (as Pelias returns
+        # it; none for a territory outside ISO 3166-1), country_code the alpha-2 the data carries.
+        # coarse marks the worldwide tier.
+        "country": r["country"],
+        "country_gid": "whosonfirst:country:85633793" if r["country_a"] == "US" else None,
+        "country_a": ALPHA3.get(r["country_a"]),
+        "country_code": r["country_a"],
+        "coarse": True if r["coarse"] else None,
         "region": r["region"],
         "region_a": r["region_a"],
         # Already carries its own suffix from Who's on First. This used to append " County"
@@ -372,7 +403,9 @@ def envelope(query: dict, rows: list, errors: list[str] | None = None, parsed: P
 
 # ---- endpoints -----------------------------------------------------------------------------
 
-SEARCH_SQL = "SELECT * FROM geocode.search($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)"
+SEARCH_SQL = (
+    "SELECT * FROM geocode.search($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)"
+)
 
 
 async def run_search(request: Request, text: str | None, p: Parsed, c: dict) -> list:
@@ -397,6 +430,7 @@ async def run_search(request: Request, text: str | None, p: Parsed, c: dict) -> 
             c["country"],
             # the state the parser found, so "Texarkana, AR" is not answered with Texarkana, TX
             p.state,
+            c["coarse"],
         )
 
 
@@ -405,8 +439,16 @@ async def search(request: Request, text: Annotated[str | None, Query()] = None):
     q = dict(request.query_params)
     text = clean_text(text)
     c = common(q)
-    p = await parse(request, text)
-    rows = await run_search(request, text, p, c)
+    # A country named at the end ("Oslo, Norway") limits the search to it and is not searched for
+    # as a place; the same split the SQL edge makes (geocode.split_country).
+    searched = text
+    if c["country"] is None:
+        async with acquire(request) as con:
+            sc = await con.fetchrow("SELECT rest, cc FROM geocode.split_country($1)", text)
+        if sc and sc["cc"]:
+            searched, c["country"] = sc["rest"], sc["cc"]
+    p = await parse(request, searched)
+    rows = await run_search(request, searched, p, c)
     return envelope({"text": text, "size": c["size"]}, rows, parsed=p)
 
 
@@ -466,8 +508,11 @@ async def structured(request: Request):
             c["circle"],
             c["gid"],
             c["categories"],
-            c["country"],
+            # a country given by name or code; the same helper as the SQL edge
+            (await con.fetchval("SELECT geocode.country_code_of($1)", fields["country"]))
+            if fields["country"] and c["country"] is None else c["country"],
             fields["region"],
+            c["coarse"],
         )
     return envelope({k: v for k, v in fields.items() if v} | {"size": c["size"]}, rows, parsed=p)
 
@@ -479,7 +524,7 @@ async def autocomplete(request: Request, text: Annotated[str | None, Query()] = 
     c = common(q)
     async with acquire(request) as con:
         rows = await con.fetch(
-            "SELECT * FROM geocode.autocomplete($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+            "SELECT * FROM geocode.autocomplete($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
             text,
             c["focus_lon"],
             c["focus_lat"],
@@ -491,6 +536,7 @@ async def autocomplete(request: Request, text: Annotated[str | None, Query()] = 
             c["gid"],
             c["categories"],
             c["country"],
+            c["coarse"],
         )
     return envelope({"text": text, "size": c["size"]}, rows)
 
@@ -506,7 +552,7 @@ async def reverse(request: Request):
     c = common({k: v for k, v in q.items() if not k.startswith(("focus.", "boundary.rect", "boundary.circle"))})
     async with acquire(request) as con:
         rows = await con.fetch(
-            "SELECT * FROM geocode.reverse($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+            "SELECT * FROM geocode.reverse($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
             lon,
             lat,
             c["layers"],
@@ -516,6 +562,7 @@ async def reverse(request: Request):
             c["gid"],
             c["categories"],
             c["country"],
+            c["coarse"],
         )
     return envelope({"point.lat": lat, "point.lon": lon, "size": c["size"]}, rows)
 

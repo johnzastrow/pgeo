@@ -48,6 +48,11 @@ class Region:
         return [(int(reg[st]["wof_id"]), reg[st]["name"], st, reg[st]["fips"])
                 for st in self.states]
 
+    def all_state_rows(self) -> list[tuple[str, str, str]]:
+        """(fips, abbr, name) for every state in the registry, not only this build's."""
+        reg = _registry()["states"]
+        return [(v["fips"], st, v["name"]) for st, v in reg.items() if v.get("fips")]
+
     def pbfs(self) -> list[Path]:
         """The OSM extracts for this build, in state order. Missing files are an error."""
         reg = _registry()["states"]

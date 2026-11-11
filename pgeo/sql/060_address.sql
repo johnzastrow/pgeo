@@ -126,7 +126,7 @@ INSERT INTO geocode.usps_direction (variant, standard) VALUES
   ('SW','SW'),('SOUTHWEST','SW');
 
 GRANT SELECT ON geocode.usps_suffix, geocode.usps_unit, geocode.usps_direction,
-  geocode.county_ref, geocode.region_ref TO pgeo_api;
+  geocode.county_ref, geocode.region_ref, geocode.state_ref, geocode.country_ref TO pgeo_api;
 
 -- Invalid input: same error code as the 050 helpers, which the APIs return as HTTP 400
 CREATE OR REPLACE FUNCTION geocode.check_fail(msg text) RETURNS void

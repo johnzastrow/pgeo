@@ -10,8 +10,12 @@
 #
 # Targets:
 #   per-build  osm gnis oa overture overture_themes basemap
-#   national   zcta boundary wof neighbours
+#   national   zcta boundary wof neighbours coarse
+#   shared     basemap_world (low-zoom world tiles for the demo map; not part of "all")
 #   all        everything except overture_themes (evaluation only, several GB)
+#
+# coarse is the worldwide backbone (countries, regions, counties, localadmins and the larger
+# localities from Overture divisions), shared by every build like the national targets.
 #
 # Pinned versions live below; bump them deliberately and re-run. Nothing here needs the Pelias
 # CLI: OpenAddresses and Who's on First are fetched straight from their publishers, so a pgeo
@@ -222,6 +226,89 @@ resolve_overture() {
   echo "Overture release: ${OVERTURE_RELEASE} (latest)"
 }
 
+coarse_areas() {
+  # The boundaries of the coarse tier's regions and countries (land polygon of each), simplified
+  # to about 1 km, for reverse geocoding outside a build's own region: which state and country
+  # contain a point. About 29 MB of WKB for 4,200 shapes. Overture's own geometry, not Natural Earth.
+  local areas="$1" base="$2"
+  if [[ -f "$areas" ]]; then echo "have $(basename "$areas")"; return 0; fi
+  duck <<SQL
+    INSTALL spatial; LOAD spatial; INSTALL httpfs; LOAD httpfs; SET s3_region='us-west-2';
+    COPY (
+      SELECT division_id, subtype, country, region,
+             ST_AsWKB(ST_SimplifyPreserveTopology(geometry, 0.01)) AS wkb
+      FROM (SELECT *, row_number() OVER (PARTITION BY division_id
+                                         ORDER BY coalesce(is_land, false) DESC,
+                                                  coalesce(is_territorial, false), id) AS rn
+            FROM read_parquet('${base}/type=division_area/*', hive_partitioning=1)
+            WHERE subtype IN ('country', 'dependency', 'region')) WHERE rn = 1
+      ORDER BY division_id
+    ) TO '${areas}.part' (FORMAT parquet, COMPRESSION zstd);
+SQL
+  mv "${areas}.part" "$areas"
+  find "$(dirname "$areas")" -maxdepth 1 -name 'areas_*.parquet' ! -name "$(basename "$areas")" -delete
+  echo "fetched $(basename "$areas") ($(du -h "$areas" | cut -f1))"
+}
+
+coarse() {
+  # The coarse tier: a downsampled worldwide set of Overture divisions, so a build holding a few
+  # states can still place "Oslo, Norway" or "Sacramento, CA" at low precision. Kept: every
+  # country, dependency, region, county and localadmin; localities in the US, plus elsewhere the
+  # cities and towns and anything with a population of 1,000 or more. Bounding boxes come from
+  # the division_area polygons (the land area when a division has several). A US state's point is
+  # replaced by a point on its polygon where it falls outside it. Shared by every build.
+  resolve_overture
+  local out="${SHARED}/coarse/divisions_${OVERTURE_RELEASE}.parquet"
+  local areas="${SHARED}/coarse/areas_${OVERTURE_RELEASE}.parquet"
+  mkdir -p "$(dirname "$out")"
+  local base="s3://overturemaps-us-west-2/release/${OVERTURE_RELEASE}/theme=divisions"
+  coarse_areas "$areas" "$base"
+  if [[ -f "$out" ]]; then echo "have $(basename "$out")"; return 0; fi
+  duck <<SQL
+    INSTALL spatial; LOAD spatial; INSTALL httpfs; LOAD httpfs; SET s3_region='us-west-2';
+    CREATE TEMP TABLE area AS
+      SELECT division_id, bbox FROM (
+        SELECT division_id, bbox,
+               row_number() OVER (PARTITION BY division_id
+                                  ORDER BY coalesce(is_land, false) DESC,
+                                           coalesce(is_territorial, false), id) AS rn
+        FROM read_parquet('${base}/type=division_area/*', hive_partitioning=1)
+        WHERE subtype IN ('country', 'dependency', 'region', 'county', 'localadmin')) WHERE rn = 1;
+    -- the land polygon of each US state, to check the state's point against
+    CREATE TEMP TABLE us_region_poly AS
+      SELECT division_id, geometry FROM (
+        SELECT division_id, geometry,
+               row_number() OVER (PARTITION BY division_id
+                                  ORDER BY coalesce(is_land, false) DESC,
+                                           coalesce(is_territorial, false), id) AS rn
+        FROM read_parquet('${base}/type=division_area/*', hive_partitioning=1)
+        WHERE subtype = 'region' AND country = 'US') WHERE rn = 1;
+    COPY (
+      SELECT d.id, d.subtype, d.class, d.country, d.region,
+             d.names.primary AS name_primary, d.names.common['en'] AS name_en,
+             d.population,
+             CASE WHEN p.geometry IS NOT NULL AND NOT ST_Within(d.geometry, p.geometry)
+                  THEN ST_X(ST_PointOnSurface(p.geometry)) ELSE ST_X(d.geometry) END AS lon,
+             CASE WHEN p.geometry IS NOT NULL AND NOT ST_Within(d.geometry, p.geometry)
+                  THEN ST_Y(ST_PointOnSurface(p.geometry)) ELSE ST_Y(d.geometry) END AS lat,
+             list_filter(d.hierarchies[1], x -> x.subtype = 'county')[1].division_id AS county_id,
+             a.bbox.xmin AS xmin, a.bbox.ymin AS ymin, a.bbox.xmax AS xmax, a.bbox.ymax AS ymax
+      FROM read_parquet('${base}/type=division/*', hive_partitioning=1) d
+      LEFT JOIN area a ON a.division_id = d.id
+      LEFT JOIN us_region_poly p ON p.division_id = d.id AND d.subtype = 'region'
+      WHERE d.names.primary IS NOT NULL
+        AND (d.subtype IN ('country', 'dependency', 'region', 'county', 'localadmin')
+             OR (d.subtype = 'locality'
+                 AND (d.country = 'US' OR d.class IN ('city', 'town') OR d.population >= 1000)))
+      ORDER BY d.id
+    ) TO '${out}.part' (FORMAT parquet, COMPRESSION zstd);
+SQL
+  mv "${out}.part" "$out"
+  # the loader reads exactly one release; drop the ones from older releases
+  find "$(dirname "$out")" -maxdepth 1 -name 'divisions_*.parquet' ! -name "$(basename "$out")" -delete
+  echo "fetched $(basename "$out") ($(du -h "$out" | cut -f1))"
+}
+
 # "latest" -> the newest daily Protomaps build, from build-metadata.protomaps.dev.
 resolve_protomaps() {
   [[ "$PROTOMAPS_BUILD" == latest ]] || return 0
@@ -316,13 +403,44 @@ basemap() {
   echo "fetched $(basename "$out") ($(du -h "$out" | cut -f1))"
 }
 
+# The low-zoom world basemap, so the demo map shows the whole globe when zoomed out instead of
+# only the build's region. One file serves every build, so it lives in shared/ and is not part of
+# "all". Zoom 6 is about 45 MB (zoom 5 is 15 MB, zoom 7 is 190 MB); web/js/map.js draws it below
+# zoom 7 and the regional file above. Serve it as /tiles/world.pmtiles and add
+# "world_tiles": "/tiles/world.pmtiles" to region.json (docs/CONFIGURATION.md).
+WORLD_MAXZOOM=6
+
+basemap_world() {
+  if ! command -v pmtiles >/dev/null 2>&1; then
+    echo "basemap_world: skipped, pmtiles is not installed (only the demo page's map needs it)"
+    return 0
+  fi
+  local out="${SHARED}/basemap/world-z${WORLD_MAXZOOM}.pmtiles"
+  if [[ -s "$out" ]]; then
+    echo "basemap_world: $(basename "$out") already present, skipping"
+    return 0
+  fi
+  mkdir -p "$(dirname "$out")"
+  resolve_protomaps
+  local src="https://build.protomaps.com/${PROTOMAPS_BUILD}.pmtiles"
+  if ! curl -fsS -o /dev/null -r 0-0 "$src"; then
+    echo "fetch_data: the pinned Protomaps build ${PROTOMAPS_BUILD} is not available." >&2
+    echo "  Re-pin PROTOMAPS_BUILD to a recent date, then run this target again." >&2
+    return 1
+  fi
+  # No --bbox: the whole world, down to WORLD_MAXZOOM only.
+  pmtiles extract "$src" "${out}.part" --maxzoom="$WORLD_MAXZOOM"
+  mv "${out}.part" "$out"
+  echo "fetched $(basename "$out") ($(du -h "$out" | cut -f1))"
+}
+
 targets=("${@:-all}")
 echo "build ${build}: states ${states// /, }"
 for t in "${targets[@]}"; do
   case "$t" in
-    all) wof; neighbours; boundary; zcta; osm; gnis; oa; overture; basemap ;;
-    osm|gnis|oa|wof|neighbours|zcta|boundary|overture|overture_themes|basemap) "$t" ;;
-    *) echo "usage: $0 [--build NAME] [all|osm|gnis|oa|wof|neighbours|zcta|boundary|overture|overture_themes|basemap]" >&2
+    all) wof; neighbours; boundary; zcta; coarse; osm; gnis; oa; overture; basemap ;;
+    osm|gnis|oa|wof|neighbours|zcta|coarse|boundary|overture|overture_themes|basemap|basemap_world) "$t" ;;
+    *) echo "usage: $0 [--build NAME] [all|osm|gnis|oa|wof|neighbours|zcta|coarse|boundary|overture|overture_themes|basemap|basemap_world]" >&2
        exit 2 ;;
   esac
 done

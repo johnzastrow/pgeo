@@ -25,7 +25,7 @@ from urllib.parse import urlparse
 
 import asyncpg
 
-from pgeo.load import sources
+from pgeo.load import coarse, sources
 from pgeo.regions import Region, region, stack_env
 from pgeo.settings import DATA_DIR, SECRETS_FILE, SQL_DIR, Settings, _read_env_file
 
@@ -139,6 +139,37 @@ async def take_build_lock(con: asyncpg.Connection) -> None:
         )
 
 
+async def stage_coarse(con: asyncpg.Connection, reg: Region, counts: dict[str, int]) -> None:
+    """Stage the worldwide coarse tier (load/coarse.py), unless it is switched off or absent.
+
+    PGEO_COARSE=0 turns it off. Without the tier the build is what it was before: stage_coarse
+    stays empty and 030_enrich_index.sql inserts nothing from it.
+    """
+    if os.environ.get("PGEO_COARSE", "1").strip() == "0":
+        log("coarse tier skipped: PGEO_COARSE=0")
+        return
+    f = STAGE_DIR / "coarse.csv"
+    n, by_layer, note = await asyncio.to_thread(
+        coarse.build_csv, f, reg, reg.all_state_rows(), STAGE_DIR
+    )
+    if not n:
+        log(f"coarse tier skipped: {note}")
+        return
+    await copy_csv(con, "stage_coarse", coarse.STAGE_COARSE_COLS, f)
+    counts["coarse"] = n
+    log(f"staged coarse: {n:,} ({', '.join(f'{k} {v:,}' for k, v in sorted(by_layer.items()))})")
+    if note:
+        log(f"coarse tier: {note}")
+    fa = STAGE_DIR / "coarse_area.csv"
+    na = await asyncio.to_thread(coarse.build_areas_csv, fa)
+    if na:
+        await copy_csv(con, "stage_coarse_area", "source_id, layer, wkb_hex", fa)
+        counts["coarse_areas"] = na
+        log(f"staged coarse boundaries: {na:,}")
+    else:
+        log(f"coarse boundaries skipped: no areas file in {coarse.COARSE_DIR} (run scripts/fetch_data.sh coarse)")
+
+
 async def build(settings: Settings, selected: list[str], reg: Region) -> None:
     STAGE_DIR.mkdir(parents=True, exist_ok=True)
     log(f"build {reg.build}: {', '.join(reg.states)}")
@@ -179,6 +210,7 @@ async def build(settings: Settings, selected: list[str], reg: Region) -> None:
                                 else sources.csv_source(name, f, reg))
                 await copy_csv(con, "stage_point", sources.STAGE_POINT_COLS, f)
                 log(f"staged {name}: {counts[name]:,}")
+        await stage_coarse(con, reg, counts)
         await run_sql(con, "022_stage.sql")
         timings["stage"] = time.time() - step
 
@@ -201,12 +233,16 @@ async def build(settings: Settings, selected: list[str], reg: Region) -> None:
         log("enriched and indexed")
 
         stats = await con.fetch("SELECT layer, count(*) AS n FROM feature GROUP BY layer ORDER BY 2 DESC")
+        # What the coarse tier added, by layer: features_by_layer counts every row.
+        coarse_stats = await con.fetch(
+            "SELECT layer, count(*) AS n FROM feature WHERE coarse GROUP BY layer ORDER BY 2 DESC")
         info = {
             "build": reg.build,
             "states": list(reg.states),
             "sources": selected,
             "raw_counts": counts,
             "features_by_layer": {r["layer"]: r["n"] for r in stats},
+            "coarse_by_layer": {r["layer"]: r["n"] for r in coarse_stats},
             "timings_s": {k: round(v, 1) for k, v in timings.items()},
             "built_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         }
@@ -214,7 +250,9 @@ async def build(settings: Settings, selected: list[str], reg: Region) -> None:
         # Staging and raw tables are not needed at query time (~300 MB).
         # admin_parts is the subdivided copy the point-in-polygon step probes; nothing reads it
         # at query time (030_enrich_index.sql).
-        await con.execute("DROP TABLE stage_admin, stage_point, feature_raw, admin_parts")
+        await con.execute(
+            "DROP TABLE stage_admin, stage_point, stage_coarse, stage_coarse_area, feature_raw, admin_parts"
+        )
 
         # Atomic swap + function rebuild (functions depend on the pgeo table types).
         await ensure_api_role(con)

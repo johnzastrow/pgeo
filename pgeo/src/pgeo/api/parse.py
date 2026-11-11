@@ -93,8 +93,19 @@ class RuleParser:
     """Small US-address parser. Towns are recognized from the loaded admin names."""
 
     def __init__(self, localities: set[str], states: dict[str, str] | None = None,
-                 town_states: dict[str, set[str]] | None = None) -> None:
-        self.localities = localities  # normalized, lowercase
+                 town_states: dict[str, set[str]] | None = None,
+                 home_localities: set[str] | None = None,
+                 home_states: set[str] | None = None) -> None:
+        self.localities = localities  # normalized, lowercase: every town, worldwide tier included
+        # The build's own towns. A state name is the state unless it is also one of these, and a
+        # typo is corrected to one of these: towns called Maine or Georgia exist elsewhere, and the
+        # worldwide towns number in the hundreds of thousands. Mirrors the `coarse` flag on
+        # pgeo.town; without it every town counts as the build's own, as before the tier.
+        self.home_localities = localities if home_localities is None else home_localities
+        # Postal codes of the states the build holds. A state outside them is taken from a query
+        # only with a comma and a known town before it ("Sacramento, CA"): MD, PA, MS and IN end
+        # names and credentials as often as they name a state. None = every state is the build's.
+        self.home_states = home_states
         # town name -> the states it is in, for the typo fallback. Empty is fine: the fallback
         # then behaves as it did before, preferring the closest spelling in any state.
         self.town_states = town_states or {}
@@ -102,7 +113,7 @@ class RuleParser:
         # Towns grouped by (word count, length), so the typo search below compares against a
         # handful of names instead of all of them.
         self._by_shape: dict[tuple[int, int], list[str]] = {}
-        for t in localities:
+        for t in self.home_localities:
             self._by_shape.setdefault((len(t.split()), len(t)), []).append(t)
         # Lower-case spelling -> postal abbreviation, for every state this build covers: {"me":
         # "ME", "maine": "ME"}. It used to be the literal {"me", "maine"}, which on a New York
@@ -110,6 +121,13 @@ class RuleParser:
         # "350 5th Ave, New York, NY" into a search for 350 New York Ave.
         self.states = states or {}
         self.max_state_words = max((len(x.split()) for x in self.states), default=1)
+
+    def town_in_state(self, ws: list[str], code: str) -> bool:
+        """Does this word list end with a town that is in state `code`? Mirrors the SQL parser."""
+        for k in range(1, min(self.max_words, len(ws)) + 1):
+            if code in self.town_states.get(" ".join(ws[-k:]).lower().strip("."), ()):
+                return True
+        return False
 
     def town_fuzzy(self, cand: str, want_state: str | None = None) -> str | None:
         """The town `cand` is a misspelling of, or None. Mirrors geocode.town_fuzzy in SQL.
@@ -163,7 +181,10 @@ class RuleParser:
             return any(" ".join(ws[-k:]).lower() in self.localities
                        for k in range(1, min(self.max_words, len(ws)) + 1)) if ws else False
 
-        def is_state(tail: str, rest: list[str]) -> bool:
+        def is_home_state(code: str) -> bool:
+            return self.home_states is None or code in self.home_states
+
+        def is_state(tail: str, rest: list[str], prev: str | None = None, comma: bool = False) -> bool:
             """A trailing state, allowing for one that is also a town here.
 
             New York is both. What precedes decides: "North Woodmere, New York" names a town, so
@@ -172,10 +193,18 @@ class RuleParser:
             """
             if tail not in self.states:
                 return False
-            return tail not in self.localities or tail_is_town(rest)
+            if not is_home_state(self.states[tail]):
+                # A state the build does not hold. After a comma, a known town before it is enough;
+                # without one the town has to be in that state ("Sacramento CA"), because bare MD,
+                # PA and MS end names and credentials and no town of the name is in those states.
+                if comma:
+                    return prev is not None and prev.lower().strip(".") in self.localities
+                return self.town_in_state(rest, self.states[tail])
+            return tail not in self.home_localities or tail_is_town(rest)
 
         tail_part = parts[-1].lower().strip(".") if parts else ""
-        if is_state(tail_part, " ".join(parts[:-1]).split()):
+        if is_state(tail_part, " ".join(parts[:-1]).split(),
+                    parts[-2] if len(parts) > 1 else None, comma=True):
             p.state = self.states[tail_part]
             parts = parts[:-1]
             words = " ".join(parts).split()
@@ -192,10 +221,14 @@ class RuleParser:
                     if parts and parts[-1].lower().strip(".") == tail:
                         parts = parts[:-1]
                     break
+        # Worldwide towns count as localities only after a state the build does not hold; "Ter" and
+        # "Rd" are towns somewhere, and read as one they take a street's suffix away.
+        world = p.state is not None and not is_home_state(self.states.get(p.state.lower(), p.state))
+        towns = self.localities if world else self.home_localities
         # town: last comma part if it is a known town, else longest known suffix of words;
         # "number street, Town" keeps an unknown (possibly misspelled) last part as the town,
         # since the SQL compares towns fuzzily.
-        if len(parts) >= 2 and (parts[-1].lower() in self.localities or HN_RE.match(parts[0])):
+        if len(parts) >= 2 and (parts[-1].lower() in towns or HN_RE.match(parts[0])):
             p.locality = parts[-1]
             head = ", ".join(parts[:-1])
         else:
@@ -204,7 +237,7 @@ class RuleParser:
             # the town may be the whole remaining text ("Bangor ME")
             for n in range(min(self.max_words, len(lw)), 0, -1):
                 cand = " ".join(lw[-n:])
-                if cand in self.localities:
+                if cand in towns:
                     p.locality = " ".join(head.split()[-n:])
                     head = " ".join(head.split()[:-n])
                     break
