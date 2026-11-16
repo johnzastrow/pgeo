@@ -10,12 +10,12 @@
     "export": "slidev export --output ../docs/pgeo-slides.pdf"
   },
   "dependencies": {
-    "@slidev/cli": "^53.0.0",
+    "@slidev/cli": "^53.1.0",
     "@slidev/theme-default": "^0.25.0",
-    "vue": "^3.5.44"
+    "vue": "^3.5.45"
   },
   "devDependencies": {
-    "playwright-chromium": "^1.64.1"
+    "playwright-chromium": "^1.65.0"
   },
   "overrides": {
     "dompurify": "^3.4.17"
