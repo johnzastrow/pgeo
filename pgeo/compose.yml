@@ -65,7 +65,7 @@ services:
   rest:
     # Phase 13: logic-free HTTP gateway in front of the SQL API (schema geocode_api only).
     # Edge rewrites /v1/<endpoint> -> /rpc/v1_<endpoint> (see docs/HTTP_OPTIONS.md).
-    image: postgrest/postgrest:v16.5@sha256:1347d7552b88f17832912c06afbf7c43209af6eeeb60834b04aae12c9bd9d5cc
+    image: postgrest/postgrest:v16.6@sha256:5ce030c153500fe90ba157da4da8ba99ab51d3bc7b95e071bd0b544b67a632f7
     container_name: ${PGEO_STACK:-pgeo}_rest
     restart: unless-stopped
     depends_on:
